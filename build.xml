@@ -3,7 +3,7 @@
     <target name="build">
         <exec executable="tinker"><arg value="--build" /></exec>
         <exec executable="git"><arg value="checkout" /><arg value="gh-pages" /></exec>
-        <copy todir=".">
+        <copy todir="." override="true">
             <fileset dir="${basedir}/blog/html" />
         </copy>
         <exec executable="git"><arg value="add" /><arg value="." /></exec>
