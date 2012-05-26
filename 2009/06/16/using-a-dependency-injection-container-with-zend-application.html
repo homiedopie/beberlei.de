@@ -1,0 +1,292 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using a Dependency Injection Container with Zend_Application &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Netbeans PHP CodeSniffer Plugin: Now with Options Dialog" href="../../11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html" />
+    <link rel="prev" title="Explicit Code requires no comments - Only bad code does" href="../../05/01/explicit-code-requires-no-comments-only-bad-code-does.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2009-06-16-using-a-dependency-injection-container-with-zend-application">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="../../05/01/explicit-code-requires-no-comments-only-bad-code-does.html">Explicit Code requires no comments - Only bad code does</a>
+            </li>
+            <li class="right">
+                <a href="../../11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html">Netbeans PHP CodeSniffer Plugin: Now with Options Dialog</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>June 16, 2009</span> 
+        </div>
+    <div class="section" id="using-a-dependency-injection-container-with-zend-application">
+<h1>Using a Dependency Injection Container with Zend_Application</h1>
+<p>Much has been written on Dependency Injection lately, mostly by Padraic
+Brady
+(<a class="reference external" href="http://blog.astrumfutura.com/archives/394-The-Case-For-Dependency-Injection-Part-1.html">1</a>,
+<a class="reference external" href="http://blog.astrumfutura.com/archives/395-The-Case-For-Dependency-Injection-Part-2.html">2</a>)
+and Fabien Potencier
+(<a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">1</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/12/do-you-need-a-dependency-injection-container">2</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/13/introduction-to-the-symfony-service-container">3</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/14/symfony-service-container-using-a-builder-to-create-services">4</a>,
+<a class="reference external" href="http://github.com/fabpot/Pimple/tree/master">5</a>). My subjective
+feeling tells me there are now more PHP DI containers out there than CMS
+or ORMs implemented in PHP, including two written by myself (an
+<a class="reference external" href="http://www.beberlei.de/sphicy/">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
+one</a>). Its an awesome
+pattern if used on a larger scale and can (re-) wire a complex business
+application according to a clients needs without having to change much
+of the domain code. It aims at a complete seperation of object
+instantiation and dependency tracking from the business logic.</p>
+<p>Beginning with version 1.8 Zend Framework is able to integrate any of
+these DI containers into its <strong>Zend_Application</strong> component easily. The
+Application component intializes a set of common resources and pushes
+them into the MVC stack as additional Front Controller parameters.
+Technically a <strong>Zend_Registry</strong> instance holds all these resources with
+their respective resource names as keys. The resources are accessible
+inside the Front Controller and the Action Controller classes. Assume
+the resource &#8216;Db&#8217; is initialized in your application, you can access it
+with:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$front = Zend_Controller_Front::getInstance();
+$container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
+$db = $container-&gt;db;
+
+// or:
+class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $db = $container-&gt;db;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>This is pretty much dependency injection already, but the default
+registry approach suffers from two serious problem: New instances can
+only be added to the Container by implementing new Zend_Application
+resources and these instances cannot be lazy loaded. All resources used
+by Zend_Application are always loaded on every request. But the
+application container implementation was developed with Dependency
+Injection in mind and is not tied to the use of Zend_Registry. Only
+three magic methods are required by any container that wants to be
+Zend_Application compliant: __get(), __set() and __isset(). Each
+instantiated resource is pushed via __set() into the container. If
+required by another resource, __isset() is used to check wheater a
+resource with the given name exists inside the container and __get()
+is used to retrieve the instances from the container.</p>
+<p>Some month ago I extended
+<a class="reference external" href="http://github.com/beberlei/yadif/tree/master">Yadif</a>, a lightweight
+PicoContainer-like DI container for PHP written by Thomas McKelvey, with
+several features that make it a very powerful DI container in my
+opinion. It has a detailed documentation and examples on the GitHub Page
+if you want to check it out. I extended Yadif to be Zend_Application
+compliant in a way that the application-wide Zend_Application resources
+can be used as dependencies for objects that are lazy-loaded from the
+container. Skipping the tech-talk, here is an example. First we have to
+replace the default Container with Yadif:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
+$container = new Yadif_Container($objects);
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+// Set Yadif as Container
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();</pre>
+</div>
+</div></blockquote>
+<p>Assume you run Zend_Application with a &#8220;Db&#8221; and a &#8220;Cache&#8221; resource.
+These resources are loaded on every request. The objects configured in
+Yadif however are not instantiated until they are requested for the
+first time from the container. We can merge these two worlds and make
+use of the Application resources inside the Yadif Configuration
+&#8220;objects.xml&#8221;, which looks like:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>&lt;?xml version="1.0" ?&gt;
+&lt;objects&gt;
+    &lt;myModel&gt;
+        &lt;class&gt;MyModel&lt;/class&gt;
+        &lt;arguments arg1="db" arg2="cache" /&gt;
+    &lt;/myModel&gt;
+&lt;/objects&gt;</pre>
+</div>
+<p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
+the the Database and Cache resources as constructor arguments:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $myModel = $container-&gt;myModel;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Given the possibilites by the Yadif_Container you are now empowered
+to use Dependency Injection for all your application objects and
+make use of Zend_Applications resource system. Furthermore any
+other dependency injection container, simple or complex, can also be
+integrated easily.</p>
+</div></blockquote>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2009/06/16/using-a-dependency-injection-container-with-zend-application";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2009/06/16/using-a-dependency-injection-container-with-zend-application.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
+        </li>
+        <li>
+            <a href="../../02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

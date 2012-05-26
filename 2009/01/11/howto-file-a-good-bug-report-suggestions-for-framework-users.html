@@ -1,0 +1,230 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Howto file a good bug report: Suggestions for framework users &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="What will be new in ZF 1.8" href="what-will-be-new-in-zf-1-8.html" />
+    <link rel="prev" title="Finally: Zend_Mail charset and/or long lines header encoding bug fixed" href="../14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2009-01-11-howto-file-a-good-bug-report-suggestions-for-framework-users">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="../14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html">Finally: Zend_Mail charset and/or long lines header encoding bug fixed</a>
+            </li>
+            <li class="right">
+                <a href="what-will-be-new-in-zf-1-8.html">What will be new in ZF 1.8</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>January 11, 2009</span> 
+        </div>
+    <div class="section" id="howto-file-a-good-bug-report-suggestions-for-framework-users">
+<h1>Howto file a good bug report: Suggestions for framework users</h1>
+<p>I have fixed quite a number of bugs for the ZF lately, which lead me to
+this post about how to file a good bug report. There are many annoying
+bug reports out there, where the reporter of the bug withholds important
+information to the bugfixer unintended. This advice applies bug reports
+in general of course.</p>
+<p>What are the benefits of a good bug report? The bug generally gets fixed
+faster, when the developer has more information at hand. Additionally
+other developers might come to rescue since they can understand the
+issue faster. These benefits are good for both parties. If you take no
+time for a good bug report, your issue might risk to end up getting old
+or closed unfixed.</p>
+<ul class="simple">
+<li><strong>Post the whole Exception Stack Trace</strong>: If the library throws an
+Exception into your application that is unexpected and may indicate
+an bug: Do not post the Message or Exception name only. The exception
+may be thrown in many different places or due to different reasons.
+The PHP exception class offers the method <strong>getTraceAsString()</strong>,
+which offers many information to the developer what the cause of the
+exception might be. Please use it!</li>
+<li><strong>Post codefixes in a patch format</strong>: When you find a bug in the
+framework, it is quite possible that you can offer a fix directly.
+Writing &#8220;Replace x in line y with z&#8221; does not help very often. The
+component might be in flux and the line positions change more often
+than you think. Please create a diff file of this changes that
+indicate the precise position of the change. This diff also includes
+2 lines above and below the patched code for direction of the
+developer. SVN Diffs are even more useful since they include the
+revision where you fixed the bug in.</li>
+<li><strong>Post reproducible cases as PHPUnit Test</strong>: If you find a bug and
+can show how to reproduce it: Write a unittest to prove it. It is ZF
+policy to create a unittest for each bugfix showing that the bug was
+indeed fixed and previous functionality remains the same, so this
+unit-test has to be written anyways. Many show-offs rely on massive
+<strong>echo</strong> statements or <strong>var_dump</strong>, which render them almost
+useless for the developer.</li>
+<li><strong>Attach a unit-test to a submitted patch</strong>: This is related to the
+previous point. If you add a unit test your patch will get more
+attention. It will prove that you have thought about the patch, its
+consequences and that you might have checked it does not break
+backwards compatibility. This is worth a lot.</li>
+<li><strong>Run the test suite with your patch</strong>: If you want to provide a
+patch. Run the testsuite of the Zend Framework. It might break
+expected behaviour. When you post a patch that will break BC, it will
+be recognized. Your bug report might be closed, which helps nobody.</li>
+</ul>
+<p>When you find a bug you have probably thought about it and how to fix
+it. This is valuable information. Disregarding one of this points will
+lead to missing information on part of the developer that he has to
+&#8220;learn&#8221; again. This takes time, which may make your bug last longer than
+it should.</p>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
+        </li>
+        <li>
+            <a href="../../02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

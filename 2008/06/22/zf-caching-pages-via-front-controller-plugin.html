@@ -1,0 +1,242 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZF: Caching Pages via Front Controller Plugin &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="On Frameworks and Javascript Coupling" href="../21/on-frameworks-and-javascript-coupling.html" />
+    <link rel="prev" title="Multimediatreff on Frameworks" href="../25/multimediatreff-on-frameworks.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2008-06-22-zf-caching-pages-via-front-controller-plugin">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="../25/multimediatreff-on-frameworks.html">Multimediatreff on Frameworks</a>
+            </li>
+            <li class="right">
+                <a href="../21/on-frameworks-and-javascript-coupling.html">On Frameworks and Javascript Coupling</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>June 22, 2008</span> 
+        </div>
+    <div class="section" id="zf-caching-pages-via-front-controller-plugin">
+<h1>ZF: Caching Pages via Front Controller Plugin</h1>
+<p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
+Matthews post on Zend Devzone</a>)
+into the Whitewashing blog software via Zend_Cache and the Filesystem
+Backend. I ran some superficial Apache Benachmark tests to have a look
+at the gain change in performance.</p>
+<p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
+Devzone</a> and a missing function
+getCache() in the code fragment:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>public function getCache()
+{
+    if( ($response = $this-&gt;cache-&gt;load($this-&gt;key)) != false) {
+        return $response;
+    }
+    return false;
+}</pre>
+</div>
+</div></blockquote>
+<p>I loaded the Plugin into the front controller and initialized it with a
+Zend_Config_Ini object. This all works very smoothly and caching is
+ready to begin.</p>
+<p>Testing came to the result that with 1000 requests, 10 of them concurent
+(ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
+this blog, the request time dropped by half, from six to three seconds
+(still lot of time, but this isn&#8217;t the best webserver).</p>
+<div class="section" id="results-without-caching">
+<h2>Results without caching</h2>
+<div class="highlight-python"><pre>Requests per second:    1.49 [#/sec] (mean)
+Time per request:       6695.213 [ms] (mean)
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       26   30   4.0     30      43
+Processing:  1556 6452 3372.1   5511   14768
+Waiting:     1436 6129 3174.1   5145   14595
+Total:       1583 6483 3373.2   5538   14810</pre>
+</div>
+</div>
+<div class="section" id="results-with-caching">
+<h2>Results with caching</h2>
+<div class="highlight-python"><pre>Requests per second:    3.03 [#/sec] (mean)
+Time per request:       3304.534 [ms] (mean)
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       26   31   6.3     30      73
+Processing:   781 3214 1757.7   3103    7445
+Waiting:      650 3055 1731.4   2928    7190
+Total:        809 3245 1757.8   3135    7475</pre>
+</div>
+<p>As said before this testing is superficial, but its gives a broad sense
+of what perfomance gain is possible with just some lines of code and a
+temporary directory. Using memcache will probably speed up the process
+another good amount.</p>
+<p>Later I realized that complete page caching (rather than block element
+caching) sucks when you inject admin area linkes into the navigation,
+which would allow non-logged in users to see parts of the admin area so
+I had to disable caching totally. You never know in the first place (you
+should though). I have to rework my admin area or extend my
+authentication or the caching plugin somehow. This will probably be the
+topic another time.</p>
+</div>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2008/06/22/zf-caching-pages-via-front-controller-plugin";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2008/06/22/zf-caching-pages-via-front-controller-plugin.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
+        </li>
+        <li>
+            <a href="../../../2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

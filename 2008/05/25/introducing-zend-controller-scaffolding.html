@@ -1,0 +1,262 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introducing: Zend Controller Scaffolding &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="My 2 cents on Zend_Search_Lucene Update Problems" href="../18/my-2-cents-on-zend-search-lucene-update-problems.html" />
+    <link rel="prev" title="PDT: Back to easyeclipse with PHP extension" href="../../02/12/pdt-back-to-easyeclipse-with-php-extension.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2008-05-25-introducing-zend-controller-scaffolding">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="../../02/12/pdt-back-to-easyeclipse-with-php-extension.html">PDT: Back to easyeclipse with PHP extension</a>
+            </li>
+            <li class="right">
+                <a href="../18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>May 25, 2008</span> 
+        </div>
+    <div class="section" id="introducing-zend-controller-scaffolding">
+<h1>Introducing: Zend Controller Scaffolding</h1>
+<p>In the last couple of weeks I <a class="reference external" href="http://codecaine.co.za/posts/form-generation-with-zend-form-part-2/">came across the
+idea</a>
+of building a little component for scaffolding in Zend Framework. After
+playing around with this idea a little I came up with an
+Zend_Controller_Scaffolding object, which extends the
+Zend_Controller_Action object.</p>
+<p>It takes any Zend_Db_Table_Abstract object and generates create and
+update forms using Zend_Form and displays them in the Controller. The
+component is very easy to use, as this example shows:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You now have access to the following actions of the controller:
+some/create some/edit some/delete and some/index (some/list). They
+handle all your model editing dreams.</p>
+<p>All you have to own is the WW_Controller_Scaffolding Library Class and
+a folder of scaffolding view templates both of which are <a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">bundled in an
+archive you can
+download</a>.</p>
+<p><strong>Download</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">Download Version
+0.5.5</a></li>
+</ul>
+<p><strong>Changes</strong></p>
+<ul class="simple">
+<li>0.5.5: Put Component into own Namespace (WW = Whitewashing). Make it
+possible to hide fields in the list via the options. Allow to specify
+scaffolding view scripts folder via options.</li>
+</ul>
+<p><strong>Install &amp; Usage</strong></p>
+<blockquote>
+<div><div class="highlight-python"><pre>Untar the two folders include/ and views/ into your
+Zend Framework project application directory.
+
+Make sure the include folder is in your Zend_Loader
+include path or move the Scaffolding.php so that it
+is placed in your library include path.
+
+Define each Controller that should be a Scaffolding Interface
+as:
+
+class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}
+
+Where $options is an array or Zend_Config object with any of the following keys:
+
+  'allow_edit_primary_key' True/false - Wheater the form allows you to set the
+                          Primary Key fields or not
+
+ 'field_names' an Array of the Database Tables field names mapped to Label Names
+
+ 'hide_list_fields' Array of database table field names that should not be displayed in the list overview.
+
+ 'checkbox' an Array of Database Table field names that should be represented
+            as Checkbox. Useful for TINYINT(1) fields that represent boolean decisions.
+
+ 'view_folder' Sometimes you want to use different views for scaffolding in one project. Use
+               this variable and copy the scaffolding folder for each component you want to
+               change the view basics for.</pre>
+</div>
+</div></blockquote>
+<p><strong>Todos &amp; Problems:</strong></p>
+<ul class="simple">
+<li>Many To Many Relationsships are not implemented yet (Using
+MultiSelec).</li>
+<li>Compound Keys are probably not working correctly</li>
+<li>Relationsships on non-primary key fields probably don&#8217;t work as
+expected</li>
+<li>Relationsships with lots of data are not scaled down for easy
+administration.</li>
+</ul>
+<p>Please report any bugs and feature requests or recommodations to
+<strong>kontakt at beberlei dot de</strong>.</p>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2008/05/25/introducing-zend-controller-scaffolding";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2008/05/25/introducing-zend-controller-scaffolding.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
+        </li>
+        <li>
+            <a href="../../../2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
