@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/05/26/doctrine_goes_mit
    2012/02/25/symfony2_controller_testing
    2010/02/07/resources-for-a-php-and-hudson-ci-integration
    2010/05/02/testing-database-locks-with-phpunit-and-gearman
