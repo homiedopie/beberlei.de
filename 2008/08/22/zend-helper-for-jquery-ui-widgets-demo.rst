@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Zend Helper for jQuery UI Widgets Demo
 ======================================
@@ -22,3 +18,8 @@ and elements will follow when I finished these components.
 just finished in their first versions. I committed the classes to `the
 SVN <http://www.beberlei.de/dev/svn/ZendX_JQuery>`_ so you can already
 check them if you want.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

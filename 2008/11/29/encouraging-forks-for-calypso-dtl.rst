@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Encouraging forks for Calypso DTL
 =================================
@@ -16,3 +12,8 @@ compiling and parsing. I created a `GITHub Project for Calypso
 DTL <http://github.com/beberlei/calypsodtl/tree/master>`_, so
 collaborative development is very easy and added general TODOS to the
 README.txt that is on the front page of github project page.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

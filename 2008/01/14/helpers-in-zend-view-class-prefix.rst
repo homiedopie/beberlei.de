@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Helpers in Zend_View: Class Prefix
 ==================================
@@ -40,3 +36,8 @@ Zend\_Controller\_Action you have to do something like this:
             }
         }
 
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

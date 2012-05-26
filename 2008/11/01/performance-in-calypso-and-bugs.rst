@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Performance in Calypso (and Bugs)
 =================================
@@ -20,3 +16,8 @@ Additionally there are some bugs:
 
 I sadly have no time currently to fix any of the issues poping up with
 Calypso, so please don't use it for anything production.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

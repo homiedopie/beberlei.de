@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Wrestling with Dojo
 ===================
@@ -26,3 +22,8 @@ In general I think the Dojos Site is too complex and hard to navigate.
 The layout seems to change massivly on each click and you it is hard
 recognize common patterns. Dear Dojo Team, please make your project more
 accessible!
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

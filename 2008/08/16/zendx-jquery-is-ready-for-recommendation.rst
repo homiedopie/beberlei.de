@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ZendX_JQuery is Ready for Recommendation
 ========================================
@@ -21,3 +17,8 @@ some additional Use-Case scenarios to ensure proper working. You can
 `find the current
 version <http://www.beberlei.de/dev/svn/ZendX_JQuery>`_ at my SVN
 repository.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

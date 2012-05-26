@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Bad news: jQuery UI 1.6 ships without Spinner and AutoComplete
 ==============================================================
@@ -21,3 +17,8 @@ have known bugs and problems.
 I am adding a compability table to the ZendX jQuery manual today that
 will make its way to the manual of the 1.7.2 release. This will
 hopefully help and guide everyone to the correct dependencies.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

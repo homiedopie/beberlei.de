@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 New Calypso DTL Version 0.2
 ===========================
@@ -11,3 +7,8 @@ a little bit, so that you can now `download version
 0.2 <http://www.beberlei.de/sources/calypso-dtl-0.2.tar.gz>`_ of the
 `Calypso DTL template engine <http://www.beberlei.de/calypso>`_. Have
 fun.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

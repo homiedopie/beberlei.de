@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Knights Tour using Warndorff's rule
 ===================================
@@ -13,3 +9,8 @@ some time for me to realize it in PASCAL though using a **RECORD** type
 to match the jumps to the number of free fields and then sort them. You
 can view my source code
 `here <http://www.beberlei.de/sources/knightstour.txt>`_.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

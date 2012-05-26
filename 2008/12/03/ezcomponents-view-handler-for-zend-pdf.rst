@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ezComponents View Handler for Zend_Pdf
 ======================================
@@ -158,3 +154,8 @@ and look like the following:
         }
 
 There you go!
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

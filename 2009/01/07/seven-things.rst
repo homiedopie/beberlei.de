@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Seven Things
 ============
@@ -57,3 +53,8 @@ else, still for the head count:
 -  `Petr Pisl <http://blogs.sun.com/netbeansphp/>`_ because of the
    awesome NetBeans PHP support.
 
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

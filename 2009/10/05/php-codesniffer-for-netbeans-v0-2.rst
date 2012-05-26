@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 PHP CodeSniffer for Netbeans v0.2
 =================================
@@ -35,3 +31,8 @@ direction\*)?] By default the Zend Coding Standard is used.
 file .netbeans/6.7/config/Preferences.properties setting
 "phpcs.CodingStandard=". Additionally I fixed several bugs with the
 inline highlighting that did not refresh when lines in the file changed.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

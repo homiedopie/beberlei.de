@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Trying a Two Step PEAR/PHAR approach to develop and deploy
 ==========================================================
@@ -245,3 +241,8 @@ deployment process would then be as easy as:
 
 If you need the ability to go back to any version of your application
 you could make use of symlinks.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

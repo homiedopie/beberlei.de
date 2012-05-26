@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Resources for a PHP and Hudson CI Integration
 =============================================
@@ -78,3 +74,8 @@ instance. See this tutorial by one of the `Hudson + Netbeans
 Developers <http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6>`_.
 You can then start all the builds from inside Netbeans and be notified
 of the success or failure.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

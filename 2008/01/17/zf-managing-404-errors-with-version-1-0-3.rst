@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ZF: Managing 404 Errors with Version 1.0.3
 ==========================================
@@ -65,3 +61,8 @@ renamed, my current snippet is:
             }
 
 I hope someone needs this as much as me.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

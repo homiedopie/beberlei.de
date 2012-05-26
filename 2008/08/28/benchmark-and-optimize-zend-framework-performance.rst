@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Benchmark and Optimize Zend Framework Performance
 =================================================
@@ -84,3 +80,8 @@ is a job to hard to do you can still get lots of performance gain out of
 your application by fixing the include path, using Zend Loaders Autoload
 and stripping all require\_once calls from all of the Zend Framework
 files.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Constructions...
 ================
@@ -12,3 +8,8 @@ shortly. I am programming this whole blog using the `Zend
 Framework <http://framework.zend.com>`_ to have a bit of learning
 experience. It will take some more time than if I would do it in "the
 old ways".
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

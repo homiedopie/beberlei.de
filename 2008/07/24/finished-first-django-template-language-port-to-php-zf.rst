@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Finished first Django Template Language Port to PHP + ZF
 ========================================================
@@ -12,3 +8,8 @@ Language <http://www.djangoproject.com>`_ Clone for PHP implementing the
 proposal <http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Dtl+-+Benjamin+Eberlei>`_
 is up and running on the ZF Wiki. The source code can be downloaded from
 my `svn repository <http://www.beberlei.de/dev/svn>`_.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

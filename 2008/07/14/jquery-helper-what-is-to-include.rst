@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 jQuery Helper - What is to include?
 ===================================
@@ -34,3 +30,8 @@ this.
 
 My proposal is currently in the workings and will be on the ZF Wiki in
 the next couple of hours.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

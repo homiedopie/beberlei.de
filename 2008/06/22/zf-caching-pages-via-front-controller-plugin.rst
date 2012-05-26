@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ZF: Caching Pages via Front Controller Plugin
 =============================================
@@ -77,3 +73,8 @@ I had to disable caching totally. You never know in the first place (you
 should though). I have to rework my admin area or extend my
 authentication or the caching plugin somehow. This will probably be the
 topic another time.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

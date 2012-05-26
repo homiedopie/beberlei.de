@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ezComponents 2008.2 Beta - Mvc separation for win
 =================================================
@@ -53,3 +49,8 @@ Now all the the logic that is potentially in the controller is completly
 seperated from the view handling that may depend on the routing
 information not on the controller. And views can be tested seperatly
 from the controller result. Testability is very high.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

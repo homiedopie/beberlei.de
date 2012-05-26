@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 My 2 cents on Zend_Search_Lucene Update Problems
 ================================================
@@ -49,3 +45,8 @@ Lucene <http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_
 (given abote) uses an extended version of this delete routine snippet
 that also checks if an article is up to date and does not have to be
 reindexed and deletes multiple entries of one article.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

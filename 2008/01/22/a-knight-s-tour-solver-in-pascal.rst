@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 A knight's tour solver in pascal
 ================================
@@ -26,3 +22,8 @@ problem set.
 Tour <http://mathworld.wolfram.com/KnightsTour.html>`_
  `Presentation Knights Tour (German
 Language) <http://www.zaik.uni-koeln.de/AFS/teachings/ss07/InfoSeminar/handout/leonid_torgovitski_nknighttours.pdf>`_
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

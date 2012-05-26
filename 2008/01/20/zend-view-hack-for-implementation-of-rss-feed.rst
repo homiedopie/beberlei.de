@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Zend_View Hack for implementation of RSS Feed
 =============================================
@@ -18,3 +14,8 @@ Before you start cursing the world try this (rather obvious) workaround:
 
         <?php echo '<?xml version="1.0" encoding="ISO-8859-1"?>'; ?>
 
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

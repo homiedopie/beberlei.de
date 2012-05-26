@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 A knight's tour solver in pascal - supplement
 =============================================
@@ -20,3 +16,8 @@ seconds. Using the same order for an 8x8 board gets me stuck in endless
 tries again. I see its important to implement the `Warnsdorff's
 algorithm <http://en.wikipedia.org/wiki/Warnsdorff's_algorithm>`_,
 perhaps I will do so.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

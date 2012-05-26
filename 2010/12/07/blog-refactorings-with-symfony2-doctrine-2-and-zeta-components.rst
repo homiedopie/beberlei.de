@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components
 ===============================================================
@@ -25,3 +21,8 @@ My next plans for the blog bundle are:
 * Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.
 
 Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

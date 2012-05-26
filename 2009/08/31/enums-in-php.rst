@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Enums in PHP
 ============
@@ -95,3 +91,8 @@ Now you could nice things such as:
         doStuff($a);
 
 What are your thoughts?
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

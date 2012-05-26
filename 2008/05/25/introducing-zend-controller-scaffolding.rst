@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Introducing: Zend Controller Scaffolding
 ========================================
@@ -93,3 +89,8 @@ download <http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.g
 
 Please report any bugs and feature requests or recommodations to
 **kontakt at beberlei dot de**.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

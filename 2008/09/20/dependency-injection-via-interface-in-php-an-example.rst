@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Dependency Injection via Interface in PHP: An example
 =====================================================
@@ -92,3 +88,8 @@ dependencies for each new class generation but rather inverts the usage
 of a registry. It should be an easy task to extend the registering
 method to decide between new class generation and using the globally
 registered class instance.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

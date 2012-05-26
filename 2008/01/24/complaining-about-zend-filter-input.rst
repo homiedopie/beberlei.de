@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Complaining about Zend_Filter_Input
 ===================================
@@ -44,3 +40,8 @@ friendly messages one had to make child objects of each of the
 Validators and edit the error messages accordingly. I avoid this by
 printing my own errors from outside the Zend\_Filter\_Input, rather than
 using the object for what it is propably supposed to do.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

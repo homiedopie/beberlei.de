@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Using Symfony Dependency Injection with Zend_Application
 ========================================================
@@ -50,3 +46,8 @@ Access to a MyModel instance with its dependencies is then granted
 through the call **$container->myModel** throughout the application.
 Make sure to call this after running Zend\_Application::bootstrap, so
 that the Resource dependencies are injected first.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

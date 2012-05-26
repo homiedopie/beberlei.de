@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Generate Proxy code using a stream wrapper
 ==========================================
@@ -129,3 +125,8 @@ The stream wrapper to make this work looks like this:
     }
 
 What do you think about this approach? Are there any potential problems I am not seeing?
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

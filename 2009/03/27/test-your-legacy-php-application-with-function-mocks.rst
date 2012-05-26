@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Test your Legacy PHP Application with Function Mocks!
 =====================================================
@@ -82,3 +78,8 @@ Runkit.
     Additionally what the real killer for runkit would be: The
     possibility to insert PHP callbacks instead of real PHP code into
     the **runkit\_function\_redefine**.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

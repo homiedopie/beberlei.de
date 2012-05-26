@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 First impressions on Zend_Soap and a basic implementation
 =========================================================
@@ -103,3 +99,8 @@ this simple lines:
     PHP5's internal SOAP Service and might therefore gain widespread
     use. I have never tested PEAR's WSDL Autodiscovery, so i cannot draw
     comparissons.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

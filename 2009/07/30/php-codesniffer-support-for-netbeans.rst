@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 PHP CodeSniffer Support for Netbeans
 ====================================
@@ -34,3 +30,8 @@ I hope to get more familiar with Netbeans in the future to add some more
 PHP tools and enhance Code Sniffer support.
 
 .. |image0| image:: http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/netbeans_cs_support.png
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

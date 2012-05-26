@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Explicit Code requires no comments - Only bad code does
 =======================================================
@@ -172,3 +168,8 @@ go.
     **Update:** Fixed a creepy copy-paste code bug, thanks to azeroth
     for pointing out. Moved methods around a bit to be more reading
     friendly.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

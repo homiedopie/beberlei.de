@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Teaching Zend_Form some MVC
 ===========================
@@ -185,3 +181,8 @@ a field key level, which is not currently done.
 
     Isnt that nice? Now each part of the equation is doing what its
     supposed to do.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

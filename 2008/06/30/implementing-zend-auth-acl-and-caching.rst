@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Implementing Zend Auth, Acl and Caching
 =======================================
@@ -46,3 +42,8 @@ Plugin <http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Fr
         }
 
 This prevents caching for registered identities.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Zend_Form and the Model: Yet another perspective using a Mediator
 =================================================================
@@ -180,3 +176,8 @@ performed on the same model. For this case you might want to either:
 There is still some overhead on using the mediator. Since its generic
 you could build an Action Helper for it and use the direct call
 mechanism to save some lines of code.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

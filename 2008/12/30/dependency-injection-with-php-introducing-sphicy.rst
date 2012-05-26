@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Dependency Injection with PHP: Introducing Sphicy
 =================================================
@@ -126,3 +122,8 @@ Have a look at the `Sphicy Website <http://www.beberlei.de/sphicy>`_ and
 `FAQ <http://www.beberlei.de/sphicy/documentation/faq.html>`_ to see
 more examples and information about the possibilites of this dependency
 injection framework.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

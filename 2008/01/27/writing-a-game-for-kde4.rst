@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Writing a Game for KDE4
 =======================
@@ -31,3 +27,8 @@ semesters final exams in the first place.
 
 **Update:** Moruba seems to have different rules than the game we are
 playing. I will elaborate on that soon.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

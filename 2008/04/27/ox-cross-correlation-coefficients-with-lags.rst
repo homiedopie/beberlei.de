@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Ox: Cross-correlation coefficients with lags
 ============================================
@@ -63,3 +59,8 @@ lag length:
         }
 
 It may prove useful to someone.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

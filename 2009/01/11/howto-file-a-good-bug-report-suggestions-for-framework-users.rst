@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Howto file a good bug report: Suggestions for framework users
 =============================================================
@@ -57,3 +53,8 @@ it. This is valuable information. Disregarding one of this points will
 lead to missing information on part of the developer that he has to
 "learn" again. This takes time, which may make your bug last longer than
 it should.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

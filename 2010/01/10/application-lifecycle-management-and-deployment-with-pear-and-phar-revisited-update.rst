@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) *UPDATE*
 =======================================================================================
@@ -152,3 +148,8 @@ Also after apinsteins comment on "pear config-create" I rewrote the
 generate-project parts to use the config-create functionality
 internally, which allowed me to throw away half of the self-written
 code. Thanks!
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Testing Database Locks with PHPUnit and Gearman
 ===============================================
@@ -141,3 +137,8 @@ The code for this steps could look like:
 
 Now if both workers are waiting for processing the task we can run this
 test and get a green bar for a working lock support.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

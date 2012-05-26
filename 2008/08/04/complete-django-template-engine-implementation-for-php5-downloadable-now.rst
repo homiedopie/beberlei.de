@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Complete Django Template Engine Implementation for PHP5 - Downloadable Now
 ==========================================================================
@@ -32,3 +28,8 @@ neat functionality and stricter View / Controller logic seperation.
 See it here: `Calypso Site <http://www.beberlei.de/calypso/>`_. I have
 put up a little tutorial how to get the Template Engine running with
 Zend Framework and as a standalone component.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

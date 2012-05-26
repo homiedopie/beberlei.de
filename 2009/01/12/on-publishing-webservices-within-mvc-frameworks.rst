@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 On Publishing Webservices within MVC Frameworks
 ===============================================
@@ -79,3 +75,8 @@ So what are good practices to implement webservices?
 If you follow these simple rules, you should get around the performance
 issues that generally come with webservices, without loosing flexibility
 at all.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

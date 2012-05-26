@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill
 ============================================================
@@ -90,3 +86,8 @@ post.
 
 AutoFill and Tooltip extensions will be topic of the next installments
 of this series, so be aware of new content soonish.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

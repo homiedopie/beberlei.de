@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Git is great: Helping out with MutateMe
 =======================================
@@ -30,3 +26,8 @@ beginning to write a complete Runner now that calls all three components
 `PHPUnit <http://www.phpunit.de>`_, `PDepend <http://www.pdepend.org>`_
 and CodeSniffer at once and directly processes the results. When this is
 done, I will pack it all up as a PEAR package for anyone to test out.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

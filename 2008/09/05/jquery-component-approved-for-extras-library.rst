@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 jQuery Component approved for extras library
 ============================================
@@ -31,3 +27,8 @@ Since this component also includes helpers for the jQuery UI Widgets 1.6
 release (which is not released yet), a little waiting time before
 release is still good. I hope this all works out and the jQuery UI 1.6
 release is in the Google CDN, when ZF 1.7 comes out.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

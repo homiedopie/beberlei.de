@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 DojoX Django Template Language Example with Data from PHP/JSON
 ==============================================================
@@ -36,3 +32,8 @@ Language component filled with data from a JSON GET Response:
             echo json_encode($food);
             ?>
 
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

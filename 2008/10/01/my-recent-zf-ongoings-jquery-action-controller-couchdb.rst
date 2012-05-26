@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 My recent ZF ongoings: JQuery, Action Controller, CouchDb
 =========================================================
@@ -44,3 +40,8 @@ on `Matthews <http://github.com/weierophinney/phly/tree/master>`_ and
 integrates lots of stuff of the Zym component).
 
 
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ZF jQuery Helper - First Prototype Ready
 ========================================
@@ -14,3 +10,8 @@ and implements all the advertised features. I also implemented 2 demos
 that nicely present the functionality.
 
 Please test and comment!
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Updating from KDE3.5 to KDE4 with Mac-Style Menubars
 ====================================================
@@ -12,3 +8,8 @@ upgrade installer like I did) you end up with no menubars at all.
 To solve this little issue find a variable "macStyle = true" in the
 /home/username/.kde/share/config/kdeglobals file and switch it to
 macStyle = false and you have your menubars back.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

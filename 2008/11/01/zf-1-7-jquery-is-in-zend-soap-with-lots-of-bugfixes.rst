@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.
 ======================================================
@@ -25,3 +21,8 @@ You can now choose between several strategies to evaluate complex types
 in WSDL Autodiscovering. Array of Datatypes (simple or complex) via
 type[] syntax and complex objects can be parsed differently now based on
 settings.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Integrated Zend_Layout into this blog
 =====================================
@@ -53,3 +49,8 @@ The NavigationController looks like this:
 
 The layout.pthml then just calls certain named sections, for example <=?
 $this->layout()->secondaryNavigation; ?>
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

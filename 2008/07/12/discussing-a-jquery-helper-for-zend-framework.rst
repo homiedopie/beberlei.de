@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Discussing a jQuery Helper for Zend Framework
 =============================================
@@ -47,3 +43,8 @@ stating that a CDN is planned for the jQuery UI library. Sadly this does
 not include plugins for which one might desperatly need a View Helper
 except for maybe the Date Picker. I will post further comments on this
 issue in the near future.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

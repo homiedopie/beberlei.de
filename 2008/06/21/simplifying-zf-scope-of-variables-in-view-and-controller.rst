@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Simplifying ZF: Scope of Variables in View and Controller
 =========================================================
@@ -50,3 +46,8 @@ $this->variable. I haven't tested this though.
             }
         }
 
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

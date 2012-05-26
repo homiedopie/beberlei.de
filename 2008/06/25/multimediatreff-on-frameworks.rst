@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Multimediatreff on Frameworks
 =============================
@@ -45,3 +41,8 @@ implementation.
 The pizza battle, mysteriously announced by the host, was another
 highlight, as well as the drinks and snacks in between. All in all I can
 highly recommend the Multimediatreff for the next time.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

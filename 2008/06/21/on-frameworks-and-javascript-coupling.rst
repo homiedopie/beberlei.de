@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 On Frameworks and Javascript Coupling
 =====================================
@@ -36,3 +32,8 @@ Larger Javascript components like Popup Calendars, Autocomplete and the
 like are harder to integrate than in Rails or cakePHP, but thinking
 about the problem a little longer leads to powerful reusable solutions,
 that save time on integration after the first initial setup.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

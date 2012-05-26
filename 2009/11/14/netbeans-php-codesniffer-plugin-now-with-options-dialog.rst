@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Netbeans PHP CodeSniffer Plugin: Now with Options Dialog
 ========================================================
@@ -28,3 +24,8 @@ You can download the new version from the `Github Project Downloads
 page <http://github.com/beberlei/netbeans-php-enhancements/downloads/>`_.
 
 .. |image0| image:: http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/phpcsoptions.png
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

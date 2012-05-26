@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 What will be new in ZF 1.8
 ==========================
@@ -25,3 +21,8 @@ to the newly added WSDL type detection strategies.
 
 Additionally I went on another bug killing spree and fixed around 20-30
 old bugs in a wide range of different components.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Exim4 and Virtual Users .forward Files
 ======================================
@@ -47,3 +43,8 @@ Now each virtual user is using the .forward file in its actual system
 user account home directory. The next problem was: $home is not defined
 in this case in the .forward file syntax: Its empty. So replacing $home
 with its obvious path leads to the final solution.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Dependecy Injection the juicy way
 =================================
@@ -75,3 +71,8 @@ dependency detection is possible.
 Because using dependency injection with only this little example I will
 refrain from releasing the source code yet. I have to provide some
 useful documentation for it to be of use to anyone.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

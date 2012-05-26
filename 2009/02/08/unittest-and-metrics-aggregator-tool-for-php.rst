@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Unittest and Metrics Aggregator Tool for PHP
 ============================================
@@ -33,3 +29,8 @@ Github <http://wiki.github.com/beberlei/puma>`_. Its written with
 `ezcMvcTools <http://www.ezcomponents.org>`_, so you need this to work
 too. A list of `some screenshots is at the Github Wiki
 page <http://wiki.github.com/beberlei/puma>`_.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

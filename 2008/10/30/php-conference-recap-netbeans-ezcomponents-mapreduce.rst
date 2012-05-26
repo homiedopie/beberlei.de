@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 PHP Conference Recap: NetBeans, ezComponents, MapReduce..
 =========================================================
@@ -64,3 +60,8 @@ Addtional great things:
 Not so good things: There were absolutly to few power lines. People
 using their notebooks were packed on hotspots where power was available.
 Please more power plug possibilites next time!
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Next ZF Mini Release: 1.7.1
 ===========================
@@ -15,3 +11,8 @@ minor bugs that have been in the Zend\_Soap\_Wsdl stuff i added for the
 And a question for the 1.8 release that is due around February 2009:
 What do you think is missing in the jQuery support to ZF? Any widgets or
 stuff that you want to have included?
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

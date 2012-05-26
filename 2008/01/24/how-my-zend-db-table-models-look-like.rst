@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 How my Zend_Db_Table models look like
 =====================================
@@ -38,3 +34,8 @@ An example:
 That way you still follow the MVC pattern and don't have to take one
 compromise after another for getting the Table Gateway to reproduce a
 result that looks like a join.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

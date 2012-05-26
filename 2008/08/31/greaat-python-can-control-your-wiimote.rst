@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Greaat, Python can control your Wiimote
 =======================================
@@ -19,3 +15,8 @@ applications, but that might still be included in the future. You can
 `download this little
 goodie <http://www.beberlei.de/sources/wiipylib-0.1.tar.gz>`_ and have a
 look at it.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

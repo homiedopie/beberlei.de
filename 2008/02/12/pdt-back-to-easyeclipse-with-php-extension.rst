@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 PDT: Back to easyeclipse with PHP extension
 ===========================================
@@ -23,3 +19,8 @@ if you do, you won't understand what they mean.
 So I am going back to my easyeclipse with php combination, which always
 worked well, the only problem being that it is no longer under active
 development. At least it has all the features I need for now.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 New Netbeans PHP CodeSniffer Plugin Version
 ===========================================
@@ -20,3 +16,8 @@ Here are the changes done by Manuel:
 The only open TODO for this project is the possibility to specify
 different standards on a per project basis, currently you can only
 choose a global standard.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

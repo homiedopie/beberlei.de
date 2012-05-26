@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Import and PYTHONPATH Problems with PyDev and Linux
 ===================================================
@@ -29,3 +25,8 @@ with the PythonPath, Symlinks and whatever are gone.
 **Update:** Another note maybe, you can also add the action "running the
 last used external tool again" as keyboard shortcut in the Eclipse
 preferences. This simplifies the execution even more.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

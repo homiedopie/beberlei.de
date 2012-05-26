@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Speaking about Framework Quality on the IPC Spring 09
 =====================================================
@@ -26,3 +22,8 @@ their testtools may have to be written.
 
 I am really excited for my first time being speaker on a conference and
 looking forward to see you at IPC.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Symfony2 Controller Testing without Application
 ===============================================
@@ -152,3 +148,8 @@ the Monolog lines to get the log-messages printed to the screen.
 
 You have to add the `Tests/App/cache` and `Tests/App/logs` to your version
 control ignore files.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

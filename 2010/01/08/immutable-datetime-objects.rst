@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Immutable DateTime Objects
 ==========================
@@ -143,3 +139,8 @@ Otherwise the sharing of instances could not be implemented. If you need
 to create shareable instances from other formats you could just create
 another creation method for it and convert the format for create() to be
 used.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

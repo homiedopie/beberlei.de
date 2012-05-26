@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Overwrite ezcMvcController - A bit more rapid
 =============================================
@@ -100,3 +96,8 @@ Very nice! The next thing I have to extend in ezcMvc is automagical
 matching of controller and action names to view output names with a
 special View Handler that takes care of this. This saves another bunch
 of work you have to cope with in the current standard setup.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

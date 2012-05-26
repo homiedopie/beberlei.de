@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Zend, Dojo and the Django Template Language
 ===========================================
@@ -72,3 +68,8 @@ Framework and the whole weekend later I got a working implementation
 that supports at least the "extends", "for", "include", and "comment"
 tags. As a next task I will implement the helper for DojoX DTL and will
 report back on my efforts.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

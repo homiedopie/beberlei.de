@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Using Zend_Soap Server and Autodiscover in a Controller
 =======================================================
@@ -47,3 +43,8 @@ that makes **http://example.com/pathto/wsdl** point to
 **MyDiscouragedSoapServerController::wsdlAction**. The wrong version
 (Version Mismatch) error comes from sending a request for the WSDL file
 to the actual Soap Server, which he doesn't like.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

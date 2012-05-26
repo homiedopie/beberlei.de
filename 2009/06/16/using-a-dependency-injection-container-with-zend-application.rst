@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Using a Dependency Injection Container with Zend_Application
 ============================================================
@@ -124,3 +120,8 @@ use of the Application resources inside the Yadif Configuration
     make use of Zend\_Applications resource system. Furthermore any
     other dependency injection container, simple or complex, can also be
     integrated easily.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

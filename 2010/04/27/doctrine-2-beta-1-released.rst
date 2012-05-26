@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Doctrine 2 Beta 1 released
 ==========================
@@ -100,3 +96,8 @@ feedback in our `Issue
 Tracker <http://www.doctrine-project.org/jira/secure/Dashboard.jspa>`_,
 the `Mailing-List <http://groups.google.com/group/doctrine-user>`_ or
 come discuss with us on Doctrine 2 on Freenode #doctrine-dev.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

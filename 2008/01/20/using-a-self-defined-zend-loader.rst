@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Using a self defined Zend_Loader
 ================================
@@ -83,3 +79,8 @@ initialize the following at the beginning of my bootstrap file:
         Zend_Loader::registerAutoload('WWLoader');
 
 After that, its just Objects.
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>

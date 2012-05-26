@@ -1,7 +1,3 @@
-.. categories:: none
-.. tags:: none
-.. comments::
-.. author:: beberlei <kontakt@beberlei.de>
 
 Using Zend_Http_Client to Ping Technorati
 =========================================
@@ -35,3 +31,8 @@ You also need a little view in XML format like it is described in the
 `Technorati Ping Configuration
 Guide <http://technorati.com/developers/ping/>`_ and ready to go you
 are!
+
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
