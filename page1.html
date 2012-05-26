@@ -1,0 +1,1052 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Page 2 &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/disqus.js"></script>
+    <link rel="shortcut icon" href="_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="index.html" />
+    <link rel="next" title="Older" href="page2.html" />
+    <link rel="prev" title="Newer" href="index.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="page1">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="index.html">Newer</a>
+            </li>
+            <li class="right">
+                <a href="page2.html">Older</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+        
+        <div class="timestamp postmeta">
+            <span>February 08, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="unittest-and-metrics-aggregator-tool-for-php">
+<a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html"><h1>Unittest and Metrics Aggregator Tool for PHP</h1></a>
+<p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
+<a class="reference external" href="http:/www.pdepend.org">PDepend</a> offer export functionality in XML or
+in a Test-database that is not quite readable for any user from the
+start. Over the last month I have gradually written <a class="reference external" href="http://wiki.github.com/beberlei/puma">a nice webbased
+tool</a>, that aggregates this data
+and (todo in the future) relates them to help me with my open source
+projects.</p>
+<p>PHPUnit can be used with a <strong>–test-db-dsn</strong> command, which saves all
+information about tests into a Database and PDepend has a strong Package
+centric source parser for all sorts of project metrics.</p>
+<p>What I needed for my <a class="reference external" href="http://framework.zend.com">Zend Framework</a>
+related work (and other projects) was a tool that does a run of the
+complete test-suite for me and saves the information, so that I can see
+where problems occur (and if they are due to my changes or other
+peoples). Since PHPUnit will stopped calculating additional metrics, I
+have also integrated the fabulous PDepend Tool into this aggregator. It
+shows me, what classes and functions need refactoring due to complexity
+issues and draws some nice graphs that summarize all sorts of project
+related information on a per package basis.</p>
+<p>You can <a class="reference external" href="http://wiki.github.com/beberlei/puma">download or clone the an alpha version at
+Github</a>. Its written with
+<a class="reference external" href="http://www.ezcomponents.org">ezcMvcTools</a>, so you need this to work
+too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
+page</a>.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html#disqus_thread" data-disqus-identifier="2009/02/08/unittest-and-metrics-aggregator-tool-for-php">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>February 13, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="update-on-unittest-and-metrics-tool">
+<a href="2009/02/13/update-on-unittest-and-metrics-tool.html"><h1>Update on Unittest and Metrics Tool</h1></a>
+<p>Some days ago i posted about the <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PHP Unittest and Metrics
+Aggregator</a> tool that i
+have written on (and which I have dubbed PUMA). Discussing it with
+people I came to the conclusion that the approach using
+<a class="reference external" href="http://ezcomponents.org">ezcMvcTools</a> is quite problematic that it
+forces to use this application, although the reporting and the
+application are quite separate. This is not against ezcMvcTools: I love
+it, its just the wrong type of support.</p>
+<p>I began to split up the aggregator into some sort of importing-exporting
+tool. You can specify library-, test- and output-directory of your
+application and it will use the tools at hand
+(<a class="reference external" href="http://www.phpunit.de">PHPUnit</a>, <a class="reference external" href="http://www.pdepend.org">PDepend</a>
+and CodeSniffer currently) to generate their XML formatted reports. It
+then parses those XML outputted files and combines their result to give
+a consistent view on your application.</p>
+<p>The Import-To-Output generator uses a three-step approach. An importer
+emits signals to report observers, which will then hand over their
+collected data to specific html pages that are then generated to the
+disc. This is a very flexible approach that allows anyone to extend and
+re-use the tool to generate project metrics, unittest overview and other
+interesting details on your application.</p>
+<p><a class="reference external" href="http://github.com/beberlei/puma/tree/master">Have a look at the tool on
+Github</a> and play with it.
+I would really like to hear your thoughts.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/02/13/update-on-unittest-and-metrics-tool.html#disqus_thread" data-disqus-identifier="2009/02/13/update-on-unittest-and-metrics-tool">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>May 01, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="explicit-code-requires-no-comments-only-bad-code-does">
+<a href="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html"><h1>Explicit Code requires no comments - Only bad code does</h1></a>
+<p>Following the recent discussion on commenting source code by <a class="reference external" href="http://www.brandonsavage.net/on-code-commenting-and-technical-debt/">Brandon
+Savage</a>
+and <a class="reference external" href="http://mtabini.blogspot.com/2009/04/myth-of-myth-of-self-commenting-code.html">Marco
+Tabini</a>,
+I wanted to add upon Marcos code example to show that it not even needs
+any inline comments and can be greatly enhanced in readability with
+taking 2-5 minutes of time and refactoring the code. The original code
+sample was:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>function __construct(array $pathInfo) {
+    $section = $pathInfo[0];
+    $file = $pathInfo[1];
+
+    // Assume that the location of this file is inside the main trunk, and that pathInfo has already been filtered.
+
+    $path = dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
+
+    if (!file_exists($path)) {
+        Controller::singleton()-&gt;doError(404);
+    }
+
+    parent::__construct('main/xsl/template.xsl', $path);
+}</pre>
+</div>
+</div></blockquote>
+<p>This sample is somehow related to the response and view rendering of an
+application and its pretty understandable. For me there are some squirks
+though that would make me have to scroll to other classes to see how
+they interact. For example the path information falls from heaven. Why
+is it an array of 2 values and are these sections set the same all the
+time? And what exactly happens when the front controller does the 404
+error? Is there a die() or exit in the <strong>doError()</strong></p>
+<p>The Agile movement postulates the phase of refactoring for a finished
+piece of code. Rebuilding the hacked solutions that did it to make them
+more understandable. I applied this to Marcos code snippet. The
+refactoring produces about double the code, but its done entirely by
+using NetBeans nice Rename variable and copy paste on extracting
+methods, which takes not more than 5 minutes.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class StaticXmlXsltRendererImpl extends AbstractXsltView
+{
+    function render(array $filteredPathInfo) {
+        $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
+
+        if(!$this-&gt;templateExists($templateValuesXmlPath)) {
+            Controller::singleton()-&gt;doError(404);
+        } else {
+            parent::render('main/xsl/template.xsl', $templateValuesXmlPath);
+        }
+    }
+
+    private function getTemplateValuesXmlFile($filteredPathInfo) {
+        $section = $this-&gt;getSection($filteredPathInfo);
+        $file = $this-&gt;getFile($filteredPathInfo);
+
+        // Assume that the location of this file is inside the main trunk
+        return dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
+    }
+
+
+    private function getSection($pathInfo) {
+        return $pathInfo[0];
+    }
+
+    private function getFile($pathInfo) {
+        return $pathInfo[1];
+    }
+
+    private function templateExists($path) {
+        return file_exists($path);
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>In this code snippet the class name, variable names and methods clearly
+communicate what is done, which wasn’t the case in the previous example.
+The only change for the clients is the change of using the constructor
+to using the <strong>render()</strong> method, which communicates the intend more.
+Also the render method now clearly communicates that either the error or
+the parent rendering is executed and leaves no doubt about it.</p>
+<p>The <strong>getTemplateValuesXmlFile()</strong> method still uses the comment to show
+the assumption about relative pathes, but this is only the case because
+application configuration is made implicit into the code. This has to be
+extracted to be an explicit configuration constant and the comment can
+go.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>private function getTemplateValuesXmlFile($filteredPathInfo) {
+    $section = $this-&gt;getSection($filteredPathInfo);
+    $file = $this-&gt;getFile($filteredPathInfo);
+
+    return APPLICATION_ROOT . '/' . $section . '/xml/static/' . $file . '.xml';
+}</pre>
+</div>
+<p>In my opinion commenting code is necessary only for non-refactored
+code that has been hacked into existence and is hard to understand.
+Either the programmer has to get it done and has no chance to
+clearly communicate the intend. Or what is even worse the to be
+changed legacy code is hard to understand but you can’t take the
+chances to refactor it because its also already in production and
+has no tests. Now from the second point it is obvious that upon ugly
+code you put only more and more ugly code to fix the problems. This
+is what leads to the legacy maintenance problems that pretty much
+every programmer faces. And then commenting comes into play: You
+have to add a new feature X and it has to be done fast. You don’t
+really understand the code or how it works together but you know you
+can put the new code for the feature into existence but its really
+unintuitive. So you begin to comment it excessively, because its the
+only way to clearly show its intend.</p>
+<p>There are two mindestting factors that help to write code that is
+understandable without having to excessivly comment it:</p>
+<ul class="simple">
+<li>From the beginning, do not write code for the computer but for
+developers. Changing this attitude really helps to write
+understandable code like the one above.</li>
+<li>Only leave code better than it was before, never worse.</li>
+</ul>
+<p>There are five technical practices that - when followed - allow to
+write clearly communicating code from the beginning:</p>
+<ol class="arabic simple">
+<li>Giving classes, variables and methods good names. This is a
+no-brainer but few people seem to follow it anyways.</li>
+<li>Following the object-oriented <strong>Single Responsibility Principle</strong>
+by never giving a class more than one responsibility. Macros
+example seems to follow this one.</li>
+<li>Methods should never switch in the level of detail. Micro-work at
+the datastructure level should never be mixed with macro level
+delegation to executing large chunks of code. Macros code
+violates this by mixing the path building micro-level work with
+the macro-level work of rendering the XSLT template. The path
+building code can be hidden behind a method to communicate intend
+more clearly.</li>
+<li>Exchange if conditions with private methods that explain the
+condition being checked for. In Marcos example this is not really
+necessary, because file_exists already is quite a good
+description to the condition. But in cases of logical
+combinations of conditions the method extracting is a superior
+way to explain the conditions intend without having to write a
+comment.</li>
+<li><strong>Seperate Query and Command</strong>: A method never should do a query
+which returns the state of an object and a command which executes
+a set of rules on the state.</li>
+</ol>
+<p>These practices sum up to one guideline: Make code explicit. This
+obviously requires less commenting since a comment of explicit code
+would be duplication and duplication is bad. What if you have a
+project that does not follow this guidelines? Then of course
+comments should be used to explain code, but in the long run this
+should be refactored to self-explaining code. Additionally every new
+feature should be programmed explicitly to follow the “leave code
+better than before” principle.</p>
+<p>In my opinion two refactoring tools are missing that would greatly
+help PHP programmers write nice to read code: Extract method and
+Replace magic value with constant. Can someone integrate them into
+NetBeans please?</p>
+<p><strong>Update:</strong> Fixed a creepy copy-paste code bug, thanks to azeroth
+for pointing out. Moved methods around a bit to be more reading
+friendly.</p>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html#disqus_thread" data-disqus-identifier="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>June 16, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="using-a-dependency-injection-container-with-zend-application">
+<a href="2009/06/16/using-a-dependency-injection-container-with-zend-application.html"><h1>Using a Dependency Injection Container with Zend_Application</h1></a>
+<p>Much has been written on Dependency Injection lately, mostly by Padraic
+Brady
+(<a class="reference external" href="http://blog.astrumfutura.com/archives/394-The-Case-For-Dependency-Injection-Part-1.html">1</a>,
+<a class="reference external" href="http://blog.astrumfutura.com/archives/395-The-Case-For-Dependency-Injection-Part-2.html">2</a>)
+and Fabien Potencier
+(<a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">1</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/12/do-you-need-a-dependency-injection-container">2</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/13/introduction-to-the-symfony-service-container">3</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/14/symfony-service-container-using-a-builder-to-create-services">4</a>,
+<a class="reference external" href="http://github.com/fabpot/Pimple/tree/master">5</a>). My subjective
+feeling tells me there are now more PHP DI containers out there than CMS
+or ORMs implemented in PHP, including two written by myself (an
+<a class="reference external" href="http://www.beberlei.de/sphicy/">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
+one</a>). Its an awesome
+pattern if used on a larger scale and can (re-) wire a complex business
+application according to a clients needs without having to change much
+of the domain code. It aims at a complete seperation of object
+instantiation and dependency tracking from the business logic.</p>
+<p>Beginning with version 1.8 Zend Framework is able to integrate any of
+these DI containers into its <strong>Zend_Application</strong> component easily. The
+Application component intializes a set of common resources and pushes
+them into the MVC stack as additional Front Controller parameters.
+Technically a <strong>Zend_Registry</strong> instance holds all these resources with
+their respective resource names as keys. The resources are accessible
+inside the Front Controller and the Action Controller classes. Assume
+the resource ‘Db’ is initialized in your application, you can access it
+with:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$front = Zend_Controller_Front::getInstance();
+$container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
+$db = $container-&gt;db;
+
+// or:
+class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $db = $container-&gt;db;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>This is pretty much dependency injection already, but the default
+registry approach suffers from two serious problem: New instances can
+only be added to the Container by implementing new Zend_Application
+resources and these instances cannot be lazy loaded. All resources used
+by Zend_Application are always loaded on every request. But the
+application container implementation was developed with Dependency
+Injection in mind and is not tied to the use of Zend_Registry. Only
+three magic methods are required by any container that wants to be
+Zend_Application compliant: __get(), __set() and __isset(). Each
+instantiated resource is pushed via __set() into the container. If
+required by another resource, __isset() is used to check wheater a
+resource with the given name exists inside the container and __get()
+is used to retrieve the instances from the container.</p>
+<p>Some month ago I extended
+<a class="reference external" href="http://github.com/beberlei/yadif/tree/master">Yadif</a>, a lightweight
+PicoContainer-like DI container for PHP written by Thomas McKelvey, with
+several features that make it a very powerful DI container in my
+opinion. It has a detailed documentation and examples on the GitHub Page
+if you want to check it out. I extended Yadif to be Zend_Application
+compliant in a way that the application-wide Zend_Application resources
+can be used as dependencies for objects that are lazy-loaded from the
+container. Skipping the tech-talk, here is an example. First we have to
+replace the default Container with Yadif:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH.&quot;/config/objects.xml&quot;);
+$container = new Yadif_Container($objects);
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+// Set Yadif as Container
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();</pre>
+</div>
+</div></blockquote>
+<p>Assume you run Zend_Application with a “Db” and a “Cache” resource.
+These resources are loaded on every request. The objects configured in
+Yadif however are not instantiated until they are requested for the
+first time from the container. We can merge these two worlds and make
+use of the Application resources inside the Yadif Configuration
+“objects.xml”, which looks like:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>&lt;?xml version=&quot;1.0&quot; ?&gt;
+&lt;objects&gt;
+    &lt;myModel&gt;
+        &lt;class&gt;MyModel&lt;/class&gt;
+        &lt;arguments arg1=&quot;db&quot; arg2=&quot;cache&quot; /&gt;
+    &lt;/myModel&gt;
+&lt;/objects&gt;</pre>
+</div>
+<p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
+the the Database and Cache resources as constructor arguments:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $myModel = $container-&gt;myModel;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Given the possibilites by the Yadif_Container you are now empowered
+to use Dependency Injection for all your application objects and
+make use of Zend_Applications resource system. Furthermore any
+other dependency injection container, simple or complex, can also be
+integrated easily.</p>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/06/16/using-a-dependency-injection-container-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/06/16/using-a-dependency-injection-container-with-zend-application">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>November 14, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="netbeans-php-codesniffer-plugin-now-with-options-dialog">
+<a href="2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html"><h1>Netbeans PHP CodeSniffer Plugin: Now with Options Dialog</h1></a>
+<p>Just two days before the <a class="reference external" href="http://www.phpconference.de">International PHP Conference
+09</a> will start I got an email from
+<a class="reference external" href="http://github.com/alexandrehaguiar">alexandrehaguiar</a> that he forked
+my Netbeans PHP CodeSniffer plugin and added the long awaited Options
+screen. This is just awesome! This way I don’t have to ask the Netbeans
+guys at IPC all the questions about how to implement it. I merged the
+changes back into my branch and released a new version which also fixed
+another small bug. For me it works with both Netbeans 6.7.1 and 6.8
+Beta. I want to thank alexandre very much for this awesome contribution.</p>
+<p>What you can do now is chose the Coding Standard you want to use in an
+Options Dialog under the “Miscallenous” button. You can choose from a
+list of pre-defined standards, or even enter your own if you use one.
+Additionally you can disable that warning are shown, so that with any
+given coding standard you only see the errors.</p>
+<p><a class="reference external" href="http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/phpcsoptions.png">|image0|</a></p>
+<p>You can download the new version from the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads/">Github Project Downloads
+page</a>.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html#disqus_thread" data-disqus-identifier="2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>August 31, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="enums-in-php">
+<a href="2009/08/31/enums-in-php.html"><h1>Enums in PHP</h1></a>
+<p><a class="reference external" href="http://blog.tobias-olry.de">A colleague of mine</a> complained about the
+missing support for Enums in PHP and how one often wants to have a
+variable that is constant and has one of several specific values. We
+came up with an elegant solution that we want to share, maybe its even
+helpful to you.
+If you want to implement Enum behaviour with a simple string or int
+value you end up with having to validate the values at several different
+locations in the code rather than being able to strictly enforce the
+Enum structure by using typehints.</p>
+<p>We discussed several approaches to this problem that all seemed a bit
+ugly in one or another way. For example the <strong>SplEnum</strong> class is a step
+in the right direction, however you can only use a type hint for
+“SplEnum” or add another inheritance layer. Also you have to implement
+different classes for each enum type, which requires you to implement a
+factory method for your enum to help with creation of the different
+types.</p>
+<p>We came up with a very simple Enum concept. It uses reflection in the
+constructor to check if the given value is a valid Enum value by
+checking it against all the defined constants of the implementing class
+and throws an Exception if it is not. The __toString() magic method is
+implemented to allow for simple checks of the enums value. Strict
+type-checks are not possible with this construct, however in our opinion
+it is a very elegant solution to enforce a limited set of specific
+values throughout your code-base.</p>
+<p>Here is the code plus a small example:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>abstract class MyEnum
+{
+    final public function __construct($value)
+    {
+        $c = new ReflectionClass($this);
+        if(!in_array($value, $c-&gt;getConstants())) {
+            throw IllegalArgumentException();
+        }
+        $this-&gt;value = $value;
+    }
+
+    final public function __toString()
+    {
+        return $this-&gt;value;
+    }
+}
+
+class Foo extends MyEnum
+{
+    const FOO = &quot;foo&quot;;
+    const BAR = &quot;bar&quot;;
+}
+
+$a = new Foo(Foo::FOO);
+$b = new Foo(Foo::BAR);
+$c = new Foo(Foo::BAR);
+
+if($a == Foo::FOO) {
+    echo &quot;My value is Foo::FOO\n&quot;;
+} else {
+    echo &quot;I dont match!\n&quot;;
+}
+
+if($a == $b) {
+    echo &quot;a value equals b value!\n&quot;;
+}
+if($b == $c) {
+    echo &quot;b value equals c value!\n&quot;;
+}</pre>
+</div>
+</div></blockquote>
+<p>Now you could nice things such as:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>function doStuff(Foo $foo) {
+    switch($foo) {
+        case Foo::FOO:
+            echo &quot;do more here!\n&quot;;
+            break;
+        case Foo::BAR;
+            echo &quot;evil stop!\n&quot;;
+            break;
+    }
+}
+
+doStuff($a);</pre>
+</div>
+</div></blockquote>
+<p>What are your thoughts?</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/08/31/enums-in-php.html#disqus_thread" data-disqus-identifier="2009/08/31/enums-in-php">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 23, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="zend-form-and-the-model-yet-another-perspective-using-a-mediator">
+<a href="2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html"><h1>Zend_Form and the Model: Yet another perspective using a Mediator</h1></a>
+<p><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weier O’Phinney</a> of the
+Zend Framework Devteam <a class="reference external" href="http://weierophinney.net/matthew/archives/200-Using-Zend_Form-in-Your-Models.html">wrote a controversial post on integrating
+Zend_Form and the Model last
+month</a>.
+He separated concerns of view and model that communicate via a Form, by
+calling just thee validation functions on the Form inside the mode. On
+request you could retrieve the model to the controller and view layers.
+I already wrote into his comments that I didn’t like the solution
+because it relys on implicit rules for the developers to use the Form
+component correctly in all layers. Additionally the building of the form
+using this approach would be performed inside the model, although
+strictly speaking this is responsibility of the View Layer. Another
+negative point is duplication of input filtering code that has to be
+performed to use certain variables inside the controller or when
+different forms talk with the same model.</p>
+<p><a class="reference external" href="http://codeutopia.net">Jani</a> took it up and <a class="reference external" href="http://codeutopia.net/blog/2009/01/07/another-idea-for-using-models-with-forms/">proposed writing
+validators for forms and attaching them to the
+Form</a>
+as sort of a mediator. I am not a fan of this approach either, because
+the validator would have to include domain logic but is not really a
+part of the domain logic anymore but just a validator. Developers might
+forget using the validator inside the model for all their actions or
+there would be duplication of code in some places. In a perfect world,
+only functions of the models public interface should be called for
+validation.</p>
+<p>My personal favorite for Form and Model integration is a <strong>mediator</strong>
+object between the two layers. Your model will have to include an
+additional interface with one function <strong>acceptFormRequest($values);</strong>
+which accepts an array of validated Zend Form field values. It then
+tries to apply the validated data into a record. Additional required
+validations of the model can take place in this function, which
+separates the concerns of Form validation and Model data validation.
+Still the mediator merges those differences together: You can throw an
+Exception and it will be attached as a custom error message to the Form.
+The following very short code will show the required interface and the
+mediator code. This code is very simple and might produce maintenance
+overhead fast, but I propose some refactoring enhancements later in the
+discussion.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>interface WW_Model_AcceptFormRequest
+{
+    /**
+     * Acceept a form request
+     * @param array $values
+     * @return WW_Record_Interface
+     */
+    public function acceptFormRequest($values);
+}
+class WW_Model_FormMediator
+{
+    /**
+     * Try to push the form request to the model
+     *
+     * @param Zend_Form $form
+     * @param WW_Model_AcceptFormRequest $model
+     * @return WW_Record_Interface
+     */
+    public function pushFormToModel(Zend_Form $form, WW_Model_AcceptFormRequest $model)
+    {
+        if(!$form-&gt;isValid()) {
+            throw new Exception(&quot;Form not valid!&quot;);
+        } else {
+            $values = $form-&gt;getValues();
+            try {
+                $record = $model-&gt;acceptFormRequest($values);
+            } catch(Exception $e) {
+                // This exception message comes from the model, because validation failed
+                $form-&gt;addErrorMessage($e-&gt;getMessage());
+                throw new Exception(&quot;Form request not accepted by model!&quot;);
+            }
+        }
+        return $record;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You can see the mediator has two different stages where errors can
+occour: When the form is not valid or the model is not valid. Both exits
+can be catched inside the controller and are the indicator that the form
+has to be displayed again for further input corrections. When successful
+the model returns a valid record that applies to the form and model
+requirements and can be displayed. If this record should be persistent
+this would have been done inside the <strong>acceptFormRequest</strong> function
+already. An example using a very simple Model using the a BankAccount
+example. We have a form that validates all the incoming request data for
+a withdrawel of money, though does not validate it against the models
+internal state. Our BankAccountModel implements the
+<strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
+BankAccount. If found the given amount is withdrawn.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class BankAccountModel implements WW_Model_AcceptFormRequest {
+    public function acceptFormRequest($values)
+    {
+        $bankAccount = $this-&gt;getBankAccountBy($values['bankAccountNumber'], $values['pin']);
+        if($values['action'] == &quot;withdraw&quot;) {
+            $bankAccount-&gt;withdraw($values['amount']);
+            $this-&gt;save($bankAccount);
+        } else {
+            // unknown action...
+        }
+    }
+    public function getBankAccountBy($key, $password) {
+        // Find by Primary Key returning 'BankAccount' instance or exception if not found.
+    }
+    public function save(BankAccount $ba) {
+        // Sql for saving the Bank Account
+    }
+}
+
+class BankAccount
+{
+    public function withdraw($amount)
+    {
+        if( ($this-&gt;getBalance()-$amount) &lt; 0 ) {
+            throw new Exception(&quot;You cannot withdraw more money than your bank account holds!&quot;);
+        }
+        $this-&gt;balance -= $amount;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Two exceptions might be thrown in this case: The Bank Account number
+does not exist or the password is wrong. Or you are not allowed to
+withdraw the given amount of money. If any of those exceptions is thrown
+the Model does not accept the form data and the form will have to be
+displayed again for the client showing the new error message that was
+returned from the model. The controller handling this process would lool
+like this:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class BankAccountController extends Zend_Controller_Action {
+    public function performWithdrawlAction() {
+        $form = new BankAccountWithdrawlForm(); // extends Zend_Form and builds the form
+
+        if($this-&gt;getRequest()-&gt;isPost()) {
+            $mediator         = new WW_Model_FormMediator();
+            $bankAccountModel = new BankAccountModel();
+            try {
+                $bankAccount = $mediator-&gt;pushFormToModel($form, $bankAccountModel);
+
+                $this-&gt;view-&gt;assign('bankAccount', $bankAccount); // Show new balance in view!
+            } catch(Exception $e) {
+                $this-&gt;view-&gt;assign('withdrawlForm', $form);
+                $this-&gt;_redirect('showWithdrawl');
+            }
+        } else {
+            $this-&gt;view-&gt;assign('withdrawlForm', $form);
+            $this-&gt;_redirect('showWithdrawl');
+        }
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You can see the mediator tightly integrates Form and Model without both
+components knowing too much of each other. Still you can add error
+messages recieved from the model into the Form and redisplay it. One
+negative point of this approach is the fact that you only have one
+method for accepting form data, which could result in variable checking
+and redispatching in the case of many different operations that can be
+performed on the same model. For this case you might want to either:</p>
+<ol class="arabic simple">
+<li>Rewrite the mediator to accept a specific model class (not the
+interface) and call the required custom method that matches the forms
+request. (Best approach for separation concerns)</li>
+<li>Rewrite the mediator to also pass the <strong>get_class($form);</strong> value to
+the model for decision making (Faster approach)</li>
+</ol>
+<p>There is still some overhead on using the mediator. Since its generic
+you could build an Action Helper for it and use the direct call
+mechanism to save some lines of code.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html#disqus_thread" data-disqus-identifier="2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 14, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">
+<a href="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html"><h1>Finally: Zend_Mail charset and/or long lines header encoding bug fixed</h1></a>
+<p>There was this <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">lurking bug in
+Zend_Mail</a> which
+destroyed every Mail-Header (and corresponding Mail) with non US-ASCII
+Chars and more than an encoded length of 74 chars. This is quite a huge
+subset of mails, but it seems a nice solution was not so easy, at least
+nobody tried to fixed it for quite some time.</p>
+<p>Where many hackish solutions we’re offered, Ota Mares aka Littlex spent
+incredible time to hunt the original problem down and with his help I
+tag-teamed the bug to death today. Saturo Yoshida of Zend Fame added
+some further spice regarding an alternative solution with Base64
+Encoding instead of Quoted Printable Mime Header encoding.</p>
+<p>In the end the solution we chose was, not to re-use the Mime encoding
+function that is specific to MIME bodies according to
+<a class="reference external" href="http://tools.ietf.org/html/rfc2045">RFC2045</a>, but to write a
+completely new algorithm for Mime Headers, whose rules are specified in
+<a class="reference external" href="http://tools.ietf.org/html/rfc2047">RFC2047</a>. This is now done and
+unit-tests prove its working according to standard.</p>
+<p>What is missing now is people trying that fix on as many Mail platforms
+as possible and <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">giving feedback in the
+issue</a> if a lengthy
+subject with non-ASCII chars is displayed correctly.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html#disqus_thread" data-disqus-identifier="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 11, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="howto-file-a-good-bug-report-suggestions-for-framework-users">
+<a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html"><h1>Howto file a good bug report: Suggestions for framework users</h1></a>
+<p>I have fixed quite a number of bugs for the ZF lately, which lead me to
+this post about how to file a good bug report. There are many annoying
+bug reports out there, where the reporter of the bug withholds important
+information to the bugfixer unintended. This advice applies bug reports
+in general of course.</p>
+<p>What are the benefits of a good bug report? The bug generally gets fixed
+faster, when the developer has more information at hand. Additionally
+other developers might come to rescue since they can understand the
+issue faster. These benefits are good for both parties. If you take no
+time for a good bug report, your issue might risk to end up getting old
+or closed unfixed.</p>
+<ul class="simple">
+<li><strong>Post the whole Exception Stack Trace</strong>: If the library throws an
+Exception into your application that is unexpected and may indicate
+an bug: Do not post the Message or Exception name only. The exception
+may be thrown in many different places or due to different reasons.
+The PHP exception class offers the method <strong>getTraceAsString()</strong>,
+which offers many information to the developer what the cause of the
+exception might be. Please use it!</li>
+<li><strong>Post codefixes in a patch format</strong>: When you find a bug in the
+framework, it is quite possible that you can offer a fix directly.
+Writing “Replace x in line y with z” does not help very often. The
+component might be in flux and the line positions change more often
+than you think. Please create a diff file of this changes that
+indicate the precise position of the change. This diff also includes
+2 lines above and below the patched code for direction of the
+developer. SVN Diffs are even more useful since they include the
+revision where you fixed the bug in.</li>
+<li><strong>Post reproducible cases as PHPUnit Test</strong>: If you find a bug and
+can show how to reproduce it: Write a unittest to prove it. It is ZF
+policy to create a unittest for each bugfix showing that the bug was
+indeed fixed and previous functionality remains the same, so this
+unit-test has to be written anyways. Many show-offs rely on massive
+<strong>echo</strong> statements or <strong>var_dump</strong>, which render them almost
+useless for the developer.</li>
+<li><strong>Attach a unit-test to a submitted patch</strong>: This is related to the
+previous point. If you add a unit test your patch will get more
+attention. It will prove that you have thought about the patch, its
+consequences and that you might have checked it does not break
+backwards compatibility. This is worth a lot.</li>
+<li><strong>Run the test suite with your patch</strong>: If you want to provide a
+patch. Run the testsuite of the Zend Framework. It might break
+expected behaviour. When you post a patch that will break BC, it will
+be recognized. Your bug report might be closed, which helps nobody.</li>
+</ul>
+<p>When you find a bug you have probably thought about it and how to fix
+it. This is valuable information. Disregarding one of this points will
+lead to missing information on part of the developer that he has to
+“learn” again. This takes time, which may make your bug last longer than
+it should.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html#disqus_thread" data-disqus-identifier="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 11, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="what-will-be-new-in-zf-1-8">
+<a href="2009/01/11/what-will-be-new-in-zf-1-8.html"><h1>What will be new in ZF 1.8</h1></a>
+<p>In Februar or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
+Framework</a> is schedulded to be released. I
+have contributed some stuff already regarding ZendX_JQuery and
+Zend_Soap.</p>
+<p>Both components have seen numerous bugfixes and I managed to get the
+JQuery helper down to zero open issues. I have also taken over the
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_Json_Expr+to+allow+Javascript+Expressions+(functions)+to+be+encoded+using+Zend_Json">Zend_Json_Expr
+proposal</a>,
+which will be a huge benefit to everything JSON that can be done with
+ZF. Foremost it is an integral part for the jQuery component which
+heavily relies on javascript callbacks.</p>
+<p>The Soap Autodiscover and WSDL classes compability with Java and .NET
+has been optimized due to great user feedback, aswell as some bugfixes
+to the newly added WSDL type detection strategies.</p>
+<p>Additionally I went on another bug killing spree and fixed around 20-30
+old bugs in a wide range of different components.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/11/what-will-be-new-in-zf-1-8.html#disqus_thread" data-disqus-identifier="2009/01/11/what-will-be-new-in-zf-1-8">Leave a comment</a>
+        </div>
+    </div>
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="index.html">Newer</a>
+            </li>
+            <li class="right">
+                <a href="page2.html">Older</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    <div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/page1.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+        <li>
+            <a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
+        </li>
+        <li>
+            <a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
+        </li>
+        <li>
+            <a href="2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

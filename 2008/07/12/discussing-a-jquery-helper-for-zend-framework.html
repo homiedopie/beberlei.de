@@ -1,0 +1,217 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Discussing a jQuery Helper for Zend Framework &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Finished first Django Template Language Port to PHP + ZF" href="../24/finished-first-django-template-language-port-to-php-zf.html" />
+    <link rel="prev" title="Zend, Dojo and the Django Template Language" href="../21/zend-dojo-and-the-django-template-language.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2008-07-12-discussing-a-jquery-helper-for-zend-framework">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="../21/zend-dojo-and-the-django-template-language.html">Zend, Dojo and the Django Template Language</a>
+            </li>
+            <li class="right">
+                <a href="../24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>July 12, 2008</span> 
+        </div>
+    <div class="section" id="discussing-a-jquery-helper-for-zend-framework">
+<h1>Discussing a jQuery Helper for Zend Framework</h1>
+<p>Yesterday I had some time to test Matthews <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Helper_Dojo">Dojo View
+Helper</a>
+and the Zend_Dojo_Form component. At a first glance the implementation
+looks great and can almost instantly generate you a very nice form with
+all the possible Dijit form extensions that
+<a class="reference external" href="http://dojotoolkit.org/">Dojo</a> has to offer.</p>
+<p>If one were to refactor the Dojo Component to allow for
+<a class="reference external" href="http://www.jquery.com">jQuery</a> elements one bigger problem appears.
+Dojo has a CDN (Content Distribution Network) for all its components,
+that is, the Zend Dojo components can load all javascript and css files
+from a distant server. JQuery can only offer its main library to be
+loaded from a CDN. All additional components, for example the jQuery
+DatePicker, have to be installed locally. This significantly reduces the
+possibility for rapid development of Javascript/Ajax/Form components
+with jQuery and Zend Framework.</p>
+<p>One could offer a complete dependency downloadable archive with all the
+CSS, Javascript and Images inside, but this would be very complex to
+maintain. Looking at the future Zend Tool capabilites one possibilty
+would be to offer a download client for all the relevant jQuery plugins,
+but there would have to be a man-middle-server that maintaines the most
+up to date locations of all the plugins, which also has to be
+maintained. Does anybody have a better solution to solve this problem?
+Perhaps the jQuery Team needs to be made aware that they need a CDN for
+their most stable plugins.</p>
+<p>Abstracting from the CDN problem, I implemented a simple jQuery View
+Helper (mostly copy paste and simple rewrites from Matthews Dojo
+component) and a HtmlElement Form Helper which constructs a Date-Picker
+from within the template. This is very easy to use and looks great. In
+the next days I will add further helpers for the jQuery plugins I use in
+my day to day work live and hope to present a demo. I might even optin
+for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
+<p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
+list</a>
+stating that a CDN is planned for the jQuery UI library. Sadly this does
+not include plugins for which one might desperatly need a View Helper
+except for maybe the Date Picker. I will post further comments on this
+issue in the near future.</p>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2008/07/12/discussing-a-jquery-helper-for-zend-framework";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2008/07/12/discussing-a-jquery-helper-for-zend-framework.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
+        </li>
+        <li>
+            <a href="../../../2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
+        </li>
+        <li>
+            <a href="../../../2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

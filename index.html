@@ -1,6 +1,1165 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="REFRESH" content="0; url=./blog/html/index.html" />
-    </head>
-    <body/>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Home &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/disqus.js"></script>
+    <link rel="shortcut icon" href="_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="#" />
+    <link rel="next" title="Older" href="page1.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="#"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
+        and web-development and other topics of interest for the author. You can read about me at my
+        personal page or write a mail to kontakt at beberlei dot de.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="index">
+              
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="page1.html">Older</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+        
+        <div class="timestamp postmeta">
+            <span>February 25, 2012</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="symfony2-controller-testing-without-application">
+<a href="2012/02/25/symfony2_controller_testing.html"><h1>Symfony2 Controller Testing without Application</h1></a>
+<p>Controller testing using the WebTestCase requires a Symfony Kernel and with
+that a complete application. However you can just ship your own simple kernel
+with just the dependencies necessary to test your application. This way you can
+easily create functional tests for bundles without the bundle requiring an
+application.</p>
+<div class="section" id="create-a-testkernel">
+<h2>Create a TestKernel</h2>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// Tests/Controller/App/AppKernel.php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$bundles</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="c1">// Dependencies</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\SecurityBundle\SecurityBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\MonologBundle\MonologBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">JMS\SerializerBundle\JMSSerializerBundle</span><span class="p">(</span><span class="nv">$this</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nx">FOS\RestBundle\FOSRestBundle</span><span class="p">(),</span>
+            <span class="c1">// My Bundle to test</span>
+            <span class="k">new</span> <span class="nx">Beberlei\WorkflowBundle\BeberleiWorkflowBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$bundles</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// We dont need that Environment stuff, just one config</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-config-yml">
+<h2>Creating the config.yml</h2>
+<div class="highlight-yml"><pre># Tests/Controller/App/config.yml
+framework:
+    secret:          secret
+    charset:         UTF-8
+    test: ~
+    router:          { resource: &quot;%kernel.root_dir%/routing.yml&quot; }
+    form:            true
+    csrf_protection: true
+    validation:      { enable_annotations: true }
+    templating:      { engines: ['twig'] }
+    session:
+        auto_start:     false
+        storage_id: session.storage.filesystem
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug</pre>
+</div>
+</div>
+<div class="section" id="creating-the-routing-yml">
+<h2>Creating the routing.yml</h2>
+<div class="highlight-yml"><pre># Tests/Controller/App/routing.yml
+BeberleiWorkflowBundle:
+    resource: &quot;@BeberleiWorkflowBundle/Controller/&quot;
+    type:     annotation
+    prefix:   /</pre>
+</div>
+</div>
+<div class="section" id="adding-a-phpunit-bootstrap">
+<h2>Adding a PHPUnit bootstrap</h2>
+<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree/">Travis &amp; Composer sitting in a
+Tree K-I-S-S-I-N-G” blog post</a>.</p>
+<p>His setup is missing the spl_autoload_register() call in the bootstrap file
+though.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// Tests/bootstrap.php</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../vendor/.composer/autoload.php'</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;'EOT'</span>
+<span class="s">You must set up the project dependencies, run the following commands:</span>
+<span class="s">wget http://getcomposer.org/composer.phar</span>
+<span class="s">php composer.phar install</span>
+<span class="s">EOT</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">'loadClass'</span><span class="p">));</span>
+
+<span class="nx">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">'Beberlei\\WorkflowBundle\\'</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">require_once</span> <span class="nv">$path</span><span class="p">;</span>
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p>That means your bundle should have a composer.json that loads all the
+dependencies.</p>
+</div>
+<div class="section" id="modifying-the-phpunit-xml-dist">
+<h2>Modifying the phpunit.xml.dist</h2>
+<p>We have to tell the WebTestCase base class where to find this kernel:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Tests/bootstrap.php&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;php&gt;</span>
+        <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">&quot;KERNEL_DIR&quot;</span> <span class="na">value=</span><span class="s">&quot;Tests/Controller/App&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/php&gt;</span>
+<span class="nt">&lt;/phpunit&gt;</span>
+</pre></div>
+</div>
+<p>Now just run your web-test cases.</p>
+<p>If you want to debug the logging happing inside the Kernel just comment out
+the Monolog lines to get the log-messages printed to the screen.</p>
+<p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
+control ignore files.</p>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/02/25/symfony2_controller_testing.html#disqus_thread" data-disqus-identifier="2012/02/25/symfony2_controller_testing">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>February 07, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="resources-for-a-php-and-hudson-ci-integration">
+<a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html"><h1>Resources for a PHP and Hudson CI Integration</h1></a>
+<p>Yesterday I finally had the time to setup my first continuous
+integration environment. Possible solutions for CI are
+<a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
+<a class="reference external" href="http://www.hudson-ci.org">Hudson</a> or
+<a class="reference external" href="http://www.arbitracker.org">Arbit</a>. Although phpUnderControl is the
+most wide-spread, but from I heard complex to setup/maintain, solution
+[STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
+to give Hudson a shoot. Another reason for this decision, I heard it has
+a simple plugin architecture and is easy to install and use.
+Additionally Hudson is easily integrated into
+<a class="reference external" href="http://www.netbeans.org">Netbeans</a> and
+<a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
+development.</p>
+<p>My motivation to dive into CI is easily explained. I just never felt it
+was necessary to add a continuous integration enviroment to my projects,
+since I had one or two simple bash scripts that did the job. In general
+this is rather annoying, because they mostly only run PHPUnit and have
+to be done using a cronjob or manually, without any real process of
+notification. Additionally you have no way to navigate the test-results,
+code-coverage and no history of the last builds. For projects like
+<a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> we have the additional
+requirement to support 4 different database platforms, i.e. 4 different
+PHPUnit configurations. Currently that is solved by me using a Bash
+script that iterates over the configuration file names and invokes
+PHPUnit.</p>
+<p>There are already some awesome sources how to get Hudson and PHP
+working. I’ll list them here:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
+Screenshots</a></li>
+<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
+Hudson</a></li>
+<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
+Screenshots)</a></li>
+</ul>
+<p>All those guides are already awesome and I would recommend choosing one
+of those to install Hudson, I think i can’t add anything new to those. I
+have used Sebastians Howto, however i also like the third one. David
+Luhmans guide adds lots of details that are important to get the
+different parts of a build process to work.</p>
+<p>Now what these tutorials all do is that they use a bash command to
+execute the build process or specifiy an Ant Build file. However there
+is also a Phing Build process plugin for Hudson that allows to specify
+the build.xml targets to execute in the process. From the “Available
+Plugins” list you can choose the “Phing plugin”.</p>
+<p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
+Plugin Wiki
+Page</a> shows how
+to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
+look for Phing. There you find the dialog to configure your phing
+installations.</p>
+<p>In the context of choosing a build script for your project you can now
+choose “Phing” instead of Ant:</p>
+<div class="figure align-center">
+<img alt="" src="http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849/"/>
+</div>
+<p>You can enter the targets to build, for example on my local Hudson
+instance I only execute “test” for Doctrine 2, since I am not interested
+in the building and deployment onto the PEAR channel at this development
+stage.</p>
+<p>From inside Netbeans you can then start builds by pointing to the Hudson
+instance. See this tutorial by one of the <a class="reference external" href="http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6">Hudson + Netbeans
+Developers</a>.
+You can then start all the builds from inside Netbeans and be notified
+of the success or failure.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/02/07/resources-for-a-php-and-hudson-ci-integration.html#disqus_thread" data-disqus-identifier="2010/02/07/resources-for-a-php-and-hudson-ci-integration">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>May 02, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="testing-database-locks-with-phpunit-and-gearman">
+<a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html"><h1>Testing Database Locks with PHPUnit and Gearman</h1></a>
+<p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
+2</a> we plan to integrate pessimistic
+Database-level locks across all the supported vendors (MySQL, Oracle,
+PostgreSql, IBM DB2 so far). This means row-level locking as defined in
+the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
+optionally in DQL Queries and Finder methods. The Implementation of this
+extension to SELECT statements is rather trivial, however functional
+testing of this feature is not.</p>
+<p>A general approach would look like this:</p>
+<ol class="arabic simple">
+<li>Run Query 1 and 2 with FOR UPDATE into the background</li>
+<li>Have both queries lock the row for a specified time x (using sleep)</li>
+<li>Verify that one of the two processes/threads runs approximately 2*x
+the lock time.</li>
+</ol>
+<p>Since PHP does not support process forking or threads naturally you run
+into a serious problem. How do you execute two database queries in
+parallel and verify that indeed one query is locking read access for the
+second one?</p>
+<p>Side note: There are some drawbacks to this testing approach. It could
+be that one background threads finishes the lock sleep already when the
+second just starts. The locking would work in these cases, however the
+lock time would not nearly be 2*x seconds, producing a test-failure. We
+are talking about a functional test though and I will accept a failure
+from time to time just to be 99% sure that locking works.</p>
+<p>Solving this problem with Gearman provides a pretty nice “real-world”
+example for the Job-Server that I wanted to share. This blog post
+contains a stripped down code-example from the Doctrine 2 testsuite. If
+you are interested, you can see the complete Gearman Locking Tests in
+<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
+GitHub</a>.</p>
+<p>Gearman allows to register worker processes with the job-server and
+offers clients to execute jobs on those workers in parallel. After
+installing the Gearman job-server and PHP pecl/gearman extension
+(<a class="reference external" href="http://toys.lerdorf.com/archives/51-Playing-with-Gearman.html">Rasmus Lerdorf has a post on
+installation</a>)
+we can go on writing our locking tests with Gearman.</p>
+<p>The first bit is the worker, a PHP script that tries to acquire a
+database lock and then sleeps for a second. The return value of this
+script is the total time required for acquiring the lock and sleeping.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class LockAgentWorker</span>
+<span class="x">{</span>
+<span class="x">    public function findWithLock($job)</span>
+<span class="x">    {</span>
+<span class="x">        $fixture = $this-&gt;processWorkload($job); // setup doctrine in here</span>
+
+<span class="x">        $s = microtime(true);</span>
+<span class="x">        $this-&gt;em-&gt;beginTransaction();</span>
+
+<span class="x">        $entity = $this-&gt;em-&gt;find($fixture['entityName'], $fixture['entityId'], $fixture['lockMode']);</span>
+
+<span class="x">        sleep(1);</span>
+<span class="x">        $this-&gt;em-&gt;rollback(); // clean up doctrine</span>
+
+<span class="x">        return (microtime(true) - $s);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The glue-code for the worker script contains of the registering of the
+worker method with the job-server and a simple infinite loop:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$lockAgent = new LockAgentWorker();</span>
+
+<span class="x">$worker = new \GearmanWorker();</span>
+<span class="x">$worker-&gt;addServer();</span>
+<span class="x">$worker-&gt;addFunction(&quot;findWithLock&quot;, array($lockAgent, &quot;findWithLock&quot;));</span>
+
+<span class="x">while($worker-&gt;work()) {</span>
+<span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
+<span class="x">        break;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>We need two running workers for this to work, since one worker only
+processes one task at a time. Just open up two terminals and launch the
+php scripts. They will wait for their first task to process.</p>
+<p>Now we need to write our PHPUnit TestCase, which will contain a
+GearmanClient to execute two of the “findWithLock” in parallel. Our
+locking assertion will work like this:</p>
+<ol class="arabic simple">
+<li>Register two tasks for the “findWithLock” method that access the same
+database row.</li>
+<li>Register a completed callback using
+“GearmanClient::setCompleteCallback()” that collects the run-time of
+the individual workers.</li>
+<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
+<li>Assert that the maximum run-time is around 2 seconds (since each
+worker sleeps 1 second)</li>
+</ol>
+<p>The code for this steps could look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
+<span class="x">{</span>
+<span class="x">    private $gearman = null;</span>
+<span class="x">    private $maxRunTime = 0;</span>
+<span class="x">    private $articleId;</span>
+
+<span class="x">    public function testLockIsAquired()</span>
+<span class="x">    {</span>
+<span class="x">        // .. write fixture data into the database</span>
+
+<span class="x">        $gearman = new \GearmanClient();</span>
+<span class="x">        $gearman-&gt;addServer();</span>
+<span class="x">        $gearman-&gt;setCompleteCallback(array($this, &quot;gearmanTaskCompleted&quot;));</span>
+
+<span class="x">        $workload = array(); // necessary workload data to configure workers</span>
+<span class="x">        $gearman-&gt;addTask(&quot;findWithLock&quot;, serialize($workload));</span>
+<span class="x">        $gearman-&gt;addTask(&quot;findWithLock&quot;, serialize($workload));</span>
+
+<span class="x">        $gearman-&gt;runTasks();</span>
+
+<span class="x">        $this-&gt;assertTrue($this-&gt;maxRunTime &gt;= 2);</span>
+<span class="x">    }</span>
+
+<span class="x">    public function gearmanTaskCompleted($task)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;maxRunTime = max($this-&gt;maxRunTime, $task-&gt;data());</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>Now if both workers are waiting for processing the task we can run this
+test and get a green bar for a working lock support.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/05/02/testing-database-locks-with-phpunit-and-gearman.html#disqus_thread" data-disqus-identifier="2010/05/02/testing-database-locks-with-phpunit-and-gearman">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 08, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="immutable-datetime-objects">
+<a href="2010/01/08/immutable-datetime-objects.html"><h1>Immutable DateTime Objects</h1></a>
+<p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
+extension</a> is the mutability of its
+instances. It can lead to serious bugs if a DateTime instance is passed
+between different functions and is modified at unexpected places.
+Additionally this possibly rules out several optimizations for scripts
+that make very heavy use of dates and could share references to equal
+timestamps.</p>
+<p><strong>Warning:</strong> All the code assumes that you work with one timezone only!</p>
+<p>The following code is an immutable version of PHP’s DateTime. All setter
+methods throw an exception and add(),sub() and modify() clone the
+current instance, apply the operation and return the new instance.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Whitewashing\DateTime</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">DateTime</span> <span class="k">extends</span> <span class="nx">\DateTime</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * To prevent infinite recursions</span>
+<span class="sd">     *</span>
+<span class="sd">     * @var bool</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$month</span><span class="p">,</span> <span class="nv">$day</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setISODate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$week</span><span class="p">,</span> <span class="nv">$day</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTime</span><span class="p">(</span><span class="nv">$hour</span><span class="p">,</span> <span class="nv">$minute</span><span class="p">,</span> <span class="nv">$second</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimestamp</span><span class="p">(</span><span class="nv">$timestamp</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimezone</span><span class="p">(</span><span class="nv">$timezone</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">ImmutableException</span> <span class="k">extends</span> <span class="nx">\Exception</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">&quot;Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Its not the prettiest code, but it works.</p>
+<p>A next optimization would be a <strong>DateFactory</strong> that manages DateTime
+instances by returning already existing instances for specific dates.
+This is not a perfect solution, since you won’t be able to enforce a
+single instance when you are using the relative descriptive dates or
+when calculating with dates using add(), sub() and modify(), however for
+lots of dates created from a database or other external source it might
+be quite a powerful optimization depending on your use-case:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">namespace Whitewashing\DateTime;</span>
+
+<span class="x">class DateFactory</span>
+<span class="x">{</span>
+<span class="x">    static private $_dates = array();</span>
+
+<span class="x">    static public function create($hour, $minute, $second, $month, $day, $year)</span>
+<span class="x">    {</span>
+<span class="x">        $ts = mktime($hour, $minute, $second, $month, $day, $year);</span>
+<span class="x">        if (!isset(self::$_dates[$ts])) {</span>
+<span class="x">            self::$_dates[$ts] = new DateTime('@'.$ts);</span>
+<span class="x">        }</span>
+<span class="x">        return self::$_dates[$ts];</span>
+<span class="x">    }</span>
+
+<span class="x">    static public function createFromMysqlDate($mysqlDate)</span>
+<span class="x">    {</span>
+<span class="x">        list($date, $time) = explode(&quot; &quot;, $mysqlDate);</span>
+<span class="x">        if($time == null) {</span>
+<span class="x">            $hour = $minute = $second = 0;</span>
+<span class="x">        } else {</span>
+<span class="x">            list($hour, $minute, $second) = explode(&quot;:&quot;, $time);</span>
+<span class="x">        }</span>
+<span class="x">        list($year, $month, $day) = explode(&quot;-&quot;, $mysqlDate);</span>
+<span class="x">        return self::create($hour, $minute, $second, $month, $day, $year);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>This includes some date time calculations and date creation with
+mktime() and DateTimes unix timestamp capabilities to be able to work.
+Otherwise the sharing of instances could not be implemented. If you need
+to create shareable instances from other formats you could just create
+another creation method for it and convert the format for create() to be
+used.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/01/08/immutable-datetime-objects.html#disqus_thread" data-disqus-identifier="2010/01/08/immutable-datetime-objects">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 10, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
+<a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html"><h1>Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></h1></a>
+<p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
+article</a> on using PEAR
+and PHAR for application lifecycle management and deployment. Since then
+I have gotten some feedback through comments, but also discussed the
+topic with collegues. I have also optimized the approach quite
+considerably and even <a class="reference external" href="http://github.com/beberlei/pearanha">made an open-source project out of parts of
+it</a> and I want to share all that
+is new with you. First of all, yes the presented solution was somewhat
+complex, partly because it is still a proposed idea and definately up
+for optimizations. However I am still very convinced of my approach,
+something I should discuss in more detail.</p>
+<p>The only other two languages I have ever programmed something in with
+more than 50 lines of code are Java and C#. In both languages you can
+explicitly import different dependencies like libraries and frameworks
+by adding them to your application, i.e. in java you would add for
+example Spring as an MVC Web layer, Hibernate as an ORM and several
+other things to your project and directly bundle them in your
+executable. This is very easy to configure and maintain in IDEs like
+Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
+libraries to your project). It also makes for a much more
+straightforward deployment.</p>
+<p>In the PHP world this siutation was quite different (up to PHP 5.3) for
+several reasons:</p>
+<ul class="simple">
+<li>You could not package a library into a single distributable file.</li>
+<li>The PEAR installer as the only tool for updating and managing
+dependencies of your application by default installs into a
+system/global directory. This means dependencies your application
+uses are located in a completly different location than your
+application code.</li>
+<li>You can’t manage multiple versions of the same package with PEAR in
+this system directory, making it very hard to control servers with
+different applications.</li>
+<li>The global directory with your application dependencies is most often
+not under version control, which makes deployment of applications
+with PEAR dependencies somewhat difficult.</li>
+</ul>
+<p>There are some solutions to this problems:</p>
+<ul class="simple">
+<li>Don’t use PEAR, but put all dependencies in your version control
+system.</li>
+<li>Don’t use PEAR, and bundle dependencies to your code in the
+build/deployment process.</li>
+<li>Use PEAR like in the article described, on a per project basis.</li>
+</ul>
+<p>The solutions that don’t use PEAR suffer from the disadvantage that you
+need to keep track of all the library and framework dependencies
+yourself and upgrade them yourself. This might not be such a huge
+problem from a first glance, but in my opinion many PHP applications and
+projects suffer from using either no framework/library or just exactly
+one. There is no real cherry-picking going on the PHP world, for example
+I would really like to use Zend Framework for the general application
+layout, but still use Doctrine for the Modelling and HTML Purifier for
+the Output Escaping. Certain tasks might then only be solvable with the
+help of eZ Components, all of which are then to some extend dependencies
+of my application. With <a class="reference external" href="http://pearhub.org/">PEARHUB</a> and
+<a class="reference external" href="http://pearfarm.org/">PEARFARM</a> on the horizon (<a class="reference external" href="http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html">Read Padraic on this
+topic</a>)
+even more PHP code will be distributed using PEAR channels in the near
+future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
+DateTime</a> code for
+example makes for a great little open source library that could be
+distribued via PEAR, aswell as
+<a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
+container I am using extensivly.</p>
+<p>Question: Are you really going to manage all these dependencies
+correctly manually? Is everything up to date all the time, and
+upgradeable with ease?</p>
+<p>The PEAR driven solution then begins to look very desirable in this
+light, however it has a considerable disadvantage: The PEAR installer
+itself works on a system-wide/user-centric basis, making it impossible
+to manage dependencies of several applications using only one linux
+user. My little <a class="reference external" href="http://github.com/beberlei/pearanha">Pearanha</a> to the
+rescue: I have taken the PEAR installer code (which is distributed with
+all PHP installations across all systems) and put a new CLI tool on top
+of it. Its a very simple code-generator that allows to generate a
+re-configured PEAR installer script which only manages a single
+application in a given directory. This approach is also used by the
+symfony plugin mechanism, which internally uses the PEAR installer (did
+you know?).</p>
+<p>Lets revisit my blog application example <a class="reference external" href="%3Ca%20href=">from my previous PEAR
+post</a>, first install from
+<a class="reference external" href="http://github.com/beberlei/pearanha">Github</a> and make the “pearanha”
+file executable and put it in your PATH (A PEAR Server Channel will
+follow any time soon).</p>
+<p>Now we need to have an existing application directory somewhere, for
+example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
+with:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>benny@desktop: pearanha generate-project</pre>
+</div>
+</div></blockquote>
+<p>You then need to specifiy the project base dir and then the project
+style (for example Zend Framework or Manual) which prompts your for the
+directory that should be used for as the vendor/library directory that
+PEAR will install all the code in. You will also be prompted for a
+binary/scripts directory which will then hold a new PHP file for you,
+the file <strong>my_phpiranha</strong>.</p>
+<p><strong>Pro Argument:</strong> Switching to Pearanha can be done at any point in your
+application lifecycle. Just define an additional vendor directory for
+all the dependencies to go in and generate the applications pear
+installer and you are good to go.</p>
+<p>The generated script is your new application specific PEAR installer and
+you can begin to install all the required dependencies of your
+application:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>benny@desktop:~$ cd /var/www/blog
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.zfcampus.org
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install zfcampus/zf-alpha
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover htmlpurifier.org
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install hp/HTMLPurifier
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.phpdoctrine.org
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install pear.phpdoctrine.org/DoctrineORM-2.0.0
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover components.ez.no
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install ezc/ezcGraph</pre>
+</div>
+</div></blockquote>
+<p>All this stuff is now located in <strong>/var/www/blog/vendor</strong>. Again you can
+use PEARs complete upgrade, remove and install functionality for your
+application, now without the hazzle of having to create a linux user for
+each project you want to manage this way, which in my opinion is a
+considerable simplification. The complete application (including its
+dependencies) can then be put under version control and be readily
+packaged as a single executable PHAR file by your build process.</p>
+<p>As a side node, I did try Pyrus instead of PEAR for the same discussed
+purpose, however most of the current PEAR channels don’t validate
+against Pyrus strict standards for the package.xml file. In the future
+this might change and a Pyrus based application installer will then be
+integrated into Pearanha.</p>
+<p><strong>UPDATE:</strong> I renamed PHPiranha to Pearanha as its more appropriate.
+Also after apinsteins comment on “pear config-create” I rewrote the
+generate-project parts to use the config-create functionality
+internally, which allowed me to throw away half of the self-written
+code. Thanks!</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html#disqus_thread" data-disqus-identifier="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>April 27, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="doctrine-2-beta-1-released">
+<a href="2010/04/27/doctrine-2-beta-1-released.html"><h1>Doctrine 2 Beta 1 released</h1></a>
+<p>Today we are happy to announce that the first beta of <a class="reference external" href="http://www.doctrine-project.org/blog/doctrine-2-0-0-beta1-released">Doctrine
+2</a>
+has been released and we fixed 165 issues kindly reported by several
+early adopters.</p>
+<p>You can grab the code from the Github project:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><a class="reference external" href="http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1">http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1</a></dt>
+<dd>git clone git://github.com/doctrine/doctrine2.git</dd>
+</dl>
+</div></blockquote>
+<p>Or download it from our website:</p>
+<blockquote>
+<div><a class="reference external" href="http://www.doctrine-project.org/download#2_0">http://www.doctrine-project.org/download#2_0</a></div></blockquote>
+<p>It is our believe that Doctrine 2 brings PHP ORMs to a new level. We are
+leaving behind the Active Record pattern because we think it hurts
+testability, project maintainability and is not a suitable abstraction
+(80/20) for models that exceed the complexity of a blog or otherwise
+simple web application. Instead we implemented a pure Data Mapper
+approach with help of the new Reflection functionalities of PHP 5.3, so
+your Domain Objects neither have to extend a base class nor implement an
+interface.</p>
+<p>We also dropped most of the magical features of Doctrine 1 in favour of
+a simple and standardized API that is loosely based on the <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_API">Java
+Persistence API</a>, a
+technical standard for Object Relational Mappers. However we try not to
+blindly follow the “Programm PHP like Java” approach and and deviated
+from JPA where applicable to make the concepts fit better into the PHP
+environment, such as alternatively hydrating all results into nested
+array structures for very high read performance.</p>
+<p>The cornerstone of Doctrine 2 is the query language DQL. It allows to
+execute queries on the object level defined by your metadata in a
+similar fashion to SQL. You can even do Joins, Subselects and Aggregates
+and Group Clauses in DQL, eliminating the need to circumvent ORMs for
+more advanced SQL features. Nevertheless it is also possible to write
+plain SQL and let Doctrine 2 hydrate the results into an object graph.</p>
+<p>In the last three month since alpha 4 we have done considerable changes
+and integrated lots of feedback from our users. The most notable changes
+are:</p>
+<ul class="simple">
+<li>Allowing Constructors of your Domain Objects to have non-optional
+parameters.</li>
+<li>Allow to define a natural ordering of to Many Collections that is
+automatically enforced trough an SQL ORDER BY statement when
+retrieved from the database.</li>
+<li>Shipping the Symfony Console Component to replace our own Console
+Implementation</li>
+<li>New DQL syntax to load objects partially, omitting potentially
+expensive fields from retrieval for the current request.</li>
+<li>Changes to how bi-directional have to be defined in the mapping
+files.</li>
+<li>Several changes to the Events API inside the ORM, to make sure many
+possible extension scenarios work smoothly.</li>
+<li>Enhancements to our Console Tools</li>
+<li>Surpassed the 1000 unit-tests each running against Postgres, Mysql,
+Sqlite and Oci8 drivers.</li>
+<li>Moved from SVN to Git:
+<a class="reference external" href="http://github.com/doctrine/doctrine2">http://github.com/doctrine/doctrine2</a></li>
+</ul>
+<p>We also did several painful backwards incompatible changes that seemed
+necessary to clean up and optimize the API or allow the ORM to be even
+faster than before. The beta phase beginning today will not contain any
+larger BC breaks anymore, opening up this release for a broader testing
+audience.</p>
+<p>For the next iteration several enhancements are planned:</p>
+<ul class="simple">
+<li>Support for PDO IBM, IBM DB2, SqlSrv and PDO SqlSrv und MsSql drivers</li>
+<li>Pessimistic Lock Support (FOR UPDATE and SHARED)</li>
+<li>Support for Custom Hydration Modes</li>
+<li>Support for Custom Persister Implementations</li>
+<li>Support for handling very large collections of related objects
+without needing an in-memory representation of the collection</li>
+<li>Separation of Doctrine\Common, Doctrine\DBAL and Doctrine\ORM into
+three different projects</li>
+<li>Extend the documentation even further, adding quickstart tutorials,
+cookbook recipes and enhancing the existing chapters.</li>
+</ul>
+<p>We also plan to support several extensions for the 2.0 release such as:</p>
+<ul class="simple">
+<li>Migrations</li>
+<li>PHPUnit Database Testing Integration</li>
+<li>NestedSet Support</li>
+<li>Symfony 2 Support</li>
+<li>Zend Framework 2 Support</li>
+</ul>
+<p>Please try out the new Beta release If you find the time and leave your
+feedback in our <a class="reference external" href="http://www.doctrine-project.org/jira/secure/Dashboard.jspa">Issue
+Tracker</a>,
+the <a class="reference external" href="http://groups.google.com/group/doctrine-user">Mailing-List</a> or
+come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/04/27/doctrine-2-beta-1-released.html#disqus_thread" data-disqus-identifier="2010/04/27/doctrine-2-beta-1-released">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>April 18, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="new-netbeans-php-codesniffer-plugin-version">
+<a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html"><h1>New Netbeans PHP CodeSniffer Plugin Version</h1></a>
+<p>This morning I took the time to merge several changes by <a class="reference external" href="http://manuel-pichler.de/">Manuel
+Piechler</a> into <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">my Github
+branch</a> of the
+CodeSniffer Plugin and released a new NBM file for you to
+<a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">download</a>.
+Here are the changes done by Manuel:</p>
+<ul class="simple">
+<li>Ability to specifiy the path to CodeSniffer Binary</li>
+<li>Automatic Detection of all the installed Coding Standards</li>
+<li>Fixed Automatic Binary Detection on Windows</li>
+</ul>
+<p>The only open TODO for this project is the possibility to specify
+different standards on a per project basis, currently you can only
+choose a global standard.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/04/18/new-netbeans-php-codesniffer-plugin-version.html#disqus_thread" data-disqus-identifier="2010/04/18/new-netbeans-php-codesniffer-plugin-version">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>December 18, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="generate-proxy-code-using-a-stream-wrapper">
+<a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html"><h1>Generate Proxy code using a stream wrapper</h1></a>
+<p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
+<p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <tt class="docutils literal"><span class="pre">stat()</span></tt> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
+<p>I havent found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <tt class="docutils literal"><span class="pre">include()</span></tt>. The client code looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nb">stream_wrapper_register</span><span class="p">(</span><span class="s2">&quot;dc2proxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Doctrine\ORM\Proxy\ProxyStreamWrapper&quot;</span><span class="p">);</span>
+
+<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">&quot;dc2proxy:///proxies&quot;</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$em</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$className</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$proxyClass</span><span class="p">;</span>
+
+<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;.php&quot;</span><span class="p">;</span>
+
+<span class="nb">unset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
+The stream wrapper to make this work looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$proxyCode</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="nf">stream_open</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$options</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$opened_path</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span>
+                <span class="o">-&gt;</span><span class="na">getProxyFactory</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">getProxyClassCode</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">stream_stat</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
+        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">url_stat</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
+        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_read</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$ret</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_write</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$left</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
+        <span class="nv">$right</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$left</span> <span class="o">.</span> <span class="nv">$data</span> <span class="o">.</span> <span class="nv">$right</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_tell</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_eof</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">&gt;=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_seek</span><span class="p">(</span><span class="nv">$offset</span><span class="p">,</span> <span class="nv">$whence</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$whence</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">SEEK_SET</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">case</span> <span class="nx">SEEK_CUR</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">case</span> <span class="nx">SEEK_END</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What do you think about this approach? Are there any potential problems I am not seeing?</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/12/18/generate-proxy-code-using-a-stream-wrapper.html#disqus_thread" data-disqus-identifier="2010/12/18/generate-proxy-code-using-a-stream-wrapper">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>December 07, 2010</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">
+<a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html"><h1>Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</h1></a>
+<p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
+<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="s2">&quot;hello world with ReST and Zeta Components!&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home/">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
+<p>My next plans for the blog bundle are:</p>
+<ul class="simple">
+<li>WebDav support for authoring. All articles will be named “slug.inputformat”, for example “blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst”. For this I plan to write a custom backend for ezcWebdav.</li>
+<li>Making the Bundle simpler to re-use by others.</li>
+<li>More jQuery love to the backend.</li>
+<li>Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.</li>
+</ul>
+<p>Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html#disqus_thread" data-disqus-identifier="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>February 25, 2009</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="git-is-great-helping-out-with-mutateme">
+<a href="2009/02/25/git-is-great-helping-out-with-mutateme.html"><h1>Git is great: Helping out with MutateMe</h1></a>
+<p>These last days I had fun with <a class="reference external" href="https://github.com/padraic/mutateme/tree">Padraic Bradys
+MutateMe</a> project. It
+dynamically changes your code (using PECL Runkit extension) and checks
+weather your test cases fetch the errors occurring from changing the
+source code. This is a great addition to having a test suite, because it
+finds all the problematic test cases, that try to do too much and fail
+to cover the code correctly.</p>
+<p>I have also contributed to the MutateMe project already and this was
+only possible due to Git and <a class="reference external" href="http://www.github.com">GitHub</a>, which
+makes contributing to any project easy like writing a hello world
+example in a random programing language. As such I have to agree with
+Padraic: <a class="reference external" href="http://blog.astrumfutura.com/archives/390-Mutation-Testing-MutateMe-0.2.0alpha-Released.html">I love Git,
+too!</a>
+He already integrated my and <a class="reference external" href="http://www.phpunit.de">Sebastians</a>
+changes back into the master and we didn’t have to focus on merging,
+communication and integration alot.</p>
+<p>My <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PUMA project</a> is also
+hosted on GitHub (although nobody has looked into that yet), but I am
+beginning to write a complete Runner now that calls all three components
+<a class="reference external" href="http://www.phpunit.de">PHPUnit</a>, <a class="reference external" href="http://www.pdepend.org">PDepend</a>
+and CodeSniffer at once and directly processes the results. When this is
+done, I will pack it all up as a PEAR package for anyone to test out.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/02/25/git-is-great-helping-out-with-mutateme.html#disqus_thread" data-disqus-identifier="2009/02/25/git-is-great-helping-out-with-mutateme">Leave a comment</a>
+        </div>
+    </div>
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="page1.html">Older</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    <div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/index.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+
+  </body>
 </html>
