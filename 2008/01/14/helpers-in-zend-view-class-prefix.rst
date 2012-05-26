@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2008-01-14
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 Helpers in Zend_View: Class Prefix
 ==================================

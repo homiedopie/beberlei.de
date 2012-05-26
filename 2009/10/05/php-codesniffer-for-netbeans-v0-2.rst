@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2009-10-05
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 PHP CodeSniffer for Netbeans v0.2
 =================================

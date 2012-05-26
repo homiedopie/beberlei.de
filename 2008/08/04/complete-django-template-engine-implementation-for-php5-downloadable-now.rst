@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2008-08-04
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 Complete Django Template Engine Implementation for PHP5 - Downloadable Now
 ==========================================================================

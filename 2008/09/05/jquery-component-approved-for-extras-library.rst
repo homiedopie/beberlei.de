@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2008-09-05
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 jQuery Component approved for extras library
 ============================================

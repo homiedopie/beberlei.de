@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2008-01-20
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 Zend_View Hack for implementation of RSS Feed
 =============================================

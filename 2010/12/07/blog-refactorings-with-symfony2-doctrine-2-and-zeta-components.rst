@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2010-12-07
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components
 ===============================================================

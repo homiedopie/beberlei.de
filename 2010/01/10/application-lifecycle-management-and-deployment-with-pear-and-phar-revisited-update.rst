@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2010-01-10
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) *UPDATE*
 =======================================================================================

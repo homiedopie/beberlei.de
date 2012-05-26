@@ -1,5 +1,7 @@
-:author: beberlei <kontakt@beberlei.de>
-:date: 2008-11-01
+.. categories:: none
+.. tags:: none
+.. comments::
+.. author:: beberlei <kontakt@beberlei.de>
 
 ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.
 ======================================================
