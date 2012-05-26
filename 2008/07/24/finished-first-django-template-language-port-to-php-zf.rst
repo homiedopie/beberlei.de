@@ -1,4 +1,3 @@
-
 Finished first Django Template Language Port to PHP + ZF
 ========================================================
 

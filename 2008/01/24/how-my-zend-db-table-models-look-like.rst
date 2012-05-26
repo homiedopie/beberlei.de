@@ -1,4 +1,3 @@
-
 How my Zend_Db_Table models look like
 =====================================
 

@@ -1,4 +1,3 @@
-
 PHP CodeSniffer for Netbeans v0.2
 =================================
 

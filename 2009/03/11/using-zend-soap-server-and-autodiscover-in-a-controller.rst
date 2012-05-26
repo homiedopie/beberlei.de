@@ -1,4 +1,3 @@
-
 Using Zend_Soap Server and Autodiscover in a Controller
 =======================================================
 

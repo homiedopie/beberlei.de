@@ -1,4 +1,3 @@
-
 jQuery Helper - What is to include?
 ===================================
 

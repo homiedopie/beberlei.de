@@ -1,4 +1,3 @@
-
 Writing a Game for KDE4
 =======================
 

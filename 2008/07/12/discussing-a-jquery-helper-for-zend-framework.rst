@@ -1,4 +1,3 @@
-
 Discussing a jQuery Helper for Zend Framework
 =============================================
 

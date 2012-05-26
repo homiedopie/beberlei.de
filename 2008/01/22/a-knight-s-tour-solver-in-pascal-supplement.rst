@@ -1,4 +1,3 @@
-
 A knight's tour solver in pascal - supplement
 =============================================
 

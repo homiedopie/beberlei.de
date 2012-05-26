@@ -1,4 +1,3 @@
-
 Knights Tour using Warndorff's rule
 ===================================
 

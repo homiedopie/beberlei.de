@@ -1,4 +1,3 @@
-
 Updating from KDE3.5 to KDE4 with Mac-Style Menubars
 ====================================================
 

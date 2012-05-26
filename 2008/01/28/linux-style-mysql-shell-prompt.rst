@@ -1,4 +1,3 @@
-
 Linux style MySQL Shell prompt
 ==============================
 

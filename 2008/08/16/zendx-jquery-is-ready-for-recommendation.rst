@@ -1,4 +1,3 @@
-
 ZendX_JQuery is Ready for Recommendation
 ========================================
 

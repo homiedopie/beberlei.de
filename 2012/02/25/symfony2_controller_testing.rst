@@ -1,4 +1,3 @@
-
 Symfony2 Controller Testing without Application
 ===============================================
 

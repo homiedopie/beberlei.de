@@ -1,4 +1,3 @@
-
 Netbeans PHP CodeSniffer Plugin: Now with Options Dialog
 ========================================================
 

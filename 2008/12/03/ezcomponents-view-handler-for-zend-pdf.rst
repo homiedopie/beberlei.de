@@ -1,4 +1,3 @@
-
 ezComponents View Handler for Zend_Pdf
 ======================================
 

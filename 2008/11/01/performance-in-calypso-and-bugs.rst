@@ -1,4 +1,3 @@
-
 Performance in Calypso (and Bugs)
 =================================
 

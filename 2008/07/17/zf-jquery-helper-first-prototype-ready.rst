@@ -1,4 +1,3 @@
-
 ZF jQuery Helper - First Prototype Ready
 ========================================
 

@@ -1,4 +1,3 @@
-
 My 2 cents on Zend_Search_Lucene Update Problems
 ================================================
 

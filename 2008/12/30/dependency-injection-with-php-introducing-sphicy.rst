@@ -1,4 +1,3 @@
-
 Dependency Injection with PHP: Introducing Sphicy
 =================================================
 

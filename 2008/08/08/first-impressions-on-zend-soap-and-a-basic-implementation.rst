@@ -1,4 +1,3 @@
-
 First impressions on Zend_Soap and a basic implementation
 =========================================================
 

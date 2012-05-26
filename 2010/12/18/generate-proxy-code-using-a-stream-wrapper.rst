@@ -1,4 +1,3 @@
-
 Generate Proxy code using a stream wrapper
 ==========================================
 

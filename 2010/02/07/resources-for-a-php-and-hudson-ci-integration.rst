@@ -1,4 +1,3 @@
-
 Resources for a PHP and Hudson CI Integration
 =============================================
 

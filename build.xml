@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<project name="Whitewashing" basedir="." default="build">
+    <target name="build">
+        <exec executable="tinker"><arg value="--build" /></exec>
+        <exec executable="git"><arg value="checkout" /><arg value="gh-pages" /></exec>
+        <copy dir="${basedir}/blog/html/" todir="." />
+        <exec executable="git"><arg value="add" /><arg value="." /></exec>
+        <exec executable="git"><arg value="commit" /><arg value="-m" /><arg value="Release" /></exec>
+        <exec executable="git"><arg value="push" /><arg value="origin" /><arg value="gh-pages" /></exec>
+        <exec executable="git"><arg value="checkout" /><arg value="master" /></exec>
+    </target>
+</project>

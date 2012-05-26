@@ -1,4 +1,3 @@
-
 Helpers in Zend_View: Class Prefix
 ==================================
 

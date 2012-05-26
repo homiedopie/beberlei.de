@@ -1,4 +1,3 @@
-
 Testing Database Locks with PHPUnit and Gearman
 ===============================================
 

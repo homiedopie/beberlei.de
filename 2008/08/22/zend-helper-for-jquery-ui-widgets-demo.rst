@@ -1,4 +1,3 @@
-
 Zend Helper for jQuery UI Widgets Demo
 ======================================
 

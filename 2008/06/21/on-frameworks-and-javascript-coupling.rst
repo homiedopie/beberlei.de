@@ -1,4 +1,3 @@
-
 On Frameworks and Javascript Coupling
 =====================================
 

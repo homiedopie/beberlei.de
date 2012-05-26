@@ -1,4 +1,3 @@
-
 Teaching Zend_Form some MVC
 ===========================
 

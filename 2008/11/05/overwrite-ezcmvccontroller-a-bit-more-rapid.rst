@@ -1,4 +1,3 @@
-
 Overwrite ezcMvcController - A bit more rapid
 =============================================
 

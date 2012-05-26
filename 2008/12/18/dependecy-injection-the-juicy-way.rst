@@ -1,4 +1,3 @@
-
 Dependecy Injection the juicy way
 =================================
 

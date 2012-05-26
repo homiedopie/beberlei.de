@@ -1,4 +1,3 @@
-
 ZF: Caching Pages via Front Controller Plugin
 =============================================
 

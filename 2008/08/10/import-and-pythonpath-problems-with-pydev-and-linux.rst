@@ -1,4 +1,3 @@
-
 Import and PYTHONPATH Problems with PyDev and Linux
 ===================================================
 

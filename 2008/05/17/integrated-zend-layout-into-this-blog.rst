@@ -1,4 +1,3 @@
-
 Integrated Zend_Layout into this blog
 =====================================
 

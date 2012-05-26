@@ -1,4 +1,3 @@
-
 Encouraging forks for Calypso DTL
 =================================
 

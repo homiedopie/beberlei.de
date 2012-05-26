@@ -1,4 +1,3 @@
-
 Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components
 ===============================================================
 

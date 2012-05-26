@@ -1,4 +1,3 @@
-
 Multidimensional Array via SPL
 ==============================
 

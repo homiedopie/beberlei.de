@@ -1,4 +1,3 @@
-
 Wrestling with Dojo
 ===================
 

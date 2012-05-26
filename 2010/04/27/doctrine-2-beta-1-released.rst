@@ -1,4 +1,3 @@
-
 Doctrine 2 Beta 1 released
 ==========================
 

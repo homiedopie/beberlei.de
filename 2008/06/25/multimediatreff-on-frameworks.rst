@@ -1,4 +1,3 @@
-
 Multimediatreff on Frameworks
 =============================
 

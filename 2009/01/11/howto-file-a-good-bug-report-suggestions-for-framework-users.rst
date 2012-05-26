@@ -1,4 +1,3 @@
-
 Howto file a good bug report: Suggestions for framework users
 =============================================================
 

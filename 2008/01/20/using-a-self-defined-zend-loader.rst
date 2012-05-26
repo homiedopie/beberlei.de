@@ -1,4 +1,3 @@
-
 Using a self defined Zend_Loader
 ================================
 

@@ -1,4 +1,3 @@
-
 Git is great: Helping out with MutateMe
 =======================================
 

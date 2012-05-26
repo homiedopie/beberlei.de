@@ -1,4 +1,3 @@
-
 Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) *UPDATE*
 =======================================================================================
 

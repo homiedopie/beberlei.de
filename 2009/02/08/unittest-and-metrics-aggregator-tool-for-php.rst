@@ -1,4 +1,3 @@
-
 Unittest and Metrics Aggregator Tool for PHP
 ============================================
 

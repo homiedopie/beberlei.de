@@ -1,4 +1,3 @@
-
 Bad news: jQuery UI 1.6 ships without Spinner and AutoComplete
 ==============================================================
 

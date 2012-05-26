@@ -1,4 +1,3 @@
-
 Finally: Zend_Mail charset and/or long lines header encoding bug fixed
 ======================================================================
 

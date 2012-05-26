@@ -1,4 +1,3 @@
-
 Benchmark and Optimize Zend Framework Performance
 =================================================
 

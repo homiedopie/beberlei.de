@@ -1,4 +1,3 @@
-
 Implementing Zend Auth, Acl and Caching
 =======================================
 

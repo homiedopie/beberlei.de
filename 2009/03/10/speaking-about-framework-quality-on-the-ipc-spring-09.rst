@@ -1,4 +1,3 @@
-
 Speaking about Framework Quality on the IPC Spring 09
 =====================================================
 

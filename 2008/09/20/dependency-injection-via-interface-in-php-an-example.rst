@@ -1,4 +1,3 @@
-
 Dependency Injection via Interface in PHP: An example
 =====================================================
 

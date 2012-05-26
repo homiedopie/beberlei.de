@@ -1,4 +1,3 @@
-
 Ox: Cross-correlation coefficients with lags
 ============================================
 

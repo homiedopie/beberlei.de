@@ -1,4 +1,3 @@
-
 ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.
 ======================================================
 

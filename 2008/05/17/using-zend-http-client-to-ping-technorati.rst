@@ -1,4 +1,3 @@
-
 Using Zend_Http_Client to Ping Technorati
 =========================================
 

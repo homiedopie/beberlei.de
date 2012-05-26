@@ -1,4 +1,3 @@
-
 Zend, Dojo and the Django Template Language
 ===========================================
 

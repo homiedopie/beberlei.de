@@ -1,4 +1,3 @@
-
 PHP CodeSniffer Support for Netbeans
 ====================================
 

@@ -1,4 +1,3 @@
-
 REST and Ajax Aware controllers in ezcMvcTools
 ==============================================
 

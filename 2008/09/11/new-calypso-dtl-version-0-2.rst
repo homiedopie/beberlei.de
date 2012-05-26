@@ -1,4 +1,3 @@
-
 New Calypso DTL Version 0.2
 ===========================
 

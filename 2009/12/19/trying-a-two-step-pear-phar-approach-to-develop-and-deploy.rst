@@ -1,4 +1,3 @@
-
 Trying a Two Step PEAR/PHAR approach to develop and deploy
 ==========================================================
 

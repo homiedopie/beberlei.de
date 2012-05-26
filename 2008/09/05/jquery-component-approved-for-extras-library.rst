@@ -1,4 +1,3 @@
-
 jQuery Component approved for extras library
 ============================================
 

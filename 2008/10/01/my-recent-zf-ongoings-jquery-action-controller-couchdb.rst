@@ -1,4 +1,3 @@
-
 My recent ZF ongoings: JQuery, Action Controller, CouchDb
 =========================================================
 

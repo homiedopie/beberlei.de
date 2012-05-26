@@ -1,4 +1,3 @@
-
 Test your Legacy PHP Application with Function Mocks!
 =====================================================
 

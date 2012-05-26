@@ -1,4 +1,3 @@
-
 Introducing: Zend Controller Scaffolding
 ========================================
 

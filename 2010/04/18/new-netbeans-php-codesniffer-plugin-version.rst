@@ -1,4 +1,3 @@
-
 New Netbeans PHP CodeSniffer Plugin Version
 ===========================================
 

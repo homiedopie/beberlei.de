@@ -1,4 +1,3 @@
-
 PDT: Back to easyeclipse with PHP extension
 ===========================================
 

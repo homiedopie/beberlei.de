@@ -1,4 +1,3 @@
-
 Zend_Form and the Model: Yet another perspective using a Mediator
 =================================================================
 

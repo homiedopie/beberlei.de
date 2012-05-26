@@ -1,4 +1,3 @@
-
 DojoX Django Template Language Example with Data from PHP/JSON
 ==============================================================
 

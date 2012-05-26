@@ -1,4 +1,3 @@
-
 Greaat, Python can control your Wiimote
 =======================================
 

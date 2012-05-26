@@ -1,4 +1,3 @@
-
 Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill
 ============================================================
 

@@ -1,4 +1,3 @@
-
 Complete Django Template Engine Implementation for PHP5 - Downloadable Now
 ==========================================================================
 

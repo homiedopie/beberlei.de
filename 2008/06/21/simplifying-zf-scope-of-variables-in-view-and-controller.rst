@@ -1,4 +1,3 @@
-
 Simplifying ZF: Scope of Variables in View and Controller
 =========================================================
 

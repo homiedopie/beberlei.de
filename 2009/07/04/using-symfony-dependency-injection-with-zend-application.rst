@@ -1,4 +1,3 @@
-
 Using Symfony Dependency Injection with Zend_Application
 ========================================================
 

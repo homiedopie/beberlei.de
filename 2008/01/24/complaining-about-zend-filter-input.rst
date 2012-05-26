@@ -1,4 +1,3 @@
-
 Complaining about Zend_Filter_Input
 ===================================
 

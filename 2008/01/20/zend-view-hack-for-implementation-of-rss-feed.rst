@@ -1,4 +1,3 @@
-
 Zend_View Hack for implementation of RSS Feed
 =============================================
 

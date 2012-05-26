@@ -1,4 +1,3 @@
-
 Using a Dependency Injection Container with Zend_Application
 ============================================================
 
