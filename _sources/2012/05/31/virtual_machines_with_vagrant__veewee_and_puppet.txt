@@ -101,6 +101,9 @@ that we want to use with vagrant, do:
     $ vagrant up
     $ vagrant ssh
 
+Although the blog-title suggests it, Puppet hasnt been used much up to this
+point. The use of puppet with Vagrant will be part of a next blog post.
+
 .. author:: default
 .. categories:: none
 .. tags:: none
