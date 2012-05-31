@@ -126,7 +126,8 @@ building the VMs fails:</p>
 <p>You can then open up the postinstall.sh and install more packages that you need
 in your personal basebox. For example a LAMP stack. Do this right after the
 lines that do <cite>apt-get install -y</cite>:</p>
-<div class="highlight-python"><pre>apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5</pre>
+<div class="highlight-python"><pre>export DEBIAN_FRONTEND=noninteractive
+apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5</pre>
 </div>
 <p>If you are done you can start building a virtualbox image with:</p>
 <div class="highlight-python"><pre>$ vagrant basebox build</pre>
