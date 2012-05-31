@@ -25,10 +25,10 @@ matter how many different and weird dependencies you need, they will always be
 in this VM that is just created for the project and destroyed at the end of the
 day.
 
-I am using Ubuntu (currently 12.04) and tried starting with the Vagrant example.
-It fails, because their example box uses a more current Virtualbox Guest
-Additions. To be able to use vagrant, you need a basebox with the virtualbox
- and guest additions versions matching correctly. 
+I am using Ubuntu (currently 12.04) and tried starting with the Vagrant
+example.  It fails, because their example box uses a more current Virtualbox
+Guest Additions. To be able to use vagrant, you need a basebox with the
+virtualbox and guest additions versions matching correctly. 
 
 To build your own Virtualbox you can use the Vagrant plugin `Veewee
 <https://github.com/jedi4ever/veewee>`_. Install it from Github to get
