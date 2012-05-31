@@ -80,6 +80,55 @@
         <div class="timestamp postmeta">
             <span>August 02, 2008</span> 
         </div>
+        <?xml version="1.0" ?><div class="section" id="dojox-django-template-language-example-with-data-from-php-json">
+<a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html"><h1>DojoX Django Template Language Example with Data from PHP/JSON</h1></a>
+<p>This is a simple example how you would use DojoX Django Template
+Language component filled with data from a JSON GET Response:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>&lt;script type=&quot;text/javascript&quot; src=&quot;/development/dojo-release-1.1.1/dojo/dojo.js&quot; djConfig=&quot;parseOnLoad:true, isDebug:true&quot;&gt;&lt;/script&gt;
+
+&lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;&lt;!--
+dojo.require(&quot;dojox.dtl&quot;);
+dojo.require(&quot;dojox.dtl.Context&quot;);
+dojo.require(&quot;dojox.dtl.ext-dojo.NodeList&quot;);
+dojo.addOnLoad(
+    dojo.xhrGet({url: &quot;dojotest.php&quot;, handleAs: &quot;json&quot;, handle: function(data,ioArgs){
+        if(typeof data == &quot;error&quot;){
+            console.log(&quot;error?&quot;,data);
+        } else {
+            dojo.query(&quot;#test&quot;).dtl(&quot;I am eating {{food.fruit}} and {{food.meat}}&quot;, data);
+        }
+    }
+}));
+--&gt;&lt;/script&gt;
+
+::
+
+    &lt;?php
+    header('Content-type: text/json');
+    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
+    echo json_encode($food);
+    ?&gt;</pre>
+</div>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html#disqus_thread" data-disqus-identifier="2008/08/02/dojox-django-template-language-example-with-data-from-php-json">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>August 02, 2008</span> 
+        </div>
         <?xml version="1.0" ?><div class="section" id="wrestling-with-dojo">
 <a href="2008/08/02/wrestling-with-dojo.html"><h1>Wrestling with Dojo</h1></a>
 <p>I have to complain about the <a class="reference external" href="http://www.dojotoolkit.org">Dojo
@@ -574,60 +623,6 @@ old ways”.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/23/constructions.html#disqus_thread" data-disqus-identifier="2008/01/23/constructions">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 14, 2008</span> 
-        </div>
-        <?xml version="1.0" ?><div class="section" id="helpers-in-zend-view-class-prefix">
-<a href="2008/01/14/helpers-in-zend-view-class-prefix.html"><h1>Helpers in Zend_View: Class Prefix</h1></a>
-<p>I have to say, the Zend Framework documentation is a bit imprecise
-sometimes. Regarding custom Helpers in Zend_View it states:</p>
-<blockquote>
-<div>The class name must, at the very minimum, end with the helper name
-itself, using CamelCaps. E.g., if you were writing a helper called
-“specialPurpose”, the class name would minimally need to be
-“SpecialPurpose”. You may, and should, give the class name a prefix,
-and it is recommended that you use ‘View_Helper’ as part of that
-prefix: “My_View_Helper_SpecialPurpose”. (You will need to pass
-in the prefix, with or without the trailing underscore, to
-addHelperPath() or setHelperPath()).</div></blockquote>
-<p>What does that mean regarding how your Helper has to be called? The
-default prefix for a Helper function that should be called foobar() is
-actually:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class Zend_View_Helper_Foobar()
-{
-    function foobar() { }
-}</pre>
-</div>
-</div></blockquote>
-<p>It took me some time to realize that. Why doesn’t Zend just give an
-example like that? To change the prefix in a context of the
-Zend_Controller_Action you have to do something like this:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class SomeController extends Zend_Controller_Action
-{
-    function init() {
-        $this-&gt;initView();
-        $this-&gt;view-&gt;addHelperPath(&quot;pathtohelpers&quot;, &quot;ClassPrefix&quot;);
-    }
-}</pre>
-</div>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/14/helpers-in-zend-view-class-prefix.html#disqus_thread" data-disqus-identifier="2008/01/14/helpers-in-zend-view-class-prefix">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -674,6 +669,9 @@ Zend_Controller_Action you have to do something like this:</p>
     <h3>Recent Posts</h3>
     <ul>
         <li>
+            <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
+        </li>
+        <li>
             <a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
         </li>
         <li>
@@ -699,9 +697,6 @@ Zend_Controller_Action you have to do something like this:</p>
         </li>
         <li>
             <a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
-        </li>
-        <li>
-            <a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
         </li>
     </ul>
 </div>

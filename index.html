@@ -74,6 +74,98 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>May 31, 2012</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="virtual-machines-with-vagrant-veewee-and-puppet">
+<a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html"><h1>Virtual Machines with Vagrant, Veewee and Puppet</h1></a>
+<p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
+VM management very efficiently. Being always late to new technologies
+investigating Vagrant now felt about right. I am using Virtualbox for
+virtualization for about a year now but have build all my boxes manually. I
+have these machines setup:</p>
+<ul class="simple">
+<li>Windows 7</li>
+<li>Ubuntu with lots of crazy PHP builds</li>
+<li>Ubuntu with Oracle, PostgreSQL for Doctrine Unit-Tests</li>
+</ul>
+<p>The main benefit from this is that I don’t have to clutter my main machine with
+packages and dependencies that might potentially break.</p>
+<p>To benefit from Virtualization on a larger scale I wanted to investigate
+automation of box-building and was pointed to <a class="reference external" href="http://www.vagrantup.com">Vagrant</a>. This is a ruby tool that allows to copy and
+modify virtualboxes on the fly. You define a basebox and inherit from this box
+in your projects. Whenever you work on the project you start a copy of this
+basebox and install more system-dependencies using Chef or Puppet.
+That allows you to put the VM into a defined state just for this project. No
+matter how many different and weird dependencies you need, they will always be
+in this VM that is just created for the project and destroyed at the end of the
+day.</p>
+<p>I am using Ubuntu (currently 12.04) and tried starting with the Vagrant example.
+It fails, because their example box uses a more current Virtualbox Guest
+Additions. To be able to use vagrant, you need a basebox with the virtualbox</p>
+<blockquote>
+<div>and guest additions versions matching correctly.</div></blockquote>
+<p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
+all the latest VM templates:</p>
+<div class="highlight-python"><pre>$ git clone https://github.com/jedi4ever/veewee.git
+$ cd veewee
+$ sudo gem install bundler
+$ sudo bundle install
+$ alias vagrant=&quot;bundle exec vagrant&quot;</pre>
+</div>
+<p>You need Ruby and Gems installed for this to work. Veewee can be installed
+using Gems, but this not necessarily gives you the version with the most recent
+templates that match your own operating system version.</p>
+<p>Now lets define our own basebox definition and copy from an existing template
+that Veewee provides:</p>
+<div class="highlight-python"><pre>$ vagrant basebox define 'beberlei-ubuntu-12.04-i386-php' 'ubuntu-server-12.04-i386'</pre>
+</div>
+<p>This creates a copy from the default ubuntu server template into a folder
+<cite>definitions/beberlei-ubuntu-12.04-i386-php</cite>. You can start modifying the files
+in there to adjust the build process of the virtual machine image. For me its
+important to modify the definitions.rb and add the following, otherwise
+building the VMs fails:</p>
+<div class="highlight-python"><pre>:virtualbox =&gt; { : vm_options =&gt; [&quot;pae&quot; =&gt; &quot;on&quot;]},</pre>
+</div>
+<p>You can then open up the postinstall.sh and install more packages that you need
+in your personal basebox. For example a LAMP stack. Do this right after the
+lines that do <cite>apt-get install -y</cite>:</p>
+<div class="highlight-python"><pre>apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5</pre>
+</div>
+<p>If you are done you can start building a virtualbox image with:</p>
+<div class="highlight-python"><pre>$ vagrant basebox build</pre>
+</div>
+<p>Make sure not to start typing in the console window that open ups. It is
+automatically controlled from a ruby script and every change to the keysequence
+breaks the building. This step takes a while. (Enough to write a blog post
+while watching a boring football game for example).</p>
+<p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
+<div class="highlight-python"><pre>$ veewee vbox validate 'beberlei-ubuntu-12.04-i386-php'
+$ vagrant basebox export 'beberlei-ubuntu-12.04-i386-php'
+$ vagrant box add 'beberlei-ubuntu-12.04-i386-php' 'beberlei-ubuntu-12.04-i386-php.box'</pre>
+</div>
+<p>Now this box is also available as Vagrant base box. For example in a project
+that we want to use with vagrant, do:</p>
+<div class="highlight-python"><pre>$ cd myproject/
+$ vagrant init 'beberlei-ubuntu-12.04-i386-php'
+$ vagrant up
+$ vagrant ssh</pre>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html#disqus_thread" data-disqus-identifier="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>May 26, 2012</span> 
         </div>
         <?xml version="1.0" ?><div class="section" id="doctrine-switches-from-lgpl-to-mit">
@@ -1101,41 +1193,6 @@ The stream wrapper to make this work looks like this:</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/12/18/generate-proxy-code-using-a-stream-wrapper.html#disqus_thread" data-disqus-identifier="2010/12/18/generate-proxy-code-using-a-stream-wrapper">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 07, 2010</span> 
-        </div>
-        <?xml version="1.0" ?><div class="section" id="blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">
-<a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html"><h1>Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</h1></a>
-<p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
-<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">echo</span> <span class="s2">&quot;hello world with ReST and Zeta Components!&quot;</span><span class="p">;</span>
-</pre></div>
-</div>
-<p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home/">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
-<p>My next plans for the blog bundle are:</p>
-<ul class="simple">
-<li>WebDav support for authoring. All articles will be named “slug.inputformat”, for example “blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst”. For this I plan to write a custom backend for ezcWebdav.</li>
-<li>Making the Bundle simpler to re-use by others.</li>
-<li>More jQuery love to the backend.</li>
-<li>Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.</li>
-</ul>
-<p>Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html#disqus_thread" data-disqus-identifier="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">Leave a comment</a>
         </div>
     </div>
     

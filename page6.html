@@ -78,6 +78,60 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 14, 2008</span> 
+        </div>
+        <?xml version="1.0" ?><div class="section" id="helpers-in-zend-view-class-prefix">
+<a href="2008/01/14/helpers-in-zend-view-class-prefix.html"><h1>Helpers in Zend_View: Class Prefix</h1></a>
+<p>I have to say, the Zend Framework documentation is a bit imprecise
+sometimes. Regarding custom Helpers in Zend_View it states:</p>
+<blockquote>
+<div>The class name must, at the very minimum, end with the helper name
+itself, using CamelCaps. E.g., if you were writing a helper called
+“specialPurpose”, the class name would minimally need to be
+“SpecialPurpose”. You may, and should, give the class name a prefix,
+and it is recommended that you use ‘View_Helper’ as part of that
+prefix: “My_View_Helper_SpecialPurpose”. (You will need to pass
+in the prefix, with or without the trailing underscore, to
+addHelperPath() or setHelperPath()).</div></blockquote>
+<p>What does that mean regarding how your Helper has to be called? The
+default prefix for a Helper function that should be called foobar() is
+actually:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class Zend_View_Helper_Foobar()
+{
+    function foobar() { }
+}</pre>
+</div>
+</div></blockquote>
+<p>It took me some time to realize that. Why doesn’t Zend just give an
+example like that? To change the prefix in a context of the
+Zend_Controller_Action you have to do something like this:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class SomeController extends Zend_Controller_Action
+{
+    function init() {
+        $this-&gt;initView();
+        $this-&gt;view-&gt;addHelperPath(&quot;pathtohelpers&quot;, &quot;ClassPrefix&quot;);
+    }
+}</pre>
+</div>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/14/helpers-in-zend-view-class-prefix.html#disqus_thread" data-disqus-identifier="2008/01/14/helpers-in-zend-view-class-prefix">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 22, 2008</span> 
         </div>
         <?xml version="1.0" ?><div class="section" id="a-knight-s-tour-solver-in-pascal">
@@ -506,58 +560,6 @@ using the object for what it is propably supposed to do.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/24/complaining-about-zend-filter-input.html#disqus_thread" data-disqus-identifier="2008/01/24/complaining-about-zend-filter-input">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 24, 2008</span> 
-        </div>
-        <?xml version="1.0" ?><div class="section" id="how-my-zend-db-table-models-look-like">
-<a href="2008/01/24/how-my-zend-db-table-models-look-like.html"><h1>How my Zend_Db_Table models look like</h1></a>
-<p>I am not too happy with the ZF Frameworks Table access solution. Not
-that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
-pattern</a>,
-but in most web applications you almost always have to join data some
-way or another. Even this rather simple application, a blog, needs joins
-for displaying articles so that category, comment count and tags can be
-displayed. Therefore I use an instance of Zend_Db_Table_Abstract only
-for the simplest purposes and pimp it by using lots of public methods
-and
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.db.select.html">Zend_Db_Select</a>.
-An example:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class SomeModel extends Zend_Db_Table_Abstract
-{
-  $_name = &quot;someTable&quot;;
-  $_primary = &quot;id&quot;;
-
-  public function getSomethingByJoin($param1, $param2)
-  {
-     $db = $this-&gt;getAdapter();
-     $select = $db-&gt;select();
-     ...[build select]
-     $result = $db-&gt;query($select);
-
-     return $result;
-  }
-}</pre>
-</div>
-</div></blockquote>
-<p>That way you still follow the MVC pattern and don’t have to take one
-compromise after another for getting the Table Gateway to reproduce a
-result that looks like a join.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/24/how-my-zend-db-table-models-look-like.html#disqus_thread" data-disqus-identifier="2008/01/24/how-my-zend-db-table-models-look-like">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -604,6 +606,9 @@ result that looks like a join.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li>
+            <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
+        </li>
+        <li>
             <a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
         </li>
         <li>
@@ -629,9 +634,6 @@ result that looks like a join.</p>
         </li>
         <li>
             <a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a>
-        </li>
-        <li>
-            <a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a>
         </li>
     </ul>
 </div>
