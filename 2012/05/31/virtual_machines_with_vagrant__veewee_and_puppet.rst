@@ -69,6 +69,7 @@ lines that do `apt-get install -y`:
 
 ::
 
+    export DEBIAN_FRONTEND=noninteractive
     apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
 
 If you are done you can start building a virtualbox image with:
