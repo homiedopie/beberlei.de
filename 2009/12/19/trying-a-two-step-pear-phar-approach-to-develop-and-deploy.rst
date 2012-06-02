@@ -76,7 +76,7 @@ Framework, Doctrine 2, HTML Purifier:
     whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0
 
 Now we have all three of the packages installed in our project folder
-*whitewashing/trunk/vendor*, see:
+`whitewashing/trunk/vendor`, see:
 
 ::
 
@@ -103,7 +103,7 @@ Now we have all three of the packages installed in our project folder
     -rw-r--r--  1 whitewashing www-data  19537 2009-12-13 14:36 zf.php
 
 And both Doctrine and ZF registered their binary CLi tools inside the
-*whitewashing/trunk/bin/*folder:
+`whitewashing/trunk/bin/` folder:
 
 ::
 
@@ -124,7 +124,7 @@ such which is all not really interesting for this topic. At some point
 we want to package it all up into a PHAR file and distribute it. We want
 to package our application in one big phar file. We also want to make
 sure that the configuration files in
-*whitewashing/trunk/application/configs/* are not distributed, but have
+`whitewashing/trunk/application/configs/` are not distributed, but have
 to be created on the server and are kept that way. We could write an
 installer script for this configuration management.
 

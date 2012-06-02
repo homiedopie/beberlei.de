@@ -37,23 +37,27 @@ works with static method only, is therefore in the global scope, such
 that configuration is reduced to a minimum. Generally you have to write
 interfaces for object injection, for example:
 
-    ::
+.. code-block:: php
 
-        interface InjectDbAdapter{  public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);}
+    interface InjectDbAdapter
+    {
+        public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);
+    }
 
 Other potential examples include "InjectLogger", "InjectSoapClient", or
 "InjectAppConfig". You then have to register a component for usage with
 this interface:
 
-    ::
+.. code-block:: php
 
-        Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));
+    Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));
 
 Now any class that implements the InjectDbAdapter interface can be
 instantiated via:
-    ::
 
-        $obj = Whitewashing_Container::load('Class');
+.. code-block:: php
+
+    $obj = Whitewashing_Container::load('Class');
 
 and the loader takes care of calling the 'Class' implementation of
 injectDbAdapter with the given Database Adapter. A negative consequence
@@ -71,9 +75,9 @@ which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
 parameter $localInterfaceOverride for the highest priority:
 
-    ::
+.. code-block:: php
 
-        $obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' => $newDbAdapter));
+    $obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' => $newDbAdapter));
 
 Speedwise the usage of the Container reduces class instatiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec

@@ -48,7 +48,7 @@ Create a TestKernel
 Creating the config.yml
 -----------------------
 
-.. code-block:: yml
+.. code-block:: yaml
 
     # Tests/Controller/App/config.yml
     framework:
@@ -79,7 +79,7 @@ Creating the config.yml
 Creating the routing.yml
 ------------------------
 
-.. code-block:: yml
+.. code-block:: yaml
 
     # Tests/Controller/App/routing.yml
     BeberleiWorkflowBundle:
