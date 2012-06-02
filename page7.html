@@ -44,8 +44,7 @@
         <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-16 last" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
-        and web-development and other topics of interest.</p>
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
@@ -93,24 +92,23 @@ for the simplest purposes and pimp it by using lots of public methods
 and
 <a class="reference external" href="http://framework.zend.com/manual/en/zend.db.select.html">Zend_Db_Select</a>.
 An example:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class SomeModel extends Zend_Db_Table_Abstract
-{
-  $_name = &quot;someTable&quot;;
-  $_primary = &quot;id&quot;;
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeModel extends Zend_Db_Table_Abstract</span>
+<span class="x">{</span>
+<span class="x">  $_name = &quot;someTable&quot;;</span>
+<span class="x">  $_primary = &quot;id&quot;;</span>
 
-  public function getSomethingByJoin($param1, $param2)
-  {
-     $db = $this-&gt;getAdapter();
-     $select = $db-&gt;select();
-     ...[build select]
-     $result = $db-&gt;query($select);
+<span class="x">  public function getSomethingByJoin($param1, $param2)</span>
+<span class="x">  {</span>
+<span class="x">     $db = $this-&gt;getAdapter();</span>
+<span class="x">     $select = $db-&gt;select();</span>
+<span class="x">     ...[build select]</span>
+<span class="x">     $result = $db-&gt;query($select);</span>
 
-     return $result;
-  }
-}</pre>
+<span class="x">     return $result;</span>
+<span class="x">  }</span>
+<span class="x">}</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>That way you still follow the MVC pattern and don’t have to take one
 compromise after another for getting the Table Gateway to reproduce a
 result that looks like a join.</p>
@@ -437,23 +435,23 @@ implementation of Interface Dependency Injection for PHP. The Container
 works with static method only, is therefore in the global scope, such
 that configuration is reduced to a minimum. Generally you have to write
 interfaces for object injection, for example:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>interface InjectDbAdapter{  public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);}</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">interface InjectDbAdapter</span>
+<span class="x">{</span>
+<span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
+<span class="x">}</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>Other potential examples include “InjectLogger”, “InjectSoapClient”, or
 “InjectAppConfig”. You then have to register a component for usage with
 this interface:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>Now any class that implements the InjectDbAdapter interface can be
 instantiated via:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$obj = Whitewashing_Container::load('Class');</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class');</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>and the loader takes care of calling the ‘Class’ implementation of
 injectDbAdapter with the given Database Adapter. A negative consequence
 of this approach is that you have to implement the inject methods for
@@ -468,10 +466,9 @@ implemented a method “Whitewashing_Container::registerClassComponent”,
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
 parameter $localInterfaceOverride for the highest priority:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>Speedwise the usage of the Container reduces class instatiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
 on my machine. But naturally only classes with dependancies and lots of

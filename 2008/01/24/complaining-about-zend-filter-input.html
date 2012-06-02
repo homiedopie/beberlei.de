@@ -42,8 +42,7 @@
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-16 last" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
-        and web-development and other topics of interest.</p>
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
@@ -92,25 +91,24 @@ Some examples:</p>
 error messages that can be thrown are not &#8220;user-save&#8221;. Because all these
 messages are handled in each Validator class its almost impossible to
 change them without going nuts:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$validators = array(
-    'article_id' =&gt; array(
-        'Int',
-        new Zend_Validate_Int(),
-        array('GreaterThan', 0)
-        ),
-    'username' =&gt; 'Alnum',
-    'userEmail' =&gt; new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL, true),
-    'cp'   =&gt; array(
-        'Digits',                // string
-        new Zend_Validate_Int(), // object instance
-        array('Between', 1138, 1138)  // string with constructor arguments
-    ),
-    'comment' =&gt; 'NotEmpty',
-);</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$validators = array(</span>
+<span class="x">    &#39;article_id&#39; =&gt; array(</span>
+<span class="x">        &#39;Int&#39;,</span>
+<span class="x">        new Zend_Validate_Int(),</span>
+<span class="x">        array(&#39;GreaterThan&#39;, 0)</span>
+<span class="x">        ),</span>
+<span class="x">    &#39;username&#39; =&gt; &#39;Alnum&#39;,</span>
+<span class="x">    &#39;userEmail&#39; =&gt; new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL, true),</span>
+<span class="x">    &#39;cp&#39;   =&gt; array(</span>
+<span class="x">        &#39;Digits&#39;,                // string</span>
+<span class="x">        new Zend_Validate_Int(), // object instance</span>
+<span class="x">        array(&#39;Between&#39;, 1138, 1138)  // string with constructor arguments</span>
+<span class="x">    ),</span>
+<span class="x">    &#39;comment&#39; =&gt; &#39;NotEmpty&#39;,</span>
+<span class="x">);</span>
+</pre></div>
 </div>
-</div></blockquote>
-<p>. This simple $validators requirement creates templates for error
+<p>This simple $validators requirement creates templates for error
 messages in each validator object, that are: Zend_Validate_Int,
 Zend_Validate_Alnum, Zend_Validate_EmailAddress,
 Zend_Validate_Hostname, and the not empty message. To allow for user

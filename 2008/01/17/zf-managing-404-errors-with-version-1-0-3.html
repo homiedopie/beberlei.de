@@ -42,8 +42,7 @@
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-16 last" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
-        and web-development and other topics of interest.</p>
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
@@ -86,58 +85,57 @@ errors</a>
 due to missing modules or actions is wrong. It is not enought to replace
 Zend::loadClass with Zend_Loader::loadClass. Other functions have been
 renamed, my current snippet is:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>/**
- * Original Snippet from: http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework
- */
-    class NoroutePlugin extends Zend_Controller_Plugin_Abstract
-    {
-        public function preDispatch(Zend_Controller_Request_Abstract $request )
-        {
-            $dispatcher = Zend_Controller_Front::getInstance()-&gt;getDispatcher();
+<div class="highlight-php"><div class="highlight"><pre><span class="x">/**</span>
+<span class="x"> * Original Snippet from: http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework</span>
+<span class="x"> */</span>
+<span class="x">    class NoroutePlugin extends Zend_Controller_Plugin_Abstract</span>
+<span class="x">    {</span>
+<span class="x">        public function preDispatch(Zend_Controller_Request_Abstract $request )</span>
+<span class="x">        {</span>
+<span class="x">            $dispatcher = Zend_Controller_Front::getInstance()-&gt;getDispatcher();</span>
 
-            $controllerName = $request-&gt;getControllerName();
-            if (empty($controllerName)) {
-                $controllerName = $dispatcher-&gt;getDefaultControllerClass($request);
-            }
-            $className = $dispatcher-&gt;formatControllerName($controllerName);
-            if ($className)
-            {
-                try
-                {
-                    // if this fails, an exception will be thrown and
-                    // caught below, indicating that the class can't
-                    // be loaded.
-                    Zend_Loader::loadClass($className, $dispatcher-&gt;getControllerDirectory());
-                    $actionName = $request-&gt;getActionName();
-                    if (empty($actionName)) {
-                        $actionName = $dispatcher-&gt;getDefaultAction();
-                    }
-                    $methodName = $dispatcher-&gt;formatActionName($actionName);
+<span class="x">            $controllerName = $request-&gt;getControllerName();</span>
+<span class="x">            if (empty($controllerName)) {</span>
+<span class="x">                $controllerName = $dispatcher-&gt;getDefaultControllerClass($request);</span>
+<span class="x">            }</span>
+<span class="x">            $className = $dispatcher-&gt;formatControllerName($controllerName);</span>
+<span class="x">            if ($className)</span>
+<span class="x">            {</span>
+<span class="x">                try</span>
+<span class="x">                {</span>
+<span class="x">                    // if this fails, an exception will be thrown and</span>
+<span class="x">                    // caught below, indicating that the class can&#39;t</span>
+<span class="x">                    // be loaded.</span>
+<span class="x">                    Zend_Loader::loadClass($className, $dispatcher-&gt;getControllerDirectory());</span>
+<span class="x">                    $actionName = $request-&gt;getActionName();</span>
+<span class="x">                    if (empty($actionName)) {</span>
+<span class="x">                        $actionName = $dispatcher-&gt;getDefaultAction();</span>
+<span class="x">                    }</span>
+<span class="x">                    $methodName = $dispatcher-&gt;formatActionName($actionName);</span>
 
-                    $class = new ReflectionClass( $className );
-                    if( $class-&gt;hasMethod( $methodName ) )
-                    {
-                        // all is well - exit now
-                        return;
-                    }
-                }
-                catch (Zend_Exception $e)
-                {
-                    // Couldn't load the class. No need to act yet,
-                    // just catch the exception and fall out of the
-                    // if
-                }
-            }
+<span class="x">                    $class = new ReflectionClass( $className );</span>
+<span class="x">                    if( $class-&gt;hasMethod( $methodName ) )</span>
+<span class="x">                    {</span>
+<span class="x">                        // all is well - exit now</span>
+<span class="x">                        return;</span>
+<span class="x">                    }</span>
+<span class="x">                }</span>
+<span class="x">                catch (Zend_Exception $e)</span>
+<span class="x">                {</span>
+<span class="x">                    // Couldn&#39;t load the class. No need to act yet,</span>
+<span class="x">                    // just catch the exception and fall out of the</span>
+<span class="x">                    // if</span>
+<span class="x">                }</span>
+<span class="x">            }</span>
 
-            // we only arrive here if can't find controller or action
-            $request-&gt;setControllerName( 'blog' );
-            $request-&gt;setActionName( 'noroute' );
-            $request-&gt;setDispatched( false );
-        }
-    }</pre>
+<span class="x">            // we only arrive here if can&#39;t find controller or action</span>
+<span class="x">            $request-&gt;setControllerName( &#39;blog&#39; );</span>
+<span class="x">            $request-&gt;setActionName( &#39;noroute&#39; );</span>
+<span class="x">            $request-&gt;setDispatched( false );</span>
+<span class="x">        }</span>
+<span class="x">    }</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>I hope someone needs this as much as me.</p>
 </div>
 

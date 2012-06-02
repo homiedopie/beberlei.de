@@ -12,23 +12,24 @@ for the simplest purposes and pimp it by using lots of public methods
 and
 `Zend\_Db\_Select <http://framework.zend.com/manual/en/zend.db.select.html>`_.
 An example:
-    ::
 
-        class SomeModel extends Zend_Db_Table_Abstract
-        {
-          $_name = "someTable";
-          $_primary = "id";
+.. code-block:: php
 
-          public function getSomethingByJoin($param1, $param2)
-          {
-             $db = $this->getAdapter();
-             $select = $db->select();
-             ...[build select]
-             $result = $db->query($select);
+    class SomeModel extends Zend_Db_Table_Abstract
+    {
+      $_name = "someTable";
+      $_primary = "id";
 
-             return $result;
-          }
-        }
+      public function getSomethingByJoin($param1, $param2)
+      {
+         $db = $this->getAdapter();
+         $select = $db->select();
+         ...[build select]
+         $result = $db->query($select);
+
+         return $result;
+      }
+    }
 
 That way you still follow the MVC pattern and don't have to take one
 compromise after another for getting the Table Gateway to reproduce a

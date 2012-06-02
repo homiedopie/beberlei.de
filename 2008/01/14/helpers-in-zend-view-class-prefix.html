@@ -42,8 +42,7 @@
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-16 last" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
-        and web-development and other topics of interest.</p>
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
@@ -94,26 +93,24 @@ addHelperPath() or setHelperPath()).</div></blockquote>
 <p>What does that mean regarding how your Helper has to be called? The
 default prefix for a Helper function that should be called foobar() is
 actually:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class Zend_View_Helper_Foobar()
-{
-    function foobar() { }
-}</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class Zend_View_Helper_Foobar()</span>
+<span class="x">{</span>
+<span class="x">    function foobar() { }</span>
+<span class="x">}</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>It took me some time to realize that. Why doesn&#8217;t Zend just give an
 example like that? To change the prefix in a context of the
 Zend_Controller_Action you have to do something like this:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class SomeController extends Zend_Controller_Action
-{
-    function init() {
-        $this-&gt;initView();
-        $this-&gt;view-&gt;addHelperPath("pathtohelpers", "ClassPrefix");
-    }
-}</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeController extends Zend_Controller_Action</span>
+<span class="x">{</span>
+<span class="x">    function init() {</span>
+<span class="x">        $this-&gt;initView();</span>
+<span class="x">        $this-&gt;view-&gt;addHelperPath(&quot;pathtohelpers&quot;, &quot;ClassPrefix&quot;);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
 </div>
-</div></blockquote>
 </div>
 
     

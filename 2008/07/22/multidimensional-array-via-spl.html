@@ -42,8 +42,7 @@
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-16 last" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
-        and web-development and other topics of interest.</p>
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
@@ -83,34 +82,33 @@
 <p>Per default any implementation of ArrayObject does not allow to use the
 object as multidimensional array. This snippet here implements the
 support:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class ArrayMultiObject extends ArrayObject
-{
-    function __construct($array, $flags = 0, $iterator_class = "ArrayIterator")
-    {
-        $objects = array();
-        foreach($array AS $key =&gt; $value) {
-            if(is_array($value)) {
-                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);
-            } else {
-                $objects[$key] = $value;
-            }
-        }
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class ArrayMultiObject extends ArrayObject</span>
+<span class="x">{</span>
+<span class="x">    function __construct($array, $flags = 0, $iterator_class = &quot;ArrayIterator&quot;)</span>
+<span class="x">    {</span>
+<span class="x">        $objects = array();</span>
+<span class="x">        foreach($array AS $key =&gt; $value) {</span>
+<span class="x">            if(is_array($value)) {</span>
+<span class="x">                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);</span>
+<span class="x">            } else {</span>
+<span class="x">                $objects[$key] = $value;</span>
+<span class="x">            }</span>
+<span class="x">        }</span>
 
-        parent::__construct($objects, $flags, $iterator_class);
-    }
+<span class="x">        parent::__construct($objects, $flags, $iterator_class);</span>
+<span class="x">    }</span>
 
-    public function offsetSet($name, $value)
-    {
-        if(is_array($value)) {
-            $value = new ArrayMultiObject($value);
-        }
+<span class="x">    public function offsetSet($name, $value)</span>
+<span class="x">    {</span>
+<span class="x">        if(is_array($value)) {</span>
+<span class="x">            $value = new ArrayMultiObject($value);</span>
+<span class="x">        }</span>
 
-        return parent::offsetSet($name, $value);
-    }
-}</pre>
+<span class="x">        return parent::offsetSet($name, $value);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
 </div>
-</div></blockquote>
 </div>
 
     

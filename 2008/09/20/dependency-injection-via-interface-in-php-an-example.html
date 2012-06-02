@@ -42,8 +42,7 @@
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-16 last" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in computer science, databases
-        and web-development and other topics of interest.</p>
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
@@ -113,23 +112,23 @@ implementation of Interface Dependency Injection for PHP. The Container
 works with static method only, is therefore in the global scope, such
 that configuration is reduced to a minimum. Generally you have to write
 interfaces for object injection, for example:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>interface InjectDbAdapter{  public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);}</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">interface InjectDbAdapter</span>
+<span class="x">{</span>
+<span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
+<span class="x">}</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>Other potential examples include &#8220;InjectLogger&#8221;, &#8220;InjectSoapClient&#8221;, or
 &#8220;InjectAppConfig&#8221;. You then have to register a component for usage with
 this interface:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">Whitewashing_Container::registerComponent(&#39;InjectDbAdapter&#39;, Zend_Db::factory($dbConfig));</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>Now any class that implements the InjectDbAdapter interface can be
 instantiated via:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$obj = Whitewashing_Container::load('Class');</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;);</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>and the loader takes care of calling the &#8216;Class&#8217; implementation of
 injectDbAdapter with the given Database Adapter. A negative consequence
 of this approach is that you have to implement the inject methods for
@@ -144,10 +143,9 @@ implemented a method &#8220;Whitewashing_Container::registerClassComponent&#8221
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
 parameter $localInterfaceOverride for the highest priority:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</pre>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;, null, array(&#39;InjectDbAdapter&#39; =&gt; $newDbAdapter));</span>
+</pre></div>
 </div>
-</div></blockquote>
 <p>Speedwise the usage of the Container reduces class instatiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
 on my machine. But naturally only classes with dependancies and lots of
