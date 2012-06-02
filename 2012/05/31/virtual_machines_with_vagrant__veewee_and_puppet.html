@@ -103,50 +103,57 @@ Guest Additions. To be able to use vagrant, you need a basebox with the
 virtualbox and guest additions versions matching correctly.</p>
 <p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
 all the latest VM templates:</p>
-<div class="highlight-python"><pre>$ git clone https://github.com/jedi4ever/veewee.git
-$ cd veewee
-$ sudo gem install bundler
-$ sudo bundle install
-$ alias vagrant="bundle exec vagrant"</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/jedi4ever/veewee.git
+<span class="nv">$ </span><span class="nb">cd </span>veewee
+<span class="nv">$ </span>sudo gem install bundler
+<span class="nv">$ </span>sudo bundle install
+<span class="nv">$ </span><span class="nb">alias </span><span class="nv">vagrant</span><span class="o">=</span><span class="s2">&quot;bundle exec vagrant&quot;</span>
+</pre></div>
 </div>
 <p>You need Ruby and Gems installed for this to work. Veewee can be installed
 using Gems, but this not necessarily gives you the version with the most recent
 templates that match your own operating system version.</p>
 <p>Now lets define our own basebox definition and copy from an existing template
 that Veewee provides:</p>
-<div class="highlight-python"><pre>$ vagrant basebox define 'beberlei-ubuntu-12.04-i386-php' 'ubuntu-server-12.04-i386'</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>vagrant basebox define <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span> <span class="s1">&#39;ubuntu-server-12.04-i386&#39;</span>
+</pre></div>
 </div>
 <p>This creates a copy from the default ubuntu server template into a folder
 <cite>definitions/beberlei-ubuntu-12.04-i386-php</cite>. You can start modifying the files
 in there to adjust the build process of the virtual machine image. For me its
 important to modify the definitions.rb and add the following, otherwise
 building the VMs fails:</p>
-<div class="highlight-python"><pre>:virtualbox =&gt; { : vm_options =&gt; ["pae" =&gt; "on"]},</pre>
+<div class="highlight-bash"><div class="highlight"><pre>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">&quot;pae&quot;</span> <span class="o">=</span>&gt; <span class="s2">&quot;on&quot;</span><span class="o">]}</span>,
+</pre></div>
 </div>
 <p>You can then open up the postinstall.sh and install more packages that you need
 in your personal basebox. For example a LAMP stack. Do this right after the
 lines that do <cite>apt-get install -y</cite>:</p>
-<div class="highlight-python"><pre>export DEBIAN_FRONTEND=noninteractive
-apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
+</pre></div>
 </div>
 <p>If you are done you can start building a virtualbox image with:</p>
-<div class="highlight-python"><pre>$ vagrant basebox build</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>vagrant basebox build
+</pre></div>
 </div>
 <p>Make sure not to start typing in the console window that open ups. It is
 automatically controlled from a ruby script and every change to the keysequence
 breaks the building. This step takes a while. (Enough to write a blog post
 while watching a boring football game for example).</p>
 <p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
-<div class="highlight-python"><pre>$ veewee vbox validate 'beberlei-ubuntu-12.04-i386-php'
-$ vagrant basebox export 'beberlei-ubuntu-12.04-i386-php'
-$ vagrant box add 'beberlei-ubuntu-12.04-i386-php' 'beberlei-ubuntu-12.04-i386-php.box'</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>veewee vbox validate <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
+<span class="nv">$ </span>vagrant basebox <span class="nb">export</span> <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
+<span class="nv">$ </span>vagrant box add <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span> <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php.box&#39;</span>
+</pre></div>
 </div>
 <p>Now this box is also available as Vagrant base box. For example in a project
 that we want to use with vagrant, do:</p>
-<div class="highlight-python"><pre>$ cd myproject/
-$ vagrant init 'beberlei-ubuntu-12.04-i386-php'
-$ vagrant up
-$ vagrant ssh</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>myproject/
+<span class="nv">$ </span>vagrant init <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
+<span class="nv">$ </span>vagrant up
+<span class="nv">$ </span>vagrant ssh
+</pre></div>
 </div>
 <p>Although the blog-title suggests it, Puppet hasnt been used much up to this
 point. The use of puppet with Vagrant will be part of a next blog post.</p>
