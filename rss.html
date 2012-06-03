@@ -56,33 +56,30 @@ run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachin
 my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:</p>
-<blockquote>
-<div><p># /home/benny/.puppet/devmachine.pp</p>
-<p># VIM Dot Files
-vcsrepo { ‘vim-dotfiles’:</p>
-<blockquote>
-<div>path     =&gt; “/home/$id/.vim”,
-ensure   =&gt; present,
-provider =&gt; git,
-source   =&gt; ‘<a class="reference external" href="https://">https://</a>...’</div></blockquote>
-<p>}</p>
-<dl class="docutils">
-<dt>file { ‘vim-dotfiles-symlink’:</dt>
-<dd>path   =&gt; “/home/$id/.vimrc”,
-ensure =&gt; link,
-target =&gt; ‘.vim/vimrc’,
-require =&gt; Vcsrepo[‘vim-dotfiles’]</dd>
-</dl>
-<p>}</p>
-<dl class="docutils">
-<dt>exec { ‘vim-make-command-t’:</dt>
-<dd>command =&gt; ‘rake make’,
-cwd     =&gt; “/home/$id/.vim/bundle/Command-T”,
-unless  =&gt; “ls -aFlh /home/$id/.vim/bundle/Command-T|grep ‘command-t.recipe’”,
-require =&gt; Vcsrepo[‘vim-dotfiles’]</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
+<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
+
+# VIM Dot Files
+vcsrepo { 'vim-dotfiles':
+    path     =&gt; &quot;/home/$id/.vim&quot;,
+    ensure   =&gt; present,
+    provider =&gt; git,
+    source   =&gt; 'https://...'
+}
+
+file { 'vim-dotfiles-symlink':
+    path   =&gt; &quot;/home/$id/.vimrc&quot;,
+    ensure =&gt; link,
+    target =&gt; '.vim/vimrc',
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+
+exec { 'vim-make-command-t':
+    command =&gt; 'rake make',
+    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
+    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
+    require =&gt; Vcsrepo['vim-dotfiles']
+}</pre>
+</div>
 <p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
 define what functionality should be executed by puppet. Vcsrepo is a custom
 type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
@@ -98,33 +95,28 @@ puppet. The require makes sure this resource is only activated after the dotfile
 were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
-<blockquote>
-<div><p># Configure Git
-exec { “git-author-name”:</p>
-<blockquote>
-<div>command =&gt; ‘git config –global user.name “Benjamin Eberlei”’,
-unless =&gt; “git config –global –get user.name|grep ‘Benjamin Eberlei’”</div></blockquote>
-<p>}</p>
-<dl class="docutils">
-<dt>exec { “git-author-email”:</dt>
-<dd>command =&gt; ‘git config –global user.email “<a class="reference external" href="mailto:kontakt%40beberlei.de">kontakt<span>@</span>beberlei<span>.</span>de</a>“’,
-unless =&gt; “git config –global –get user.email|grep <a class="reference external" href="mailto:'kontakt%40beberlei.de">'kontakt<span>@</span>beberlei<span>.</span>de</a>‘”</dd>
-</dl>
-<p>}</p>
-<dl class="docutils">
-<dt>exec { “git-global-ignore”:</dt>
-<dd>command =&gt; “git config –global core.excludesfile /home/$id/.gitignore”,
-unless  =&gt; ‘git config -l –global|grep excludesfile’</dd>
-</dl>
-<p>}</p>
-<dl class="docutils">
-<dt>file { “git-global-ignorefile”:</dt>
-<dd>path =&gt; “/home/$id/.gitignore”,
-ensure =&gt; present,
-content =&gt; “<em>.swon</em>.swpn”</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
+<div class="highlight-python"><pre># Configure Git
+exec { &quot;git-author-name&quot;:
+    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
+    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
+}
+
+exec { &quot;git-author-email&quot;:
+    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
+    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
+}
+
+exec { &quot;git-global-ignore&quot;:
+    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
+    unless  =&gt; 'git config -l --global|grep excludesfile'
+}
+
+file { &quot;git-global-ignorefile&quot;:
+    path =&gt; &quot;/home/$id/.gitignore&quot;,
+    ensure =&gt; present,
+    content =&gt; &quot;*.swo\n*.swp\n&quot;
+}</pre>
+</div>
 <p>Here A bunch of commands is executed unless some option is already set. At last
 the global .gitingore is filled with the patterns of Vim temporary files.</p>
 <p>I also automated all the other steps listed above, but will spare you the
