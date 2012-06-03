@@ -5,7 +5,145 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Wed, 30 May 2012 22:00:00 GMT</pubDate>
+        <pubDate>Sat, 02 Jun 2012 22:00:00 GMT</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html</link>
+            <guid>http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html</guid>
+            <title>Setting up Development Machines with Puppet</title>
+            <description><![CDATA[<?xml version="1.0" ?><div class="section" id="setting-up-development-machines-with-puppet">
+<h1>Setting up Development Machines with Puppet</h1>
+<p>I wrote <cite>about Vagrant
+&lt;2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet&gt;</cite> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+dsecribe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a href="#id1"><span class="problematic" id="id2">`Strato Hidrive
+&lt;https://www.free-hidrive.com/`_</span></a> - they support rsync)</li>
+<li>and I propably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
+via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I seperate the installation process into two puppet files, one that has to be
+run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
+my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<blockquote>
+<div><p># /home/benny/.puppet/devmachine.pp</p>
+<p># VIM Dot Files
+vcsrepo { ‘vim-dotfiles’:</p>
+<blockquote>
+<div>path     =&gt; “/home/$id/.vim”,
+ensure   =&gt; present,
+provider =&gt; git,
+source   =&gt; ‘<a class="reference external" href="https://">https://</a>...’</div></blockquote>
+<p>}</p>
+<dl class="docutils">
+<dt>file { ‘vim-dotfiles-symlink’:</dt>
+<dd>path   =&gt; “/home/$id/.vimrc”,
+ensure =&gt; link,
+target =&gt; ‘.vim/vimrc’,
+require =&gt; Vcsrepo[‘vim-dotfiles’]</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>exec { ‘vim-make-command-t’:</dt>
+<dd>command =&gt; ‘rake make’,
+cwd     =&gt; “/home/$id/.vim/bundle/Command-T”,
+unless  =&gt; “ls -aFlh /home/$id/.vim/bundle/Command-T|grep ‘command-t.recipe’”,
+require =&gt; Vcsrepo[‘vim-dotfiles’]</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<blockquote>
+<div><p># Configure Git
+exec { “git-author-name”:</p>
+<blockquote>
+<div>command =&gt; ‘git config –global user.name “Benjamin Eberlei”’,
+unless =&gt; “git config –global –get user.name|grep ‘Benjamin Eberlei’”</div></blockquote>
+<p>}</p>
+<dl class="docutils">
+<dt>exec { “git-author-email”:</dt>
+<dd>command =&gt; ‘git config –global user.email “<a class="reference external" href="mailto:kontakt%40beberlei.de">kontakt<span>@</span>beberlei<span>.</span>de</a>“’,
+unless =&gt; “git config –global –get user.email|grep <a class="reference external" href="mailto:'kontakt%40beberlei.de">'kontakt<span>@</span>beberlei<span>.</span>de</a>‘”</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>exec { “git-global-ignore”:</dt>
+<dd>command =&gt; “git config –global core.excludesfile /home/$id/.gitignore”,
+unless  =&gt; ‘git config -l –global|grep excludesfile’</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>file { “git-global-ignorefile”:</dt>
+<dd>path =&gt; “/home/$id/.gitignore”,
+ensure =&gt; present,
+content =&gt; “<em>.swon</em>.swpn”</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+</div>]]></description>
+            <pubDate>Sat, 02 Jun 2012 22:00:00 GMT</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html</link>
             <guid>http://www.whitewashing.de/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html</guid>

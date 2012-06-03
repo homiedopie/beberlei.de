@@ -1,0 +1,305 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Setting up Development Machines with Puppet &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html"> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss.png" alt="Subscribe to RSS" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2012-06-03-setting_up_development_machines_with_puppet">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>June 03, 2012</span> 
+        </div>
+    <div class="section" id="setting-up-development-machines-with-puppet">
+<h1>Setting up Development Machines with Puppet</h1>
+<p>I wrote <cite>about Vagrant
+&lt;2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet&gt;</cite> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+dsecribe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a href="#id1"><span class="problematic" id="id2">`Strato Hidrive
+&lt;https://www.free-hidrive.com/`_</span></a> - they support rsync)</li>
+<li>and I propably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
+via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I seperate the installation process into two puppet files, one that has to be
+run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
+my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<blockquote>
+<div><p># /home/benny/.puppet/devmachine.pp</p>
+<p># VIM Dot Files
+vcsrepo { &#8216;vim-dotfiles&#8217;:</p>
+<blockquote>
+<div>path     =&gt; &#8220;/home/$id/.vim&#8221;,
+ensure   =&gt; present,
+provider =&gt; git,
+source   =&gt; &#8216;<a class="reference external" href="https://">https://</a>...&#8217;</div></blockquote>
+<p>}</p>
+<dl class="docutils">
+<dt>file { &#8216;vim-dotfiles-symlink&#8217;:</dt>
+<dd>path   =&gt; &#8220;/home/$id/.vimrc&#8221;,
+ensure =&gt; link,
+target =&gt; &#8216;.vim/vimrc&#8217;,
+require =&gt; Vcsrepo[&#8216;vim-dotfiles&#8217;]</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>exec { &#8216;vim-make-command-t&#8217;:</dt>
+<dd>command =&gt; &#8216;rake make&#8217;,
+cwd     =&gt; &#8220;/home/$id/.vim/bundle/Command-T&#8221;,
+unless  =&gt; &#8220;ls -aFlh /home/$id/.vim/bundle/Command-T|grep &#8216;command-t.recipe&#8217;&#8221;,
+require =&gt; Vcsrepo[&#8216;vim-dotfiles&#8217;]</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<blockquote>
+<div><p># Configure Git
+exec { &#8220;git-author-name&#8221;:</p>
+<blockquote>
+<div>command =&gt; &#8216;git config &#8211;global user.name &#8220;Benjamin Eberlei&#8221;&#8217;,
+unless =&gt; &#8220;git config &#8211;global &#8211;get user.name|grep &#8216;Benjamin Eberlei&#8217;&#8221;</div></blockquote>
+<p>}</p>
+<dl class="docutils">
+<dt>exec { &#8220;git-author-email&#8221;:</dt>
+<dd>command =&gt; &#8216;git config &#8211;global user.email &#8220;<a class="reference external" href="mailto:kontakt&#37;&#52;&#48;beberlei&#46;de">kontakt<span>&#64;</span>beberlei<span>&#46;</span>de</a>&#8220;&#8217;,
+unless =&gt; &#8220;git config &#8211;global &#8211;get user.email|grep <a class="reference external" href="mailto:'kontakt&#37;&#52;&#48;beberlei&#46;de">'kontakt<span>&#64;</span>beberlei<span>&#46;</span>de</a>&#8216;&#8221;</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>exec { &#8220;git-global-ignore&#8221;:</dt>
+<dd>command =&gt; &#8220;git config &#8211;global core.excludesfile /home/$id/.gitignore&#8221;,
+unless  =&gt; &#8216;git config -l &#8211;global|grep excludesfile&#8217;</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>file { &#8220;git-global-ignorefile&#8221;:</dt>
+<dd>path =&gt; &#8220;/home/$id/.gitignore&#8221;,
+ensure =&gt; present,
+content =&gt; &#8220;<em>.swon</em>.swpn&#8221;</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/06/03/setting_up_development_machines_with_puppet";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <a href="#">Setting up Development Machines with Puppet</a>
+        </li>
+        <li>
+            <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
+        </li>
+        <li>
+            <a href="../../05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
+        </li>
+        <li>
+            <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li>
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li>
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li>
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li>
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
