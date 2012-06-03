@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/06/03/setting_up_development_machines_with_puppet
    2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet
    2012/05/26/doctrine_goes_mit
    2012/02/25/symfony2_controller_testing
