@@ -2,7 +2,7 @@ Setting up Development Machines with Puppet
 ===========================================
 
 I wrote `about Vagrant
-<2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet>` last week and
+</2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html>`_ last week and
 mentioned to talk about `Puppet
 <http://puppetlabs.com/puppet/what-is-puppet/>`_ in the future. Before I will
 dive into Puppet in combination with Vagrant I want to share my general
@@ -32,7 +32,7 @@ have to install to get this machine productive:
 - A bunch of .bashrc initializations
 - Some open source projects I always have around (Doctrine, ...)
 - Setup automatic backup with my cloud storage provider (`Strato Hidrive
-  <https://www.free-hidrive.com/`_ - they support rsync)
+  <https://www.free-hidrive.com/>`_ - they support rsync)
 - and I propably forgot a bunch of tools just thinking about this today.
 
 I realized not only virtual machines, but also their hosts (my development
