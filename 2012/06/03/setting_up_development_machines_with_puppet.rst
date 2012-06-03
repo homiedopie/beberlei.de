@@ -55,6 +55,8 @@ my own user ``~/.puppet/devmachine.pp``.
 Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:
 
+::
+
     # /home/benny/.puppet/devmachine.pp
 
     # VIM Dot Files
@@ -95,6 +97,8 @@ type that you can grab `from Github
   were installed.
 
 Another nice example is the configuration of Git:
+
+:: 
 
     # Configure Git
     exec { "git-author-name":
