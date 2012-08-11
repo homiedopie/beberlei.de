@@ -96,7 +96,7 @@ Finding new Approaches
 Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
 there has to be some solution to organize business models structurely to avoid
 all (or most) of these problems. In the PHP world with `Symfony2
-<http://www.symfony.com>`_ and `Doctrine2 <http://www.doctrine-project.org>`
+<http://www.symfony.com>`_ and `Doctrine2 <http://www.doctrine-project.org>`_
 you have a powerful toolbox to avoid many of the problems above, but it is
 still not simple to write clean object oriented applications.
 
