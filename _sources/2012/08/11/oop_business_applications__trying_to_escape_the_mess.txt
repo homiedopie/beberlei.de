@@ -106,8 +106,9 @@ framework and persistence.
 
 Thanks to `Gordon <https://twitter.com/go_oh>`_, `Stefan
 <https://twitter.com/spriebsch>`_ and `Thomas <https://twitter.com/tom_noise>`_
-I was introduced to several "new" approaches to OO application design that I
-started to explore in the past last months. They are:
+I was introduced to several approaches to OO application design that I
+started to explore in the past last months. They are not new and have all been
+around for several years already. They are:
 
 - `Data, Context, Interaction (DCI)
   <http://en.wikipedia.org/wiki/Data,_context_and_interaction>`_ - which Gordon
