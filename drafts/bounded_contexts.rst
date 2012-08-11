@@ -1,7 +1,7 @@
 Bounded Contexts
 ================
 
-I regularly fall into the same trap with applications, when thinking of the one
+I regularly fall into the same trap with applications, by thinking of the one
 model that unifies all the use-cases and allows to solve every problem. This is
 a natural human trait to find the one puzzle piece that connects everything.
 However in software design there is a case to be made for the seperation of
@@ -19,13 +19,12 @@ cases.
 We should remeber this pattern more often when doing application design.
 It is much less akward to have some parts of the model reimplemented for
 different purposes, than creating a God object that tries to unify everything.
-
 This is especially important when seperating the CRUD parts from the really
 complicated and interesting parts that benefit from domain driven design.
 
-At the `SoCraTes conference <http://www.socrates-conference.de/>`_ at the
-beginning of august I took part in a DDD architecture game that focussed on
-bounded context. We were given a very simple domain concept "Customer" and
+At the `SoCraTes conference <http://www.socrates-conference.de/>`_ taking place
+in the beginning of august I took part in a DDD architecture game that focussed
+on bounded context. We were given a very simple domain concept "Customer" and
 assigned different roles in the business.  Everyone described their perfect
 customer very differently, imagining the Customer object that fits all these
 requirements was quite an eye opener. And even if there is no such single
@@ -33,10 +32,11 @@ software that operates a business, going to the extreme and defining 10
 different angles for a single concept made me clear, that sometimes different
 overlaping implementations are not such a bad thing.
 
-You should read up on Bounded Context from other sources. There is obviously
-the chapter in the Domain Driven Design book, but there are also many sources
-online. Many of them describe much better than me, what the benefits of bounded
-contexts are.
+One obvious drawback of course is duplication. Depending on how your bounded
+contexts work, this is something that has to be synchronized and worked with.
+Most notably `CQRS <http://martinfowler.com/bliki/CQRS.html>`_ is an
+architectural pattern, that allows for Domain Driven Design AND simplifies the
+synchronization with other parts of the application.
 
 .. author:: default
 .. categories:: none
