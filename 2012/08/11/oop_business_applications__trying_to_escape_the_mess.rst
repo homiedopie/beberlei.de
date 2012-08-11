@@ -15,7 +15,7 @@ I mentally divide the world of programming into two large parts:
    
 The first produces code solving technical problems, often in a beautiful and
 dedicated way. The second regularly produces mess, hopefully still
-serving customers by optimizing their business. This differentation an
+serving customers by optimizing their business. This differentation is an
 exageration, but from my experience its far easier to run a greenfield business
 project into the ground than a new library.
 
