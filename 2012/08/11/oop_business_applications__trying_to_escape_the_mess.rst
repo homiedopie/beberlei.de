@@ -24,8 +24,8 @@ open source projects. It might be empirical prove, that all our business
 projects don't make us happy at the end of the day and we have to show
 ourselves that we can do better.
 
-I enjoy writing business applications much more, but they are also much more
-difficult to get right in both social and technical dimensions.  One
+I enjoy writing business applications more than libraries, but they are also
+much more difficult to get right in both social and technical dimensions.  One
 motivational driver of `my open source activities
 <https://github.com/beberlei>`_ always was to simplify the technical dimension
 of OOP business applications.
@@ -33,11 +33,11 @@ of OOP business applications.
 My Personal List of Annoyances
 ------------------------------
 
-This blog post is not about blaming customers (the usual suspect), its about
+This blog post is not about blaming customers (as the usual suspect), its about
 finding the problems in usual OOP code of business systems from my experience
-with PHP projects. To keep things short, I will list my *personal* list of annoyances
-in business projects in no particular order. These are highly subjective
-points.
+with PHP projects. To keep things short, I will list my *personal* list of
+techincal annoyances in business projects in no particular order. These are
+highly subjective points.
 
 - Getter/Setter Madness of Objects that are used to store data into
   databases. Leading to huge objects that are essentially just meaningless
