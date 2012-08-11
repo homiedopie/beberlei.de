@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.3.1b',
+        VERSION:     '0.4.1b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -35,7 +35,7 @@
     
     <link rel="top" title="Whitewashing" href="#" />
     <link rel="next" title="Older" href="page1.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html"> 
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /> 
   </head>
   <body>
 <div class="container">
@@ -47,7 +47,7 @@
 
         <p class="buttons">
             <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss.png" alt="Subscribe to RSS" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss.jpg" alt="Subscribe to RSS" /></a>
         </p>
     </div>
 </div>
@@ -73,129 +73,128 @@
     </div>
         
         <div class="timestamp postmeta">
-            <span>June 03, 2012</span> 
+            <span>August 11, 2012</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="setting-up-development-machines-with-puppet">
-<a href="2012/06/03/setting_up_development_machines_with_puppet.html"><h1>Setting up Development Machines with Puppet</h1></a>
-<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
-mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
-dive into Puppet in combination with Vagrant I want to share my general
-experiences with Puppet (beginners level, I just played with this today).</p>
-<p>Puppet is a configuration management tool. It uses a declarative language to
-dsecribe how a system should look like. Upon invocation of puppet it attempts
-to get the system from its current state into the desired state by installing
-packages, executing programs/scripts and creating files/directories.</p>
-<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
-run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
-I really like the Unity desktop and wanted to get away from the Gnome that is
-in 10.04.</p>
-<p>After a backup and fresh installation of Ubuntu I realized how many things I
-have to install to get this machine productive:</p>
-<ul class="simple">
-<li>LAMP stack + a bunch of other databases and services</li>
-<li>Git, Svn, Hg, ..</li>
-<li>Virtualbox + Vagrant</li>
-<li>Vim with my Dot-Files, including Command-T which requires compilation,
-and a bunch of development tools such as tree, ack-grep.</li>
-<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
-<li>Git with Author Information and global ignore file</li>
-<li>A bunch of .bashrc initializations</li>
-<li>Some open source projects I always have around (Doctrine, ...)</li>
-<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
-<li>and I propably forgot a bunch of tools just thinking about this today.</li>
-</ul>
-<p>I realized not only virtual machines, but also their hosts (my development
-machines) could be automatically setup with Puppet.</p>
-<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
-them using Puppet. In Puppet you define Resources of several types, for example
-Files, Packages or shell commands. You group these resources together in a
-<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
-via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
-<p>The idea is to define Puppet resources in a way that they are performed once and
-then the system has this resource. This means you can run puppet as often as
-you want and it will only activate the missing resources.</p>
-<p>I seperate the installation process into two puppet files, one that has to be
-run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
-my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
-<p>Because every dev-machine setup is unique, I will just show some
-examples of my puppet file to get the message across:</p>
-<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
-
-# VIM Dot Files
-vcsrepo { 'vim-dotfiles':
-    path     =&gt; &quot;/home/$id/.vim&quot;,
-    ensure   =&gt; present,
-    provider =&gt; git,
-    source   =&gt; 'https://...'
-}
-
-file { 'vim-dotfiles-symlink':
-    path   =&gt; &quot;/home/$id/.vimrc&quot;,
-    ensure =&gt; link,
-    target =&gt; '.vim/vimrc',
-    require =&gt; Vcsrepo['vim-dotfiles']
-}
-
-exec { 'vim-make-command-t':
-    command =&gt; 'rake make',
-    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
-    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
-    require =&gt; Vcsrepo['vim-dotfiles']
-}</pre>
+        <div class="section" id="oop-business-applications-trying-to-escape-the-mess">
+<h1><a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">tl;dr Version: I present a list of problems with OOP business applications from
+my personal experience and then introduce 3 approaches that I was put in
+contact with over the last year, DCI, EBI and CQRS. This post is an
+introduction to a series about this approaches.</p>
 </div>
-<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
-define what functionality should be executed by puppet. Vcsrepo is a custom
-type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<p>I always mentally divide the world of programming into two large parts:</p>
+<ol class="arabic simple">
+<li>Library and system programming</li>
+<li>business applications</li>
+</ol>
+<p>The first produces code solving technical problems, often in a beautiful and
+dedicated way. The second regularly produces mess, hopefully still
+serving customers by optimizing their business. This differentation an
+exageration, but from my experience its far easier to run a greenfield business
+project into the ground than a new library.</p>
+<p>There has to be a reason why so many programmers dedicate much free time to
+open source projects. It might be empirical prove, that all our business
+projects don’t make us happy at the end of the day and we have to show
+ourselves that we can do better.</p>
+<p>I enjoy writing business applications much more, but they are also much more
+difficult to get right in both social and technical dimensions.  One
+motivational driver of <a class="reference external" href="https://github.com/beberlei">my open source activities</a> always was to simplify the technical dimension
+of OOP business applications.</p>
+<div class="section" id="my-personal-list-of-annoyances">
+<h2>My Personal List of Annoyances</h2>
+<p>This blog post is not about blaming customers (the usual suspect), its about
+finding the problems in usual OOP code of business systems from my experience
+with PHP projects. To keep things short, I will list my <em>personal</em> list of annoyances
+in business projects in no particular order. These are highly subjective
+points.</p>
 <ul class="simple">
-<li>The first block uses Git to make sure that in my home directory the
-<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
-<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
-using a symlink.</li>
-<li>The third block compiles the Command-T VIM plugin. Inside the
-exec block you can see the unless condition. This is necessary to prevent the
-command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
-puppet. The require makes sure this resource is only activated after the dotfiles
-were installed.</li>
+<li>Getter/Setter Madness of Objects that are used to store data into
+databases. Leading to huge objects that are essentially just meaningless
+stores of data.</li>
+<li>Updating complex object graphs from user input.</li>
+<li>Seperation of model, controller and views, especially when dealing with
+forms. This is very complicated to achieve.</li>
+<li>Lazy Loading and Query performance problems when using an ORM. Additionally
+replacing parts of the views with hand-crafted SQL is often difficult and/or
+time intensive, when already using an ORM.</li>
+<li>Inability to decouple code that was written with CRUD (generators and
+utilities) in mind towards more domain driven code, when the requirements
+change.</li>
+<li>Dependency mess leading to hard to test code, generally leading to untested
+applications. Generally frameworks create huge dependencies that
+make your domain model messy.</li>
+<li>Focus on synchroneous request/response handling makes later usage of message
+queues very complicated and expensive to refactor towards.</li>
+<li>Tight coupling of model against the framework code.</li>
+<li>Junior developers have too much freedom, when there is not much structure in
+the code, but rather just a big ball of mud. Additionally with the tight
+coupling of so many components, junior developers get easily lost in the code
+and produce unexpected side-effects.</li>
+<li>Use-cases easily span more than 5 classes. To grasp the interaction you have
+to keep lots of code in your head.</li>
+<li>Constant violations of <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29">SOLID</a> principles
+due to framework or persistence requirements.</li>
+<li>Compared to library development, user-facing applications often have much
+higher coupling between classes and namespaces. In libraries its often easy
+to find different concerns, but in applications they seem hard to divide for
+developers.</li>
+<li>In combination with a rich javascript client, requirements to update objects
+through their CRUD API produces concurrency and lost-update hell, that
+dynamic server-side applications could mostly avoid before.</li>
 </ul>
-<p>Another nice example is the configuration of Git:</p>
-<div class="highlight-python"><pre># Configure Git
-exec { &quot;git-author-name&quot;:
-    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
-    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
-}
-
-exec { &quot;git-author-email&quot;:
-    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
-    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
-}
-
-exec { &quot;git-global-ignore&quot;:
-    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
-    unless  =&gt; 'git config -l --global|grep excludesfile'
-}
-
-file { &quot;git-global-ignorefile&quot;:
-    path =&gt; &quot;/home/$id/.gitignore&quot;,
-    ensure =&gt; present,
-    content =&gt; &quot;*.swo\n*.swp\n&quot;
-}</pre>
+<p>Essentially if you work in a tight schedule, project based environment where
+the decision makers sell rapid application development and prototyping, then you
+often have only one, maybe one and a half attempts to get the big picture
+right. From that moment on you have to build on that decision and hope for the
+best.</p>
+<p>We have tried not to go the RAD+CRUD tools ways in several projects, to escape
+the problems listed above. But without changes in your mindest you end up with
+hand written mess, compared to getting there with tools.</p>
+<p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
+the problem even worse. It easily leads to lasagna code, where you have layers
+of layers that are very hard to understand. Personally I prefer spagetthi code
+over lasagna code, because its comparatively easy to understand.</p>
 </div>
-<p>Here A bunch of commands is executed unless some option is already set. At last
-the global .gitingore is filled with the patterns of Vim temporary files.</p>
-<p>I also automated all the other steps listed above, but will spare you the
-details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
-set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
-folder and they are then available in any of your puppet files.</p>
-<p>I can now reuse this on the different machines: desktop at home and at work and
-my laptop. Whenever I install a new tool or change some configuration of my
-system I can directly put this into puppet and keep the setup synchronized on
-all the machines I work with.</p>
-<p>You can find more detailed resources on the PuppetLabs website:</p>
+<div class="section" id="finding-new-approaches">
+<h2>Finding new Approaches</h2>
+<p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
+there has to be some solution to organize business models structurely to avoid
+all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <cite>Doctrine2 &lt;http://www.doctrine-project.org&gt;</cite>
+you have a powerful toolbox to avoid many of the problems above, but it is
+still not simple to write clean object oriented applications.</p>
+<p>After years of participation in both projects I still feel there is a missing
+puzzle piece, to reach a clean seperation of all the model concers from
+framework and persistence.</p>
+<p>Thanks to <a class="reference external" href="https://twitter.com/go_oh">Gordon</a>, <a class="reference external" href="https://twitter.com/spriebsch">Stefan</a> and <a class="reference external" href="https://twitter.com/tom_noise">Thomas</a>
+I was introduced to several “new” approaches to OO application design that I
+started to explore in the past last months. They are:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
-<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
-<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
+studied alot</li>
+<li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
+architecture or “Ports and adapters”. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
+at Ruby Midwest</a>
+last year.</li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blost post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+day video class</a> by Greg Young.</li>
 </ul>
+<p>I am not sure if you can group them under a common category, but they are
+neither just patterns nor software architectures. All three approaches make you
+think about application development beyond just “service layers” in radically
+new ways. All three have helped me rethink business applications in different
+ways.</p>
+<p>In the next weeks I will talk about each of these approaches individually, show
+some examples and then wrap up my thoughts about all of them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
+Conference</a> in Sankt Augustin Germany on
+25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
+</div>
+</div>
 </div>
         
     <div class="postmeta">
@@ -207,15 +206,15 @@ all the machines I work with.</p>
         
         
         <div class="comments">
-            <a href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html#disqus_thread" data-disqus-identifier="2012/06/03/setting_up_development_machines_with_puppet">Leave a comment</a>
+            <a href="http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html#disqus_thread" data-disqus-identifier="2012/08/11/oop_business_applications__trying_to_escape_the_mess">Leave a comment</a>
         </div>
     </div><div class="separator post_separator"></div>
         
         <div class="timestamp postmeta">
             <span>May 31, 2012</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="virtual-machines-with-vagrant-veewee-and-puppet">
-<a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html"><h1>Virtual Machines with Vagrant, Veewee and Puppet</h1></a>
+        <div class="section" id="virtual-machines-with-vagrant-veewee-and-puppet">
+<h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
 <p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
 VM management very efficiently. Being always late to new technologies
 investigating Vagrant now felt about right. I am using Virtualbox for
@@ -315,8 +314,8 @@ point. The use of puppet with Vagrant will be part of a next blog post.</p>
         <div class="timestamp postmeta">
             <span>May 26, 2012</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="doctrine-switches-from-lgpl-to-mit">
-<a href="2012/05/26/doctrine_goes_mit.html"><h1>Doctrine switches from LGPL to MIT</h1></a>
+        <div class="section" id="doctrine-switches-from-lgpl-to-mit">
+<h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
 succesfully in roughly 4 weeks. For that we used a small web-based tool to
@@ -383,8 +382,8 @@ fun with it.</p>
         <div class="timestamp postmeta">
             <span>February 25, 2012</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="symfony2-controller-testing-without-application">
-<a href="2012/02/25/symfony2_controller_testing.html"><h1>Symfony2 Controller Testing without Application</h1></a>
+        <div class="section" id="symfony2-controller-testing-without-application">
+<h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
 <p>Controller testing using the WebTestCase requires a Symfony Kernel and with
 that a complete application. However you can just ship your own simple kernel
 with just the dependencies necessary to test your application. This way you can
@@ -484,10 +483,10 @@ though.</p>
 <span class="p">}</span>
 <span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">'loadClass'</span><span class="p">));</span>
 
-<span class="nx">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
+<span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">'Beberlei\\WorkflowBundle\\'</span><span class="p">))</span> <span class="p">{</span>
         <span class="nv">$path</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
             <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
         <span class="p">}</span>
         <span class="k">require_once</span> <span class="nv">$path</span><span class="p">;</span>
@@ -534,8 +533,8 @@ control ignore files.</p>
         <div class="timestamp postmeta">
             <span>February 07, 2010</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="resources-for-a-php-and-hudson-ci-integration">
-<a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html"><h1>Resources for a PHP and Hudson CI Integration</h1></a>
+        <div class="section" id="resources-for-a-php-and-hudson-ci-integration">
+<h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
 <p>Yesterday I finally had the time to setup my first continuous
 integration environment. Possible solutions for CI are
 <a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
@@ -619,8 +618,8 @@ of the success or failure.</p>
         <div class="timestamp postmeta">
             <span>May 02, 2010</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="testing-database-locks-with-phpunit-and-gearman">
-<a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html"><h1>Testing Database Locks with PHPUnit and Gearman</h1></a>
+        <div class="section" id="testing-database-locks-with-phpunit-and-gearman">
+<h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
 <p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
 2</a> we plan to integrate pessimistic
 Database-level locks across all the supported vendors (MySQL, Oracle,
@@ -762,8 +761,8 @@ test and get a green bar for a working lock support.</p>
         <div class="timestamp postmeta">
             <span>January 08, 2010</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="immutable-datetime-objects">
-<a href="2010/01/08/immutable-datetime-objects.html"><h1>Immutable DateTime Objects</h1></a>
+        <div class="section" id="immutable-datetime-objects">
+<h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
 <p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
 extension</a> is the mutability of its
 instances. It can lead to serious bugs if a DateTime instance is passed
@@ -912,8 +911,8 @@ used.</p>
         <div class="timestamp postmeta">
             <span>January 10, 2010</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
-<a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html"><h1>Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></h1></a>
+        <div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
+<h1><a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></a></h1>
 <p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
 article</a> on using PEAR
 and PHAR for application lifecycle management and deployment. Since then
@@ -1066,8 +1065,8 @@ code. Thanks!</p>
         <div class="timestamp postmeta">
             <span>April 27, 2010</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="doctrine-2-beta-1-released">
-<a href="2010/04/27/doctrine-2-beta-1-released.html"><h1>Doctrine 2 Beta 1 released</h1></a>
+        <div class="section" id="doctrine-2-beta-1-released">
+<h1><a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a></h1>
 <p>Today we are happy to announce that the first beta of <a class="reference external" href="http://www.doctrine-project.org/blog/doctrine-2-0-0-beta1-released">Doctrine
 2</a>
 has been released and we fixed 165 issues kindly reported by several
@@ -1176,8 +1175,8 @@ come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
         <div class="timestamp postmeta">
             <span>April 18, 2010</span> 
         </div>
-        <?xml version="1.0" ?><div class="section" id="new-netbeans-php-codesniffer-plugin-version">
-<a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html"><h1>New Netbeans PHP CodeSniffer Plugin Version</h1></a>
+        <div class="section" id="new-netbeans-php-codesniffer-plugin-version">
+<h1><a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a></h1>
 <p>This morning I took the time to merge several changes by <a class="reference external" href="http://manuel-pichler.de/">Manuel
 Piechler</a> into <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">my Github
 branch</a> of the

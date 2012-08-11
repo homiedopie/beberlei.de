@@ -1,0 +1,294 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>OOP Business Applications: Trying to escape the mess &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.4.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-16 last" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in programming, databases and other topics of interest.</p>
+
+        <p class="buttons">
+            <a href="http://www.twitter.com/beberlei"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-a.png" alt="Follow beberlei on Twitter"/></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss.jpg" alt="Subscribe to RSS" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2012-08-11-oop_business_applications__trying_to_escape_the_mess">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>August 11, 2012</span> 
+        </div>
+    <div class="section" id="oop-business-applications-trying-to-escape-the-mess">
+<h1>OOP Business Applications: Trying to escape the mess</h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">tl;dr Version: I present a list of problems with OOP business applications from
+my personal experience and then introduce 3 approaches that I was put in
+contact with over the last year, DCI, EBI and CQRS. This post is an
+introduction to a series about this approaches.</p>
+</div>
+<p>I always mentally divide the world of programming into two large parts:</p>
+<ol class="arabic simple">
+<li>Library and system programming</li>
+<li>business applications</li>
+</ol>
+<p>The first produces code solving technical problems, often in a beautiful and
+dedicated way. The second regularly produces mess, hopefully still
+serving customers by optimizing their business. This differentation an
+exageration, but from my experience its far easier to run a greenfield business
+project into the ground than a new library.</p>
+<p>There has to be a reason why so many programmers dedicate much free time to
+open source projects. It might be empirical prove, that all our business
+projects don&#8217;t make us happy at the end of the day and we have to show
+ourselves that we can do better.</p>
+<p>I enjoy writing business applications much more, but they are also much more
+difficult to get right in both social and technical dimensions.  One
+motivational driver of <a class="reference external" href="https://github.com/beberlei">my open source activities</a> always was to simplify the technical dimension
+of OOP business applications.</p>
+<div class="section" id="my-personal-list-of-annoyances">
+<h2>My Personal List of Annoyances</h2>
+<p>This blog post is not about blaming customers (the usual suspect), its about
+finding the problems in usual OOP code of business systems from my experience
+with PHP projects. To keep things short, I will list my <em>personal</em> list of annoyances
+in business projects in no particular order. These are highly subjective
+points.</p>
+<ul class="simple">
+<li>Getter/Setter Madness of Objects that are used to store data into
+databases. Leading to huge objects that are essentially just meaningless
+stores of data.</li>
+<li>Updating complex object graphs from user input.</li>
+<li>Seperation of model, controller and views, especially when dealing with
+forms. This is very complicated to achieve.</li>
+<li>Lazy Loading and Query performance problems when using an ORM. Additionally
+replacing parts of the views with hand-crafted SQL is often difficult and/or
+time intensive, when already using an ORM.</li>
+<li>Inability to decouple code that was written with CRUD (generators and
+utilities) in mind towards more domain driven code, when the requirements
+change.</li>
+<li>Dependency mess leading to hard to test code, generally leading to untested
+applications. Generally frameworks create huge dependencies that
+make your domain model messy.</li>
+<li>Focus on synchroneous request/response handling makes later usage of message
+queues very complicated and expensive to refactor towards.</li>
+<li>Tight coupling of model against the framework code.</li>
+<li>Junior developers have too much freedom, when there is not much structure in
+the code, but rather just a big ball of mud. Additionally with the tight
+coupling of so many components, junior developers get easily lost in the code
+and produce unexpected side-effects.</li>
+<li>Use-cases easily span more than 5 classes. To grasp the interaction you have
+to keep lots of code in your head.</li>
+<li>Constant violations of <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29">SOLID</a> principles
+due to framework or persistence requirements.</li>
+<li>Compared to library development, user-facing applications often have much
+higher coupling between classes and namespaces. In libraries its often easy
+to find different concerns, but in applications they seem hard to divide for
+developers.</li>
+<li>In combination with a rich javascript client, requirements to update objects
+through their CRUD API produces concurrency and lost-update hell, that
+dynamic server-side applications could mostly avoid before.</li>
+</ul>
+<p>Essentially if you work in a tight schedule, project based environment where
+the decision makers sell rapid application development and prototyping, then you
+often have only one, maybe one and a half attempts to get the big picture
+right. From that moment on you have to build on that decision and hope for the
+best.</p>
+<p>We have tried not to go the RAD+CRUD tools ways in several projects, to escape
+the problems listed above. But without changes in your mindest you end up with
+hand written mess, compared to getting there with tools.</p>
+<p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
+the problem even worse. It easily leads to lasagna code, where you have layers
+of layers that are very hard to understand. Personally I prefer spagetthi code
+over lasagna code, because its comparatively easy to understand.</p>
+</div>
+<div class="section" id="finding-new-approaches">
+<h2>Finding new Approaches</h2>
+<p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
+there has to be some solution to organize business models structurely to avoid
+all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <cite>Doctrine2 &lt;http://www.doctrine-project.org&gt;</cite>
+you have a powerful toolbox to avoid many of the problems above, but it is
+still not simple to write clean object oriented applications.</p>
+<p>After years of participation in both projects I still feel there is a missing
+puzzle piece, to reach a clean seperation of all the model concers from
+framework and persistence.</p>
+<p>Thanks to <a class="reference external" href="https://twitter.com/go_oh">Gordon</a>, <a class="reference external" href="https://twitter.com/spriebsch">Stefan</a> and <a class="reference external" href="https://twitter.com/tom_noise">Thomas</a>
+I was introduced to several &#8220;new&#8221; approaches to OO application design that I
+started to explore in the past last months. They are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
+studied alot</li>
+<li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
+architecture or &#8220;Ports and adapters&#8221;. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
+at Ruby Midwest</a>
+last year.</li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blost post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+day video class</a> by Greg Young.</li>
+</ul>
+<p>I am not sure if you can group them under a common category, but they are
+neither just patterns nor software architectures. All three approaches make you
+think about application development beyond just &#8220;service layers&#8221; in radically
+new ways. All three have helped me rethink business applications in different
+ways.</p>
+<p>In the next weeks I will talk about each of these approaches individually, show
+some examples and then wrap up my thoughts about all of them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
+Conference</a> in Sankt Augustin Germany on
+25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
+</div>
+</div>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/08/11/oop_business_applications__trying_to_escape_the_mess";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-8 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">OOP Business Applications: Trying to escape the mess</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
