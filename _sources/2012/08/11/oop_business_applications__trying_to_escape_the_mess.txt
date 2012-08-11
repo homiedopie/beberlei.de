@@ -8,7 +8,7 @@ OOP Business Applications: Trying to escape the mess
     contact with over the last year, DCI, EBI and CQRS. This post is an
     introduction to a series about this approaches.
 
-I always mentally divide the world of programming into two large parts:
+I mentally divide the world of programming into two large parts:
 
 1. Library and system programming
 2. business applications
