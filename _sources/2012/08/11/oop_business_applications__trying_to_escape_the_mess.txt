@@ -107,8 +107,7 @@ framework and persistence.
 Thanks to `Gordon <https://twitter.com/go_oh>`_, `Stefan
 <https://twitter.com/spriebsch>`_ and `Thomas <https://twitter.com/tom_noise>`_
 I was introduced to several approaches to OO application design that I
-started to explore in the past last months. They are not new and have all been
-around for several years already. They are:
+started to explore in the past last months: 
 
 - `Data, Context, Interaction (DCI)
   <http://en.wikipedia.org/wiki/Data,_context_and_interaction>`_ - which Gordon
@@ -125,11 +124,11 @@ around for several years already. They are:
   <http://www.udidahan.com/2009/12/09/clarified-cqrs/>`_ and in a hands on `one
   day video class <http://www.viddler.com/v/dc528842>`_ by Greg Young.
 
-I am not sure if you can group them under a common category, but they are
-neither just patterns nor software architectures. All three approaches make you
-think about application development beyond just "service layers" in radically
-new ways. All three have helped me rethink business applications in different
-ways. 
+They are not new and have all been around for several years already. I am not
+sure if you can group them under a common category, but they are neither just
+patterns nor software architectures. All three approaches make you think about
+application development beyond just "service layers" in radically new ways. All
+three have helped me rethink business applications in different ways. 
 
 In the next weeks I will talk about each of these approaches individually, show
 some examples and then wrap up my thoughts about all of them.
