@@ -52,8 +52,8 @@ highly subjective points.
   utilities) in mind towards more domain driven code, when the requirements
   change.
 - Dependency mess leading to hard to test code, generally leading to untested
-  applications. Generally frameworks create huge dependencies that
-  make your domain model messy.
+  applications. Too often frameworks create huge dependencies that
+  make your domain model messy and complex to mock in tests.
 - Focus on synchroneous request/response handling makes later usage of message
   queues very complicated and expensive to refactor towards.
 - Tight coupling of model against the framework code.
@@ -62,7 +62,8 @@ highly subjective points.
   coupling of so many components, junior developers get easily lost in the code
   and produce unexpected side-effects. 
 - Use-cases easily span more than 5 classes. To grasp the interaction you have
-  to keep lots of code in your head.
+  to keep lots of code in your head, especially complicated for junior
+  developers again. As they cannot really work on a problem in isolation.
 - Constant violations of `SOLID
   <http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29>`_ principles
   due to framework or persistence requirements.
@@ -88,7 +89,7 @@ Specifically `Domain Driven Design
 <http://en.wikipedia.org/wiki/Domain-driven_design>`_ applied naively can make
 the problem even worse. It easily leads to lasagna code, where you have layers
 of layers that are very hard to understand. Personally I prefer spagetthi code
-over lasagna code, because its comparatively easy to understand.
+over lasagna code, because its comparatively simpler to understand.
 
 Finding new Approaches
 ----------------------
