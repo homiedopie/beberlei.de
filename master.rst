@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/08/11/oop_business_applications__trying_to_escape_the_mess
    2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet
    2012/05/26/doctrine_goes_mit
    2012/02/25/symfony2_controller_testing
@@ -93,4 +94,5 @@ Sitemap
    2008/07/17/zf-jquery-helper-first-prototype-ready
    2008/07/21/zend-dojo-and-the-django-template-language
    2008/07/12/discussing-a-jquery-helper-for-zend-framework
+   pages/oop_business_applications__trying_to_escape_the_mess
    2008/07/24/finished-first-django-template-language-port-to-php-zf
