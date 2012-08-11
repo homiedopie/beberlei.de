@@ -176,11 +176,18 @@ What this design pattern improves is the testability of code and also the
 execution of tests is MUCH better, when you don't have to go through the whole
 application stack to test something.
 
+Implementing behavior into the use-cases also avoids lots of lasagna code
+compared to a fully domain driven design. You get a very good overview of
+what is actually happening just by looking at the Model Request and Interactor
+classes.
+
 In conclusion I can recommend using the EBI pattern, however you have to be
 careful to find abstraction layers that keep your code DRY and SOLID, something
 which does not come naturally with this pattern. Additionally you should be
 careful to avoid lots of DTO <-> Entity Mapping code by using some
-code-generation for example to do parts of this job for you.
+code-generation for example to do parts of this job for you.  The worst outcome
+with this pattern is you having to manually code layers for HTTP Request/Form
+=> DTO => Entity mapping and the other way around.
 
 .. author:: default
 .. categories:: none
