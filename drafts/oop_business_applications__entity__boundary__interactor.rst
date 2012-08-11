@@ -179,7 +179,14 @@ application stack to test something.
 Implementing behavior into the use-cases also avoids lots of lasagna code
 compared to a fully domain driven design. You get a very good overview of
 what is actually happening just by looking at the Model Request and Interactor
-classes.
+classes. However depending on the use-case the classes can get very big
+and might need lots of collaborators, which make the problem complex again.
+
+It is important to note that aggregating the domain logic in the use-cases
+actually means going to some sort of transaction script processing, away from
+domain driven design. However depending on the sophistication of the
+applications domain logic, transaction script is actually a very good pattern
+for simple to medium complex use-cases.
 
 In conclusion I can recommend using the EBI pattern, however you have to be
 careful to find abstraction layers that keep your code DRY and SOLID, something
