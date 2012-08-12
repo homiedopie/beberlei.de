@@ -2,7 +2,7 @@ OOP Business Applications: Data, Context, Interaction
 =====================================================
 
 The next design pattern for technical system design is called "Data, Context,
-Interaction". The inventor <name> calls it a new paradigm, however given PHPs
+Interaction". It's inventors Trygve Reenskaug and James Coplien calls it a new paradigm, however given PHPs
 langugage constraints it cannot be more than just a design pattern. I came
 accross this pattern through `Gordon Oheim <https://twitter.com/go_oh>`_. He
 has also invested quite some time going through the book on DCI and trying
