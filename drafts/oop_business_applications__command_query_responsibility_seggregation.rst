@@ -21,7 +21,11 @@ CQRS is an OOP design pattern building on that imperative principle. As
 I tried to understand this pattern I found that there are many different
 variations of it that all have their place. This however makes it hard to write an
 introduction blog post, without confusing the reader or selling CQRS as a
-complexity nightmare, which is not always the case.
+complexity nightmare, which is not always the case. The CQRS you find when
+doing research on Google was `introduced by Greg Young
+<http://cqrs.wordpress.com/documents/cqrs-introduction/>`_. It goes much
+further than what I describe here and combines CQRS with Event Sourcing, a
+topic which I will discuss in another blog post.
 
 The first obvious requirement: Our write service methods are not allowed to
 return data anymore. This may increase the complexity at first, especially when
