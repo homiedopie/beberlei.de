@@ -2,7 +2,7 @@ OOP Business Applications: Data, Context, Interaction
 =====================================================
 
 The next design pattern for technical system design is called "Data, Context,
-Interaction". The inventor <name> calls it a new paradigm, however given PHPs
+Interaction". It's inventors Trygve Reenskaug and James Coplien calls it a new paradigm, however given PHPs
 langugage constraints it cannot be more than just a design pattern. I came
 accross this pattern through `Gordon Oheim <https://twitter.com/go_oh>`_. He
 has also invested quite some time going through the book on DCI and trying
@@ -24,12 +24,16 @@ Terminology
 -----------
 
 In DCI, **data** are objects that encapsulate the state of the application.
-As in EBI, they only contain logic that is true for all the possible use-cases.
+As in EBI, they only contain logic that is true for all the possible use-cases. 
+These classes represent *what the system is*.
+
+**Roles** and **Context** represent *what the system does* and are supposed to
+capture the End User's Mental Model as close as possible.
 
 **Roles** add behavior to the data objects by either wrapping them or
 acting as traits for the data objects.
 
-**Context** is the use-case and fullfils its role by making roles **interact** with
+**Context** is the use-case and fulfils its role by making roles **interact** with
 each other. These roles then modify the underlying data.
 
 Example
@@ -126,7 +130,7 @@ having to rely on I/O.
         public function __construct($moneySource, $moneySink) 
         {
             $this->source = $moneySource;
-            $this->desstination = $moneySink;
+            $this->destination = $moneySink;
         }
 
         public function transferMoney(Money $money)
@@ -136,7 +140,7 @@ having to rely on I/O.
     }
 
 The simplicity of this is appealing, however don't forget that we have
-abstracted I/O completly here. There has to be code that deals with that part
+abstracted I/O completley here. There has to be code that deals with that part
 of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
 implications.
