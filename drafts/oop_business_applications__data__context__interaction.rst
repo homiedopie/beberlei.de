@@ -2,11 +2,11 @@ OOP Business Applications: Data, Context, Interaction
 =====================================================
 
 The next design pattern for technical system design is called "Data, Context,
-Interaction". It's inventors Trygve Reenskaug and James Coplien calls it a new paradigm, however given PHPs
-langugage constraints it cannot be more than just a design pattern. I came
-accross this pattern through `Gordon Oheim <https://twitter.com/go_oh>`_. He
-has also invested quite some time going through the book on DCI and trying
-to understand this pattern with me.
+Interaction". It's inventors Trygve Reenskaug and James Coplien call it a new
+paradigm, in the context of PHPs langugage constraints it can be classified as
+architectural design pattern. I came accross this pattern through `Gordon Oheim
+<https://twitter.com/go_oh>`_. He has also invested quite some time going
+through the book on DCI and trying to understand this pattern with me.
 
 As in the EBI pattern, DCI seperates data objects (Data) from behavior implemented
 in use-cases (Context). Data objects are never directly involved in these
@@ -110,15 +110,14 @@ The bank account would then be modified to look:
 The use-case ``TransferMoney`` would then be modified to create Roles instead
 of Data objects from the DAO. This can be a bit tricky when you have multiple
 data objects implementing the same role and you have no way of knowing which
-underyling data object to pick. How this binding of data and roles work is
-actually something that DCI does not explain to well from my limited
-understanding of it. One approach would be to store all data in a single
-namespace/collection and use UUIDs to access them. Another one would be
-to leave the binding up to the developer and outside of the scope of use-cases.
+underyling data object to pick. The binding of data objects to roles happens
+in the use-case. The use-case needs a means to retrieve objects with certain
+roles, which then access underlying data sources. To avoid that your use-cases
+have to know about how to bind roles to data, you could use GUIDs in your
+application and fetch all objects from one data store. Another way would be to
+implement data access objects for roles, that then know how to retrieve their
+corresponding data.
 
-I choose the latter now, because this avoids having to deal with data access
-inside the use-case. Which can make the code much more deterministic when not
-having to rely on I/O.
 
 .. code-block:: php
 
@@ -150,7 +149,7 @@ Conclusion
 
 When Gordon started showing me this pattern we were both puzzled as how
 to actually implement this in the real world. Especially the concept
-of binding roles to data objects still confuses us. Most notably why the use
+of binding roles to data objects still confuses me. Most notably why the use
 of traits or aggregates should actually constitute a new programming paradigm
 instead of just another way to do OOP.
 
@@ -169,11 +168,16 @@ One thing that is lacking in DCI is that there is no concrete mechanism to deal
 with the boundary to other parts of the system. This is actually a step back
 from EBI and I suggest using EBI pattern in combination with DCI to solve this.
 
-The largest benefit from DCI (and its self proclaimed goal) is the
-simplification of use-cases and reduction of side-effects between different
-parts of the system. This can lead to easier to test code and makes it much
-easier for junior developers to develop on small and isolated parts of the
-system.
+The largest benefit from DCI (and its self proclaimed goal) is the mapping from
+the users/customers mental model directly into the code by using Use-Cases and
+Roles. The communication with the customer about behavior can exclusively focus
+on the current context and its use-case. Mapping this behavior to actual data
+can then be done in a different step.
+
+This simplification of use-cases and reduction of side-effects between
+different parts of the system has other benefits: It can lead to easier to test
+code and makes it much easier for developers to develop on small and isolated
+parts of the system.
 
 .. author:: default
 .. categories:: none
