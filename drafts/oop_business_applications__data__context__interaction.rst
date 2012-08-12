@@ -140,7 +140,7 @@ having to rely on I/O.
     }
 
 The simplicity of this is appealing, however don't forget that we have
-abstracted I/O completly here. There has to be code that deals with that part
+abstracted I/O completley here. There has to be code that deals with that part
 of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
 implications.
