@@ -130,7 +130,7 @@ having to rely on I/O.
         public function __construct($moneySource, $moneySink) 
         {
             $this->source = $moneySource;
-            $this->desstination = $moneySink;
+            $this->destination = $moneySink;
         }
 
         public function transferMoney(Money $money)
