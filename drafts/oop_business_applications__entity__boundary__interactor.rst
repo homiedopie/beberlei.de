@@ -3,17 +3,17 @@ OOP Business Applications: Entity, Boundary, Interactor
 
 Other posts in this series:
 
-- [OOP Business Aplications: Trying to escape the mess](http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html)
+- [OOP Business Aplications: Trying to escape the
+  mess](http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html)
 
-Continuing the series, I will talk about Entity, Boundary and Interactor (EBI). I
-first heard about it in a keynote video of `Uncle Bob
-<https://sites.google.com/site/unclebobconsultingllc/>`_ on Ruby Midwest called
-`"The lost years of architecture"
+Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
+an architectural design pattern. I first heard about it in a keynote video of
+`Uncle Bob <https://sites.google.com/site/unclebobconsultingllc/>`_ on Ruby
+Midwest called `"The lost years of architecture"
 <http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years>`_.
 This is also described as `Hexagonal architecture
 <http://alistair.cockburn.us/Hexagonal+architecture>`_ or "Ports and Adapters"
-by Alistair Cockburn. I would call EBI a design pattern as it is clearly not an
-architecture on its own.
+by Alistair Cockburn.
 
 In this pattern any client of the system talks to the model using a model
 request object and receives data from the model in form of model responses objects.
@@ -272,13 +272,16 @@ actually a very good pattern for simple to medium complex use-cases and
 I like to have this as a general rule for developers ("Put behavior on the
 use-case").
 
-In conclusion I can recommend using the EBI pattern, however you have to be
-careful to find abstraction layers that keep your code DRY and SOLID, something
-which does not come naturally with this pattern. Additionally you should be
-careful to avoid lots of DTO <-> Entity Mapping code by using some
-code-generation for example to do parts of this job for you. The worst outcome
-with this pattern is, when you manually code layers for HTTP Request/Form
-=> DTO => Entity mapping and the other way around.
+In conclusion I can partially recommend using the EBI pattern. You have to be
+careful to find abstraction layers that keep your code DRY and SOLID however,
+something which does not come naturally with this pattern. If you are not
+careful you end up with all the "messy points" that I mentioned in my previoius
+blog post.
+
+You should be especially careful to avoid lots of DTO <-> Entity Mapping code
+by using some code-generation for example to do parts of this job for you. The
+worst outcome with this pattern is, when you manually code layers for HTTP
+Request/Form => DTO => Entity mapping and the other way around. 
 
 .. author:: default
 .. categories:: none
