@@ -24,12 +24,16 @@ Terminology
 -----------
 
 In DCI, **data** are objects that encapsulate the state of the application.
-As in EBI, they only contain logic that is true for all the possible use-cases.
+As in EBI, they only contain logic that is true for all the possible use-cases. 
+These classes represent *what the system is*.
+
+**Roles** and **Context** represent *what the system does* and are supposed to
+capture the End User's Mental Model as close as possible.
 
 **Roles** add behavior to the data objects by either wrapping them or
 acting as traits for the data objects.
 
-**Context** is the use-case and fullfils its role by making roles **interact** with
+**Context** is the use-case and fulfils its role by making roles **interact** with
 each other. These roles then modify the underlying data.
 
 Example
