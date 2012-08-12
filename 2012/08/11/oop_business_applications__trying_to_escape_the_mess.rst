@@ -30,6 +30,7 @@ motivational driver of `my open source activities
 <https://github.com/beberlei>`_ always was to simplify the technical dimension
 of OOP business applications.
 
+
 My Personal List of Annoyances
 ------------------------------
 
@@ -101,9 +102,15 @@ all (or most) of these problems. In the PHP world with `Symfony2
 you have a powerful toolbox to avoid many of the problems above, but it is
 still not simple to write clean object oriented applications.
 
-After years of participation in both projects I still feel there is a missing
-puzzle piece, to reach a clean seperation of all the model concers from
-framework and persistence. 
+After years of participation in both open source projects I still feel there is
+a missing puzzle piece, to reach a clean seperation of all the model concerns
+from framework and persistence. 
+
+At some point I would really like to close the gap between desired technical
+state of a project and the state it is actually in. I know there is no size
+fits all solution, but I fell a checklist of architectural patterns with pro
+and con arguments allows me to adjust the expectations about how a system looks
+in the end.
 
 Thanks to `Gordon <https://twitter.com/go_oh>`_, `Stefan
 <https://twitter.com/spriebsch>`_ and `Thomas <https://twitter.com/tom_noise>`_
@@ -125,11 +132,12 @@ started to explore in the past last months:
   <http://www.udidahan.com/2009/12/09/clarified-cqrs/>`_ and in a hands on `one
   day video class <http://www.viddler.com/v/dc528842>`_ by Greg Young.
 
-They are not new and have all been around for several years already. I am not
-sure if you can group them under a common category, but they are neither just
-patterns nor software architectures. All three approaches make you think about
-application development beyond just "service layers" in radically new ways. All
-three have helped me rethink business applications in different ways. 
+They are not new and have all been around for several years already. I would
+describe all three of them as architectural design patterns, though some people
+might probably disagreee with this classification. All three approaches make
+you think about application development beyond just "service layers" in
+radically new ways. All three have helped me rethink business applications in
+different ways. 
 
 In the next weeks I will talk about each of these approaches individually, show
 some examples and then wrap up my thoughts about all of them.
