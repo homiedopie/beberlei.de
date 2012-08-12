@@ -1,6 +1,10 @@
 OOP Business Applications: Entity, Boundary, Interactor
 =======================================================
 
+Other posts in this series:
+
+- [OOP Business Aplications: Trying to escape the mess](http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html)
+
 Continuing the series, I will talk about Entity, Boundary and Interactor (EBI). I
 first heard about it in a keynote video of `Uncle Bob
 <https://sites.google.com/site/unclebobconsultingllc/>`_ on Ruby Midwest called
@@ -147,53 +151,133 @@ manage transactions in this case. The code here is very explicit about
 the actual task. In a real application you would probably find a more
 generic approach to getting this job done.
 
+Boundary Abstraction
+--------------------
+
+Thinking about the boundaries I came up with a library several month ago called
+[Context](https://github.com/beberlei/context). It allows you to wrap calls
+to the model by some sort of proxy that transforms the request and response
+and also handles transactions and such. Loosly spoken this was actually
+some kind of AOP library, using the limited ways that PHP provides to implement
+AOP (magic ``__call`` proxies).
+
+With context you would do something like:
+
+.. code-block::
+
+    <?php
+    $context = $this->getContext();
+
+    // 1. direct invocation
+    $myService = new MyService();
+    $context->execute(array('service' => $myService, 'method' =>
+    'doSomething', 'arguments' => $args));
+
+    // 2. proxy wrapping
+    $myService = $context->wrap(new MyService());
+    $myService->doSomething($args);
+
+The second way is obviously way more readable, but its also rather magic.
+
+I deprecated this library because in the end it wasn't really helpful that
+much. Implementing an application specific proxy for services is done in
+almost no time and then it solves all your specific needs. My main problem with
+the library is that it tries to magically take away the need to design the
+boundary of your application yourself - in a way that is not really coherent to
+other developers.
+
+In my own current greenfield applications I quickly went away from using it,
+since a custom application proxy [as shown in this
+Gist](https://gist.github.com/3272909) is really much simpler to implement and
+use.
+
+Using with Symfony2
+-------------------
+
+As I am currently exclusively developing Symfony2/Silex applications, applying
+EBI to Symfony2 framework based applications is very important to me. The
+biggest difficulty here is the Form layer, escpecially the request data-mapping and
+validation concerns, which are normally part of the model. There are two
+approaches I came up with to solve this:
+
+* Build Forms for arrays or DTOs and send them through to the boundary to the model.
+  You have to validate the data again on the model, which is annoying, but in
+  this case the clean way. This is not so easy to do with complex forms though
+  as you need to map the request objects to your entities.
+* Create a Model Request that wraps and hides the form behind a simple data
+  mapping API. This way you can make it look as if you would map a DTO onto
+  an object, but in this case you are using the Form API as the mapper.
+
+.. code-block:: php
+
+    <?php
+    class MyService
+    {
+        public function edit(EditRequest $request)
+        {
+            $entity = $this->dao->find($request->id);
+            $this->dataMapper->transform($request, $data);
+        }
+    }
+
+The problem with this approach is, that you cant really unit-test these methods
+anymore, because the complexity of the form layer mapping cannot be mocked
+with this API. Additionally you have to make the DataMapper throw an exception
+that you can catch in the controller, rendering the appropriate response.
+
+Another thing that actually helped was the SensioFrameworkExtraBundle and
+ParamConverters. In my project I now have the framework building the Model
+Request objects by convention from the HTTP Request, so that I only need to
+pass them on and can skip the actual mapping of HTTP Request to Model Request.
+
 Pros and Cons
 -------------
 
-This design pattern very closely resembles the **Service Layer** pattern that
-is described in Martin Fowlers PoEAA, going a bit more into detail by naming
-individual parts of the pattern more explicit. Without more
-restrictions using this pattern will drive you towards many of the problems
-described in my previous post. Entities are still a meaningless getter/setter
-storage and use-cases interact with these to modify the state of the system.
+This design pattern very closely resembles what Fowler calls **Service Layer**
+pattern in PoEAA. EBI is going a bit more into detail by naming individual
+parts of the pattern more explicit. Without more restrictions however using
+this pattern will drive you towards many of the problems described in my
+previous post.
 
-Clean seperation from frameworks is achieved, however at a significant cost.
-Manually implementing this seperation without stepping back and thinking
-about further abstractions is leading to lots of code being manually written.
+Clean seperation from frameworks is achieved, depending on the actual usage
+however only at a significant cost.  Never forget stepping back and thinking
+about further abstractions, otherwise applying EBI is leading to lots of code
+being manually written. 
 
-One particular annoyance are the data-transfer objects. You need to invest
-quite some work to get a mapping working from entities to transfer objects and
-back. In the process you will loose the convenience of "Open Entity Manager in
-the View" anti-pattern, where you can lazy load any data you want to access in
-the view. This is quite a painful step, because you are loosing lots of
-flexibility. Much more annoying is the need to update entities from
-data-transfer objects, requiring sophisticated code for merging of partial object
-graphs. As we will see in future blog posts one particular problem that EBI
-does not specifically address is the reuse of data-transfer-objects for read
-and write scenarios.
+This already shows one particular annoyance are the data-transfer objects. You
+need to invest quite some work to get a mapping working from entities to
+transfer objects and back. In the process you will loose the convenience of
+"Open Entity Manager in the View", where you can lazy load any
+data you want to access in the view. This is quite a painful step, because you
+are loosing lots of flexibility. Much more annoying is the need to update
+entities from data-transfer objects, requiring sophisticated code for merging
+of partial object graphs. 
 
 What this design pattern improves is the testability of code and also the
 execution of tests is MUCH better, when you don't have to go through the whole
 application stack to test something.
 
 Implementing behavior into the use-cases also avoids lots of lasagna code
-compared to a fully domain driven design. You get a very good overview of
+compared to a messy domain driven design. You get a very good overview of
 what is actually happening just by looking at the Model Request and Interactor
 classes. However depending on the use-case the classes can get very big
 and might need lots of collaborators, which make the problem complex again.
 
 It is important to note that aggregating the domain logic in the use-cases
 actually means going to some sort of transaction script processing, away from
-domain driven design. However depending on the sophistication of the
-applications domain logic, transaction script is actually a very good pattern
-for simple to medium complex use-cases.
+domain driven design. I am pretty sure that this is not necessarily the
+intention of this design pattern from a POV of Uncle Bob. However depending on
+the sophistication of the applications domain logic, transaction script is
+actually a very good pattern for simple to medium complex use-cases and
+I like to have this as a general rule for developers ("Put behavior on the
+use-case").
 
 In conclusion I can recommend using the EBI pattern, however you have to be
 careful to find abstraction layers that keep your code DRY and SOLID, something
 which does not come naturally with this pattern. Additionally you should be
 careful to avoid lots of DTO <-> Entity Mapping code by using some
-code-generation for example to do parts of this job for you.  The worst outcome
-with this pattern is you having to manually code layers for HTTP Request/Form
+code-generation for example to do parts of this job for you. The worst outcome
+with this pattern is, when you manually code layers for HTTP Request/Form
 => DTO => Entity mapping and the other way around.
 
 .. author:: default
