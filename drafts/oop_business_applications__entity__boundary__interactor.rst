@@ -77,7 +77,7 @@ functionality. The Money object implementation is omitted here.
 The Interactor handles the use-case of transfering money from the
 source to the destination account:
 
-.. code-block::
+.. code-block:: php
 
     <?php
     class MoneyTransferRequest
@@ -163,7 +163,7 @@ AOP (magic ``__call`` proxies).
 
 With context you would do something like:
 
-.. code-block::
+.. code-block:: php
 
     <?php
     $context = $this->getContext();
