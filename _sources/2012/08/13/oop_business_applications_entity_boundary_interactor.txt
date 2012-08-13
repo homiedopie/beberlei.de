@@ -157,11 +157,11 @@ Boundary Abstraction
 --------------------
 
 Thinking about the boundaries I came up with a library several month ago called
-`Context <https://github.com/beberlei/context>`_. It allows you to wrap calls
-to the model by some sort of proxy that transforms the request and response
-and also handles transactions and such. Loosly spoken this was actually
-some kind of AOP library, using the limited ways that PHP provides to implement
-AOP (magic ``__call`` proxies).
+`Context <https://github.com/beberlei/context>`_, which I deprecated already
+(Reason below).  It allows you to wrap calls to the model by some sort of proxy
+that transforms the request and response and also handles transactions and
+such. Loosly spoken this was actually some kind of AOP library, using the
+limited ways that PHP provides to implement AOP (magic ``__call`` proxies).
 
 With context you would do something like:
 
@@ -188,7 +188,7 @@ boundary of your application yourself - in a way that is not really coherent to
 other developers.
 
 In my own current greenfield applications I quickly went away from using it,
-since a custom application proxy [as shown in this
+since a custom application proxy as shown in this
 `Gist <https://gist.github.com/3272909>`_ is really much simpler to implement and
 use.
 
@@ -222,9 +222,12 @@ approaches I came up with to solve this:
     }
 
 The problem with this approach is, that you cant really unit-test these methods
-anymore, because the complexity of the form layer mapping cannot be mocked
-with this API. Additionally you have to make the DataMapper throw an exception
-that you can catch in the controller, rendering the appropriate response.
+anymore, because the complexity of the form layer mapping cannot be mocked with
+this API. Instead your tests always need the full form layer (with validation,
+depending services etc.) to allow for real-world esting. Additionally you have
+to make the DataMapper throw an exception that you can catch in the controller,
+rendering the appropriate response. Using exceptions for controlling executions
+paths is not a very good practice though.
 
 Another thing that actually helped was the SensioFrameworkExtraBundle and
 ParamConverters. In my project I now have the framework building the Model

@@ -146,11 +146,11 @@ generic approach to getting this job done.</p>
 <div class="section" id="boundary-abstraction">
 <h2>Boundary Abstraction</h2>
 <p>Thinking about the boundaries I came up with a library several month ago called
-<a class="reference external" href="https://github.com/beberlei/context">Context</a>. It allows you to wrap calls
-to the model by some sort of proxy that transforms the request and response
-and also handles transactions and such. Loosly spoken this was actually
-some kind of AOP library, using the limited ways that PHP provides to implement
-AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
+<a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
+(Reason below).  It allows you to wrap calls to the model by some sort of proxy
+that transforms the request and response and also handles transactions and
+such. Loosly spoken this was actually some kind of AOP library, using the
+limited ways that PHP provides to implement AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
 <p>With context you would do something like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
@@ -172,7 +172,7 @@ the library is that it tries to magically take away the need to design the
 boundary of your application yourself - in a way that is not really coherent to
 other developers.</p>
 <p>In my own current greenfield applications I quickly went away from using it,
-since a custom application proxy [as shown in this
+since a custom application proxy as shown in this
 <a class="reference external" href="https://gist.github.com/3272909">Gist</a> is really much simpler to implement and
 use.</p>
 </div>
@@ -204,9 +204,12 @@ an object, but in this case you are using the Form API as the mapper.</li>
 </pre></div>
 </div>
 <p>The problem with this approach is, that you cant really unit-test these methods
-anymore, because the complexity of the form layer mapping cannot be mocked
-with this API. Additionally you have to make the DataMapper throw an exception
-that you can catch in the controller, rendering the appropriate response.</p>
+anymore, because the complexity of the form layer mapping cannot be mocked with
+this API. Instead your tests always need the full form layer (with validation,
+depending services etc.) to allow for real-world esting. Additionally you have
+to make the DataMapper throw an exception that you can catch in the controller,
+rendering the appropriate response. Using exceptions for controlling executions
+paths is not a very good practice though.</p>
 <p>Another thing that actually helped was the SensioFrameworkExtraBundle and
 ParamConverters. In my project I now have the framework building the Model
 Request objects by convention from the HTTP Request, so that I only need to
