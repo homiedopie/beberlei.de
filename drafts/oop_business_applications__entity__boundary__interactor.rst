@@ -117,6 +117,7 @@ by offering a port (Interface):
 
 .. code-block:: php
 
+    <?php
     interface AccountDaoInterface
     {
         public function find($accountId);
@@ -131,6 +132,7 @@ some kind of application boundary object:
 
 .. code-block:: php
 
+    <?php
     class BankApplicationBoundary
     {
         private $applicationFactory;
