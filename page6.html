@@ -77,6 +77,38 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 31, 2008</span> 
+        </div>
+        <div class="section" id="greaat-python-can-control-your-wiimote">
+<h1><a href="2008/08/31/greaat-python-can-control-your-wiimote.html">Greaat, Python can control your Wiimote</a></h1>
+<p>In the last days I had lots of time to play with my Wiimote and its
+bluetooth capabilities. Sadly there is activly supported driver in non-C
+(and I am not the biggest C programmmer). I found this little prototype
+driver written in Python by Will Woods which is using pyBluez to
+communicate with my wiimote and have extended it quite a bit.
+<a class="reference external" href="http://www.wiili.org">WiiLinux</a> is a huge resource that offers
+information on reverse engineering of the Wiimote protocol.</p>
+<p>The driver is still far from finished or usable outside some demo
+applications, but that might still be included in the future. You can
+<a class="reference external" href="http://www.beberlei.de/sources/wiipylib-0.1.tar.gz">download this little
+goodie</a> and have a
+look at it.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/08/31/greaat-python-can-control-your-wiimote.html#disqus_thread" data-disqus-identifier="2008/08/31/greaat-python-can-control-your-wiimote">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 23, 2008</span> 
         </div>
         <div class="section" id="constructions">
@@ -441,84 +473,6 @@ Zend_Loader::registerAutoload('WWLoader');</pre>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/20/using-a-self-defined-zend-loader.html#disqus_thread" data-disqus-identifier="2008/01/20/using-a-self-defined-zend-loader">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 17, 2008</span> 
-        </div>
-        <div class="section" id="zf-managing-404-errors-with-version-1-0-3">
-<h1><a href="2008/01/17/zf-managing-404-errors-with-version-1-0-3.html">ZF: Managing 404 Errors with Version 1.0.3</a></h1>
-<p>Ok, the description of the Link referring to the <a class="reference external" href="http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework">version 0.9 solution
-for Managing 404
-errors</a>
-due to missing modules or actions is wrong. It is not enought to replace
-Zend::loadClass with Zend_Loader::loadClass. Other functions have been
-renamed, my current snippet is:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">/**</span>
-<span class="x"> * Original Snippet from: http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework</span>
-<span class="x"> */</span>
-<span class="x">    class NoroutePlugin extends Zend_Controller_Plugin_Abstract</span>
-<span class="x">    {</span>
-<span class="x">        public function preDispatch(Zend_Controller_Request_Abstract $request )</span>
-<span class="x">        {</span>
-<span class="x">            $dispatcher = Zend_Controller_Front::getInstance()-&gt;getDispatcher();</span>
-
-<span class="x">            $controllerName = $request-&gt;getControllerName();</span>
-<span class="x">            if (empty($controllerName)) {</span>
-<span class="x">                $controllerName = $dispatcher-&gt;getDefaultControllerClass($request);</span>
-<span class="x">            }</span>
-<span class="x">            $className = $dispatcher-&gt;formatControllerName($controllerName);</span>
-<span class="x">            if ($className)</span>
-<span class="x">            {</span>
-<span class="x">                try</span>
-<span class="x">                {</span>
-<span class="x">                    // if this fails, an exception will be thrown and</span>
-<span class="x">                    // caught below, indicating that the class can't</span>
-<span class="x">                    // be loaded.</span>
-<span class="x">                    Zend_Loader::loadClass($className, $dispatcher-&gt;getControllerDirectory());</span>
-<span class="x">                    $actionName = $request-&gt;getActionName();</span>
-<span class="x">                    if (empty($actionName)) {</span>
-<span class="x">                        $actionName = $dispatcher-&gt;getDefaultAction();</span>
-<span class="x">                    }</span>
-<span class="x">                    $methodName = $dispatcher-&gt;formatActionName($actionName);</span>
-
-<span class="x">                    $class = new ReflectionClass( $className );</span>
-<span class="x">                    if( $class-&gt;hasMethod( $methodName ) )</span>
-<span class="x">                    {</span>
-<span class="x">                        // all is well - exit now</span>
-<span class="x">                        return;</span>
-<span class="x">                    }</span>
-<span class="x">                }</span>
-<span class="x">                catch (Zend_Exception $e)</span>
-<span class="x">                {</span>
-<span class="x">                    // Couldn't load the class. No need to act yet,</span>
-<span class="x">                    // just catch the exception and fall out of the</span>
-<span class="x">                    // if</span>
-<span class="x">                }</span>
-<span class="x">            }</span>
-
-<span class="x">            // we only arrive here if can't find controller or action</span>
-<span class="x">            $request-&gt;setControllerName( 'blog' );</span>
-<span class="x">            $request-&gt;setActionName( 'noroute' );</span>
-<span class="x">            $request-&gt;setDispatched( false );</span>
-<span class="x">        }</span>
-<span class="x">    }</span>
-</pre></div>
-</div>
-<p>I hope someone needs this as much as me.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/17/zf-managing-404-errors-with-version-1-0-3.html#disqus_thread" data-disqus-identifier="2008/01/17/zf-managing-404-errors-with-version-1-0-3">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -565,6 +519,9 @@ renamed, my current snippet is:</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
@@ -590,9 +547,6 @@ renamed, my current snippet is:</p>
         </li>
         <li class="recent_post">
             <a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
         </li>
     </ul>
 </div>

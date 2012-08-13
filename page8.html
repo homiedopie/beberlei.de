@@ -77,6 +77,100 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>December 01, 2008</span> 
+        </div>
+        <div class="section" id="zend-jquery-enhancements-ajax-forms-tooltip-and-autofill">
+<h1><a href="2008/12/01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html">Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill</a></h1>
+<p>Some weeks ago <a class="reference external" href="http://framework.zend.com">Zend Framework 1.7</a> was
+released with the <a class="reference external" href="http://jquery.com">jQuery</a> support I contributed.
+What is the essential advantage of using jQuery support in ZF? You can
+develop forms with ajax support either by using View Helpers or directly
+by the integrated Zend_Form support. The implementation of a DatePicker
+or AutoComplete functionality becomes as easy as using 2-3 lines of php
+code.</p>
+<p>Currently only support for the jQuery UI library is shipped, but you can
+easily extend the jQuery support on your own and this blog post will
+show you how using three very popular jQuery plugins:
+<a class="reference external" href="http://malsup.com/jquery/form/">AjaxForm</a>,
+<a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-tooltip/">Tooltip</a>
+and <a class="reference external" href="http://plugins.jquery.com/project/Autofill">AutoFill</a>. This will
+be a series of installments, beginning with the first one: AjaxForms</p>
+<p>AjaxForm allows you to enhance any form of yours to submit the data with
+ajax to the server, so no additional overhead of loading a new page is
+necessary. Combining the power of Zend_Form and jQuery’s ajaxForm you
+can even go so far as differentiating between successful and
+non-validated form submits. We will build a Form Decorator that
+integrates the AjaxForm plugin in any of your Zend_Form’s. On submit it
+will send the form data to the server via ajax and clears the form
+afterwards. Clients that have javascript disabled will work too, the
+form is submitted to the server in a standard pre-ajax fashion and
+processed that way.</p>
+<p>First what we need is obviously the new decorator, we will call it
+“My_JQuery_Form_Decorator_AjaxForm” and it will inherit from
+Zend_Form_Decorator_Form. What we then realize is, that this is just
+using a view helper to render, so what we need additionally is a
+“My_JQuery_View_Helper_AjaxForm” that extends from
+“Zend_View_Helper_Form”. The code of the view helper will have to
+look as follows to fullfil our needs:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>require_once &quot;Zend/View/Helper/Form.php&quot;;class ZendX_JQuery_View_Helper_AjaxForm extends Zend_View_Helper_Form{  /**   * Contains reference to the jQuery view helper   *   * @var ZendX_JQuery_View_Helper_JQuery_Container   */  protected $jquery;  /**   * Set view and enable jQuery Core and UI libraries   *   * @param Zend_View_Interface $view   * @return ZendX_JQuery_View_Helper_Widget   */  public function setView(Zend_View_Interface $view)  {    parent::setView($view);    $this-&gt;jquery = $this-&gt;view-&gt;jQuery();    $this-&gt;jquery-&gt;enable()           -&gt;uiEnable();    return $this;  }  public function ajaxForm($name, $attribs = null, $content = false, array $options=array())  {    $id = $name;    if(isset($attribs['id'])) {      $id = $attribs['id'];    }    if(!isset($options['clearForm'])) {      $options['clearForm'] = true;    }    if(count($options) &gt; 0) {      require_once &quot;Zend/Json.php&quot;;      $jsonOptions = Zend_Json::encode($options);      // Fix Callbacks if present      if(isset($options['beforeSubmit'])) {        $jsonOptions = str_replace('&quot;beforeSubmit&quot;:&quot;'.$options['beforeSubmit'].'&quot;', '&quot;beforeSubmit&quot;:'.$options['beforeSubmit'], $jsonOptions);      }      if(isset($options['success'])) {        $jsonOptions = str_replace('&quot;success&quot;:&quot;'.$options['success'].'&quot;', '&quot;success&quot;:'.$options['success'], $jsonOptions);      }    } else {      $jsonOptions = &quot;{}&quot;;    }    $this-&gt;jquery-&gt;addOnLoad(sprintf(      '$(&quot;#%s&quot;).ajaxForm(%s)', $id, $jsonOptions    ));    return parent::form($name, $attribs, $content);  }}</pre>
+</div>
+</div></blockquote>
+<p>It takes all the form-tag building of the inherited view helper for
+granted and just appends the necessary jQuery code to the jQuery
+onLoadActions stack. They will be outputted to the clients browser when
+calling &lt;?php $this-&gt;jQuery(); ?&gt; in your layout or view script. Make
+sure that you include the jQuery Form plugin in your code, for example
+with &lt;?php $view-&gt;jQuery()-&gt;addJavascriptFile(..); &gt;</p>
+<p>Programming the decorator becomes a simple trick now:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>require_once &quot;Zend/Form/Decorator/Form.php&quot;;class My_JQuery_Form_Decorator_AjaxForm extends Zend_Form_Decorator_Form{  protected $_helper = &quot;ajaxForm&quot;;  protected $_jQueryParams = array();  public function getOptions()  {    $options = parent::getOptions();    if(isset($options['jQueryParams'])) {      $this-&gt;_jQueryParams = $options['jQueryParams'];      unset($options['jQueryParams']);      unset($this-&gt;_options['jQueryParams']);    }    return $options;  }  /**   * Render a form   *   * Replaces $content entirely from currently set element.   *   * @param string $content   * @return string   */  public function render($content)  {    $form  = $this-&gt;getElement();    $view  = $form-&gt;getView();    if (null === $view) {      return $content;    }    $helper    = $this-&gt;getHelper();    $attribs    = $this-&gt;getOptions();    $name     = $form-&gt;getFullyQualifiedName();    $attribs['id'] = $form-&gt;getId();    return $view-&gt;$helper($name, $attribs, $content, $this-&gt;_jQueryParams);  }}</pre>
+</div>
+</div></blockquote>
+<p>Now to use either the decorator for your form, or just the view helper
+to print your form tag with jQuery code you can invoke:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$form-&gt;addPrefixPath('My_JQuery_Form_Decorator', 'My/JQuery/Form/Decorator', 'decorator');$form-&gt;removeDecorator('Form')-&gt;addDecorator(array('AjaxForm', array(  'jQueryParams' =&gt; array(),)));$view-&gt;addHelperPath(&quot;My/JQuery/View/Helper&quot;, &quot;My_JQuery_View_Helper&quot;);$view-&gt;ajaxForm(&quot;formId1&quot;, $attribs, $content, $options);</pre>
+</div>
+</div></blockquote>
+<p>Now we finished up the view side of our script. Assuming that we use the
+Form Decorator instead of the View Helper, we can additionally add some
+fancy logic and error handling ajax fun to the action controller that is
+handling the Zend_Form instance.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class IndexController extends Zend_Controller_Action{  public function indexAction()  {    $foo = new MyAjaxTestForm();    try {      if(!$foo-&gt;isValid($_POST)) {        throw new Exception(&quot;Form is not valid!&quot;);      } else {        // do much saving and stuff here        if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {          $this-&gt;_helper-&gt;json(array(&quot;success&quot; =&gt; &quot;SUCCESSMESSAGEHERE&quot;));        }      }    } catch(Exception $e) {      if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {        $jsonErrors = array();        foreach( ( new RecursiveIteratorIterator(new RecursiveArrayIterator($form-&gt;getMessages())) ) AS $error) {          $jsonErrors[] = $error;        }        $this-&gt;_helper-&gt;json-&gt;sendJson($jsonErrors);      }    }  }}</pre>
+</div>
+</div></blockquote>
+<p>This has to be processed by a callback function of the AjaxForm and
+which may for example look like the following which uses a predefined
+div box (#formMessages, dont forget to implement it) to render either
+the success or the error messages.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$form-&gt;addDecorator(array('AjaxForm', array(  'jQueryParams' =&gt; array(    'success' =&gt; &quot;formCallback1&quot;,   ),)));$view-&gt;jQuery()-&gt;addJavascript('function formCallback1(data) {  if(data.errors) {    $(&quot;#formMessages&quot;).append(&quot;&lt;ul&gt;&quot;);    for each(var item in data.errors) {      $(&quot;#formMessages&quot;).append(&quot;&lt;li&gt;&quot;+item+&quot;&lt;/li&gt;&quot;);    }    $(&quot;#formMessages&quot;).append(&quot;&lt;/ul&gt;&quot;);  } else {    $(&quot;#formMessages&quot;).html(data.success);  }}');</pre>
+</div>
+</div></blockquote>
+<p>This seems very complex, but you could include that javascript code into
+the AjaxForm decorator and implement an Action Helper to do the action
+controller side of the stuff. This will be an exercise for a future
+post.</p>
+<p>AutoFill and Tooltip extensions will be topic of the next installments
+of this series, so be aware of new content soonish.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html#disqus_thread" data-disqus-identifier="2008/12/01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>December 18, 2008</span> 
         </div>
         <div class="section" id="dependecy-injection-the-juicy-way">
@@ -679,63 +773,6 @@ report back on my efforts.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/07/21/zend-dojo-and-the-django-template-language.html#disqus_thread" data-disqus-identifier="2008/07/21/zend-dojo-and-the-django-template-language">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>July 12, 2008</span> 
-        </div>
-        <div class="section" id="discussing-a-jquery-helper-for-zend-framework">
-<h1><a href="2008/07/12/discussing-a-jquery-helper-for-zend-framework.html">Discussing a jQuery Helper for Zend Framework</a></h1>
-<p>Yesterday I had some time to test Matthews <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Helper_Dojo">Dojo View
-Helper</a>
-and the Zend_Dojo_Form component. At a first glance the implementation
-looks great and can almost instantly generate you a very nice form with
-all the possible Dijit form extensions that
-<a class="reference external" href="http://dojotoolkit.org/">Dojo</a> has to offer.</p>
-<p>If one were to refactor the Dojo Component to allow for
-<a class="reference external" href="http://www.jquery.com">jQuery</a> elements one bigger problem appears.
-Dojo has a CDN (Content Distribution Network) for all its components,
-that is, the Zend Dojo components can load all javascript and css files
-from a distant server. JQuery can only offer its main library to be
-loaded from a CDN. All additional components, for example the jQuery
-DatePicker, have to be installed locally. This significantly reduces the
-possibility for rapid development of Javascript/Ajax/Form components
-with jQuery and Zend Framework.</p>
-<p>One could offer a complete dependency downloadable archive with all the
-CSS, Javascript and Images inside, but this would be very complex to
-maintain. Looking at the future Zend Tool capabilites one possibilty
-would be to offer a download client for all the relevant jQuery plugins,
-but there would have to be a man-middle-server that maintaines the most
-up to date locations of all the plugins, which also has to be
-maintained. Does anybody have a better solution to solve this problem?
-Perhaps the jQuery Team needs to be made aware that they need a CDN for
-their most stable plugins.</p>
-<p>Abstracting from the CDN problem, I implemented a simple jQuery View
-Helper (mostly copy paste and simple rewrites from Matthews Dojo
-component) and a HtmlElement Form Helper which constructs a Date-Picker
-from within the template. This is very easy to use and looks great. In
-the next days I will add further helpers for the jQuery plugins I use in
-my day to day work live and hope to present a demo. I might even optin
-for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
-<p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
-list</a>
-stating that a CDN is planned for the jQuery UI library. Sadly this does
-not include plugins for which one might desperatly need a View Helper
-except for maybe the Date Picker. I will post further comments on this
-issue in the near future.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/12/discussing-a-jquery-helper-for-zend-framework.html#disqus_thread" data-disqus-identifier="2008/07/12/discussing-a-jquery-helper-for-zend-framework">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -782,6 +819,9 @@ issue in the near future.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
@@ -807,9 +847,6 @@ issue in the near future.</p>
         </li>
         <li class="recent_post">
             <a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a>
         </li>
     </ul>
 </div>
