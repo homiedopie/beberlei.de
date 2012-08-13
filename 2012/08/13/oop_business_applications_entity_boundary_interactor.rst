@@ -172,8 +172,7 @@ With context you would do something like:
 
     // 1. direct invocation
     $myService = new MyService();
-    $context->execute(array('service' => $myService, 'method' =>
-    'doSomething', 'arguments' => $args));
+    $context->execute(array('service' => $myService, 'method' => 'doSomething', 'arguments' => $args));
 
     // 2. proxy wrapping
     $myService = $context->wrap(new MyService());
@@ -190,7 +189,7 @@ other developers.
 
 In my own current greenfield applications I quickly went away from using it,
 since a custom application proxy [as shown in this
-Gist](https://gist.github.com/3272909) is really much simpler to implement and
+`Gist <https://gist.github.com/3272909>`_ is really much simpler to implement and
 use.
 
 Using with Symfony2
