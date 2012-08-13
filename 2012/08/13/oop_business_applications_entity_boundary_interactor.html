@@ -69,8 +69,8 @@
 <h1>OOP Business Applications: Entity, Boundary, Interactor</h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
-<li>[OOP Business Aplications: Trying to escape the
-mess](<a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</a>)</li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Aplications: Trying to escape the
+mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
 an architectural design pattern. I first heard about it in a keynote video of
@@ -125,20 +125,50 @@ is the money transfer from one bank account (source) to another one
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>It is straightforward to implement the <tt class="docutils literal"><span class="pre">withdraw`</span> <span class="pre">and</span> <span class="pre">``deposit</span></tt>
+<p>It is straightforward to implement the <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>
 functionality. The Money object implementation is omitted here.</p>
 <p>The Interactor handles the use-case of transfering money from the
 source to the destination account:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$amount</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">MoneyTransferResponse</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$transfer</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
+
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">MoneyTransferResponse</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>The <tt class="docutils literal"><span class="pre">MoneyTransferRequest</span></tt> and <tt class="docutils literal"><span class="pre">MoneyTransferResponse</span></tt> objects are dumb
 value objects or data-transfer objects as they are commonly called.</p>
 <p>You can see in the example that we use a Data Access object to retrieve the
 source and destination account entities from some storage subsystem. To follow the EBI
 design pattern, we have to decouple this data access object from the model,
 by offering a port (Interface):</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">interface AccountDaoInterface</span>
-<span class="x">{</span>
-<span class="x">    public function find($accountId);</span>
-<span class="x">}</span>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>This way our business logic is storage independent.</p>
@@ -146,19 +176,20 @@ by offering a port (Interface):</p>
 the bank account sample. We need to wrap the whole MoneyTransfer use-case in
 a transaction. Lets say the invocation of our Use-Case is controlled through
 some kind of application boundary object:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class BankApplicationBoundary</span>
-<span class="x">{</span>
-<span class="x">    private $applicationFactory;</span>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
 
-<span class="x">    public function transferMoney(MoneyTransferRequest $request)</span>
-<span class="x">    {</span>
-<span class="x">        $unitOfWork = $this-&gt;applicationFactory-&gt;createUnitOfWork();</span>
-<span class="x">        return $unitOfWork-&gt;work(function($factory) use ($request) {</span>
-<span class="x">            $useCase = new MoneyTransfer($factory-&gt;createAccountDao());</span>
-<span class="x">            return $useCase-&gt;transferMoney($request);</span>
-<span class="x">        });</span>
-<span class="x">    }</span>
-<span class="x">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$unitOfWork</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">applicationFactory</span><span class="o">-&gt;</span><span class="na">createUnitOfWork</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$unitOfWork</span><span class="o">-&gt;</span><span class="na">work</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$factory</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$request</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createAccountDao</span><span class="p">());</span>
+            <span class="k">return</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>This is a very elaborate way to describe that calling the transfer money
@@ -170,12 +201,25 @@ generic approach to getting this job done.</p>
 <div class="section" id="boundary-abstraction">
 <h2>Boundary Abstraction</h2>
 <p>Thinking about the boundaries I came up with a library several month ago called
-[Context](<a class="reference external" href="https://github.com/beberlei/context">https://github.com/beberlei/context</a>). It allows you to wrap calls
+<a class="reference external" href="https://github.com/beberlei/context">Context</a>. It allows you to wrap calls
 to the model by some sort of proxy that transforms the request and response
 and also handles transactions and such. Loosly spoken this was actually
 some kind of AOP library, using the limited ways that PHP provides to implement
 AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
 <p>With context you would do something like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
+
+<span class="c1">// 1. direct invocation</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyService</span><span class="p">();</span>
+<span class="nv">$context</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;service&#39;</span> <span class="o">=&gt;</span> <span class="nv">$myService</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span> <span class="o">=&gt;</span>
+<span class="s1">&#39;doSomething&#39;</span><span class="p">,</span> <span class="s1">&#39;arguments&#39;</span> <span class="o">=&gt;</span> <span class="nv">$args</span><span class="p">));</span>
+
+<span class="c1">// 2. proxy wrapping</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="nv">$context</span><span class="o">-&gt;</span><span class="na">wrap</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">());</span>
+<span class="nv">$myService</span><span class="o">-&gt;</span><span class="na">doSomething</span><span class="p">(</span><span class="nv">$args</span><span class="p">);</span>
+</pre></div>
+</div>
 <p>The second way is obviously way more readable, but its also rather magic.</p>
 <p>I deprecated this library because in the end it wasn&#8217;t really helpful that
 much. Implementing an application specific proxy for services is done in

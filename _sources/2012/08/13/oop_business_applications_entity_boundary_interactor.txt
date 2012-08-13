@@ -3,8 +3,8 @@ OOP Business Applications: Entity, Boundary, Interactor
 
 Other posts in this series:
 
-- [OOP Business Aplications: Trying to escape the
-  mess](http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html)
+- `OOP Business Aplications: Trying to escape the
+  mess <http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html>`_
 
 Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
 an architectural design pattern. I first heard about it in a keynote video of
@@ -71,13 +71,13 @@ We start by implementing the entity ``BankAccount``:
         }
     }
 
-It is straightforward to implement the ``withdraw` and ``deposit``
+It is straightforward to implement the ``withdraw`` and ``deposit``
 functionality. The Money object implementation is omitted here.
 
 The Interactor handles the use-case of transfering money from the
 source to the destination account:
 
-.. code-block::
+.. code-block:: php
 
     <?php
     class MoneyTransferRequest
@@ -117,6 +117,7 @@ by offering a port (Interface):
 
 .. code-block:: php
 
+    <?php
     interface AccountDaoInterface
     {
         public function find($accountId);
@@ -131,6 +132,7 @@ some kind of application boundary object:
 
 .. code-block:: php
 
+    <?php
     class BankApplicationBoundary
     {
         private $applicationFactory;
@@ -155,7 +157,7 @@ Boundary Abstraction
 --------------------
 
 Thinking about the boundaries I came up with a library several month ago called
-[Context](https://github.com/beberlei/context). It allows you to wrap calls
+`Context <https://github.com/beberlei/context>`_. It allows you to wrap calls
 to the model by some sort of proxy that transforms the request and response
 and also handles transactions and such. Loosly spoken this was actually
 some kind of AOP library, using the limited ways that PHP provides to implement
@@ -163,7 +165,7 @@ AOP (magic ``__call`` proxies).
 
 With context you would do something like:
 
-.. code-block::
+.. code-block:: php
 
     <?php
     $context = $this->getContext();
