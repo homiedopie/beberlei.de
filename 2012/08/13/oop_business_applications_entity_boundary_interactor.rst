@@ -108,7 +108,7 @@ source to the destination account:
     }
 
 The ``MoneyTransferRequest`` and ``MoneyTransferResponse`` objects are dumb
-value objects or data-transfer objects as they are commonly called.
+php objects (so called data-transfer objects, DTO).
 
 You can see in the example that we use a Data Access object to retrieve the
 source and destination account entities from some storage subsystem. To follow the EBI
