@@ -139,16 +139,24 @@ some kind of application boundary object:
 
         public function transferMoney(MoneyTransferRequest $request)
         {
-            $unitOfWork = $this->applicationFactory->createUnitOfWork();
-            return $unitOfWork->work(function($factory) use ($request) {
+            $connection = $this->applicationFactory->createConnection();
+            $connection->beginTransaction();
+
+            try {
                 $useCase = new MoneyTransfer($factory->createAccountDao());
-                return $useCase->transferMoney($request);
-            });
+                $result = $useCase->transferMoney($request);
+                $connection->commit();
+
+                return $result;
+            } catch(\Exception $e) {
+                $connection->rollback();
+                throw $e;
+            }
         }
     }
 
 This is a very elaborate way to describe that calling the transfer money
-use-case is wrapped in a UnitOfWork, another port for the storage system to
+use-case is wrapped in a Transaction, another port for the storage system to
 manage transactions in this case. The code here is very explicit about
 the actual task. In a real application you would probably find a more
 generic approach to getting this job done.

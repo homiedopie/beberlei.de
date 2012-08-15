@@ -128,17 +128,25 @@ some kind of application boundary object:</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$request</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$unitOfWork</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">applicationFactory</span><span class="o">-&gt;</span><span class="na">createUnitOfWork</span><span class="p">();</span>
-        <span class="k">return</span> <span class="nv">$unitOfWork</span><span class="o">-&gt;</span><span class="na">work</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$factory</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$connection</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">applicationFactory</span><span class="o">-&gt;</span><span class="na">createConnection</span><span class="p">();</span>
+        <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
             <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createAccountDao</span><span class="p">());</span>
-            <span class="k">return</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
-        <span class="p">});</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>This is a very elaborate way to describe that calling the transfer money
-use-case is wrapped in a UnitOfWork, another port for the storage system to
+use-case is wrapped in a Transaction, another port for the storage system to
 manage transactions in this case. The code here is very explicit about
 the actual task. In a real application you would probably find a more
 generic approach to getting this job done.</p>
