@@ -70,7 +70,7 @@ objects using them in the tests for this use-case.
         {
             $destination->transferFrom($destination, $money);  
         }
-        abtract public function withdraw(Money $money);
+        abstract public function withdraw(Money $money);
     }
     trait TransferMoneySink
     {
@@ -129,6 +129,7 @@ corresponding data.
 
 .. code-block:: php
 
+    <?php
     class MoneyTransfer
     {
         private $source;
@@ -169,7 +170,7 @@ Here is an example of how the bank application service could look like:
             $source      = $this->objectStorage->find($sourceId);
             $destination = $this->objectStorage->find($destinationId);
 
-            $useCase = new TransferMoney($source, $destination);
+            $useCase = new MoneyTransfer($source, $destination);
 
             $conn = $this->conn->beginTransaction();
 
