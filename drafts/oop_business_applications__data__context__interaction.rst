@@ -1,6 +1,14 @@
 OOP Business Applications: Data, Context, Interaction
 =====================================================
 
+Other posts in this series:
+
+- `OOP Business Aplications: Trying to escape the
+  mess <http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html>`_
+- `OOP Business Applications: Entity, Boundary, Interactor
+  <http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html>`_
+
+
 The next design pattern for technical system design is called "Data, Context,
 Interaction". It's inventors Trygve Reenskaug and James Coplien call it a new
 paradigm, in the context of PHPs langugage constraints it can be classified as
@@ -11,7 +19,7 @@ through the book on DCI and trying to understand this pattern with me.
 As in the EBI pattern, DCI seperates data objects (Data) from behavior implemented
 in use-cases (Context). Data objects are never directly involved in these
 use-cases, but are "casted" to their respective roles that they are taking in
-the use-case. This can be implemented in PHP with aggregation or traits.
+the use-case. This can be implemented with aggregation or traits in PHP.
 
 One goal of DCI is to get object-oriented programming to a place, where you
 can look at a use-case and its roles and be very sure that the programm is
@@ -144,12 +152,52 @@ of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
 implications.
 
+.. note::
+
+    One drawback with this example is, that PHP does not support typehinting for
+    traits.
+
+Here is an example of how the bank application service could look like:
+
+.. code-block:: php
+
+    <?php
+    class BankApplicationService
+    {
+        public function transferMoney($sourceId, $destinationId, Money $amount)
+        {
+            $source      = $this->objectStorage->find($sourceId);
+            $destination = $this->objectStorage->find($destinationId);
+
+            $useCase = new TransferMoney($source, $destination);
+
+            $conn = $this->conn->beginTransaction();
+
+            try {
+                $result = $useCase->transferMoney($amount);
+                $conn->commit();
+
+                return $result;
+            } catch(\Exception $e) {
+                $conn->rollback();
+            }
+        }
+    }
+
+The ``ObjectStorage`` here is a service (repository) that can find any
+persistent data object by a global ID. This is necessary, because it
+doesn't actually matter what data object uses the necessary traits
+for this use-case.
+
+Again as in EBI, in a bigger system you would need to find some abstraction
+layer that does this in a more generic way.
+
 Conclusion
 ----------
 
 When Gordon started showing me this pattern we were both puzzled as how
 to actually implement this in the real world. Especially the concept
-of binding roles to data objects still confuses me. Most notably why the use
+of binding roles to data objects still confuses us. Most notably why the use
 of traits or aggregates should actually constitute a new programming paradigm
 instead of just another way to do OOP.
 
@@ -159,10 +207,10 @@ statically.
 
 Compared to EBI, DCI focuses drastically on transaction script domain logic, by
 suggesting to implement roles for every use-case for the sake of avoiding
-side-effects. This is actually is very valuable lesson from this pattern. Finding means to
-decrease the complexity of software is always a good thing. And the explicit
-definition of this concept as **roles** is actually easy to teach to other
-programmers. 
+side-effects. This is actually is very valuable lesson from this pattern.
+Finding means to decrease the complexity of software is always a good thing.
+And the explicit definition of this concept as **roles** is actually easy to
+explain to other programmers. 
 
 One thing that is lacking in DCI is that there is no concrete mechanism to deal
 with the boundary to other parts of the system. This is actually a step back
