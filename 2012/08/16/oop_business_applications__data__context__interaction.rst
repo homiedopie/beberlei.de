@@ -61,7 +61,7 @@ one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.
 
-.. code-block::
+.. code-block:: php
 
     <?php
     trait TransferMoneySource
@@ -89,7 +89,7 @@ on the execution of this use-case.
 
 The bank account would then be modified to look:
 
-.. code-block::
+.. code-block:: php
 
     <?php
 
