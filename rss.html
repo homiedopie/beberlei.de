@@ -5,7 +5,202 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Thu, 16 Aug 2012 00:00:00 +0200</pubDate>
+        <pubDate>Sat, 18 Aug 2012 00:00:00 +0200</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</link>
+            <guid>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</guid>
+            <title>OOP Business Applications: Command-Query-Responsibility-Seggregation (CQRS)</title>
+            <description><![CDATA[<div class="section" id="oop-business-applications-command-query-responsibility-seggregation-cqrs">
+<h1>OOP Business Applications: Command-Query-Responsibility-Seggregation (CQRS)</h1>
+<p>Other posts in this series about OOP Business Applications:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">Trying to escape the
+mess</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">Entity, Boundary, Interactor</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
+</ul>
+<p>The last pattern for desigining your business logic is called
+“Command-Query-Responsiblity-Seggregation” or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Seperation”</a> principle that was
+put forward by Bertrand Meyer.</p>
+<p>Wikipedia has a very good summary about what this principle is about:</p>
+<div class="highlight-python"><pre>Command-Query-Seperation states that every method should either be a
+command that performs an action, or a query that returns data to the
+caller, but not both. In other words, asking a question should not change
+the answer. More formally, methods should return a value only if they are
+referentially transparent and hence possess no side effects.</pre>
+</div>
+<p>CQRS is an OOP architecture design pattern building on that imperative
+principle.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are many different variations of the CQRS pattern that
+all have their place. This post describes a simple variant that does
+<strong>not</strong>
+use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
+with CQRS.</p>
+</div>
+<p>At its heart is the seperation of Read and Write methods. This can be easily
+achieved by just having two different service layer classes instead of one.
+This insight alone is not really helpful, its just moving methods around.
+Coupled to this change however is the notion, that read and write models don’t
+necessarily have to be the same:</p>
+<ul class="simple">
+<li>Getter/Setters: We don’t need setters in the write model, instead we use
+explicit methods for each write operation. Entities are also much simpler
+without bi-direcitional relationships that read/write models often need.
+Read-only models (ViewModel) don’t need getters/setters. They could just use
+public properties or even be arrays.</li>
+<li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
+mostly need queries by primary key, changing only some objects. In
+read scenarios we need complex queries, joins and aggregations. A seperation
+prevents both from affecting each other negatively.</li>
+<li>Mapping Data-Transfer objects becomes simple. Instead of sending the whole
+model back and forth, for the write scenario you define use-case specific
+tasks and upates. This is much simpler than generic mapping of Data Transfer
+objects to complex object graphs.</li>
+<li>Transformating SQL directly to a view model in a highly optimized way.
+Simple concept, but it has huge implications: A pure read-only model is simple to
+maintain and refactor for any performance requirements that come up.</li>
+</ul>
+<p>Furhtermore with CQRS our write service methods are not allowed to return data
+anymore (With the exceptions to the rule of course). This may increase the
+complexity at first, but it has benefits for scalability and decoupling.
+Following this principle allows us to turn every command from synchroneous to
+asynchroneous processing later without much problems. Services are allowed to
+throw exceptions and refuse the execution. Proper validation of input data
+should happen before executing write operations though.</p>
+<p>One drawback of CQRS: A naive implementation doubles the amount of classes and
+services to write. But there are simple shortcuts to avoid having to write a
+full blown read-model:</p>
+<ul class="simple">
+<li>Don’t use different data-stores for both models.</li>
+<li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
+very simple. You can easily generialize this to a simple object that gives
+efficent access to all your data.</li>
+<li>Share parts of the write and read models if you don’t have to compromise
+much.</li>
+</ul>
+<p>The important thing to take away from this seperation is, that the read part of
+your application is seldom the part where business value lies in. Moving this
+code into a different part of your applications allows you to work with the
+underyling data-source much more directly, without need for much abstractions.</p>
+<p>One thing that CQRS puts forward is the concept of Commands, Command Handlers
+and Command Bus and how they interact. Commands are simple objects that
+contain all the data necessary to execute an operation. Each command is
+processed by exactly one command handler. The Command Bus is responsible to
+route a command to its apporpriate command handler.</p>
+<div class="section" id="example">
+<h2>Example</h2>
+<p>Here is the most simple implementation of the Command Bus, just holds a hash map
+mapping command class names to command handlers:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">Handler</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">CommandBus</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$handlers</span><span class="p">;</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">(</span><span class="nv">$commandClassName</span><span class="p">,</span> <span class="nx">Handler</span> <span class="nv">$handler</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handlers</span><span class="p">[</span><span class="nv">$commandClassName</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$handler</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handlers</span><span class="p">[</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$command</span><span class="p">)]</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In your code you would always pass Commands to the bus. That way the command
+bus is a central entry point to any write operation. With this we can rewrite the
+TransferMoney service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">TransferMoneyCommand</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$money</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MoneyTransfer</span> <span class="k">implements</span> <span class="nx">Handler</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
+
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There is also a benefit from the mental model of commands compared to the
+“generic” term of model requests in EBI. Your write model gets task
+oriented.</p>
+<p>Routing everything through the command bus has several benefits as well:</p>
+<ul class="simple">
+<li>Nesting handlers that take care of transactions, logging, 2 phase commits</li>
+<li>Order nested command calls sequentially instead of deep into each other.</li>
+<li>Asynchroneous processing with message queue become an option</li>
+</ul>
+<p>The command bus acts as the application boundary as described in the
+Entity-Boundary-Interactor pattern, usage is simple:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$commandBus</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'command_bus'</span><span class="p">);</span>
+        <span class="nv">$commandBus</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TransferMoneyCommand</span><span class="p">(</span>
+            <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'sourceId'</span><span class="p">),</span>
+            <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'destinationId'</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'amount'</span><span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pros-and-cons">
+<h2>Pros and Cons</h2>
+<p>I really like CQRS for multiple reasons. It offers excplicit guidance how solve
+tasks by making use of a range of different design patterns. This is very
+helpful, because the code-base is based on conventions that are simple to
+understand by everyone on the team. This structure liberates you from the curse
+of choice and gives you a cookbook of best-practicies how to solve problems.
+You want this struture for all your applications, regardless of what
+architectural patttern you have chosen.</p>
+<p>Embracing the difference between read and write models is another plus of CQRS.
+It is very helpful, not to try fitting both read and write into one model.  You
+also don’t run into so many read-related problems with an ORM any more. You
+design the entities to be optimized for the write model only, loose the
+bidirectional associations and avoid all the optmizations here and there for
+read performance.</p>
+<p>Compared to EBI, where we had to maintain a mapping between DTOs and entities,
+CQRS explicitly uses the command based approach to avoid the complexity of
+these mappings. You will still have to map between command and entity, however
+doing so in the context of a use-case simplifies the code considerably compared
+to a generic mapping solution.</p>
+<p>One negative point: Its difficult to work with commands not returning any data
+in some cases. You need to find simple ways to return messages to the
+user. For that you also need to validate commands on the “client” or
+controller side, using the read model, so that you can prevent invalid/illegal
+commands from being sent as often as possible.</p>
+<p>Without return values from your models, you are left to using mocks as means of
+testing. This might be more difficult for developers to use and understand.
+This problem goes away however, if you combine CQRS with Event Sourcing. A
+topic that I will discuss in the next blog post.</p>
+</div>
+</div>]]></description>
+            <pubDate>Sat, 18 Aug 2012 00:00:00 +0200</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</link>
             <guid>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</guid>
