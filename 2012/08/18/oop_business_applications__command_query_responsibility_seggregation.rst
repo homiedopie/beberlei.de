@@ -70,7 +70,7 @@ should happen before executing write operations though.
 
 One drawback of CQRS: A naive implementation doubles the amount of classes and
 services to write. But there are simple shortcuts to avoid having to write a
-full blown read-model:
+full blown read-model if you don't apply CQRS religiously:
 
 - Don't use different data-stores for both models.
 - Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
