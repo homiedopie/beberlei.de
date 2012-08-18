@@ -1,6 +1,15 @@
 OOP Business Applications: Command-Query-Responsibility-Seggregation (CQRS)
 ===========================================================================
 
+Other posts in this series about OOP Business Applications:
+
+- `Trying to escape the
+  mess <http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html>`_
+- `Entity, Boundary, Interactor
+  <http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html>`_
+- `Data, Context, Interaction
+  <http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html>`_
+
 The last pattern for desigining your business logic is called
 "Command-Query-Responsiblity-Seggregation" or short CQRS. It has its roots in
 the `"Command Query Seperation"
@@ -23,8 +32,9 @@ principle.
 .. note::
 
     There are many different variations of the CQRS pattern that
-    all have their place. This post describes a simple variant that does not
-    use the DomainEvent or EventSourcing patterns, which are commonly mentioned
+    all have their place. This post describes a simple variant that does
+    **not**
+    use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
     with CQRS.
 
 At its heart is the seperation of Read and Write methods. This can be easily
@@ -50,7 +60,7 @@ necessarily have to be the same:
   Simple concept, but it has huge implications: A pure read-only model is simple to
   maintain and refactor for any performance requirements that come up.
 
-Another part of CQRS: Our write service methods are not allowed to return data
+Furhtermore with CQRS our write service methods are not allowed to return data
 anymore (With the exceptions to the rule of course). This may increase the
 complexity at first, but it has benefits for scalability and decoupling.
 Following this principle allows us to turn every command from synchroneous to
@@ -144,6 +154,7 @@ Routing everything through the command bus has several benefits as well:
 
 - Nesting handlers that take care of transactions, logging, 2 phase commits
 - Order nested command calls sequentially instead of deep into each other.
+- Asynchroneous processing with message queue become an option
 
 The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:
@@ -167,11 +178,13 @@ Entity-Boundary-Interactor pattern, usage is simple:
 Pros and Cons
 -------------
 
-I really like CQRS for multiple reasons. It offers a common "framework" how to
-solve tasks and does so by posing restrictions on how to do this tasks. This is very
+I really like CQRS for multiple reasons. It offers excplicit guidance how solve
+tasks by making use of a range of different design patterns. This is very
 helpful, because the code-base is based on conventions that are simple to
-understand by everyone on the team. It frees you from the curse of choice,
-the free for all mode of operations.
+understand by everyone on the team. This structure liberates you from the curse
+of choice and gives you a cookbook of best-practicies how to solve problems.
+You want this struture for all your applications, regardless of what
+architectural patttern you have chosen.
 
 Embracing the difference between read and write models is another plus of CQRS.
 It is very helpful, not to try fitting both read and write into one model.  You
@@ -185,10 +198,6 @@ CQRS explicitly uses the command based approach to avoid the complexity of
 these mappings. You will still have to map between command and entity, however
 doing so in the context of a use-case simplifies the code considerably compared
 to a generic mapping solution.
-
-With the command in command execution, it is even possible to divide the tasks
-into many small isolated parts, which makes it much simpler to create DRY and
-SOLID code.
 
 One negative point: Its difficult to work with commands not returning any data 
 in some cases. You need to find simple ways to return messages to the
