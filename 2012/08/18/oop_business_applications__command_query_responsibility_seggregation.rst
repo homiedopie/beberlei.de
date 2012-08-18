@@ -1,5 +1,5 @@
-OOP Business Applications: Command-Query-Responsibility-Seggregation (CQRS)
-===========================================================================
+OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)
+==========================================================================
 
 Other posts in this series about OOP Business Applications:
 
@@ -11,7 +11,7 @@ Other posts in this series about OOP Business Applications:
   <http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html>`_
 
 The last pattern for desigining your business logic is called
-"Command-Query-Responsiblity-Seggregation" or short CQRS. It has its roots in
+"Command-Query-Responsiblity-Segregation" or short CQRS. It has its roots in
 the `"Command Query Seperation"
 <http://en.wikipedia.org/wiki/Command-query_separation>`_ principle that was
 put forward by Bertrand Meyer.
