@@ -1,7 +1,7 @@
 CQRS and Traits
 ===============
 
-If you apply CQRS and Event Sourcing in a language that has traits, you can
+If you apply CQRS and Domain Event pattern in a language that has traits, you can
 share commands accross entities of multiple types. This is a very powerful
 concept It might actually be comparable to **Roles** in the Data, Context,
 Interaction paradigm.
@@ -32,12 +32,17 @@ You could model this behavior as a trait:
     }
 
 Now you can have any approvable entity use this trait, for
-example the hours worked by an employer on a particular project:
+example the hours worked by an employer on a particular project,
+or the project offering to a customer:
 
 .. code-block::
 
     <?php
     class HoursWorked
+    {
+        use Approvable;
+    }
+    class ProjectOffering
     {
         use Approvable;
     }
@@ -97,15 +102,12 @@ event.
                 throw new \RuntimeException("Already approved.");
             }
 
-            $this->apply(new ManagementApprovedEvent(array(
-                'approvedBy' => $managerName 
-            )));
-        }
-
-        protected function applyManagementApproved($event)
-        {
             $this->approved   = true;
             $this->approvedBy = $event->approvedBy;
+
+            $this->raise(new ManagementApprovedEvent(array(
+                'approvedBy' => $managerName 
+            )));
         }
     }
 
