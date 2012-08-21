@@ -109,7 +109,7 @@ and API for external services to pull them from the entity:
             $this->emittedEvents[] = $event;
         }
 
-        public function popEmittedEvents()
+        public function dequeueEmittedEvents()
         {
             $events = $this->emittedEvents;
             $this->emittedEvents = array();
