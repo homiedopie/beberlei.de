@@ -26,7 +26,8 @@ Why do we use getters/setters so much?
 - It became natural in OOP to have write access to every field.
 
 However Getters/setters `violate the open/closed principle
-<http://en.wikipedia.org/wiki/Open/closed_principle>`_ and are `should be considered evil
+<http://en.wikipedia.org/wiki/Open/closed_principle>`_, prevent information
+hiding and are `should be considered evil
 <http://stackoverflow.com/questions/565095/are-getters-and-setters-evil>`_
 (`Long version
 <http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html>`_). Using
@@ -65,10 +66,10 @@ changes all the affected fields at once.
         }
     }
 
-This ``Post`` is now much more protected from outside destruction and
+The ``Post`` class is now much more protected from the outside and
 is actually much better to read and understand. You can clearly see
 the behaviors that exist on this object. In the future you might even
-be able to change the behavior without breaking client code.
+be able to change the state of this object without breaking client code.
 
 You could even call this code domain driven, but actually its just applying
 the SOLID principles to entities.
@@ -76,9 +77,10 @@ the SOLID principles to entities.
 Tackling getters
 ----------------
 
-Avoiding getters is a bit more cumbersome.
+Avoiding getters is a bit more cumbersome and given no setters, maybe
+not worth the trouble anymore.
 
-You still need getters to access the information, either if you display
+You still need getters to access the object state, either if you display
 models directly in the view or for testing purposes. There is another way
 to get rid of all the getters that you don't need explicitly in a domain
 model, using the visitor pattern in combination with view models:
@@ -139,11 +141,13 @@ objects:
 
 .. code-block:: php
 
+    <?php
     class EditPostCommand
     {
-        public $title;
-        public $body;
-        public $tags;
+        public $id;
+        public $headline;
+        public $text;
+        public $tags = array();
     }
 
 In our application we could attach these form models to our form framework and
@@ -152,11 +156,13 @@ then pass these as commands into our "real model" through a service layer,
 
 .. code-block:: php
 
+    <?php
     class PostController
     {
         public function editAction(Request $request)
         {
             $editPostCommand = new EditPostCommand();
+            $editPostCommand->id = $request->get('id');
 
             // here be the form framework handling...
             $form = $this->createForm(new EditPostType(), $editPostCommand);
@@ -168,6 +174,15 @@ then pass these as commands into our "real model" through a service layer,
 
             // here we invoke the model, finally, through the service layer
             $this->postService->edit($editPostCommand);
+        }
+    }
+
+    class PostService
+    {
+        public function edit(EditPostCommand $command)
+        {
+            $post = $this->postRepository->find($command->id);
+            $post->compose($command->headline, $command->text, $command->tags);
         }
     }
 
