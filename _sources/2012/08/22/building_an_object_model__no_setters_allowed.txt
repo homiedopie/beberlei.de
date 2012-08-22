@@ -162,8 +162,14 @@ then pass these as commands into our "real model" through a service layer,
     {
         public function editAction(Request $request)
         {
-            $editPostCommand = new EditPostCommand();
-            $editPostCommand->id = $request->get('id');
+            $post = $this->findPostViewModel($request->get('id'));
+
+            // This could need some more automation/generic code
+            $editPostCommand           = new EditPostCommand();
+            $editPostCommand->id       = $request->get('id');
+            $editPostCommand->headline = $post->headline;
+            $editPostCommand->text     = $post->text;
+            $editPostCommand->tags     = $post->tags;
 
             // here be the form framework handling...
             $form = $this->createForm(new EditPostType(), $editPostCommand);

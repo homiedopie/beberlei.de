@@ -150,8 +150,14 @@ then pass these as commands into our “real model” through a service layer,
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$editPostCommand</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EditPostCommand</span><span class="p">();</span>
-        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">id</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+        <span class="nv">$post</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">findPostViewModel</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">));</span>
+
+        <span class="c1">// This could need some more automation/generic code</span>
+        <span class="nv">$editPostCommand</span>           <span class="o">=</span> <span class="k">new</span> <span class="nx">EditPostCommand</span><span class="p">();</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">id</span>       <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">headline</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">;</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">text</span>     <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">;</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">tags</span>     <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">;</span>
 
         <span class="c1">// here be the form framework handling...</span>
         <span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="k">new</span> <span class="nx">EditPostType</span><span class="p">(),</span> <span class="nv">$editPostCommand</span><span class="p">);</span>
