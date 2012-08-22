@@ -1,11 +1,12 @@
 Decoupling applications with Domains Events
 ===========================================
 
-In the previous series I have described 3 architectural patterns for business
-applications. Applying them to your software helps you decouple the business
-logic from the application/framework/UI. However given sufficient complexity,
-you will want to decouple different parts of your business model from each
-other as well.
+In the `previous posts
+<http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html>`_
+I have described 3 architectural patterns for business applications. Applying
+them to your software helps you decouple the business logic from the
+application/framework/UI. However given sufficient complexity, you will want to
+decouple different parts of your business model from each other as well.
 
 As an example, lets think of a batch process in your application that updates
 orders from a CRM or logistics system:
@@ -19,9 +20,9 @@ orders from a CRM or logistics system:
 - If the user confirms his optin mail, all outstanding remote accounts are
   created.
 
-Except the last point, you can build all the steps into a single batch
-processing service. This will be a particularly huge service and in violation
-of the Single Responsibility principle. 
+You can build all the steps into a single batch processing service. This will
+be a particularly huge service and in violation of the Single Responsibility
+principle. 
 
 the part with updating of users and fields has nothing to with the sending of
 mails and creation of remote accounts.  We want to decouple them from each
@@ -71,10 +72,11 @@ only if the parent service executed succesfully:
 
 We could use an event dispatcher in all of the services to notify each other,
 but the `DomainEvent pattern
-<http://martinfowler.com/eaaDev/DomainEvent.html>`_ does this more subtle. Every entity is an event
-provider and can emit events. Whenever a transaction is committed and an
-operation is completed, we take all the events emitted from all entities and
-trigger observing event handlers.
+<http://martinfowler.com/eaaDev/DomainEvent.html>`_ does this more subtle:
+Every entity is an event provider and can emit events. Whenever a transaction
+is committed and an operation is completed, we take all the events emitted from
+all entities (looking at the identity map for example) and trigger observing
+event handlers.
 
 .. code-block:: php
 
@@ -129,12 +131,19 @@ on the event names. We want the following command/event chain to happen:
 
 With this approach we can decouple all services from each other and avoid
 deep nesting in each other. Yet we still have transactional dependencies,
-by dropping all events when the parent command fails.
+by dropping all events when the parent command fails. Transactions over
+multiple commands will not have ACID properties though, instead you will have
+to look into `BASE transactions <http://queue.acm.org/detail.cfm?id=1394128>`_
+that are important in systems with eventual consistency. This is one downside
+that you need to take into account.
 
-The Domain Event pattern is a prerequisate for full blown CQRS. My `LiteCQRS
+The Domain Event pattern is a prerequisate for full blown `CQRS
+<http://queue.acm.org/detail.cfm?id=1394128>`_. My `LiteCQRS
 <https://github.com/beberlei/litecqrs-php>`_ library includes a simple
 implementation of DomainEvent and EventProvider classes and integration into
-Symfony and Doctrine ORM.
+Symfony and Doctrine ORM. Generally this pattern is very easy to implement
+though, so that you can just have a look at the implementation and take the
+best parts for your own.
 
 .. author:: default
 .. categories:: none
