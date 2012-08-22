@@ -79,6 +79,97 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>March 27, 2009</span> 
+        </div>
+        <div class="section" id="test-your-legacy-php-application-with-function-mocks">
+<h1><a href="2009/03/27/test-your-legacy-php-application-with-function-mocks.html">Test your Legacy PHP Application with Function Mocks!</a></h1>
+<p>Much talking is going on about Unittesting, Mocks and TDD in the PHP
+world. For the most this discussions surround object-oriented PHP code,
+frameworks and applications.</p>
+<p>Yet I would assert that the reality for PHP developers (me included) is
+dealing with PHP 4, PHP 5 migrated, or non-object oriented legacy
+applications which are near to impossible to bring under test. Still
+this code works, is in production and needs maintenance and possibly
+extension for new features.</p>
+<p>For example many applications may still use <strong>mysql_*</strong> functions at
+length inside their model or have multiple nested function levels
+(Example: Wordpress). <a class="reference external" href="http://pecl.php.net/package/runkit">Runkit</a> to
+the rescue: A PECL extension that can hack your running PHP code, such
+that method or functions are repointed to execute new implementations.
+Using this extension you can actually mock out internal PHP functions,
+which is great to bring legacy code under test.</p>
+<p>Consider this following proof of concept, <a class="reference external" href="http://github.com/padraic/runkit/tree/master">using the Runkit extension
+build by Padraic Brady</a>
+(the one from pecl.php.net does not compile on PHP 5.2), which replaces
+the functionality of <strong>mysql_query()</strong>. You have to set the following
+option in your php.ini: <strong>runkit.internal_override = On</strong> for this to
+work. By default only user-defined functions may be overwritten by
+Runkit.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class FunctionMocker
+{
+    protected $_mockedFuncBehaviourMap = array();
+
+    public function mock($funcName, $return=null)
+    {
+        $newFuncCode = 'return &quot;'.$return.'&quot;;';
+
+        $renamedName = &quot;__&quot;.$funcName.&quot;_mockOriginalCopy&quot;;
+        runkit_function_copy($funcName, $renamedName);
+        runkit_function_redefine($funcName, '', $newFuncCode);
+
+        $this-&gt;_mockedFuncBehaviourMap[$funcName] = $renamedName;
+    }
+
+    public function reset()
+    {
+        foreach($this-&gt;_mockedFuncBehaviourMap AS $funcName =&gt; $renamedName) {
+            runkit_function_remove($funcName);
+            runkit_function_copy($renamedName, $funcName);
+            runkit_function_remove($renamedName);
+        }
+        $this-&gt;_mockedFuncBehaviourMap = array();
+    }
+}
+
+$mocker = new FunctionMocker();
+$mocker-&gt;mock('mysql_query', 'hello world!');
+
+echo mysql_query(); // hello world
+
+$mocker-&gt;reset();
+
+mysql_query(); // error</pre>
+</div>
+<p>This example, only allows for string return values of the mock and
+has no support for replacing the arguments of the mocked function.
+Also chaining of different return values based on input or call
+number might be interesting. Some kind of Code Generator Tool would
+have to be implemented to support this functionality. Additionally
+Assertions and Verifying should be implemented for the function
+arguments. All in all this would allow to mock functions as you
+would mock interfaces/classes, which would be a great addition for
+all those legacy applications that use procedural PHP.</p>
+<p>Additionally what the real killer for runkit would be: The
+possibility to insert PHP callbacks instead of real PHP code into
+the <strong>runkit_function_redefine</strong>.</p>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/03/27/test-your-legacy-php-application-with-function-mocks.html#disqus_thread" data-disqus-identifier="2009/03/27/test-your-legacy-php-application-with-function-mocks">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>March 10, 2009</span> 
         </div>
         <div class="section" id="speaking-about-framework-quality-on-the-ipc-spring-09">
@@ -745,54 +836,6 @@ $this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/05/17/integrated-zend-layout-into-this-blog.html#disqus_thread" data-disqus-identifier="2008/05/17/integrated-zend-layout-into-this-blog">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>May 17, 2008</span> 
-        </div>
-        <div class="section" id="using-zend-http-client-to-ping-technorati">
-<h1><a href="2008/05/17/using-zend-http-client-to-ping-technorati.html">Using Zend_Http_Client to Ping Technorati</a></h1>
-<p>Send a ping to Technorati manually is a pain in the ass. Writing a
-little Method that handles this functionality for your own blog software
-is quite easy. Call the following method after you created or updated a
-post of yours:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>private function _pingTechnorati()
-{
-    $xml = $this-&gt;view-&gt;render('ping_technorati.phtml');
-
-    $httpclient = new Zend_Http_Client('http://rpc.technorati.com/rpc/ping');
-            $httpclient-&gt;setHeaders('User-Agent', 'PHP/Zend Framework/Zend_Http');
-
-    $httpclient-&gt;setRawData($xml, 'text/xml')-&gt;request('POST');
-
-    $response = $httpclient-&gt;request();
-
-    if($response-&gt;isSuccessful() === true) {
-        return true;
-    } else {
-        return false;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>You also need a little view in XML format like it is described in the
-<a class="reference external" href="http://technorati.com/developers/ping/">Technorati Ping Configuration
-Guide</a> and ready to go you
-are!</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/17/using-zend-http-client-to-ping-technorati.html#disqus_thread" data-disqus-identifier="2008/05/17/using-zend-http-client-to-ping-technorati">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -839,6 +882,9 @@ are!</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
         </li>
         <li class="recent_post">
@@ -864,9 +910,6 @@ are!</p>
         </li>
         <li class="recent_post">
             <a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a>
         </li>
     </ul>
 </div>
