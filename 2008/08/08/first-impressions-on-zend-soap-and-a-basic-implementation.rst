@@ -97,7 +97,7 @@ this simple lines:
     The usage of Zend\_Soap is quite simple and straightforward as is
     PHP5's internal SOAP Service and might therefore gain widespread
     use. I have never tested PEAR's WSDL Autodiscovery, so i cannot draw
-    comparissons.
+    comparisons.
 
 .. categories:: none
 .. tags:: none

@@ -16,7 +16,7 @@ Additionally Hudson is easily integrated into
 development.
 
 My motivation to dive into CI is easily explained. I just never felt it
-was necessary to add a continuous integration enviroment to my projects,
+was necessary to add a continuous integration environment to my projects,
 since I had one or two simple bash scripts that did the job. In general
 this is rather annoying, because they mostly only run PHPUnit and have
 to be done using a cronjob or manually, without any real process of
@@ -45,7 +45,7 @@ Luhmans guide adds lots of details that are important to get the
 different parts of a build process to work.
 
 Now what these tutorials all do is that they use a bash command to
-execute the build process or specifiy an Ant Build file. However there
+execute the build process or specify an Ant Build file. However there
 is also a Phing Build process plugin for Hudson that allows to specify
 the build.xml targets to execute in the process. From the "Available
 Plugins" list you can choose the "Phing plugin".

@@ -8,15 +8,15 @@ Frameworks and Content-Management-Systems.
 
 It was held in a very nice conference center in cologne, and from what I
 heard about 200 people attended. The first two topics were on
-`Joomla! <http://www.joomla.org/>`_ and bareer-free
+`Joomla! <http://www.joomla.org/>`_ and barrier-free
 `Typo3 <http://www.typo3.org>`_. Since I am more the framework guy, I
 did not enjoy them too much. At least I got some input on how a
-bareer-free website has to function. The Joomla! presentation supported
+barrier-free website has to function. The Joomla! presentation supported
 my prejudice, that programming in and for Joomla! produces ugly code.
 
 I did like the presentations on frameworks, the most interesting being
 the `CakePHP <http://www.cakephp.org>`_ presentation by `Timo
-Derstappen <http://teemow.com/>`_, since I havent looked into Cake for
+Derstappen <http://teemow.com/>`_, since I haven't looked into Cake for
 about one and a half years. I have seen that with the new to come
 version 2, the framework became even better, now supporting easy code
 generation and flexible site generation. But its still somehow a Ruby
@@ -28,7 +28,7 @@ the creation of a blog using Zend Framework, being the Hello World
 example for frameworks. He specifically showed, that you can use
 anything you want as a model, a Zend\_Db\_Table object or any other
 object. He also showed something like a Data-Mapper pattern in his
-application. I got some ideas from this I propably will write about some
+application. I got some ideas from this I probably will write about some
 later time.
 
 I also enjoyed the `Rails <http://www.rubyonrails.de>`_ presentation,

@@ -12,7 +12,7 @@ another small bug. For me it works with both Netbeans 6.7.1 and 6.8
 Beta. I want to thank alexandre very much for this awesome contribution.
 
 What you can do now is chose the Coding Standard you want to use in an
-Options Dialog under the "Miscallenous" button. You can choose from a
+Options Dialog under the "Miscellaneous" button. You can choose from a
 list of pre-defined standards, or even enter your own if you use one.
 Additionally you can disable that warning are shown, so that with any
 given coding standard you only see the errors.

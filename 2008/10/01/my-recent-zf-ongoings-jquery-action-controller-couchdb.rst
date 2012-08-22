@@ -3,7 +3,7 @@ My recent ZF ongoings: JQuery, Action Controller, CouchDb
 
 In the last weeks lots of stuff came up for me regarding the Zend
 Framework. My `jQuery <http://jquery.com>`_ component is finished, i
-have even commited the documentation into the SVN already. Do read it
+have even committed the documentation into the SVN already. Do read it
 you have to be either an XML fetishist or compile it using a docbook
 compiler. Lots of questions about ZF and jQuery come up regularly on the
 mailing lists so I really look forward for the first ZF 1.7 release
@@ -15,7 +15,7 @@ Microsoft will include jQuery as the framework to go into its Webbased
 ASP.Net applications and Nokia will include the library in their mobile
 phones.
 
-Additionaly i reported an `important issue
+Additionally i reported an `important issue
 (ZF-4385) <http://framework.zend.com/issues/browse/ZF-4385>`_ that
 offers a patch to create an interface of the Action Controller and
 therefore allows everyone to implement their own action controller

@@ -9,7 +9,7 @@ He separated concerns of view and model that communicate via a Form, by
 calling just thee validation functions on the Form inside the mode. On
 request you could retrieve the model to the controller and view layers.
 I already wrote into his comments that I didn't like the solution
-because it relys on implicit rules for the developers to use the Form
+because it relies on implicit rules for the developers to use the Form
 component correctly in all layers. Additionally the building of the form
 using this approach would be performed inside the model, although
 strictly speaking this is responsibility of the View Layer. Another
@@ -81,7 +81,7 @@ discussion.
         }
 
 You can see the mediator has two different stages where errors can
-occour: When the form is not valid or the model is not valid. Both exits
+occur: When the form is not valid or the model is not valid. Both exits
 can be catched inside the controller and are the indicator that the form
 has to be displayed again for further input corrections. When successful
 the model returns a valid record that applies to the form and model
@@ -89,7 +89,7 @@ requirements and can be displayed. If this record should be persistent
 this would have been done inside the **acceptFormRequest** function
 already. An example using a very simple Model using the a BankAccount
 example. We have a form that validates all the incoming request data for
-a withdrawel of money, though does not validate it against the models
+a withdrawal of money, though does not validate it against the models
 internal state. Our BankAccountModel implements the
 **WW\_Model\_AcceptFormRequest** interface and returns a valid
 BankAccount. If found the given amount is withdrawn.

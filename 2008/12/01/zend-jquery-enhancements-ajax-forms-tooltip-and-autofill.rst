@@ -34,7 +34,7 @@ Zend\_Form\_Decorator\_Form. What we then realize is, that this is just
 using a view helper to render, so what we need additionally is a
 "My\_JQuery\_View\_Helper\_AjaxForm" that extends from
 "Zend\_View\_Helper\_Form". The code of the view helper will have to
-look as follows to fullfil our needs:
+look as follows to fulfil our needs:
 
     ::
 
@@ -71,7 +71,7 @@ handling the Zend\_Form instance.
 
 This has to be processed by a callback function of the AjaxForm and
 which may for example look like the following which uses a predefined
-div box (#formMessages, dont forget to implement it) to render either
+div box (#formMessages, don't forget to implement it) to render either
 the success or the error messages.
 
     ::

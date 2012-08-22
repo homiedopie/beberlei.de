@@ -10,7 +10,7 @@ work in its original implementation due to different users groups
 sharing the same cached views.
 
 In the last days I came across two in depth tutorials on Zend\_Acl and
-Zend\_Auth integration to MVC. Most people propably saw the DevZone
+Zend\_Auth integration to MVC. Most people probably saw the DevZone
 article "`Zend\_Acl and MVC Integration (part
 1) <http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use>`_"
 by Aldemar Bernal on the Frameworks Frontpage. Another good article was

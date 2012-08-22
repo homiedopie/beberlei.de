@@ -5,11 +5,11 @@ Some weeks ago `I posted an
 article <http://www.whitewashing.de/blog/articles/123>`_ on using PEAR
 and PHAR for application lifecycle management and deployment. Since then
 I have gotten some feedback through comments, but also discussed the
-topic with collegues. I have also optimized the approach quite
+topic with colleagues. I have also optimized the approach quite
 considerably and even `made an open-source project out of parts of
 it <http://github.com/beberlei/pearanha>`_ and I want to share all that
 is new with you. First of all, yes the presented solution was somewhat
-complex, partly because it is still a proposed idea and definately up
+complex, partly because it is still a proposed idea and definitely up
 for optimizations. However I am still very convinced of my approach,
 something I should discuss in more detail.
 
@@ -24,14 +24,14 @@ Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
 libraries to your project). It also makes for a much more
 straightforward deployment.
 
-In the PHP world this siutation was quite different (up to PHP 5.3) for
+In the PHP world this situation was quite different (up to PHP 5.3) for
 several reasons:
 
 -  You could not package a library into a single distributable file.
 -  The PEAR installer as the only tool for updating and managing
    dependencies of your application by default installs into a
    system/global directory. This means dependencies your application
-   uses are located in a completly different location than your
+   uses are located in a completely different location than your
    application code.
 -  You can't manage multiple versions of the same package with PEAR in
    this system directory, making it very hard to control servers with
@@ -65,9 +65,9 @@ even more PHP code will be distributed using PEAR channels in the near
 future. My `immutable
 DateTime <http://www.whitewashing.de/blog/articles/124>`_ code for
 example makes for a great little open source library that could be
-distribued via PEAR, aswell as
+distributed via PEAR, as well as
 `Yadif <http://github.com/beberlei/yadif>`_ - a dependency injection
-container I am using extensivly.
+container I am using extensively.
 
 Question: Are you really going to manage all these dependencies
 correctly manually? Is everything up to date all the time, and
@@ -100,7 +100,7 @@ with:
 
         benny@desktop: pearanha generate-project 
 
-You then need to specifiy the project base dir and then the project
+You then need to specify the project base dir and then the project
 style (for example Zend Framework or Manual) which prompts your for the
 directory that should be used for as the vendor/library directory that
 PEAR will install all the code in. You will also be prompted for a

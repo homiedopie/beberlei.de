@@ -18,7 +18,7 @@ the project. There are no short examples given to any function like
 `jQuery <http://www.jquery.com>`_ does.
 
 In general I think the Dojos Site is too complex and hard to navigate.
-The layout seems to change massivly on each click and you it is hard
+The layout seems to change massively on each click and you it is hard
 recognize common patterns. Dear Dojo Team, please make your project more
 accessible!
 

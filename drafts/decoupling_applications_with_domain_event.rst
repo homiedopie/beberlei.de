@@ -17,7 +17,7 @@ orders from a CRM or logistics system:
 - Some orders require creating accounts in different remote systems
 - If the user has not confirmed his email yet he should receive an opt-in
   mail instead.
-- If the user confirms his optin mail, all outstanding remote accounts are
+- If the user confirms his opt-in mail, all outstanding remote accounts are
   created.
 
 You can build all the steps into a single batch processing service. This will
@@ -43,7 +43,7 @@ is not nearly as tasty as eating real lasagna.
 ::
 
     ImportService
-    |_AuthenticationSerivce
+    |_AuthenticationService
     | |_Mailer
     | |_Database
     |_AccountGenerationService
@@ -55,14 +55,14 @@ This becomes more complicated when transaction semantics need to be taken care
 of. For example dependencies between mailer and database services.
 
 What we want instead is a sequential execution of those nested services, but
-only if the parent service executed succesfully:
+only if the parent service executed successfully:
 
 :: 
 
     ImportService
     \_Database
 
-    AuthenticationSerivce
+    AuthenticationService
     |_Mailer
     \_Database
 
@@ -137,7 +137,7 @@ to look into `BASE transactions <http://queue.acm.org/detail.cfm?id=1394128>`_
 that are important in systems with eventual consistency. This is one downside
 that you need to take into account.
 
-The Domain Event pattern is a prerequisate for full blown `CQRS
+The Domain Event pattern is a prerequisite for full blown `CQRS
 <http://queue.acm.org/detail.cfm?id=1394128>`_. My `LiteCQRS
 <https://github.com/beberlei/litecqrs-php>`_ library includes a simple
 implementation of DomainEvent and EventProvider classes and integration into

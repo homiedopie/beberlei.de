@@ -8,7 +8,7 @@ CodeSniffer Plugin and released a new NBM file for you to
 `download <http://github.com/beberlei/netbeans-php-enhancements/downloads>`_.
 Here are the changes done by Manuel:
 
--  Ability to specifiy the path to CodeSniffer Binary
+-  Ability to specify the path to CodeSniffer Binary
 -  Automatic Detection of all the installed Coding Standards
 -  Fixed Automatic Binary Detection on Windows
 

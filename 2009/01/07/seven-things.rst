@@ -6,7 +6,7 @@ I have been tagged by
 letter machinery. So read on for seven things you probably may not know
 about me.
 
--  I will get my degree in some weeks, currently intensivly writting on
+-  I will get my degree in some weeks, currently intensively writting on
    my thesis. My major is economics though. I probably won't get a job
    with that sooner or later. I actually don't want to, I have a job as
    programmer already.

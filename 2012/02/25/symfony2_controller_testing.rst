@@ -40,7 +40,7 @@ Create a TestKernel
 
         public function registerContainerConfiguration(LoaderInterface $loader)
         {
-            // We dont need that Environment stuff, just one config
+            // We don't need that Environment stuff, just one config
             $loader->load(__DIR__.'/config.yml');
         }
     }
@@ -142,7 +142,7 @@ We have to tell the WebTestCase base class where to find this kernel:
 
 Now just run your web-test cases.
 
-If you want to debug the logging happing inside the Kernel just comment out
+If you want to debug the logging happening inside the Kernel just comment out
 the Monolog lines to get the log-messages printed to the screen.
 
 You have to add the `Tests/App/cache` and `Tests/App/logs` to your version

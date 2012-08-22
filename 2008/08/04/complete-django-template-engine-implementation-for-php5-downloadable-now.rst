@@ -13,7 +13,7 @@ You can grab the
 `Tarball <http://www.beberlei.de/sources/calypso-dtl-0.1.tar.gz>`_ and
 there is also a
 `README <http://www.beberlei.de/sources/README_Dtl.txt>`_ with some
-information. I would appreciate if anbody would test the lib and gave
+information. I would appreciate if anybody would test the lib and gave
 some feedback.
 
 I will soon start to push this component in the ZF proposal process. I
@@ -21,7 +21,7 @@ still have to finish the class structure before I can move to the Ready
 for Review stage. The library will max end up in Zend Extras. Therefore
 I will have to say again: This View Renderer shall be no replacement for
 the current Zend View. It is only an alternative which allows for some
-neat functionality and stricter View / Controller logic seperation.
+neat functionality and stricter View / Controller logic separation.
 
 **UPDATE:** I finished a little page for what I call the Calypso DTL.
 See it here: `Calypso Site <http://www.beberlei.de/calypso/>`_. I have

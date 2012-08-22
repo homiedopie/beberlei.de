@@ -9,7 +9,7 @@ Zend\_Loader doesn't seem to help at first, its just another command
 autoload paths too.
 
 I wrote my own Zend\_Loader child class. It grabs all include paths from
-a config File using the Zend\_Config class, and completly frees you of
+a config File using the Zend\_Config class, and completely frees you of
 thinking about includes.
 
     ::

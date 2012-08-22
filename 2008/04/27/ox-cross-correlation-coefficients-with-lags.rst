@@ -6,7 +6,7 @@ class <http://mueller.gernot.googlepages.com/monetaryeconomics>`_ I
 realized that `Ox <http://www.doornik.com>`_ has different mechanisms to
 calculate correlation coefficients like Mathlab has.
 
-Our assignement was to replicate the Dynamic Correlations graph in
+Our assignment was to replicate the Dynamic Correlations graph in
 `Walshs' Monetary Theory and
 Policy <http://www.amazon.de/gp/redirect.html?ie=UTF8&location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&s=books-intl-de&qid=1209289935&sr=8-1&site-redirect=de&tag=economystuden-21&linkCode=ur2&camp=1638&creative=6742>`_
 for European Data, which shows the cross-correlation of different

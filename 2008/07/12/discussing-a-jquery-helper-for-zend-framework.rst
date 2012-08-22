@@ -20,9 +20,9 @@ with jQuery and Zend Framework.
 
 One could offer a complete dependency downloadable archive with all the
 CSS, Javascript and Images inside, but this would be very complex to
-maintain. Looking at the future Zend Tool capabilites one possibilty
+maintain. Looking at the future Zend Tool capabilities one possibility
 would be to offer a download client for all the relevant jQuery plugins,
-but there would have to be a man-middle-server that maintaines the most
+but there would have to be a man-middle-server that maintains the most
 up to date locations of all the plugins, which also has to be
 maintained. Does anybody have a better solution to solve this problem?
 Perhaps the jQuery Team needs to be made aware that they need a CDN for
@@ -33,13 +33,13 @@ Helper (mostly copy paste and simple rewrites from Matthews Dojo
 component) and a HtmlElement Form Helper which constructs a Date-Picker
 from within the template. This is very easy to use and looks great. In
 the next days I will add further helpers for the jQuery plugins I use in
-my day to day work live and hope to present a demo. I might even optin
+my day to day work live and hope to present a demo. I might even opting
 for a jQuery proposal aiming at inclusion in the Zend Extras Library.
 
 **Update:** I got a `reply on the jQuery mailing
 list <http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880>`_
 stating that a CDN is planned for the jQuery UI library. Sadly this does
-not include plugins for which one might desperatly need a View Helper
+not include plugins for which one might desperately need a View Helper
 except for maybe the Date Picker. I will post further comments on this
 issue in the near future.
 
