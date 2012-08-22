@@ -59,7 +59,7 @@ Additionally you can also use the same template to render any new
 comment to the comment list using via an ajax form submit, returning the
 (model or form) filtered data via JSON and appending it to the comment
 list using the DojoX DTL parser. For non-JS browsers you can always use
-a <noscript> variant to render the templates completly server-side.
+a <noscript> variant to render the templates completely server-side.
 
 This generally being a cool idea since it makes developing applications
 with AJAX technology very easy I began to port the DTL to the Zend

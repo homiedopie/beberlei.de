@@ -10,9 +10,9 @@ Other posts in this series about OOP Business Applications:
 - `Data, Context, Interaction
   <http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html>`_
 
-The last pattern for desigining your business logic is called
-"Command-Query-Responsiblity-Segregation" or short CQRS. It has its roots in
-the `"Command Query Seperation"
+The last pattern for designing your business logic is called
+"Command-Query-Responsibility-Segregation" or short CQRS. It has its roots in
+the `"Command Query Separation"
 <http://en.wikipedia.org/wiki/Command-query_separation>`_ principle that was
 put forward by Bertrand Meyer.
 
@@ -20,7 +20,7 @@ Wikipedia has a very good summary about what this principle is about:
 
 ::
 
-    Command-Query-Seperation states that every method should either be a
+    Command-Query-Separation states that every method should either be a
     command that performs an action, or a query that returns data to the
     caller, but not both. In other words, asking a question should not change
     the answer. More formally, methods should return a value only if they are
@@ -37,7 +37,7 @@ principle.
     use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
     with CQRS.
 
-At its heart is the seperation of Read and Write methods. This can be easily
+At its heart is the separation of Read and Write methods. This can be easily
 achieved by just having two different service layer classes instead of one.
 This insight alone is not really helpful, its just moving methods around.
 Coupled to this change however is the notion, that read and write models don't
@@ -45,26 +45,26 @@ necessarily have to be the same:
 
 - Getter/Setters: We don't need setters in the write model, instead we use
   explicit methods for each write operation. Entities are also much simpler
-  without bi-direcitional relationships that read/write models often need.
+  without bi-directional relationships that read/write models often need.
   Read-only models (ViewModel) don't need getters/setters. They could just use
   public properties or even be arrays.
 - ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
   mostly need queries by primary key, changing only some objects. In
-  read scenarios we need complex queries, joins and aggregations. A seperation
+  read scenarios we need complex queries, joins and aggregations. A separation
   prevents both from affecting each other negatively.
 - Mapping Data-Transfer objects becomes simple. Instead of sending the whole
   model back and forth, for the write scenario you define use-case specific
-  tasks and upates. This is much simpler than generic mapping of Data Transfer
+  tasks and updates. This is much simpler than generic mapping of Data Transfer
   objects to complex object graphs.
-- Transformating SQL directly to a view model in a highly optimized way.
+- Transforming SQL directly to a view model in a highly optimized way.
   Simple concept, but it has huge implications: A pure read-only model is simple to
   maintain and refactor for any performance requirements that come up.
 
 Furthermore with CQRS our write service methods are not allowed to return data
 anymore (With the exceptions to the rule of course). This may increase the
 complexity at first, but it has benefits for scalability and decoupling.
-Following this principle allows us to turn every command from synchroneous to
-asynchroneous processing later without much problems. Services are allowed to
+Following this principle allows us to turn every command from synchronous to
+asynchronous processing later without much problems. Services are allowed to
 throw exceptions and refuse the execution. Proper validation of input data
 should happen before executing write operations though.
 
@@ -74,21 +74,21 @@ full blown read-model if you don't apply CQRS religiously:
 
 - Don't use different data-stores for both models.
 - Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
-  very simple. You can easily generialize this to a simple object that gives
-  efficent access to all your data.
+  very simple. You can easily generalize this to a simple object that gives
+  efficient access to all your data.
 - Share parts of the write and read models if you don't have to compromise
   much.
 
-The important thing to take away from this seperation is, that the read part of
+The important thing to take away from this separation is, that the read part of
 your application is seldom the part where business value lies in. Moving this
 code into a different part of your applications allows you to work with the
-underyling data-source much more directly, without need for much abstractions.
+underlying data-source much more directly, without need for much abstractions.
 
 One thing that CQRS puts forward is the concept of Commands, Command Handlers
 and Command Bus and how they interact. Commands are simple objects that
 contain all the data necessary to execute an operation. Each command is
 processed by exactly one command handler. The Command Bus is responsible to
-route a command to its apporpriate command handler.
+route a command to its appropriate command handler.
 
 Example
 -------
@@ -154,7 +154,7 @@ Routing everything through the command bus has several benefits as well:
 
 - Nesting handlers that take care of transactions, logging, 2 phase commits
 - Order nested command calls sequentially instead of deep into each other.
-- Asynchroneous processing with message queue become an option
+- Asynchronous processing with message queue become an option
 
 The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:
@@ -178,19 +178,19 @@ Entity-Boundary-Interactor pattern, usage is simple:
 Pros and Cons
 -------------
 
-I really like CQRS for multiple reasons. It offers excplicit guidance how solve
+I really like CQRS for multiple reasons. It offers explicit guidance how solve
 tasks by making use of a range of different design patterns. This is very
 helpful, because the code-base is based on conventions that are simple to
 understand by everyone on the team. This structure liberates you from the curse
-of choice and gives you a cookbook of best-practicies how to solve problems.
-You want this struture for all your applications, regardless of what
-architectural patttern you have chosen.
+of choice and gives you a cookbook of best-practices how to solve problems.
+You want this structure for all your applications, regardless of what
+architectural pattern you have chosen.
 
 Embracing the difference between read and write models is another plus of CQRS.
 It is very helpful, not to try fitting both read and write into one model.  You
 also don't run into so many read-related problems with an ORM any more. You
 design the entities to be optimized for the write model only, loose the
-bidirectional associations and avoid all the optmizations here and there for
+bidirectional associations and avoid all the optimizations here and there for
 read performance.
 
 Compared to EBI, where we had to maintain a mapping between DTOs and entities,

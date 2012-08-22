@@ -6,11 +6,11 @@ The current version strikes my rather old machine with "just" 512mb to
 death. Building projects is not possible even when assigning eclipse all
 my available memory, because of an Java Heap Error (`See this blog
 post <http://blog.wolff-hamburg.de/archives/20-Migrating-to-PDT.html>`_).
-This effectivly hinders you to use all the completion and hint features,
+This effectively hinders you to use all the completion and hint features,
 because PDT does not know about any functions, classes and their phpdoc
 descriptions.
 
-PDT is also missing some very important features. Marking all occurances
+PDT is also missing some very important features. Marking all occurrences
 of a function, class, constant or variable on click for example. PHP
 Errors and Warnings are display in a way so that you won't find them and
 if you do, you won't understand what they mean.

@@ -16,16 +16,16 @@ following include strategies were tested (I've used the Zend Framework
 
 #. Zend\_Loader Autoload, Default PHP Include Path
 #. Zend\_Loader Autoload, Swapped Include Path
-#. ZF 1.6 RC2 stripped from all **"require\_once"** dependancies,
+#. ZF 1.6 RC2 stripped from all **"require\_once"** dependencies,
    Zend\_Loader Autoload, Swapped Include Path
-#. ZF 1.6 RC2 stripped from all **"require\_once"** dependancies, no
+#. ZF 1.6 RC2 stripped from all **"require\_once"** dependencies, no
    autoload, used `inclued <http://pecl.php.net/package/inclued>`_ to
-   find file dependancies and require (not \_once) them all on startup.
+   find file dependencies and require (not \_once) them all on startup.
 
 To strip all the require\_once from the Zend Framework source code, i
 built a little script to do that for me. For the last test I wrote a
 little script that used the **inclued\_get\_data()** function to built a
-correct dependancy tree for all includes. I have put each configuration
+correct dependency tree for all includes. I have put each configuration
 of my Zend Framework install 30 seconds under siege with 5 concurrent
 requests. I have rerun all tests with APC and without APC.
 
@@ -67,7 +67,7 @@ Turning APC on gives a boost of about 50% to your application no matter
 what include strategy you are following (so there is excuse not using
 APC). But switching between different include strategies still makes a
 huge difference in performance. Percentage-wise this is a larger
-difference than without APC. Requiring all dependend scripts up front
+difference than without APC. Requiring all dependent scripts up front
 takes only about 63% of the default configuration time, which can make a
 major difference on any production server.
 

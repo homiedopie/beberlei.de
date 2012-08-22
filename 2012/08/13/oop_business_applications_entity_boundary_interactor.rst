@@ -3,7 +3,7 @@ OOP Business Applications: Entity, Boundary, Interactor
 
 Other posts in this series:
 
-- `OOP Business Aplications: Trying to escape the
+- `OOP Business Applications: Trying to escape the
   mess <http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html>`_
 
 Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
@@ -18,7 +18,7 @@ by Alistair Cockburn.
 In this pattern any client of the system talks to the model using a model
 request object and receives data from the model in form of model responses objects.
 Additionally when your model talks to any kind of persistence or subsystem it
-should go through an adapter that is replacable. For a model architecture
+should go through an adapter that is replaceable. For a model architecture
 designed this way, you can replace any part of the UI oder lower layers by
 writing new adapters and plug them in.
 
@@ -32,7 +32,7 @@ much logic except rules that are set in stone and are never going to change
 (based on physic or mathematical laws or something).
 
 **Interactors** are use-case objects, they contain the business logic that is valid
-in the current use-case and works with entities to fullfil their task.
+in the current use-case and works with entities to fulfil their task.
 
 The **boundary** is responsible for translating model request/response into a
 format that the UI or actor can understand. They also mediate between model
@@ -74,7 +74,7 @@ We start by implementing the entity ``BankAccount``:
 It is straightforward to implement the ``withdraw`` and ``deposit``
 functionality. The Money object implementation is omitted here.
 
-The Interactor handles the use-case of transfering money from the
+The Interactor handles the use-case of transferring money from the
 source to the destination account:
 
 .. code-block:: php
@@ -168,7 +168,7 @@ Thinking about the boundaries I came up with a library several month ago called
 `Context <https://github.com/beberlei/context>`_, which I deprecated already
 (Reason below).  It allows you to wrap calls to the model by some sort of proxy
 that transforms the request and response and also handles transactions and
-such. Loosly spoken this was actually some kind of AOP library, using the
+such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic ``__call`` proxies).
 
 With context you would do something like:
@@ -205,7 +205,7 @@ Using with Symfony2
 
 As I am currently exclusively developing Symfony2/Silex applications, applying
 EBI to Symfony2 framework based applications is very important to me. The
-biggest difficulty here is the Form layer, escpecially the request data-mapping and
+biggest difficulty here is the Form layer, especially the request data-mapping and
 validation concerns, which are normally part of the model. There are two
 approaches I came up with to solve this:
 
@@ -232,7 +232,7 @@ approaches I came up with to solve this:
 The problem with this approach is, that you cant really unit-test these methods
 anymore, because the complexity of the form layer mapping cannot be mocked with
 this API. Instead your tests always need the full form layer (with validation,
-depending services etc.) to allow for real-world esting. Additionally you have
+depending services etc.) to allow for real-world testing. Additionally you have
 to make the DataMapper throw an exception that you can catch in the controller,
 rendering the appropriate response. Using exceptions for controlling executions
 paths is not a very good practice though.
@@ -251,7 +251,7 @@ parts of the pattern more explicit. Without more restrictions however using
 this pattern will drive you towards many of the problems described in my
 previous post.
 
-Clean seperation from frameworks is achieved, depending on the actual usage
+Clean separation from frameworks is achieved, depending on the actual usage
 however only at a significant cost.  Never forget stepping back and thinking
 about further abstractions, otherwise applying EBI is leading to lots of code
 being manually written. 
@@ -287,7 +287,7 @@ use-case").
 In conclusion I can partially recommend using the EBI pattern. You have to be
 careful to find abstraction layers that keep your code DRY and SOLID however,
 something which does not come naturally with this pattern. If you are not
-careful you end up with all the "messy points" that I mentioned in my previoius
+careful you end up with all the "messy points" that I mentioned in my previous
 blog post.
 
 You should be especially careful to avoid lots of DTO <-> Entity Mapping code

@@ -86,7 +86,7 @@ Also the render method now clearly communicates that either the error or
 the parent rendering is executed and leaves no doubt about it.
 
 The **getTemplateValuesXmlFile()** method still uses the comment to show
-the assumption about relative pathes, but this is only the case because
+the assumption about relative paths, but this is only the case because
 application configuration is made implicit into the code. This has to be
 extracted to be an explicit configuration constant and the comment can
 go.
@@ -117,7 +117,7 @@ go.
     only way to clearly show its intend.
 
     There are two mindestting factors that help to write code that is
-    understandable without having to excessivly comment it:
+    understandable without having to excessively comment it:
 
     -  From the beginning, do not write code for the computer but for
        developers. Changing this attitude really helps to write

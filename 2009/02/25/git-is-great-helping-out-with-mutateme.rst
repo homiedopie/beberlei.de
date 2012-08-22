@@ -17,7 +17,7 @@ Padraic: `I love Git,
 too! <http://blog.astrumfutura.com/archives/390-Mutation-Testing-MutateMe-0.2.0alpha-Released.html>`_
 He already integrated my and `Sebastians <http://www.phpunit.de>`_
 changes back into the master and we didn't have to focus on merging,
-communication and integration alot.
+communication and integration a lot.
 
 My `PUMA project <http://github.com/beberlei/puma/tree/master>`_ is also
 hosted on GitHub (although nobody has looked into that yet), but I am

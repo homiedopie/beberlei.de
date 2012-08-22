@@ -15,8 +15,8 @@ I mentally divide the world of programming into two large parts:
    
 The first produces code solving technical problems, often in a beautiful and
 dedicated way. The second regularly produces mess, hopefully still
-serving customers by optimizing their business. This differentation is an
-exageration, but from my experience its far easier to run a greenfield business
+serving customers by optimizing their business. This differentiation is an
+exaggeration, but from my experience its far easier to run a greenfield business
 project into the ground than a new library.
 
 There has to be a reason why so many programmers dedicate much free time to
@@ -37,14 +37,14 @@ My Personal List of Annoyances
 This blog post is not about blaming customers (as the usual suspect), its about
 finding the problems in usual OOP code of business systems from my experience
 with PHP projects. To keep things short, I will list my *personal* list of
-techincal annoyances in business projects in no particular order. These are
+technical annoyances in business projects in no particular order. These are
 highly subjective points.
 
 - Getter/Setter Madness of Objects that are used to store data into
   databases. Leading to huge objects that are essentially just meaningless
   stores of data.
 - Updating complex object graphs from user input.
-- Seperation of model, controller and views, especially when dealing with
+- Separation of model, controller and views, especially when dealing with
   forms. This is very complicated to achieve.
 - Lazy Loading and Query performance problems when using an ORM. Additionally
   replacing parts of the views with hand-crafted SQL is often difficult and/or
@@ -55,7 +55,7 @@ highly subjective points.
 - Dependency mess leading to hard to test code, generally leading to untested
   applications. Too often frameworks create huge dependencies that
   make your domain model messy and complex to mock in tests.
-- Focus on synchroneous request/response handling makes later usage of message
+- Focus on synchronous request/response handling makes later usage of message
   queues very complicated and expensive to refactor towards.
 - Tight coupling of model against the framework code.
 - Junior developers have too much freedom, when there is not much structure in
@@ -89,21 +89,21 @@ hand written mess, compared to getting there with tools.
 Specifically `Domain Driven Design
 <http://en.wikipedia.org/wiki/Domain-driven_design>`_ applied naively can make
 the problem even worse. It easily leads to lasagna code, where you have layers
-of layers that are very hard to understand. Personally I prefer spagetthi code
+of layers that are very hard to understand. Personally I prefer spaghetti code
 over lasagna code, because its comparatively simpler to understand.
 
 Finding new Approaches
 ----------------------
 
 Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
-there has to be some solution to organize business models structurely to avoid
+there has to be some solution to organize business models structurally to avoid
 all (or most) of these problems. In the PHP world with `Symfony2
 <http://www.symfony.com>`_ and `Doctrine2 <http://www.doctrine-project.org>`_
 you have a powerful toolbox to avoid many of the problems above, but it is
 still not simple to write clean object oriented applications.
 
 After years of participation in both open source projects I still feel there is
-a missing puzzle piece, to reach a clean seperation of all the model concerns
+a missing puzzle piece, to reach a clean separation of all the model concerns
 from framework and persistence. 
 
 At some point I would really like to close the gap between desired technical
@@ -119,7 +119,7 @@ started to explore in the past last months:
 
 - `Data, Context, Interaction (DCI)
   <http://en.wikipedia.org/wiki/Data,_context_and_interaction>`_ - which Gordon
-  studied alot
+  studied a lot
 - `Entity, Boundary, Interactor (EBI)
   <http://alistair.cockburn.us/Hexagonal+architecture>`_, also called Hexagonal
   architecture or "Ports and adapters". Gained popularity after `Uncle Bobs talk
@@ -128,13 +128,13 @@ started to explore in the past last months:
   last year.
 - `Command-Query-Responsibility-Segregation (CQRS)
   <http://en.wikipedia.org/wiki/Command-query_separation>`_ well described in a
-  `blost post by Udi Dahan
+  `blog post by Udi Dahan
   <http://www.udidahan.com/2009/12/09/clarified-cqrs/>`_ and in a hands on `one
   day video class <http://www.viddler.com/v/dc528842>`_ by Greg Young.
 
 They are not new and have all been around for several years already. I would
 describe all three of them as architectural design patterns, though some people
-might probably disagreee with this classification. All three approaches make
+might probably disagree with this classification. All three approaches make
 you think about application development beyond just "service layers" in
 radically new ways. All three have helped me rethink business applications in
 different ways. 

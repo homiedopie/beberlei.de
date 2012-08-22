@@ -10,7 +10,7 @@ Additionally there are some bugs:
 
 #. You cannot currently use UTF8 encoding since htmlentities deep in the
    escape mechanism cannot be given the utf-8 specification.
-#. Triple or higher inheritence may not work under some circumstances.
+#. Triple or higher inheritance may not work under some circumstances.
    Which sucks.
 
 I sadly have no time currently to fix any of the issues poping up with

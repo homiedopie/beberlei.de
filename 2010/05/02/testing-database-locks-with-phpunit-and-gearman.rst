@@ -111,7 +111,7 @@ The code for this steps could look like:
             private $maxRunTime = 0;
             private $articleId;
 
-            public function testLockIsAquired()
+            public function testLockIsAcquired()
             {
                 // .. write fixture data into the database
 

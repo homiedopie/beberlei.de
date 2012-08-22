@@ -1,4 +1,4 @@
-Dependecy Injection the juicy way
+Dependency Injection the juicy way
 =================================
 
 I have written on dependency injection before and `came up with a
@@ -9,7 +9,7 @@ you have to implement all setter methods again and again.
 
 Still dependency injection is the way to write good, testable and easily
 exchanged and re-wired object graphs. I tried to do lots of dependency
-injection via constructor lately and realized that it polutes my
+injection via constructor lately and realized that it pollutes my
 constructors when my object graph is too deep.
 
 An example: When I setup my database connection in the bootstrap file
@@ -28,7 +28,7 @@ as being evil (he does that on his blog too). From there I learnt about
 `Guice <http://code.google.com/p/google-guice/>`_, a dependency
 injection framework for Java by Google.
 
-What I like about Guice: Its easy to use and its immediatly obvious to
+What I like about Guice: Its easy to use and its immediately obvious to
 someone without experience, why it works so good and you don't have to
 hand down objects deep down the object graph. I cloned the basic
 functionality for PHP and an example would work as follows.

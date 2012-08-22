@@ -3,7 +3,7 @@ OOP Business Applications: Data, Context, Interaction
 
 Other posts in this series:
 
-- `OOP Business Aplications: Trying to escape the
+- `OOP Business Applications: Trying to escape the
   mess <http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html>`_
 - `OOP Business Applications: Entity, Boundary, Interactor
   <http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html>`_
@@ -11,20 +11,20 @@ Other posts in this series:
 
 The next design pattern for technical system design is called "Data, Context,
 Interaction". It's inventors Trygve Reenskaug and James Coplien call it a new
-paradigm, in the context of PHPs langugage constraints it can be classified as
-architectural design pattern. I came accross this pattern through `Gordon Oheim
+paradigm, in the context of PHPs language constraints it can be classified as
+architectural design pattern. I came across this pattern through `Gordon Oheim
 <https://twitter.com/go_oh>`_. He has also invested quite some time going
 through the book on DCI and trying to understand this pattern with me.
 
-As in the EBI pattern, DCI seperates data objects (Data) from behavior implemented
+As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
 in use-cases (Context). Data objects are never directly involved in these
 use-cases, but are "casted" to their respective roles that they are taking in
 the use-case. This can be implemented with aggregation or traits in PHP.
 
 One goal of DCI is to get object-oriented programming to a place, where you
-can look at a use-case and its roles and be very sure that the programm is
+can look at a use-case and its roles and be very sure that the program is
 running correctly, because you can guarantee that there are no unexpected side
-effects. It also aims at keeping the amound of code required to keep in mind
+effects. It also aims at keeping the amount of code required to keep in mind
 for a given use-case as small as possible, allowing developers to reason about
 the code with more confidence.
 
@@ -49,7 +49,7 @@ Example
 
 Starting from the bank account example of the EBI post, we can introduce DCI 
 quite easily by adding the missing concept of roles. In the use case of
-transfering money that would be:
+transferring money that would be:
 
 * TransferMoneySource
 * TransferMoneySink (Destination)
@@ -77,7 +77,7 @@ objects using them in the tests for this use-case.
         public function transferFrom($source, Money $money)
         {
             $source->withdraw($money);
-            $this->desposit($money);
+            $this->deposit($money);
         }
         abstract public function deposit(Money $money);
     }
@@ -118,7 +118,7 @@ The bank account would then be modified to look:
 The use-case ``TransferMoney`` would then be modified to create Roles instead
 of Data objects from the DAO. This can be a bit tricky when you have multiple
 data objects implementing the same role and you have no way of knowing which
-underyling data object to pick. The binding of data objects to roles happens
+underlying data object to pick. The binding of data objects to roles happens
 in the use-case. The use-case needs a means to retrieve objects with certain
 roles, which then access underlying data sources. To avoid that your use-cases
 have to know about how to bind roles to data, you could use GUIDs in your
@@ -148,7 +148,7 @@ corresponding data.
     }
 
 The simplicity of this is appealing, however don't forget that we have
-abstracted I/O completley here. There has to be code that deals with that part
+abstracted I/O completely here. There has to be code that deals with that part
 of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
 implications.

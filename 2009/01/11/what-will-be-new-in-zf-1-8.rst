@@ -14,8 +14,8 @@ which will be a huge benefit to everything JSON that can be done with
 ZF. Foremost it is an integral part for the jQuery component which
 heavily relies on javascript callbacks.
 
-The Soap Autodiscover and WSDL classes compability with Java and .NET
-has been optimized due to great user feedback, aswell as some bugfixes
+The Soap Autodiscover and WSDL classes compatibility with Java and .NET
+has been optimized due to great user feedback, as well as some bugfixes
 to the newly added WSDL type detection strategies.
 
 Additionally I went on another bug killing spree and fixed around 20-30

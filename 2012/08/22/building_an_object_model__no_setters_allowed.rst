@@ -8,12 +8,12 @@ use getter/setter methods or properties (C#) to encapsulate object properties.
 Take `a look
 <https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php>`_
 at the default ``User`` entity from the Symfony2 FOSUserBundle plugin for
-example: A collosus of getter/setter methods with nearly no real business
+example: A colossus of getter/setter methods with nearly no real business
 logic. This is how most of our persistence related objects look like in PHP.
-A Rails ActiceRecord such as `Redmines "Issue"
+A Rails ActiveRecord such as `Redmines "Issue"
 <https://github.com/redmine/redmine/blob/master/app/models/issue.rb>`_ avoids
 the explicit getter/setters, however generates accessors magically for you.
-Nevertheless you have to add considerable amound of code to configure all the
+Nevertheless you have to add considerable amount of code to configure all the
 properties. And code using these active records becomes ambiguous as well.
 
 Why do we use getters/setters so much?
@@ -27,7 +27,7 @@ Why do we use getters/setters so much?
 
 However Getters/setters `violate the open/closed principle
 <http://en.wikipedia.org/wiki/Open/closed_principle>`_, prevent information
-hiding and are `should be considered evil
+hiding and `should be considered evil
 <http://stackoverflow.com/questions/565095/are-getters-and-setters-evil>`_
 (`Long version
 <http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html>`_). Using
@@ -114,12 +114,12 @@ There are drawbacks with this approach though:
 - Why use the Post model in memory, when you are only passing ``PostView``
   instances to the controllers and views only anyways? Its much more efficient
   to have the database map to the view objects directly. This is what CQRS
-  postulates as seperation of read- and write model.
+  postulates as separation of read- and write model.
 - You have to write additional classes for every entity (Data transfer objects)
   instead of passing the entities directly to the view. But if you want to
-  cleanly seperate the model from the application/framework, you don't get
+  cleanly separate the model from the application/framework, you don't get
   around view model/data transfer objects anyways.
-- It looks awkard in tests at first, but you can write some custom assertions
+- It looks awkward in tests at first, but you can write some custom assertions
   to get your sanity back for this task.
 
 What about the automagic form mapping?
@@ -193,13 +193,13 @@ then pass these as commands into our "real model" through a service layer,
         }
     }
 
-This way we seperated the business model from the application framework.
+This way we separated the business model from the application framework.
 
 A word about RAD
 ----------------
 
 Rapid-application development or rapid prototyping is a wide-spread approach in web
-development. My explicit approach seems to be completly against this kind of
+development. My explicit approach seems to be completely against this kind of
 development and much slower as well. But I think you don't loose much time
 in the long run:
 
@@ -220,7 +220,7 @@ Conclusion
 ----------
 
 If we take a step back from all our tools suggesting to generate getter/setters
-we find that there is a simple way to avoid using setters when focussing on the
+we find that there is a simple way to avoid using setters when focusing on the
 tasks that objects perform. This actually makes our code much more readable and
 is one building block towards clean object oriented code and domain driven design.
 

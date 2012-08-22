@@ -2,7 +2,7 @@ Doctrine switches from LGPL to MIT
 ==================================
 
     tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
-    succesfully in roughly 4 weeks. For that we used a small web-based tool to
+    successfully in roughly 4 weeks. For that we used a small web-based tool to
     ask the permission of 358 authors that contributed in the last 6 years.
 
 The `Doctrine project <http://www.doctrine-project.org>`_ has been LGPL
@@ -27,14 +27,14 @@ of switching the license could be done. After a short email with the `FSF
 <http://www.fsf.org>`_ it was clear that we had to get the approval of every
 single committer or remove their code.
 
-VLC `succesfully attempted a license change
+VLC `successfully attempted a license change
 <http://www.videolan.org/press/lgpl.html>`_ last year from GPL to LGPL, so we
 we're hopeful to get this done. After discussing with Lukas we came up with the
 idea of a tool that helps this process, so `I wrote it
 <http://dlm.beberlei.de>`_. It features:
 
 - Import of all commits from one or many Github projects
-- Aggregation of commits to authors based on e-mail adress from Git log
+- Aggregation of commits to authors based on e-mail address from Git log
 - Status approved/not-approved for every author.
 - An e-mail engine to send a request for approval to every author using
   `the awesome Mailgun service <http://www.mailgun.net>`_, who has not approved
@@ -55,7 +55,7 @@ eventually collected all e-mail addresses except maybe 6-8 missing ones.
 Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
 accepted the license change. No single person refused the change. All commits
 of the 16 people left we're luckily not part of the code base anymore when we
-completly rewrote Doctrine 2 or trivial one-line changes. 
+completely rewrote Doctrine 2 or trivial one-line changes.
 
 I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.
