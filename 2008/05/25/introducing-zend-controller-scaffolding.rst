@@ -62,7 +62,7 @@ download <http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.g
 
         Where $options is an array or Zend_Config object with any of the following keys:
 
-          'allow_edit_primary_key' True/false - Wheater the form allows you to set the
+          'allow_edit_primary_key' True/false - Whether the form allows you to set the
                                   Primary Key fields or not
 
          'field_names' an Array of the Database Tables field names mapped to Label Names
@@ -78,15 +78,15 @@ download <http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.g
 
 **Todos & Problems:**
 
--  Many To Many Relationsships are not implemented yet (Using
+-  Many To Many Relationships are not implemented yet (Using
    MultiSelec).
 -  Compound Keys are probably not working correctly
--  Relationsships on non-primary key fields probably don't work as
+-  Relationships on non-primary key fields probably don't work as
    expected
--  Relationsships with lots of data are not scaled down for easy
+-  Relationships with lots of data are not scaled down for easy
    administration.
 
-Please report any bugs and feature requests or recommodations to
+Please report any bugs and feature requests or recommendations to
 **kontakt at beberlei dot de**.
 
 .. categories:: none

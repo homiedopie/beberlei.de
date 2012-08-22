@@ -16,7 +16,7 @@ in the PHP market. People working with unittests will like it very much,
 since all the parts are perfectly separated from each other allowing to
 test controllers, views, routers and filters in complete separation.
 
-To show one very simple example howto benefit of the seperation of view
+To show one very simple example howto benefit of the separation of view
 and controllers. If we need a view in both html and pdf, this should
 generally make no difference for the controller. We add two routes, one
 for the pdf one for the html view that execute the same controller and
@@ -36,17 +36,17 @@ response writer, nothing more.
 
 Now both **myHtmlView** and **myPdfView** can create their
 ezcMvcResponse objects that fill the response body depending on their
-type. Please note that overwritting createResponseBody() in myPdfView is
-a shortcut that circumventes me having to write a new PDF View Handler
+type. Please note that overwriting createResponseBody() in myPdfView is
+a shortcut that circumvents me having to write a new PDF View Handler
 (which would be the way to go).
 
     ::
 
         class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this->result->content->type = "application/pdf";   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf->render(); }}
 
-Now all the the logic that is potentially in the controller is completly
-seperated from the view handling that may depend on the routing
-information not on the controller. And views can be tested seperatly
+Now all the the logic that is potentially in the controller is completely
+separated from the view handling that may depend on the routing
+information not on the controller. And views can be tested separately
 from the controller result. Testability is very high.
 
 .. categories:: none

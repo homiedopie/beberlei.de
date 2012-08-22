@@ -4,9 +4,9 @@ Overwrite ezcMvcController - A bit more rapid
 ezComponents gets Mvc in its 2008.2 version. I have played around a bit
 with the alpha version, since I am currently searching for a good
 framework for a high performance application. My first benchmarks on
-ezcMvc just say: wh000pie! Alot faster as compared to the Zend
+ezcMvc just say: wh000pie! A lot faster as compared to the Zend
 Framework.
-Still ezcMvc is VERY loosly coupled and you have to write lots of lines
+Still ezcMvc is VERY loosely coupled and you have to write lots of lines
 to get where ZF gets you with less (more magic involved). As you can see
 from the `tutorial on the ezcMvcTools
 component <http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller>`_

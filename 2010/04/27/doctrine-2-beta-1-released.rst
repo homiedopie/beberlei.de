@@ -28,7 +28,7 @@ We also dropped most of the magical features of Doctrine 1 in favour of
 a simple and standardized API that is loosely based on the `Java
 Persistence API <http://en.wikipedia.org/wiki/Java_Persistence_API>`_, a
 technical standard for Object Relational Mappers. However we try not to
-blindly follow the "Programm PHP like Java" approach and and deviated
+blindly follow the "Program PHP like Java" approach and and deviated
 from JPA where applicable to make the concepts fit better into the PHP
 environment, such as alternatively hydrating all results into nested
 array structures for very high read performance.

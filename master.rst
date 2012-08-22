@@ -4,6 +4,11 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/08/22/building_an_object_model__no_setters_allowed
+   2012/08/18/oop_business_applications__command_query_responsibility_seggregation
+   2012/08/16/oop_business_applications__data__context__interaction
+   2012/08/13/oop_business_applications_entity_boundary_interactor
+   2012/08/11/oop_business_applications__trying_to_escape_the_mess
    2012/06/03/setting_up_development_machines_with_puppet
    2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet
    2012/05/26/doctrine_goes_mit

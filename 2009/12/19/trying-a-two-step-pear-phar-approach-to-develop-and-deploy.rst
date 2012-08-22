@@ -25,7 +25,7 @@ First we'll add a new user that we develop our application with:
     su - whitewashing
 
 Now there is the possibility that with this user PHP and PEAR is not in
-your $PATH enviroment, so you might have to add it. In my case on Ubuntu
+your $PATH environment, so you might have to add it. In my case on Ubuntu
 i also had to switch the console from /bin/sh to /bin/bash for this
 user. Then we need to setup our application, I am going to use the Zend
 Framework project style here but with a little twist. We will add a
@@ -150,7 +150,7 @@ mount capabilities that allow to import files or directories from
 outside into the PHAR context. This is a powerful feature that is
 required to distribute configurable applications like our blog.
 
-This screenshot shows how the application is currently structued in
+This screenshot shows how the application is currently structured in
 development mode. In production its structure should look like:
 
 ::
@@ -177,7 +177,7 @@ like:
     define('EXTERNAL_APPLICATION_ROOT', __DIR__."/../");
     include EXTERNAL_APPLICATION_ROOT."/whitewashing.phar";
 
-Including a PHAR file essentially has two conesequences:
+Including a PHAR file essentially has two consequences:
 
 -  The PHAR path will be added to your include path.
 -  The stub file will be executed.
@@ -214,7 +214,7 @@ application with a default configuration, but allows any user to replace
 the configuration files to fit the application to his need.
 
 The second bit loads Zend Framework Autoloader that is required by the
-bootstrapping mechanism. The third bit decides wheater this request is
+bootstrapping mechanism. The third bit decides whether this request is
 executed from the CLI- or the Web-Entry point of the application. The
 fourth bit, ``__HALT_COMPILER();`` is a technically required call inside
 your stub-file.
@@ -230,7 +230,7 @@ possibly as a phing or ant task or something alike.
 Now what this build process does not manage is the creation of the
 application entry point php and .htaccess files, but since they won't
 ever change its easy to add them to the build directory for now. An even
-more sophisiticated version of the build script would lead to the
+more sophisticated version of the build script would lead to the
 creation of an additional tar.gz of the complete application folder. Our
 deployment process would then be as easy as:
 

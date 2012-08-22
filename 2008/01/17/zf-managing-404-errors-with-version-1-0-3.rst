@@ -4,7 +4,7 @@ ZF: Managing 404 Errors with Version 1.0.3
 Ok, the description of the Link referring to the `version 0.9 solution
 for Managing 404
 errors <http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework>`_
-due to missing modules or actions is wrong. It is not enought to replace
+due to missing modules or actions is wrong. It is not enough to replace
 Zend::loadClass with Zend\_Loader::loadClass. Other functions have been
 renamed, my current snippet is:
 

@@ -5,7 +5,7 @@ This blog-post is about an experiment and I am curios what others have to say ab
 
 Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of ``stat()`` for the original file you can automatically regenerate your proxy code in APC when the original file changes.
 
-I havent found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling ``include()``. The client code looks like this:
+I haven't found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling ``include()``. The client code looks like this:
 
 .. code-block:: php
     

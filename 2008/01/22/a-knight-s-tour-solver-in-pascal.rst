@@ -9,7 +9,7 @@ of size n>=3 given a starting position. I used a backtracking algorithm
 combinations and setting steps back, when they do not lead to a
 solution.
 
-Beginning with n = 7 my algorithmus gets very slow, caused by the
+Beginning with n = 7 my algorithms gets very slow, caused by the
 backtracking algorithm which is not very efficient. I found some
 interesting articles regarding this problem using graph theory to solve
 it. Some pretty big minds have thought about the problem, I guess its
