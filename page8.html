@@ -79,6 +79,123 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>April 27, 2008</span> 
+        </div>
+        <div class="section" id="ox-cross-correlation-coefficients-with-lags">
+<h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
+<p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
+class</a> I
+realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
+calculate correlation coefficients like Mathlab has.</p>
+<p>Our assignment was to replicate the Dynamic Correlations graph in
+<a class="reference external" href="http://www.amazon.de/gp/redirect.html?ie=UTF8&amp;location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&amp;s=books-intl-de&amp;qid=1209289935&amp;sr=8-1&amp;site-redirect=de&amp;tag=economystuden-21&amp;linkCode=ur2&amp;camp=1638&amp;creative=6742">Walshs’ Monetary Theory and
+Policy</a>
+for European Data, which shows the cross-correlation of different
+monetary aggregates (M0,M1,M2) with GDP over lagging periods of -8 to +8
+quarters.</p>
+<p>What was missing for me to do that assignment in Ox was a function to
+calculate cross-correlation coefficients for two vectors for a specified
+lag length:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>#include &lt;oxfloat.h&gt;
+
+/**
+ * Computes the cross-correlation coefficient for two vector series allowing
+ * to optionally specify the number of positive and negative lags the ccc
+ * should be calculated for.
+ *
+ * @author Benjamin Eberlei (kontakt at beberlei dot de)
+ * @param vVarY Tx1 vector of variable related to
+ * @param vVarX Tx1 vector of variable which is tested in different lags
+ * @param lags Integer indicating the number of negative and positive lags.
+ * @returns (1+lags*2)*1 vector of correlations from -lags to lags
+ **/
+ccf(const vVarY, const vVarX, const lags)
+{
+    // Generate positive and negative lags of given length and fill with NaN, so
+    // that rows with not available numbers can be dropped from calculating the CCF later on.
+    decl mXLag = lag0(vVarX, range(lags, -lags), M_NAN);
+
+    decl mCorr, sCov;
+
+    // initialize result vector holding one crosscorrelation per lag
+    decl vCorrLags = zeros(1+lags*2, 1);
+
+    // sadly there are no matrix operations to ease this computation, loop over all lags
+    for(decl i = 0; i &lt; 1+lags*2; i++) {
+        mCorr = deleter(vVarY ~ mXLag[][i]); // stick y and current lagged x together and delete NaN rows
+
+        // calculate covariance of both time series
+        sCov = 1/(rows(mCorr)-1) * sumc( (mCorr[][0]-meanc(mCorr[][0]))' * (mCorr[][1]-meanc(mCorr[][1])) );
+
+        // calculate correlation coefficient
+        vCorrLags[i][0] = sCov / ( sqrt(varc(mCorr[][0])) * sqrt(varc(mCorr[][1])) );
+    }
+
+    return vCorrLags;
+}</pre>
+</div>
+</div></blockquote>
+<p>It may prove useful to someone.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/04/27/ox-cross-correlation-coefficients-with-lags.html#disqus_thread" data-disqus-identifier="2008/04/27/ox-cross-correlation-coefficients-with-lags">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>September 05, 2008</span> 
+        </div>
+        <div class="section" id="jquery-component-approved-for-extras-library">
+<h1><a href="2008/09/05/jquery-component-approved-for-extras-library.html">jQuery Component approved for extras library</a></h1>
+<p>Yesterday both my jQuery Helper proposals (<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">Core
+Helper</a>,
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei?focusedCommentId=7373203#comment-7373203">UI
+Widgets</a>)
+for the Zend Framework have been accepted for development. I have
+already checked my working prototypes <a class="reference external" href="http://framework.zend.com/svn/framework/extras/incubator/">into the Zend Framework
+SVN</a>. In my
+opinion the usage is quite stable already. There is likely to be no
+argument flip, function renaming or whatsoever. I have renamed the
+jqLink helper to ajaxLink though, because other libraries are offering
+the same functionality to make Ajax related calls and this way the
+learning curve for people using different libraries in different
+projects may be more easy.</p>
+<p>What is still missing? I have to add captureStart()/captureEnd()
+functions to the Container Widgets Accordion and Tabs, and will create
+additional pane helpers for both of them. This will likely be finished
+this weekend and then there is only the documentation missing. I am very
+confident this component will be finished for the Zend Framework 1.7
+release later this year.</p>
+<p>Since this component also includes helpers for the jQuery UI Widgets 1.6
+release (which is not released yet), a little waiting time before
+release is still good. I hope this all works out and the jQuery UI 1.6
+release is in the Google CDN, when ZF 1.7 comes out.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/09/05/jquery-component-approved-for-extras-library.html#disqus_thread" data-disqus-identifier="2008/09/05/jquery-component-approved-for-extras-library">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>September 11, 2008</span> 
         </div>
         <div class="section" id="new-calypso-dtl-version-0-2">
@@ -109,31 +226,31 @@ fun.</p>
         <div class="section" id="dependency-injection-via-interface-in-php-an-example">
 <h1><a href="2008/09/20/dependency-injection-via-interface-in-php-an-example.html">Dependency Injection via Interface in PHP: An example</a></h1>
 <p>Personal projects and work currently both force me to think about
-application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came accross dependency
+application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
 injection</a> the
 other day. Its quite a complex Design Pattern and hard to grasp, even
 with the number of examples you can find in the internet. Basically
 Dependency Injection means you register components that might be a
 dependency for other components and when loading new classes via the
-dependency injection framework, it knows of this relationsships and
+dependency injection framework, it knows of this relationships and
 assembles the object in need and all its dependencies and returns them
-fully initialized. This pattern leads to completly encapsulated objects
+fully initialized. This pattern leads to completely encapsulated objects
 where any class in the object graph can be exchanged for a new
 implementation without breaking all its dependencies. It also makes
-testing complex components and object relationsships very easy.</p>
-<p>Asfar as I could find out, three different types of Dependency Injection
+testing complex components and object relationships very easy.</p>
+<p>As far as I could find out, three different types of Dependency Injection
 implementations exist: Via Constructor, via Setter and via Interfaces.
 There exist implementations of Dependency Injection for Java (Spring)
 that are configured via XML config files and seem very complex. They are
-also hard to read in code I pressume, since you always have to be aware
+also hard to read in code I presume, since you always have to be aware
 of the current application configuration. There are also some more
 lightweight implementations (PicoContainer) that assemble their
-relationsships in the application and work with config methods that act
-as configuration of the dependancies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
+relationships in the application and work with config methods that act
+as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
 implementation via
 interfaces</a>,
 which seems most accessible for me.</p>
-<p>All PHP clones of any dependancy injection framework seem to go the
+<p>All PHP clones of any dependency injection framework seem to go the
 complex way via configuration though. With traits and multiple class
 inheritance on the horizon, some kind of interface injection seems
 mighty powerful though. So I implemented a really lightweight
@@ -162,12 +279,12 @@ instantiated via:</p>
 injectDbAdapter with the given Database Adapter. A negative consequence
 of this approach is that you have to implement the inject methods for
 all interfaces in your concrete class implementations. With Traits
-(multiple class inheritence) being a new feature in PHP soon, injection
+(multiple class inheritance) being a new feature in PHP soon, injection
 via parent classes seems to become a very powerful approach though,
 which can handle the concrete implementations.</p>
-<p>The Container takes care of all the dependancy building, so when testing
+<p>The Container takes care of all the dependency building, so when testing
 your components you can register lots of mock objects. You can also
-exchange dependancies for only a subset of objects very easily. I
+exchange dependencies for only a subset of objects very easily. I
 implemented a method “Whitewashing_Container::registerClassComponent”,
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
@@ -175,9 +292,9 @@ parameter $localInterfaceOverride for the highest priority:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
 </pre></div>
 </div>
-<p>Speedwise the usage of the Container reduces class instatiation by about
+<p>Speedwise the usage of the Container reduces class instantiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
-on my machine. But naturally only classes with dependancies and lots of
+on my machine. But naturally only classes with dependencies and lots of
 them should be using this mechanism and with good application design,
 this shouldn’t be to many. You can download
 <a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
@@ -236,7 +353,7 @@ wraps around it and requires all the dependencies:</p>
     protected $front;
 
     /**
-     * Create Front Controller for Zend Framework using explicity dependencies created by Sphicy.
+     * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
      *
      * @param Zend_Controller_Request_Abstract      $request
      * @param Zend_Controller_Response_Abstract     $response
@@ -368,7 +485,7 @@ Zend_Form_Decorator_Form. What we then realize is, that this is just
 using a view helper to render, so what we need additionally is a
 “My_JQuery_View_Helper_AjaxForm” that extends from
 “Zend_View_Helper_Form”. The code of the view helper will have to
-look as follows to fullfil our needs:</p>
+look as follows to fulfil our needs:</p>
 <blockquote>
 <div><div class="highlight-python"><pre>require_once &quot;Zend/View/Helper/Form.php&quot;;class ZendX_JQuery_View_Helper_AjaxForm extends Zend_View_Helper_Form{  /**   * Contains reference to the jQuery view helper   *   * @var ZendX_JQuery_View_Helper_JQuery_Container   */  protected $jquery;  /**   * Set view and enable jQuery Core and UI libraries   *   * @param Zend_View_Interface $view   * @return ZendX_JQuery_View_Helper_Widget   */  public function setView(Zend_View_Interface $view)  {    parent::setView($view);    $this-&gt;jquery = $this-&gt;view-&gt;jQuery();    $this-&gt;jquery-&gt;enable()           -&gt;uiEnable();    return $this;  }  public function ajaxForm($name, $attribs = null, $content = false, array $options=array())  {    $id = $name;    if(isset($attribs['id'])) {      $id = $attribs['id'];    }    if(!isset($options['clearForm'])) {      $options['clearForm'] = true;    }    if(count($options) &gt; 0) {      require_once &quot;Zend/Json.php&quot;;      $jsonOptions = Zend_Json::encode($options);      // Fix Callbacks if present      if(isset($options['beforeSubmit'])) {        $jsonOptions = str_replace('&quot;beforeSubmit&quot;:&quot;'.$options['beforeSubmit'].'&quot;', '&quot;beforeSubmit&quot;:'.$options['beforeSubmit'], $jsonOptions);      }      if(isset($options['success'])) {        $jsonOptions = str_replace('&quot;success&quot;:&quot;'.$options['success'].'&quot;', '&quot;success&quot;:'.$options['success'], $jsonOptions);      }    } else {      $jsonOptions = &quot;{}&quot;;    }    $this-&gt;jquery-&gt;addOnLoad(sprintf(      '$(&quot;#%s&quot;).ajaxForm(%s)', $id, $jsonOptions    ));    return parent::form($name, $attribs, $content);  }}</pre>
 </div>
@@ -400,7 +517,7 @@ handling the Zend_Form instance.</p>
 </div></blockquote>
 <p>This has to be processed by a callback function of the AjaxForm and
 which may for example look like the following which uses a predefined
-div box (#formMessages, dont forget to implement it) to render either
+div box (#formMessages, don’t forget to implement it) to render either
 the success or the error messages.</p>
 <blockquote>
 <div><div class="highlight-python"><pre>$form-&gt;addDecorator(array('AjaxForm', array(  'jQueryParams' =&gt; array(    'success' =&gt; &quot;formCallback1&quot;,   ),)));$view-&gt;jQuery()-&gt;addJavascript('function formCallback1(data) {  if(data.errors) {    $(&quot;#formMessages&quot;).append(&quot;&lt;ul&gt;&quot;);    for each(var item in data.errors) {      $(&quot;#formMessages&quot;).append(&quot;&lt;li&gt;&quot;+item+&quot;&lt;/li&gt;&quot;);    }    $(&quot;#formMessages&quot;).append(&quot;&lt;/ul&gt;&quot;);  } else {    $(&quot;#formMessages&quot;).html(data.success);  }}');</pre>
@@ -430,8 +547,8 @@ of this series, so be aware of new content soonish.</p>
         <div class="timestamp postmeta">
             <span>December 18, 2008</span> 
         </div>
-        <div class="section" id="dependecy-injection-the-juicy-way">
-<h1><a href="2008/12/18/dependecy-injection-the-juicy-way.html">Dependecy Injection the juicy way</a></h1>
+        <div class="section" id="dependency-injection-the-juicy-way">
+<h1><a href="2008/12/18/dependecy-injection-the-juicy-way.html">Dependency Injection the juicy way</a></h1>
 <p>I have written on dependency injection before and <a class="reference external" href="http://www.whitewashing.de/blog/articles/83">came up with a
 solution for PHP via interface
 injection</a>. Thinking
@@ -439,7 +556,7 @@ about it twice I didn’t like it very much. Its too much overkill that
 you have to implement all setter methods again and again.</p>
 <p>Still dependency injection is the way to write good, testable and easily
 exchanged and re-wired object graphs. I tried to do lots of dependency
-injection via constructor lately and realized that it polutes my
+injection via constructor lately and realized that it pollutes my
 constructors when my object graph is too deep.</p>
 <p>An example: When I setup my database connection in the bootstrap file
 and encapsulate it in my model creation factory object, i have to insert
@@ -455,7 +572,7 @@ where he argues in favour of dependency injection and debunks singletons
 as being evil (he does that on his blog too). From there I learnt about
 <a class="reference external" href="http://code.google.com/p/google-guice/">Guice</a>, a dependency
 injection framework for Java by Google.</p>
-<p>What I like about Guice: Its easy to use and its immediatly obvious to
+<p>What I like about Guice: Its easy to use and its immediately obvious to
 someone without experience, why it works so good and you don’t have to
 hand down objects deep down the object graph. I cloned the basic
 functionality for PHP and an example would work as follows.</p>
@@ -692,7 +809,7 @@ the code. Its very simple but by default the most powerful mvc solution
 in the PHP market. People working with unittests will like it very much,
 since all the parts are perfectly separated from each other allowing to
 test controllers, views, routers and filters in complete separation.</p>
-<p>To show one very simple example howto benefit of the seperation of view
+<p>To show one very simple example howto benefit of the separation of view
 and controllers. If we need a view in both html and pdf, this should
 generally make no difference for the controller. We add two routes, one
 for the pdf one for the html view that execute the same controller and
@@ -710,16 +827,16 @@ response writer, nothing more.</p>
 </div></blockquote>
 <p>Now both <strong>myHtmlView</strong> and <strong>myPdfView</strong> can create their
 ezcMvcResponse objects that fill the response body depending on their
-type. Please note that overwritting createResponseBody() in myPdfView is
-a shortcut that circumventes me having to write a new PDF View Handler
+type. Please note that overwriting createResponseBody() in myPdfView is
+a shortcut that circumvents me having to write a new PDF View Handler
 (which would be the way to go).</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = &quot;application/pdf&quot;;   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}</pre>
 </div>
 </div></blockquote>
-<p>Now all the the logic that is potentially in the controller is completly
-seperated from the view handling that may depend on the routing
-information not on the controller. And views can be tested seperatly
+<p>Now all the the logic that is potentially in the controller is completely
+separated from the view handling that may depend on the routing
+information not on the controller. And views can be tested separately
 from the controller result. Testability is very high.</p>
 </div>
         
@@ -776,7 +893,7 @@ http request methods:</p>
 </div>
 </div></blockquote>
 <p>This very simple extension is independent of the advanced request parser
-given above, so you could use it separatly. In the light of our delete
+given above, so you could use it separately. In the light of our delete
 user example, you would use the new router in the following way:</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class myRouter extends ezcMvcRouter{  public function createRoutes()  {    return array(      new myMvcRestRoute( 'GET', '/users/:id/delete', 'UserController', 'deleteDialog' ),      new myMvcRestRoute( 'POST', '/users/:id/delete', 'UserController', 'delete' ),    );  }}</pre>
@@ -795,84 +912,6 @@ user example, you would use the new router in the following way:</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html#disqus_thread" data-disqus-identifier="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 12, 2008</span> 
-        </div>
-        <div class="section" id="bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">
-<h1><a href="2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete.html">Bad news: jQuery UI 1.6 ships without Spinner and AutoComplete</a></h1>
-<p>The jQuery UI team <a class="reference external" href="http://blog.jquery.com/2008/12/11/whats-up-with-jquery-ui/">announced yesterday on its
-blog</a> that
-<a class="reference external" href="http://ui.jquery.com">jQuery UI 1.6</a> will not be shipped with
-AutoComplete and Spinner Plugin support. No further delay, for the
-orginal august 2008 estimated release, is wanted.</p>
-<p>This brings about a problem on
-<a class="reference external" href="http://framework.zend.com/manual/en/zendx.jquery.html">ZendX_JQuery</a>.
-All view helpers and decorators that depend on AutoComplete and Spinner
-Plugins can only be run with SVN trunk or 1.6 release candidates, which
-have known bugs and problems.</p>
-<p>I am adding a compability table to the ZendX jQuery manual today that
-will make its way to the manual of the 1.7.2 release. This will
-hopefully help and guide everyone to the correct dependencies.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete.html#disqus_thread" data-disqus-identifier="2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>July 14, 2008</span> 
-        </div>
-        <div class="section" id="jquery-helper-what-is-to-include">
-<h1><a href="2008/07/14/jquery-helper-what-is-to-include.html">jQuery Helper - What is to include?</a></h1>
-<p>I took some time in the last days to develop the concept for a possible
-jQuery View Helper that could pass the integration into the <a class="reference external" href="http://framework.zend.com">ZF
-Core</a>. Since
-<a class="reference external" href="http://www.jquery.com">jQuery</a> is organized somewhat different than
-Dojo is, its possible implementation for ZF will differ.</p>
-<p>The jQuery Helper itself will manage inclusion of jQuery javascript
-files and the base library, much like the Dojo component works (Using
-the Google CDN). On top of this simple Helpers should mimic $.get,
-$.post, $.load and $.getJSON in a simple way, so that with a simple
-function call you can generate an XmlHttpRequest that updates a
-specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
-Ajax</a>)</p>
-<p>Problematic are the next ideas: Additional Helpers will allow to
-specifiy the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
-(DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/">jQuery
-Autocomplete</a>
-or <a class="reference external" href="http://malsup.com/jquery/form/">jQuery Form</a> (AjaxForm and
-AjaxSubmit). These libraries need additional javascript content to be
-downloaded and implemented in the Zend Framework project. There
-currently exists no way to implement them using a CDN. Therefore any
-documentation must clearly specify which additional content has to be
-installed and how. The helpers will have to be general enough to support
-this.</p>
-<p>My proposal is currently in the workings and will be on the ZF Wiki in
-the next couple of hours.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/14/jquery-helper-what-is-to-include.html#disqus_thread" data-disqus-identifier="2008/07/14/jquery-helper-what-is-to-include">Leave a comment</a>
         </div>
     </div>
     
@@ -920,6 +959,9 @@ the next couple of hours.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -935,6 +977,9 @@ the next couple of hours.</p>
             <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -942,12 +987,6 @@ the next couple of hours.</p>
         </li>
         <li class="recent_post">
             <a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

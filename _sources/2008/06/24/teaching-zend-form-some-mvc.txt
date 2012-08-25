@@ -109,7 +109,7 @@ a field key level, which is not currently done.
 
                 /**
                  * this overrides the original Zend_Form Constructor and skips
-                 * the decorator initilisation, because this is now being handled
+                 * the decorator initialisation, because this is now being handled
                  * by View Helpers
                  */
                 public function __construct($options=null, $model=null)

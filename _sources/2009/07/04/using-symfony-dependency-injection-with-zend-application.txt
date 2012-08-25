@@ -6,7 +6,7 @@ post <http://www.whitewashing.de/blog/articles/117>`_ on Dependency
 Injection containers and Zend\_Application I was eager to find out if
 its possible to integrate the new `Symfony Dependency Injection
 Container <http://components.symfony-project.org/dependency-injection/>`_
-into the Zend Framework. To my suprise its possible without having to
+into the Zend Framework. To my surprise it's possible without having to
 make any changes to one of the two components. An example use-case would
 look like:
 

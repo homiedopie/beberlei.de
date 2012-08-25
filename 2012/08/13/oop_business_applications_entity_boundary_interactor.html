@@ -83,7 +83,7 @@
 <h1>OOP Business Applications: Entity, Boundary, Interactor</h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Aplications: Trying to escape the
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
 mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
@@ -95,7 +95,7 @@ by Alistair Cockburn.</p>
 <p>In this pattern any client of the system talks to the model using a model
 request object and receives data from the model in form of model responses objects.
 Additionally when your model talks to any kind of persistence or subsystem it
-should go through an adapter that is replacable. For a model architecture
+should go through an adapter that is replaceable. For a model architecture
 designed this way, you can replace any part of the UI oder lower layers by
 writing new adapters and plug them in.</p>
 <div class="section" id="terminology">
@@ -105,7 +105,7 @@ writing new adapters and plug them in.</p>
 much logic except rules that are set in stone and are never going to change
 (based on physic or mathematical laws or something).</p>
 <p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
-in the current use-case and works with entities to fullfil their task.</p>
+in the current use-case and works with entities to fulfil their task.</p>
 <p>The <strong>boundary</strong> is responsible for translating model request/response into a
 format that the UI or actor can understand. They also mediate between model
 and lower levels, for example to manage database transactions.</p>
@@ -141,7 +141,7 @@ is the money transfer from one bank account (source) to another one
 </div>
 <p>It is straightforward to implement the <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>
 functionality. The Money object implementation is omitted here.</p>
-<p>The Interactor handles the use-case of transfering money from the
+<p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
@@ -226,7 +226,7 @@ generic approach to getting this job done.</p>
 <a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
 (Reason below).  It allows you to wrap calls to the model by some sort of proxy
 that transforms the request and response and also handles transactions and
-such. Loosly spoken this was actually some kind of AOP library, using the
+such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
 <p>With context you would do something like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -257,7 +257,7 @@ use.</p>
 <h2>Using with Symfony2</h2>
 <p>As I am currently exclusively developing Symfony2/Silex applications, applying
 EBI to Symfony2 framework based applications is very important to me. The
-biggest difficulty here is the Form layer, escpecially the request data-mapping and
+biggest difficulty here is the Form layer, especially the request data-mapping and
 validation concerns, which are normally part of the model. There are two
 approaches I came up with to solve this:</p>
 <ul class="simple">
@@ -283,7 +283,7 @@ an object, but in this case you are using the Form API as the mapper.</li>
 <p>The problem with this approach is, that you cant really unit-test these methods
 anymore, because the complexity of the form layer mapping cannot be mocked with
 this API. Instead your tests always need the full form layer (with validation,
-depending services etc.) to allow for real-world esting. Additionally you have
+depending services etc.) to allow for real-world testing. Additionally you have
 to make the DataMapper throw an exception that you can catch in the controller,
 rendering the appropriate response. Using exceptions for controlling executions
 paths is not a very good practice though.</p>
@@ -299,7 +299,7 @@ pattern in PoEAA. EBI is going a bit more into detail by naming individual
 parts of the pattern more explicit. Without more restrictions however using
 this pattern will drive you towards many of the problems described in my
 previous post.</p>
-<p>Clean seperation from frameworks is achieved, depending on the actual usage
+<p>Clean separation from frameworks is achieved, depending on the actual usage
 however only at a significant cost.  Never forget stepping back and thinking
 about further abstractions, otherwise applying EBI is leading to lots of code
 being manually written.</p>
@@ -330,7 +330,7 @@ use-case&#8221;).</p>
 <p>In conclusion I can partially recommend using the EBI pattern. You have to be
 careful to find abstraction layers that keep your code DRY and SOLID however,
 something which does not come naturally with this pattern. If you are not
-careful you end up with all the &#8220;messy points&#8221; that I mentioned in my previoius
+careful you end up with all the &#8220;messy points&#8221; that I mentioned in my previous
 blog post.</p>
 <p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
 by using some code-generation for example to do parts of this job for you. The
@@ -381,6 +381,9 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="../22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -396,6 +399,9 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
             <a href="../11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -403,12 +409,6 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
         </li>
         <li class="recent_post">
             <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

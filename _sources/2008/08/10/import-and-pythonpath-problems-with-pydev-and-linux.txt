@@ -2,7 +2,7 @@ Import and PYTHONPATH Problems with PyDev and Linux
 ===================================================
 
 Today is began to configure my `PyDev <http://pydev.sf.net>`_ Eclipse
-enviroment since I want to learn Python and need it for a programming
+environment since I want to learn Python and need it for a programming
 aspect of my forthcoming diploma thesis. I ran into several difficulties
 getting the plugins run dialog to work. It seems that configuring the
 python interpreter under linux and adding all the correct include paths

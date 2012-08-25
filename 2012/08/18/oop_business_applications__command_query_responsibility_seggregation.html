@@ -88,12 +88,12 @@ mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">Entity, Boundary, Interactor</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
 </ul>
-<p>The last pattern for desigining your business logic is called
-&#8220;Command-Query-Responsiblity-Segregation&#8221; or short CQRS. It has its roots in
-the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">&#8220;Command Query Seperation&#8221;</a> principle that was
+<p>The last pattern for designing your business logic is called
+&#8220;Command-Query-Responsibility-Segregation&#8221; or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">&#8220;Command Query Separation&#8221;</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-python"><pre>Command-Query-Seperation states that every method should either be a
+<div class="highlight-python"><pre>Command-Query-Separation states that every method should either be a
 command that performs an action, or a query that returns data to the
 caller, but not both. In other words, asking a question should not change
 the answer. More formally, methods should return a value only if they are
@@ -109,7 +109,7 @@ all have their place. This post describes a simple variant that does
 use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
 with CQRS.</p>
 </div>
-<p>At its heart is the seperation of Read and Write methods. This can be easily
+<p>At its heart is the separation of Read and Write methods. This can be easily
 achieved by just having two different service layer classes instead of one.
 This insight alone is not really helpful, its just moving methods around.
 Coupled to this change however is the notion, that read and write models don&#8217;t
@@ -117,26 +117,26 @@ necessarily have to be the same:</p>
 <ul class="simple">
 <li>Getter/Setters: We don&#8217;t need setters in the write model, instead we use
 explicit methods for each write operation. Entities are also much simpler
-without bi-direcitional relationships that read/write models often need.
+without bi-directional relationships that read/write models often need.
 Read-only models (ViewModel) don&#8217;t need getters/setters. They could just use
 public properties or even be arrays.</li>
 <li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
 mostly need queries by primary key, changing only some objects. In
-read scenarios we need complex queries, joins and aggregations. A seperation
+read scenarios we need complex queries, joins and aggregations. A separation
 prevents both from affecting each other negatively.</li>
 <li>Mapping Data-Transfer objects becomes simple. Instead of sending the whole
 model back and forth, for the write scenario you define use-case specific
-tasks and upates. This is much simpler than generic mapping of Data Transfer
+tasks and updates. This is much simpler than generic mapping of Data Transfer
 objects to complex object graphs.</li>
-<li>Transformating SQL directly to a view model in a highly optimized way.
+<li>Transforming SQL directly to a view model in a highly optimized way.
 Simple concept, but it has huge implications: A pure read-only model is simple to
 maintain and refactor for any performance requirements that come up.</li>
 </ul>
 <p>Furthermore with CQRS our write service methods are not allowed to return data
 anymore (With the exceptions to the rule of course). This may increase the
 complexity at first, but it has benefits for scalability and decoupling.
-Following this principle allows us to turn every command from synchroneous to
-asynchroneous processing later without much problems. Services are allowed to
+Following this principle allows us to turn every command from synchronous to
+asynchronous processing later without much problems. Services are allowed to
 throw exceptions and refuse the execution. Proper validation of input data
 should happen before executing write operations though.</p>
 <p>One drawback of CQRS: A naive implementation doubles the amount of classes and
@@ -145,20 +145,20 @@ full blown read-model if you don&#8217;t apply CQRS religiously:</p>
 <ul class="simple">
 <li>Don&#8217;t use different data-stores for both models.</li>
 <li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
-very simple. You can easily generialize this to a simple object that gives
-efficent access to all your data.</li>
+very simple. You can easily generalize this to a simple object that gives
+efficient access to all your data.</li>
 <li>Share parts of the write and read models if you don&#8217;t have to compromise
 much.</li>
 </ul>
-<p>The important thing to take away from this seperation is, that the read part of
+<p>The important thing to take away from this separation is, that the read part of
 your application is seldom the part where business value lies in. Moving this
 code into a different part of your applications allows you to work with the
-underyling data-source much more directly, without need for much abstractions.</p>
+underlying data-source much more directly, without need for much abstractions.</p>
 <p>One thing that CQRS puts forward is the concept of Commands, Command Handlers
 and Command Bus and how they interact. Commands are simple objects that
 contain all the data necessary to execute an operation. Each command is
 processed by exactly one command handler. The Command Bus is responsible to
-route a command to its apporpriate command handler.</p>
+route a command to its appropriate command handler.</p>
 <div class="section" id="example">
 <h2>Example</h2>
 <p>Here is the most simple implementation of the Command Bus, just holds a hash map
@@ -217,7 +217,7 @@ oriented.</p>
 <ul class="simple">
 <li>Nesting handlers that take care of transactions, logging, 2 phase commits</li>
 <li>Order nested command calls sequentially instead of deep into each other.</li>
-<li>Asynchroneous processing with message queue become an option</li>
+<li>Asynchronous processing with message queue become an option</li>
 </ul>
 <p>The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:</p>
@@ -239,18 +239,18 @@ Entity-Boundary-Interactor pattern, usage is simple:</p>
 </div>
 <div class="section" id="pros-and-cons">
 <h2>Pros and Cons</h2>
-<p>I really like CQRS for multiple reasons. It offers excplicit guidance how solve
+<p>I really like CQRS for multiple reasons. It offers explicit guidance how solve
 tasks by making use of a range of different design patterns. This is very
 helpful, because the code-base is based on conventions that are simple to
 understand by everyone on the team. This structure liberates you from the curse
-of choice and gives you a cookbook of best-practicies how to solve problems.
-You want this struture for all your applications, regardless of what
-architectural patttern you have chosen.</p>
+of choice and gives you a cookbook of best-practices how to solve problems.
+You want this structure for all your applications, regardless of what
+architectural pattern you have chosen.</p>
 <p>Embracing the difference between read and write models is another plus of CQRS.
 It is very helpful, not to try fitting both read and write into one model.  You
 also don&#8217;t run into so many read-related problems with an ORM any more. You
 design the entities to be optimized for the write model only, loose the
-bidirectional associations and avoid all the optmizations here and there for
+bidirectional associations and avoid all the optimizations here and there for
 read performance.</p>
 <p>Compared to EBI, where we had to maintain a mapping between DTOs and entities,
 CQRS explicitly uses the command based approach to avoid the complexity of
@@ -311,6 +311,9 @@ topic that I will discuss in the next blog post.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="../22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -326,6 +329,9 @@ topic that I will discuss in the next blog post.</p>
             <a href="../11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -333,12 +339,6 @@ topic that I will discuss in the next blog post.</p>
         </li>
         <li class="recent_post">
             <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

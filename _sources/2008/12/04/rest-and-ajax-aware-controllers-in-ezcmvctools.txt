@@ -39,7 +39,7 @@ http request methods:
         class myMvcRestRoute extends ezcMvcRailsRoute{  protected $method;  public function __construct( $method, $pattern, $controllerClassName, $action = null, array $defaultValues = array() )  {    $this->method = $method;    parent::__construct($pattern, $controllerClassName, $action, $defaultValues);  }  public function matches( ezcMvcRequest $request )  {    if(strtolower($this->method) == strtolower($request->raw['REQUEST_METHOD'])) {      return parent::matches($request);    }    return null;  }}
 
 This very simple extension is independent of the advanced request parser
-given above, so you could use it separatly. In the light of our delete
+given above, so you could use it separately. In the light of our delete
 user example, you would use the new router in the following way:
 
     ::

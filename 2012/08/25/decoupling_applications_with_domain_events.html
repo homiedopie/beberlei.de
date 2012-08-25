@@ -1,0 +1,311 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Decoupling applications with Domains Events &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.4.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Building an Object Model: No setters allowed" href="../22/building_an_object_model__no_setters_allowed.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2012-08-25-decoupling_applications_with_domain_events">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>August 25, 2012</span> 
+        </div>
+    <div class="section" id="decoupling-applications-with-domains-events">
+<h1>Decoupling applications with Domains Events</h1>
+<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
+I have described 3 architectural patterns for business applications. Applying
+them to your software helps you decouple the business logic from the
+application/framework/UI. However given sufficient complexity, you will want to
+decouple different parts of your business model from each other as well.</p>
+<p>As an example, lets think of a batch process in your application that updates
+orders from a CRM or logistics system:</p>
+<ul class="simple">
+<li>You receive an XML with full users and order representations</li>
+<li>You need to update certain user fields</li>
+<li>You need to update certain order fields</li>
+<li>Some orders require creating accounts in different remote systems</li>
+<li>If the user has not confirmed his email yet he should receive an opt-in
+mail instead.</li>
+<li>If the user confirms his opt-in mail, all outstanding remote accounts are
+created.</li>
+</ul>
+<p>You can build all the steps into a single batch processing service. This will
+be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
+principle</a>.</p>
+<p>the part with updating of users and fields has nothing to with the sending of
+mails and creation of remote accounts.  We want to decouple them from each
+other.</p>
+<p>The first obvious choice is to decouple them into distinct services:</p>
+<ul class="simple">
+<li>Import Service</li>
+<li>Authentication Service</li>
+<li>Account Generation Service</li>
+</ul>
+<p>All these services have dependencies on infrastructure objects, database,
+mailer and so on. We could inject the authentication and account generation
+services into the Import Service, but with rising complexity this will lead to
+a lasagna of services and the execution path will dig deep into this and this
+is not nearly as tasty as eating real lasagna.</p>
+<div class="highlight-python"><pre>ImportService
+|_AuthenticationService
+| |_Mailer
+| |_Database
+|_AccountGenerationService
+| |_Database
+| \_RemoteFacade
+\_Database</pre>
+</div>
+<p>This becomes more complicated when transaction semantics need to be taken care
+of. For example dependencies between mailer and database services. Also you
+have to take into account that the code in entities and value objects
+participating in this use-case.</p>
+<p>What we want instead is a sequential execution of those nested services, but
+only if the parent service executed successfully:</p>
+<div class="highlight-python"><pre>ImportService
+\_Database
+
+AuthenticationService
+|_Mailer
+\_Database
+
+AccountGenerationService
+|_Database
+\_RemoteFacade</pre>
+</div>
+<p>We could use an event dispatcher in all of the services to notify each other,
+but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
+cleaner way:</p>
+<p>Every entity is an event provider and can emit events. Whenever a transaction
+is committed and an hence an operation is completed successfully, we take all
+the events emitted from all entities (looking at the identity map for example)
+and trigger observing event handlers. However if the operation fails, we do not
+trigger these event handlers.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">Order</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// 1. do something with $data</span>
+
+        <span class="c1">// 2. raise event</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s2">&quot;id&quot;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+        <span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The Event provider trait aggregates all the events, and offers
+and API for external services to pull them from the entity:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">trait</span> <span class="nx">EventProvider</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Our infrastructure must then trigger event handlers, based
+on the event names. It will use <tt class="docutils literal"><span class="pre">dequeueEmittedEvents</span></tt> and making
+sure the events are not emitted multiple times.</p>
+<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
+<ul class="simple">
+<li>Command executes</li>
+<li>Entities emit events</li>
+<li>Command transaction succeeds</li>
+<li>Events trigger event handlers</li>
+<li>Event handlers execute more commands</li>
+<li>Restart from 1.</li>
+</ul>
+<p>With this approach we can decouple all services from each other and avoid
+deep nesting in each other. Yet we still have transactional dependencies,
+by dropping all events when the parent command fails. Transactions over
+multiple commands will not have ACID properties though, instead you will have
+to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
+that are important in systems with eventual consistency. This is one downside
+that you need to take into account.</p>
+<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
+implementation of DomainEvent and EventProvider classes and integration into
+Symfony and Doctrine ORM. Generally this pattern is very easy to implement
+though, so that you can just have a look at the implementation and take the
+best parts for your own.</p>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/08/25/decoupling_applications_with_domain_events";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="../22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
+        </li>
+        <li class="recent_post">
+            <a href="../18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
+        </li>
+        <li class="recent_post">
+            <a href="../16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
+        </li>
+        <li class="recent_post">
+            <a href="../13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
+        </li>
+        <li class="recent_post">
+            <a href="../11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

@@ -16,7 +16,7 @@ specified part of the DOM (via injection). (See: `CakePHP
 Ajax <http://book.cakephp.org/view/208/ajax>`_)
 
 Problematic are the next ideas: Additional Helpers will allow to
-specifiy the `jQuery UI Library <http://ui.jquery.com>`_ components
+specify the `jQuery UI Library <http://ui.jquery.com>`_ components
 (DatePicker, Sortables, Draggable, Dropable..), `jQuery
 Autocomplete <http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/>`_
 or `jQuery Form <http://malsup.com/jquery/form/>`_ (AjaxForm and

@@ -82,31 +82,31 @@
     <div class="section" id="dependency-injection-via-interface-in-php-an-example">
 <h1>Dependency Injection via Interface in PHP: An example</h1>
 <p>Personal projects and work currently both force me to think about
-application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came accross dependency
+application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
 injection</a> the
 other day. Its quite a complex Design Pattern and hard to grasp, even
 with the number of examples you can find in the internet. Basically
 Dependency Injection means you register components that might be a
 dependency for other components and when loading new classes via the
-dependency injection framework, it knows of this relationsships and
+dependency injection framework, it knows of this relationships and
 assembles the object in need and all its dependencies and returns them
-fully initialized. This pattern leads to completly encapsulated objects
+fully initialized. This pattern leads to completely encapsulated objects
 where any class in the object graph can be exchanged for a new
 implementation without breaking all its dependencies. It also makes
-testing complex components and object relationsships very easy.</p>
-<p>Asfar as I could find out, three different types of Dependency Injection
+testing complex components and object relationships very easy.</p>
+<p>As far as I could find out, three different types of Dependency Injection
 implementations exist: Via Constructor, via Setter and via Interfaces.
 There exist implementations of Dependency Injection for Java (Spring)
 that are configured via XML config files and seem very complex. They are
-also hard to read in code I pressume, since you always have to be aware
+also hard to read in code I presume, since you always have to be aware
 of the current application configuration. There are also some more
 lightweight implementations (PicoContainer) that assemble their
-relationsships in the application and work with config methods that act
-as configuration of the dependancies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
+relationships in the application and work with config methods that act
+as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
 implementation via
 interfaces</a>,
 which seems most accessible for me.</p>
-<p>All PHP clones of any dependancy injection framework seem to go the
+<p>All PHP clones of any dependency injection framework seem to go the
 complex way via configuration though. With traits and multiple class
 inheritance on the horizon, some kind of interface injection seems
 mighty powerful though. So I implemented a really lightweight
@@ -135,12 +135,12 @@ instantiated via:</p>
 injectDbAdapter with the given Database Adapter. A negative consequence
 of this approach is that you have to implement the inject methods for
 all interfaces in your concrete class implementations. With Traits
-(multiple class inheritence) being a new feature in PHP soon, injection
+(multiple class inheritance) being a new feature in PHP soon, injection
 via parent classes seems to become a very powerful approach though,
 which can handle the concrete implementations.</p>
-<p>The Container takes care of all the dependancy building, so when testing
+<p>The Container takes care of all the dependency building, so when testing
 your components you can register lots of mock objects. You can also
-exchange dependancies for only a subset of objects very easily. I
+exchange dependencies for only a subset of objects very easily. I
 implemented a method &#8220;Whitewashing_Container::registerClassComponent&#8221;,
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
@@ -148,9 +148,9 @@ parameter $localInterfaceOverride for the highest priority:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;, null, array(&#39;InjectDbAdapter&#39; =&gt; $newDbAdapter));</span>
 </pre></div>
 </div>
-<p>Speedwise the usage of the Container reduces class instatiation by about
+<p>Speedwise the usage of the Container reduces class instantiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
-on my machine. But naturally only classes with dependancies and lots of
+on my machine. But naturally only classes with dependencies and lots of
 them should be using this mechanism and with good application design,
 this shouldn&#8217;t be to many. You can download
 <a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
@@ -204,6 +204,9 @@ registered class instance.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../../../2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="../../../2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -219,6 +222,9 @@ registered class instance.</p>
             <a href="../../../2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="../../../2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="../../../2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -226,12 +232,6 @@ registered class instance.</p>
         </li>
         <li class="recent_post">
             <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

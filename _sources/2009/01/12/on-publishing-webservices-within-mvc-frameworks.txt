@@ -1,7 +1,7 @@
 On Publishing Webservices within MVC Frameworks
 ===============================================
 
-Webservices are a very important part in todays enterprise applications.
+Webservices are a very important part in today's enterprise applications.
 They tie applications of different age or programming languages together
 or allow applications of different subcontracters to speak to each
 other. Because they use HTTP, a stateless network protocol, considerable

@@ -5,7 +5,149 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Wed, 22 Aug 2012 00:00:00 +0200</pubDate>
+        <pubDate>Sat, 25 Aug 2012 00:00:00 +0200</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html</link>
+            <guid>http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html</guid>
+            <title>Decoupling applications with Domains Events</title>
+            <description><![CDATA[<div class="section" id="decoupling-applications-with-domains-events">
+<h1>Decoupling applications with Domains Events</h1>
+<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
+I have described 3 architectural patterns for business applications. Applying
+them to your software helps you decouple the business logic from the
+application/framework/UI. However given sufficient complexity, you will want to
+decouple different parts of your business model from each other as well.</p>
+<p>As an example, lets think of a batch process in your application that updates
+orders from a CRM or logistics system:</p>
+<ul class="simple">
+<li>You receive an XML with full users and order representations</li>
+<li>You need to update certain user fields</li>
+<li>You need to update certain order fields</li>
+<li>Some orders require creating accounts in different remote systems</li>
+<li>If the user has not confirmed his email yet he should receive an opt-in
+mail instead.</li>
+<li>If the user confirms his opt-in mail, all outstanding remote accounts are
+created.</li>
+</ul>
+<p>You can build all the steps into a single batch processing service. This will
+be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
+principle</a>.</p>
+<p>the part with updating of users and fields has nothing to with the sending of
+mails and creation of remote accounts.  We want to decouple them from each
+other.</p>
+<p>The first obvious choice is to decouple them into distinct services:</p>
+<ul class="simple">
+<li>Import Service</li>
+<li>Authentication Service</li>
+<li>Account Generation Service</li>
+</ul>
+<p>All these services have dependencies on infrastructure objects, database,
+mailer and so on. We could inject the authentication and account generation
+services into the Import Service, but with rising complexity this will lead to
+a lasagna of services and the execution path will dig deep into this and this
+is not nearly as tasty as eating real lasagna.</p>
+<div class="highlight-python"><pre>ImportService
+|_AuthenticationService
+| |_Mailer
+| |_Database
+|_AccountGenerationService
+| |_Database
+| \_RemoteFacade
+\_Database</pre>
+</div>
+<p>This becomes more complicated when transaction semantics need to be taken care
+of. For example dependencies between mailer and database services. Also you
+have to take into account that the code in entities and value objects
+participating in this use-case.</p>
+<p>What we want instead is a sequential execution of those nested services, but
+only if the parent service executed successfully:</p>
+<div class="highlight-python"><pre>ImportService
+\_Database
+
+AuthenticationService
+|_Mailer
+\_Database
+
+AccountGenerationService
+|_Database
+\_RemoteFacade</pre>
+</div>
+<p>We could use an event dispatcher in all of the services to notify each other,
+but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
+cleaner way:</p>
+<p>Every entity is an event provider and can emit events. Whenever a transaction
+is committed and an hence an operation is completed successfully, we take all
+the events emitted from all entities (looking at the identity map for example)
+and trigger observing event handlers. However if the operation fails, we do not
+trigger these event handlers.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">Order</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// 1. do something with $data</span>
+
+        <span class="c1">// 2. raise event</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s2">&quot;id&quot;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+        <span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The Event provider trait aggregates all the events, and offers
+and API for external services to pull them from the entity:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">trait</span> <span class="nx">EventProvider</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Our infrastructure must then trigger event handlers, based
+on the event names. It will use <tt class="docutils literal"><span class="pre">dequeueEmittedEvents</span></tt> and making
+sure the events are not emitted multiple times.</p>
+<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
+<ul class="simple">
+<li>Command executes</li>
+<li>Entities emit events</li>
+<li>Command transaction succeeds</li>
+<li>Events trigger event handlers</li>
+<li>Event handlers execute more commands</li>
+<li>Restart from 1.</li>
+</ul>
+<p>With this approach we can decouple all services from each other and avoid
+deep nesting in each other. Yet we still have transactional dependencies,
+by dropping all events when the parent command fails. Transactions over
+multiple commands will not have ACID properties though, instead you will have
+to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
+that are important in systems with eventual consistency. This is one downside
+that you need to take into account.</p>
+<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
+implementation of DomainEvent and EventProvider classes and integration into
+Symfony and Doctrine ORM. Generally this pattern is very easy to implement
+though, so that you can just have a look at the implementation and take the
+best parts for your own.</p>
+</div>]]></description>
+            <pubDate>Sat, 25 Aug 2012 00:00:00 +0200</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</link>
             <guid>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</guid>
@@ -17,11 +159,11 @@ abstraction technology that converts rows to objects, then you will probably
 use getter/setter methods or properties (C#) to encapsulate object properties.</p>
 <p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
 at the default <tt class="docutils literal"><span class="pre">User</span></tt> entity from the Symfony2 FOSUserBundle plugin for
-example: A collosus of getter/setter methods with nearly no real business
+example: A colossus of getter/setter methods with nearly no real business
 logic. This is how most of our persistence related objects look like in PHP.
-A Rails ActiceRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
+A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
 the explicit getter/setters, however generates accessors magically for you.
-Nevertheless you have to add considerable amound of code to configure all the
+Nevertheless you have to add considerable amount of code to configure all the
 properties. And code using these active records becomes ambiguous as well.</p>
 <p>Why do we use getters/setters so much?</p>
 <ul class="simple">
@@ -33,7 +175,7 @@ automatically.</li>
 <li>It became natural in OOP to have write access to every field.</li>
 </ul>
 <p>However Getters/setters <a class="reference external" href="http://en.wikipedia.org/wiki/Open/closed_principle">violate the open/closed principle</a>, prevent information
-hiding and are <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
+hiding and <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
 (<a class="reference external" href="http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html">Long version</a>). Using
 getters and setters allows to <em>decouples</em> the business logic for setting values from the
 actual storage. Something that object-orientation was suppose to avoid.</p>
@@ -108,12 +250,12 @@ model, using the visitor pattern in combination with view models:</p>
 <li>Why use the Post model in memory, when you are only passing <tt class="docutils literal"><span class="pre">PostView</span></tt>
 instances to the controllers and views only anyways? Its much more efficient
 to have the database map to the view objects directly. This is what CQRS
-postulates as seperation of read- and write model.</li>
+postulates as separation of read- and write model.</li>
 <li>You have to write additional classes for every entity (Data transfer objects)
 instead of passing the entities directly to the view. But if you want to
-cleanly seperate the model from the application/framework, you don’t get
+cleanly separate the model from the application/framework, you don’t get
 around view model/data transfer objects anyways.</li>
-<li>It looks awkard in tests at first, but you can write some custom assertions
+<li>It looks awkward in tests at first, but you can write some custom assertions
 to get your sanity back for this task.</li>
 </ul>
 </div>
@@ -182,12 +324,12 @@ then pass these as commands into our “real model” through a service layer,
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This way we seperated the business model from the application framework.</p>
+<p>This way we separated the business model from the application framework.</p>
 </div>
 <div class="section" id="a-word-about-rad">
 <h2>A word about RAD</h2>
 <p>Rapid-application development or rapid prototyping is a wide-spread approach in web
-development. My explicit approach seems to be completly against this kind of
+development. My explicit approach seems to be completely against this kind of
 development and much slower as well. But I think you don’t loose much time
 in the long run:</p>
 <ul class="simple">
@@ -208,7 +350,7 @@ that these prototypes normally have.</li>
 <div class="section" id="conclusion">
 <h2>Conclusion</h2>
 <p>If we take a step back from all our tools suggesting to generate getter/setters
-we find that there is a simple way to avoid using setters when focussing on the
+we find that there is a simple way to avoid using setters when focusing on the
 tasks that objects perform. This actually makes our code much more readable and
 is one building block towards clean object oriented code and domain driven design.</p>
 <p>I am very interested in your opinions on this topic and my attempt to avoid them,
@@ -230,12 +372,12 @@ mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">Entity, Boundary, Interactor</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
 </ul>
-<p>The last pattern for desigining your business logic is called
-“Command-Query-Responsiblity-Segregation” or short CQRS. It has its roots in
-the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Seperation”</a> principle that was
+<p>The last pattern for designing your business logic is called
+“Command-Query-Responsibility-Segregation” or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-python"><pre>Command-Query-Seperation states that every method should either be a
+<div class="highlight-python"><pre>Command-Query-Separation states that every method should either be a
 command that performs an action, or a query that returns data to the
 caller, but not both. In other words, asking a question should not change
 the answer. More formally, methods should return a value only if they are
@@ -251,7 +393,7 @@ all have their place. This post describes a simple variant that does
 use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
 with CQRS.</p>
 </div>
-<p>At its heart is the seperation of Read and Write methods. This can be easily
+<p>At its heart is the separation of Read and Write methods. This can be easily
 achieved by just having two different service layer classes instead of one.
 This insight alone is not really helpful, its just moving methods around.
 Coupled to this change however is the notion, that read and write models don’t
@@ -259,26 +401,26 @@ necessarily have to be the same:</p>
 <ul class="simple">
 <li>Getter/Setters: We don’t need setters in the write model, instead we use
 explicit methods for each write operation. Entities are also much simpler
-without bi-direcitional relationships that read/write models often need.
+without bi-directional relationships that read/write models often need.
 Read-only models (ViewModel) don’t need getters/setters. They could just use
 public properties or even be arrays.</li>
 <li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
 mostly need queries by primary key, changing only some objects. In
-read scenarios we need complex queries, joins and aggregations. A seperation
+read scenarios we need complex queries, joins and aggregations. A separation
 prevents both from affecting each other negatively.</li>
 <li>Mapping Data-Transfer objects becomes simple. Instead of sending the whole
 model back and forth, for the write scenario you define use-case specific
-tasks and upates. This is much simpler than generic mapping of Data Transfer
+tasks and updates. This is much simpler than generic mapping of Data Transfer
 objects to complex object graphs.</li>
-<li>Transformating SQL directly to a view model in a highly optimized way.
+<li>Transforming SQL directly to a view model in a highly optimized way.
 Simple concept, but it has huge implications: A pure read-only model is simple to
 maintain and refactor for any performance requirements that come up.</li>
 </ul>
 <p>Furthermore with CQRS our write service methods are not allowed to return data
 anymore (With the exceptions to the rule of course). This may increase the
 complexity at first, but it has benefits for scalability and decoupling.
-Following this principle allows us to turn every command from synchroneous to
-asynchroneous processing later without much problems. Services are allowed to
+Following this principle allows us to turn every command from synchronous to
+asynchronous processing later without much problems. Services are allowed to
 throw exceptions and refuse the execution. Proper validation of input data
 should happen before executing write operations though.</p>
 <p>One drawback of CQRS: A naive implementation doubles the amount of classes and
@@ -287,20 +429,20 @@ full blown read-model if you don’t apply CQRS religiously:</p>
 <ul class="simple">
 <li>Don’t use different data-stores for both models.</li>
 <li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
-very simple. You can easily generialize this to a simple object that gives
-efficent access to all your data.</li>
+very simple. You can easily generalize this to a simple object that gives
+efficient access to all your data.</li>
 <li>Share parts of the write and read models if you don’t have to compromise
 much.</li>
 </ul>
-<p>The important thing to take away from this seperation is, that the read part of
+<p>The important thing to take away from this separation is, that the read part of
 your application is seldom the part where business value lies in. Moving this
 code into a different part of your applications allows you to work with the
-underyling data-source much more directly, without need for much abstractions.</p>
+underlying data-source much more directly, without need for much abstractions.</p>
 <p>One thing that CQRS puts forward is the concept of Commands, Command Handlers
 and Command Bus and how they interact. Commands are simple objects that
 contain all the data necessary to execute an operation. Each command is
 processed by exactly one command handler. The Command Bus is responsible to
-route a command to its apporpriate command handler.</p>
+route a command to its appropriate command handler.</p>
 <div class="section" id="example">
 <h2>Example</h2>
 <p>Here is the most simple implementation of the Command Bus, just holds a hash map
@@ -359,7 +501,7 @@ oriented.</p>
 <ul class="simple">
 <li>Nesting handlers that take care of transactions, logging, 2 phase commits</li>
 <li>Order nested command calls sequentially instead of deep into each other.</li>
-<li>Asynchroneous processing with message queue become an option</li>
+<li>Asynchronous processing with message queue become an option</li>
 </ul>
 <p>The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:</p>
@@ -381,18 +523,18 @@ Entity-Boundary-Interactor pattern, usage is simple:</p>
 </div>
 <div class="section" id="pros-and-cons">
 <h2>Pros and Cons</h2>
-<p>I really like CQRS for multiple reasons. It offers excplicit guidance how solve
+<p>I really like CQRS for multiple reasons. It offers explicit guidance how solve
 tasks by making use of a range of different design patterns. This is very
 helpful, because the code-base is based on conventions that are simple to
 understand by everyone on the team. This structure liberates you from the curse
-of choice and gives you a cookbook of best-practicies how to solve problems.
-You want this struture for all your applications, regardless of what
-architectural patttern you have chosen.</p>
+of choice and gives you a cookbook of best-practices how to solve problems.
+You want this structure for all your applications, regardless of what
+architectural pattern you have chosen.</p>
 <p>Embracing the difference between read and write models is another plus of CQRS.
 It is very helpful, not to try fitting both read and write into one model.  You
 also don’t run into so many read-related problems with an ORM any more. You
 design the entities to be optimized for the write model only, loose the
-bidirectional associations and avoid all the optmizations here and there for
+bidirectional associations and avoid all the optimizations here and there for
 read performance.</p>
 <p>Compared to EBI, where we had to maintain a mapping between DTOs and entities,
 CQRS explicitly uses the command based approach to avoid the complexity of
@@ -420,23 +562,23 @@ topic that I will discuss in the next blog post.</p>
 <h1>OOP Business Applications: Data, Context, Interaction</h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Aplications: Trying to escape the
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
 mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
 </ul>
 <p>The next design pattern for technical system design is called “Data, Context,
 Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
-paradigm, in the context of PHPs langugage constraints it can be classified as
-architectural design pattern. I came accross this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
+paradigm, in the context of PHPs language constraints it can be classified as
+architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
 through the book on DCI and trying to understand this pattern with me.</p>
-<p>As in the EBI pattern, DCI seperates data objects (Data) from behavior implemented
+<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
 in use-cases (Context). Data objects are never directly involved in these
 use-cases, but are “casted” to their respective roles that they are taking in
 the use-case. This can be implemented with aggregation or traits in PHP.</p>
 <p>One goal of DCI is to get object-oriented programming to a place, where you
-can look at a use-case and its roles and be very sure that the programm is
+can look at a use-case and its roles and be very sure that the program is
 running correctly, because you can guarantee that there are no unexpected side
-effects. It also aims at keeping the amound of code required to keep in mind
+effects. It also aims at keeping the amount of code required to keep in mind
 for a given use-case as small as possible, allowing developers to reason about
 the code with more confidence.</p>
 <div class="section" id="terminology">
@@ -455,7 +597,7 @@ each other. These roles then modify the underlying data.</p>
 <h2>Example</h2>
 <p>Starting from the bank account example of the EBI post, we can introduce DCI
 quite easily by adding the missing concept of roles. In the use case of
-transfering money that would be:</p>
+transferring money that would be:</p>
 <ul class="simple">
 <li>TransferMoneySource</li>
 <li>TransferMoneySink (Destination)</li>
@@ -480,7 +622,7 @@ objects using them in the tests for this use-case.</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">desposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
 <span class="p">}</span>
@@ -519,7 +661,7 @@ on the execution of this use-case.</p>
 <p>The use-case <tt class="docutils literal"><span class="pre">TransferMoney</span></tt> would then be modified to create Roles instead
 of Data objects from the DAO. This can be a bit tricky when you have multiple
 data objects implementing the same role and you have no way of knowing which
-underyling data object to pick. The binding of data objects to roles happens
+underlying data object to pick. The binding of data objects to roles happens
 in the use-case. The use-case needs a means to retrieve objects with certain
 roles, which then access underlying data sources. To avoid that your use-cases
 have to know about how to bind roles to data, you could use GUIDs in your
@@ -546,7 +688,7 @@ corresponding data.</p>
 </pre></div>
 </div>
 <p>The simplicity of this is appealing, however don’t forget that we have
-abstracted I/O completley here. There has to be code that deals with that part
+abstracted I/O completely here. There has to be code that deals with that part
 of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
 implications.</p>
@@ -627,7 +769,7 @@ parts of the system.</p>
 <h1>OOP Business Applications: Entity, Boundary, Interactor</h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Aplications: Trying to escape the
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
 mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
@@ -639,7 +781,7 @@ by Alistair Cockburn.</p>
 <p>In this pattern any client of the system talks to the model using a model
 request object and receives data from the model in form of model responses objects.
 Additionally when your model talks to any kind of persistence or subsystem it
-should go through an adapter that is replacable. For a model architecture
+should go through an adapter that is replaceable. For a model architecture
 designed this way, you can replace any part of the UI oder lower layers by
 writing new adapters and plug them in.</p>
 <div class="section" id="terminology">
@@ -649,7 +791,7 @@ writing new adapters and plug them in.</p>
 much logic except rules that are set in stone and are never going to change
 (based on physic or mathematical laws or something).</p>
 <p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
-in the current use-case and works with entities to fullfil their task.</p>
+in the current use-case and works with entities to fulfil their task.</p>
 <p>The <strong>boundary</strong> is responsible for translating model request/response into a
 format that the UI or actor can understand. They also mediate between model
 and lower levels, for example to manage database transactions.</p>
@@ -685,7 +827,7 @@ is the money transfer from one bank account (source) to another one
 </div>
 <p>It is straightforward to implement the <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>
 functionality. The Money object implementation is omitted here.</p>
-<p>The Interactor handles the use-case of transfering money from the
+<p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
@@ -770,7 +912,7 @@ generic approach to getting this job done.</p>
 <a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
 (Reason below).  It allows you to wrap calls to the model by some sort of proxy
 that transforms the request and response and also handles transactions and
-such. Loosly spoken this was actually some kind of AOP library, using the
+such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
 <p>With context you would do something like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -801,7 +943,7 @@ use.</p>
 <h2>Using with Symfony2</h2>
 <p>As I am currently exclusively developing Symfony2/Silex applications, applying
 EBI to Symfony2 framework based applications is very important to me. The
-biggest difficulty here is the Form layer, escpecially the request data-mapping and
+biggest difficulty here is the Form layer, especially the request data-mapping and
 validation concerns, which are normally part of the model. There are two
 approaches I came up with to solve this:</p>
 <ul class="simple">
@@ -827,7 +969,7 @@ an object, but in this case you are using the Form API as the mapper.</li>
 <p>The problem with this approach is, that you cant really unit-test these methods
 anymore, because the complexity of the form layer mapping cannot be mocked with
 this API. Instead your tests always need the full form layer (with validation,
-depending services etc.) to allow for real-world esting. Additionally you have
+depending services etc.) to allow for real-world testing. Additionally you have
 to make the DataMapper throw an exception that you can catch in the controller,
 rendering the appropriate response. Using exceptions for controlling executions
 paths is not a very good practice though.</p>
@@ -843,7 +985,7 @@ pattern in PoEAA. EBI is going a bit more into detail by naming individual
 parts of the pattern more explicit. Without more restrictions however using
 this pattern will drive you towards many of the problems described in my
 previous post.</p>
-<p>Clean seperation from frameworks is achieved, depending on the actual usage
+<p>Clean separation from frameworks is achieved, depending on the actual usage
 however only at a significant cost.  Never forget stepping back and thinking
 about further abstractions, otherwise applying EBI is leading to lots of code
 being manually written.</p>
@@ -874,7 +1016,7 @@ use-case”).</p>
 <p>In conclusion I can partially recommend using the EBI pattern. You have to be
 careful to find abstraction layers that keep your code DRY and SOLID however,
 something which does not come naturally with this pattern. If you are not
-careful you end up with all the “messy points” that I mentioned in my previoius
+careful you end up with all the “messy points” that I mentioned in my previous
 blog post.</p>
 <p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
 by using some code-generation for example to do parts of this job for you. The
@@ -904,8 +1046,8 @@ introduction to a series about this approaches.</p>
 </ol>
 <p>The first produces code solving technical problems, often in a beautiful and
 dedicated way. The second regularly produces mess, hopefully still
-serving customers by optimizing their business. This differentation is an
-exageration, but from my experience its far easier to run a greenfield business
+serving customers by optimizing their business. This differentiation is an
+exaggeration, but from my experience its far easier to run a greenfield business
 project into the ground than a new library.</p>
 <p>There has to be a reason why so many programmers dedicate much free time to
 open source projects. It might be empirical prove, that all our business
@@ -920,14 +1062,14 @@ of OOP business applications.</p>
 <p>This blog post is not about blaming customers (as the usual suspect), its about
 finding the problems in usual OOP code of business systems from my experience
 with PHP projects. To keep things short, I will list my <em>personal</em> list of
-techincal annoyances in business projects in no particular order. These are
+technical annoyances in business projects in no particular order. These are
 highly subjective points.</p>
 <ul class="simple">
 <li>Getter/Setter Madness of Objects that are used to store data into
 databases. Leading to huge objects that are essentially just meaningless
 stores of data.</li>
 <li>Updating complex object graphs from user input.</li>
-<li>Seperation of model, controller and views, especially when dealing with
+<li>Separation of model, controller and views, especially when dealing with
 forms. This is very complicated to achieve.</li>
 <li>Lazy Loading and Query performance problems when using an ORM. Additionally
 replacing parts of the views with hand-crafted SQL is often difficult and/or
@@ -938,7 +1080,7 @@ change.</li>
 <li>Dependency mess leading to hard to test code, generally leading to untested
 applications. Too often frameworks create huge dependencies that
 make your domain model messy and complex to mock in tests.</li>
-<li>Focus on synchroneous request/response handling makes later usage of message
+<li>Focus on synchronous request/response handling makes later usage of message
 queues very complicated and expensive to refactor towards.</li>
 <li>Tight coupling of model against the framework code.</li>
 <li>Junior developers have too much freedom, when there is not much structure in
@@ -968,18 +1110,18 @@ the problems listed above. But without changes in your mindest you end up with
 hand written mess, compared to getting there with tools.</p>
 <p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
 the problem even worse. It easily leads to lasagna code, where you have layers
-of layers that are very hard to understand. Personally I prefer spagetthi code
+of layers that are very hard to understand. Personally I prefer spaghetti code
 over lasagna code, because its comparatively simpler to understand.</p>
 </div>
 <div class="section" id="finding-new-approaches">
 <h2>Finding new Approaches</h2>
 <p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
-there has to be some solution to organize business models structurely to avoid
+there has to be some solution to organize business models structurally to avoid
 all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a>
 you have a powerful toolbox to avoid many of the problems above, but it is
 still not simple to write clean object oriented applications.</p>
 <p>After years of participation in both open source projects I still feel there is
-a missing puzzle piece, to reach a clean seperation of all the model concerns
+a missing puzzle piece, to reach a clean separation of all the model concerns
 from framework and persistence.</p>
 <p>At some point I would really like to close the gap between desired technical
 state of a project and the state it is actually in. I know there is no size
@@ -991,18 +1133,18 @@ I was introduced to several approaches to OO application design that I
 started to explore in the past last months:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
-studied alot</li>
+studied a lot</li>
 <li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
 architecture or “Ports and adapters”. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
 at Ruby Midwest</a>
 last year.</li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
-<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blost post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
 day video class</a> by Greg Young.</li>
 </ul>
 <p>They are not new and have all been around for several years already. I would
 describe all three of them as architectural design patterns, though some people
-might probably disagreee with this classification. All three approaches make
+might probably disagree with this classification. All three approaches make
 you think about application development beyond just “service layers” in
 radically new ways. All three have helped me rethink business applications in
 different ways.</p>
@@ -1017,6 +1159,134 @@ Conference</a> in Sankt Augustin Germany on
 </div>
 </div>]]></description>
             <pubDate>Sat, 11 Aug 2012 00:00:00 +0200</pubDate>
+        </item>
+        <item>
+            <link>http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html</link>
+            <guid>http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html</guid>
+            <title>Setting up Development Machines with Puppet</title>
+            <description><![CDATA[<div class="section" id="setting-up-development-machines-with-puppet">
+<h1>Setting up Development Machines with Puppet</h1>
+<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+dsecribe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
+<li>and I propably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
+via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I seperate the installation process into two puppet files, one that has to be
+run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
+my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
+
+# VIM Dot Files
+vcsrepo { 'vim-dotfiles':
+    path     =&gt; &quot;/home/$id/.vim&quot;,
+    ensure   =&gt; present,
+    provider =&gt; git,
+    source   =&gt; 'https://...'
+}
+
+file { 'vim-dotfiles-symlink':
+    path   =&gt; &quot;/home/$id/.vimrc&quot;,
+    ensure =&gt; link,
+    target =&gt; '.vim/vimrc',
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+
+exec { 'vim-make-command-t':
+    command =&gt; 'rake make',
+    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
+    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
+    require =&gt; Vcsrepo['vim-dotfiles']
+}</pre>
+</div>
+<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<div class="highlight-python"><pre># Configure Git
+exec { &quot;git-author-name&quot;:
+    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
+    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
+}
+
+exec { &quot;git-author-email&quot;:
+    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
+    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
+}
+
+exec { &quot;git-global-ignore&quot;:
+    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
+    unless  =&gt; 'git config -l --global|grep excludesfile'
+}
+
+file { &quot;git-global-ignorefile&quot;:
+    path =&gt; &quot;/home/$id/.gitignore&quot;,
+    ensure =&gt; present,
+    content =&gt; &quot;*.swo\n*.swp\n&quot;
+}</pre>
+</div>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+</div>]]></description>
+            <pubDate>Sun, 03 Jun 2012 00:00:00 +0200</pubDate>
         </item>
         <item>
             <link>http://www.whitewashing.de/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html</link>
@@ -1103,7 +1373,7 @@ that we want to use with vagrant, do:</p>
 <span class="nv">$ </span>vagrant ssh
 </pre></div>
 </div>
-<p>Although the blog-title suggests it, Puppet hasnt been used much up to this
+<p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
 point. The use of puppet with Vagrant will be part of a next blog post.</p>
 </div>]]></description>
             <pubDate>Thu, 31 May 2012 00:00:00 +0200</pubDate>
@@ -1116,7 +1386,7 @@ point. The use of puppet with Vagrant will be part of a next blog post.</p>
 <h1>Doctrine switches from LGPL to MIT</h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
-succesfully in roughly 4 weeks. For that we used a small web-based tool to
+successfully in roughly 4 weeks. For that we used a small web-based tool to
 ask the permission of 358 authors that contributed in the last 6 years.</div></blockquote>
 <p>The <a class="reference external" href="http://www.doctrine-project.org">Doctrine project</a> has been LGPL
 licensed since it was started in 2006. When I first started contributing in the
@@ -1135,12 +1405,12 @@ the original project.</div></blockquote>
 of this year we as Doctrine project first started to investigate how the task
 of switching the license could be done. After a short email with the <a class="reference external" href="http://www.fsf.org">FSF</a> it was clear that we had to get the approval of every
 single committer or remove their code.</p>
-<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">succesfully attempted a license change</a> last year from GPL to LGPL, so we
+<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">successfully attempted a license change</a> last year from GPL to LGPL, so we
 we’re hopeful to get this done. After discussing with Lukas we came up with the
 idea of a tool that helps this process, so <a class="reference external" href="http://dlm.beberlei.de">I wrote it</a>. It features:</p>
 <ul class="simple">
 <li>Import of all commits from one or many Github projects</li>
-<li>Aggregation of commits to authors based on e-mail adress from Git log</li>
+<li>Aggregation of commits to authors based on e-mail address from Git log</li>
 <li>Status approved/not-approved for every author.</li>
 <li>An e-mail engine to send a request for approval to every author using
 <a class="reference external" href="http://www.mailgun.net">the awesome Mailgun service</a>, who has not approved
@@ -1159,7 +1429,7 @@ eventually collected all e-mail addresses except maybe 6-8 missing ones.</p>
 <p>Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
 accepted the license change. No single person refused the change. All commits
 of the 16 people left we’re luckily not part of the code base anymore when we
-completly rewrote Doctrine 2 or trivial one-line changes.</p>
+completely rewrote Doctrine 2 or trivial one-line changes.</p>
 <p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.</p>
 </div>]]></description>
@@ -1206,7 +1476,7 @@ application.</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="c1">// We dont need that Environment stuff, just one config</span>
+        <span class="c1">// We don't need that Environment stuff, just one config</span>
         <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -1297,7 +1567,7 @@ dependencies.</p>
 </pre></div>
 </div>
 <p>Now just run your web-test cases.</p>
-<p>If you want to debug the logging happing inside the Kernel just comment out
+<p>If you want to debug the logging happening inside the Kernel just comment out
 the Monolog lines to get the log-messages printed to the screen.</p>
 <p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
 control ignore files.</p>
@@ -1325,7 +1595,7 @@ Additionally Hudson is easily integrated into
 <a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
 development.</p>
 <p>My motivation to dive into CI is easily explained. I just never felt it
-was necessary to add a continuous integration enviroment to my projects,
+was necessary to add a continuous integration environment to my projects,
 since I had one or two simple bash scripts that did the job. In general
 this is rather annoying, because they mostly only run PHPUnit and have
 to be done using a cronjob or manually, without any real process of
@@ -1352,7 +1622,7 @@ have used Sebastians Howto, however i also like the third one. David
 Luhmans guide adds lots of details that are important to get the
 different parts of a build process to work.</p>
 <p>Now what these tutorials all do is that they use a bash command to
-execute the build process or specifiy an Ant Build file. However there
+execute the build process or specify an Ant Build file. However there
 is also a Phing Build process plugin for Hudson that allows to specify
 the build.xml targets to execute in the process. From the “Available
 Plugins” list you can choose the “Phing plugin”.</p>
@@ -1482,7 +1752,7 @@ worker sleeps 1 second)</li>
 <span class="x">    private $maxRunTime = 0;</span>
 <span class="x">    private $articleId;</span>
 
-<span class="x">    public function testLockIsAquired()</span>
+<span class="x">    public function testLockIsAcquired()</span>
 <span class="x">    {</span>
 <span class="x">        // .. write fixture data into the database</span>
 
@@ -1660,11 +1930,11 @@ used.</p>
 article</a> on using PEAR
 and PHAR for application lifecycle management and deployment. Since then
 I have gotten some feedback through comments, but also discussed the
-topic with collegues. I have also optimized the approach quite
+topic with colleagues. I have also optimized the approach quite
 considerably and even <a class="reference external" href="http://github.com/beberlei/pearanha">made an open-source project out of parts of
 it</a> and I want to share all that
 is new with you. First of all, yes the presented solution was somewhat
-complex, partly because it is still a proposed idea and definately up
+complex, partly because it is still a proposed idea and definitely up
 for optimizations. However I am still very convinced of my approach,
 something I should discuss in more detail.</p>
 <p>The only other two languages I have ever programmed something in with
@@ -1677,14 +1947,14 @@ executable. This is very easy to configure and maintain in IDEs like
 Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
 libraries to your project). It also makes for a much more
 straightforward deployment.</p>
-<p>In the PHP world this siutation was quite different (up to PHP 5.3) for
+<p>In the PHP world this situation was quite different (up to PHP 5.3) for
 several reasons:</p>
 <ul class="simple">
 <li>You could not package a library into a single distributable file.</li>
 <li>The PEAR installer as the only tool for updating and managing
 dependencies of your application by default installs into a
 system/global directory. This means dependencies your application
-uses are located in a completly different location than your
+uses are located in a completely different location than your
 application code.</li>
 <li>You can’t manage multiple versions of the same package with PEAR in
 this system directory, making it very hard to control servers with
@@ -1718,9 +1988,9 @@ even more PHP code will be distributed using PEAR channels in the near
 future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
 DateTime</a> code for
 example makes for a great little open source library that could be
-distribued via PEAR, aswell as
+distributed via PEAR, as well as
 <a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
-container I am using extensivly.</p>
+container I am using extensively.</p>
 <p>Question: Are you really going to manage all these dependencies
 correctly manually? Is everything up to date all the time, and
 upgradeable with ease?</p>
@@ -1748,7 +2018,7 @@ with:</p>
 <div><div class="highlight-python"><pre>benny@desktop: pearanha generate-project</pre>
 </div>
 </div></blockquote>
-<p>You then need to specifiy the project base dir and then the project
+<p>You then need to specify the project base dir and then the project
 style (for example Zend Framework or Manual) which prompts your for the
 directory that should be used for as the vendor/library directory that
 PEAR will install all the code in. You will also be prompted for a
@@ -1825,7 +2095,7 @@ interface.</p>
 a simple and standardized API that is loosely based on the <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_API">Java
 Persistence API</a>, a
 technical standard for Object Relational Mappers. However we try not to
-blindly follow the “Programm PHP like Java” approach and and deviated
+blindly follow the “Program PHP like Java” approach and and deviated
 from JPA where applicable to make the concepts fit better into the PHP
 environment, such as alternatively hydrating all results into nested
 array structures for very high read performance.</p>
@@ -1905,7 +2175,7 @@ CodeSniffer Plugin and released a new NBM file for you to
 <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">download</a>.
 Here are the changes done by Manuel:</p>
 <ul class="simple">
-<li>Ability to specifiy the path to CodeSniffer Binary</li>
+<li>Ability to specify the path to CodeSniffer Binary</li>
 <li>Automatic Detection of all the installed Coding Standards</li>
 <li>Fixed Automatic Binary Detection on Windows</li>
 </ul>
@@ -1923,7 +2193,7 @@ choose a global standard.</p>
 <h1>Generate Proxy code using a stream wrapper</h1>
 <p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
 <p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <tt class="docutils literal"><span class="pre">stat()</span></tt> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
-<p>I havent found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <tt class="docutils literal"><span class="pre">include()</span></tt>. The client code looks like this:</p>
+<p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <tt class="docutils literal"><span class="pre">include()</span></tt>. The client code looks like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nx">stream_wrapper_register</span><span class="p">(</span><span class="s2">&quot;dc2proxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Doctrine\ORM\Proxy\ProxyStreamWrapper&quot;</span><span class="p">);</span>
 
@@ -2086,7 +2356,7 @@ Padraic: <a class="reference external" href="http://blog.astrumfutura.com/archiv
 too!</a>
 He already integrated my and <a class="reference external" href="http://www.phpunit.de">Sebastians</a>
 changes back into the master and we didn’t have to focus on merging,
-communication and integration alot.</p>
+communication and integration a lot.</p>
 <p>My <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PUMA project</a> is also
 hosted on GitHub (although nobody has looked into that yet), but I am
 beginning to write a complete Runner now that calls all three components
@@ -2249,7 +2519,7 @@ to using the <strong>render()</strong> method, which communicates the intend mor
 Also the render method now clearly communicates that either the error or
 the parent rendering is executed and leaves no doubt about it.</p>
 <p>The <strong>getTemplateValuesXmlFile()</strong> method still uses the comment to show
-the assumption about relative pathes, but this is only the case because
+the assumption about relative paths, but this is only the case because
 application configuration is made implicit into the code. This has to be
 extracted to be an explicit configuration constant and the comment can
 go.</p>
@@ -2277,7 +2547,7 @@ can put the new code for the feature into existence but its really
 unintuitive. So you begin to comment it excessively, because its the
 only way to clearly show its intend.</p>
 <p>There are two mindestting factors that help to write code that is
-understandable without having to excessivly comment it:</p>
+understandable without having to excessively comment it:</p>
 <ul class="simple">
 <li>From the beginning, do not write code for the computer but for
 developers. Changing this attitude really helps to write
@@ -2351,11 +2621,11 @@ or ORMs implemented in PHP, including two written by myself (an
 one</a>). Its an awesome
 pattern if used on a larger scale and can (re-) wire a complex business
 application according to a clients needs without having to change much
-of the domain code. It aims at a complete seperation of object
+of the domain code. It aims at a complete separation of object
 instantiation and dependency tracking from the business logic.</p>
 <p>Beginning with version 1.8 Zend Framework is able to integrate any of
 these DI containers into its <strong>Zend_Application</strong> component easily. The
-Application component intializes a set of common resources and pushes
+Application component initializes a set of common resources and pushes
 them into the MVC stack as additional Front Controller parameters.
 Technically a <strong>Zend_Registry</strong> instance holds all these resources with
 their respective resource names as keys. The resources are accessible
@@ -2387,7 +2657,7 @@ Injection in mind and is not tied to the use of Zend_Registry. Only
 three magic methods are required by any container that wants to be
 Zend_Application compliant: __get(), __set() and __isset(). Each
 instantiated resource is pushed via __set() into the container. If
-required by another resource, __isset() is used to check wheater a
+required by another resource, __isset() is used to check whether a
 resource with the given name exists inside the container and __get()
 is used to retrieve the instances from the container.</p>
 <p>Some month ago I extended
@@ -2466,7 +2736,7 @@ changes back into my branch and released a new version which also fixed
 another small bug. For me it works with both Netbeans 6.7.1 and 6.8
 Beta. I want to thank alexandre very much for this awesome contribution.</p>
 <p>What you can do now is chose the Coding Standard you want to use in an
-Options Dialog under the “Miscallenous” button. You can choose from a
+Options Dialog under the “Miscellaneous” button. You can choose from a
 list of pre-defined standards, or even enter your own if you use one.
 Additionally you can disable that warning are shown, so that with any
 given coding standard you only see the errors.</p>
@@ -2583,7 +2853,7 @@ He separated concerns of view and model that communicate via a Form, by
 calling just thee validation functions on the Form inside the mode. On
 request you could retrieve the model to the controller and view layers.
 I already wrote into his comments that I didn’t like the solution
-because it relys on implicit rules for the developers to use the Form
+because it relies on implicit rules for the developers to use the Form
 component correctly in all layers. Additionally the building of the form
 using this approach would be performed inside the model, although
 strictly speaking this is responsibility of the View Layer. Another
@@ -2652,7 +2922,7 @@ class WW_Model_FormMediator
 </div>
 </div></blockquote>
 <p>You can see the mediator has two different stages where errors can
-occour: When the form is not valid or the model is not valid. Both exits
+occur: When the form is not valid or the model is not valid. Both exits
 can be catched inside the controller and are the indicator that the form
 has to be displayed again for further input corrections. When successful
 the model returns a valid record that applies to the form and model
@@ -2660,7 +2930,7 @@ requirements and can be displayed. If this record should be persistent
 this would have been done inside the <strong>acceptFormRequest</strong> function
 already. An example using a very simple Model using the a BankAccount
 example. We have a form that validates all the incoming request data for
-a withdrawel of money, though does not validate it against the models
+a withdrawal of money, though does not validate it against the models
 internal state. Our BankAccountModel implements the
 <strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
 BankAccount. If found the given amount is withdrawn.</p>
@@ -2853,8 +3123,8 @@ proposal</a>,
 which will be a huge benefit to everything JSON that can be done with
 ZF. Foremost it is an integral part for the jQuery component which
 heavily relies on javascript callbacks.</p>
-<p>The Soap Autodiscover and WSDL classes compability with Java and .NET
-has been optimized due to great user feedback, aswell as some bugfixes
+<p>The Soap Autodiscover and WSDL classes compatibility with Java and .NET
+has been optimized due to great user feedback, as well as some bugfixes
 to the newly added WSDL type detection strategies.</p>
 <p>Additionally I went on another bug killing spree and fixed around 20-30
 old bugs in a wide range of different components.</p>
@@ -2867,7 +3137,7 @@ old bugs in a wide range of different components.</p>
             <title>On Publishing Webservices within MVC Frameworks</title>
             <description><![CDATA[<div class="section" id="on-publishing-webservices-within-mvc-frameworks">
 <h1>On Publishing Webservices within MVC Frameworks</h1>
-<p>Webservices are a very important part in todays enterprise applications.
+<p>Webservices are a very important part in today’s enterprise applications.
 They tie applications of different age or programming languages together
 or allow applications of different subcontracters to speak to each
 other. Because they use HTTP, a stateless network protocol, considerable
@@ -2951,7 +3221,7 @@ at all.</p>
 letter machinery. So read on for seven things you probably may not know
 about me.</p>
 <ul class="simple">
-<li>I will get my degree in some weeks, currently intensivly writting on
+<li>I will get my degree in some weeks, currently intensively writting on
 my thesis. My major is economics though. I probably won’t get a job
 with that sooner or later. I actually don’t want to, I have a job as
 programmer already.</li>
@@ -3219,7 +3489,7 @@ sudo passwd whitewashing
 su - whitewashing</pre>
 </div>
 <p>Now there is the possibility that with this user PHP and PEAR is not in
-your $PATH enviroment, so you might have to add it. In my case on Ubuntu
+your $PATH environment, so you might have to add it. In my case on Ubuntu
 i also had to switch the console from /bin/sh to /bin/bash for this
 user. Then we need to setup our application, I am going to use the Zend
 Framework project style here but with a little twist. We will add a
@@ -3322,7 +3592,7 @@ essentially a front-controller for your PHAR application. It also has
 mount capabilities that allow to import files or directories from
 outside into the PHAR context. This is a powerful feature that is
 required to distribute configurable applications like our blog.</p>
-<p>This screenshot shows how the application is currently structued in
+<p>This screenshot shows how the application is currently structured in
 development mode. In production its structure should look like:</p>
 <div class="highlight-python"><pre>whitewashing
 |--application
@@ -3343,7 +3613,7 @@ like:</p>
 define('EXTERNAL_APPLICATION_ROOT', __DIR__.&quot;/../&quot;);
 include EXTERNAL_APPLICATION_ROOT.&quot;/whitewashing.phar&quot;;</pre>
 </div>
-<p>Including a PHAR file essentially has two conesequences:</p>
+<p>Including a PHAR file essentially has two consequences:</p>
 <ul class="simple">
 <li>The PHAR path will be added to your include path.</li>
 <li>The stub file will be executed.</li>
@@ -3376,7 +3646,7 @@ at this location in the PHAR file. This allows us to distribute our
 application with a default configuration, but allows any user to replace
 the configuration files to fit the application to his need.</p>
 <p>The second bit loads Zend Framework Autoloader that is required by the
-bootstrapping mechanism. The third bit decides wheater this request is
+bootstrapping mechanism. The third bit decides whether this request is
 executed from the CLI- or the Web-Entry point of the application. The
 fourth bit, <tt class="docutils literal"><span class="pre">__HALT_COMPILER();</span></tt> is a technically required call inside
 your stub-file.</p>
@@ -3390,7 +3660,7 @@ possibly as a phing or ant task or something alike.</p>
 <p>Now what this build process does not manage is the creation of the
 application entry point php and .htaccess files, but since they won’t
 ever change its easy to add them to the build directory for now. An even
-more sophisiticated version of the build script would lead to the
+more sophisticated version of the build script would lead to the
 creation of an additional tar.gz of the complete application folder. Our
 deployment process would then be as easy as:</p>
 <ul class="simple">
@@ -3444,7 +3714,7 @@ post</a> on Dependency
 Injection containers and Zend_Application I was eager to find out if
 its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
 Container</a>
-into the Zend Framework. To my suprise its possible without having to
+into the Zend Framework. To my surprise it’s possible without having to
 make any changes to one of the two components. An example use-case would
 look like:</p>
 <blockquote>
@@ -3495,10 +3765,10 @@ The current version strikes my rather old machine with “just” 512mb to
 death. Building projects is not possible even when assigning eclipse all
 my available memory, because of an Java Heap Error (<a class="reference external" href="http://blog.wolff-hamburg.de/archives/20-Migrating-to-PDT.html">See this blog
 post</a>).
-This effectivly hinders you to use all the completion and hint features,
+This effectively hinders you to use all the completion and hint features,
 because PDT does not know about any functions, classes and their phpdoc
 descriptions.</p>
-<p>PDT is also missing some very important features. Marking all occurances
+<p>PDT is also missing some very important features. Marking all occurrences
 of a function, class, constant or variable on click for example. PHP
 Errors and Warnings are display in a way so that you won’t find them and
 if you do, you won’t understand what they mean.</p>
@@ -3569,7 +3839,7 @@ class SomeController extends WW_Controller_Scaffolding {
 
 Where $options is an array or Zend_Config object with any of the following keys:
 
-  'allow_edit_primary_key' True/false - Wheater the form allows you to set the
+  'allow_edit_primary_key' True/false - Whether the form allows you to set the
                           Primary Key fields or not
 
  'field_names' an Array of the Database Tables field names mapped to Label Names
@@ -3586,15 +3856,15 @@ Where $options is an array or Zend_Config object with any of the following keys:
 </div></blockquote>
 <p><strong>Todos &amp; Problems:</strong></p>
 <ul class="simple">
-<li>Many To Many Relationsships are not implemented yet (Using
+<li>Many To Many Relationships are not implemented yet (Using
 MultiSelec).</li>
 <li>Compound Keys are probably not working correctly</li>
-<li>Relationsships on non-primary key fields probably don’t work as
+<li>Relationships on non-primary key fields probably don’t work as
 expected</li>
-<li>Relationsships with lots of data are not scaled down for easy
+<li>Relationships with lots of data are not scaled down for easy
 administration.</li>
 </ul>
-<p>Please report any bugs and feature requests or recommodations to
+<p>Please report any bugs and feature requests or recommendations to
 <strong>kontakt at beberlei dot de</strong>.</p>
 </div>]]></description>
             <pubDate>Sun, 25 May 2008 00:00:00 +0200</pubDate>
@@ -3641,7 +3911,7 @@ foreach($hits AS $hit) {
 </div></blockquote>
 <p>The <a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">Tutorial Talk on Search
 Lucene</a>
-(given abote) uses an extended version of this delete routine snippet
+(given above) uses an extended version of this delete routine snippet
 that also checks if an article is up to date and does not have to be
 reindexed and deletes multiple entries of one article.</p>
 </div>]]></description>
@@ -3750,12 +4020,12 @@ existing Zend_Validate and Zend_Filter components as input for the
 generated form fields. Another plus is the handling of errors in input
 and re-entering/displaying text.</p>
 <p>There is also a neat feature of the Zend_Form component, which allows
-to <a class="reference external" href="http://framework.zend.com/manual/en/zend.form.quickstart.html#zend.form.quickstart.config">generate complete forms by passing an appropriatly formatted
+to <a class="reference external" href="http://framework.zend.com/manual/en/zend.form.quickstart.html#zend.form.quickstart.config">generate complete forms by passing an appropriately formatted
 Zend_Config_Ini object to the Zend_Form
 Constructor</a>.
 So my idea was, why not program an Eclipse Plugin allowing to rapidly
 generate and edit forms using a point-and-click plugin window approach,
-which would ultimatly generate your Form INI code.</p>
+which would ultimately generate your Form INI code.</p>
 <p>This might have been a great <a class="reference external" href="http://code.google.com/soc/">Google Summer of Code
 idea</a> for the Eclipse Foundation (since
 Zend is not taking part).</p>
@@ -3776,7 +4046,7 @@ caching</a>, which did not
 work in its original implementation due to different users groups
 sharing the same cached views.</p>
 <p>In the last days I came across two in depth tutorials on Zend_Acl and
-Zend_Auth integration to MVC. Most people propably saw the DevZone
+Zend_Auth integration to MVC. Most people probably saw the DevZone
 article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
 1)</a>”
 by Aldemar Bernal on the Frameworks Frontpage. Another good article was
@@ -3866,14 +4136,14 @@ that is held about three times a year, this last saturday on the topic:
 Frameworks and Content-Management-Systems.</p>
 <p>It was held in a very nice conference center in cologne, and from what I
 heard about 200 people attended. The first two topics were on
-<a class="reference external" href="http://www.joomla.org/">Joomla!</a> and bareer-free
+<a class="reference external" href="http://www.joomla.org/">Joomla!</a> and barrier-free
 <a class="reference external" href="http://www.typo3.org">Typo3</a>. Since I am more the framework guy, I
 did not enjoy them too much. At least I got some input on how a
-bareer-free website has to function. The Joomla! presentation supported
+barrier-free website has to function. The Joomla! presentation supported
 my prejudice, that programming in and for Joomla! produces ugly code.</p>
 <p>I did like the presentations on frameworks, the most interesting being
 the <a class="reference external" href="http://www.cakephp.org">CakePHP</a> presentation by <a class="reference external" href="http://teemow.com/">Timo
-Derstappen</a>, since I havent looked into Cake for
+Derstappen</a>, since I haven’t looked into Cake for
 about one and a half years. I have seen that with the new to come
 version 2, the framework became even better, now supporting easy code
 generation and flexible site generation. But its still somehow a Ruby
@@ -3884,7 +4154,7 @@ the creation of a blog using Zend Framework, being the Hello World
 example for frameworks. He specifically showed, that you can use
 anything you want as a model, a Zend_Db_Table object or any other
 object. He also showed something like a Data-Mapper pattern in his
-application. I got some ideas from this I propably will write about some
+application. I got some ideas from this I probably will write about some
 later time.</p>
 <p>I also enjoyed the <a class="reference external" href="http://www.rubyonrails.de">Rails</a> presentation,
 because I never got the chance to look the Ruby guys at work of the
@@ -3906,7 +4176,7 @@ highly recommend the Multimediatreff for the next time.</p>
 <p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
 Matthews post on Zend Devzone</a>)
 into the Whitewashing blog software via Zend_Cache and the Filesystem
-Backend. I ran some superficial Apache Benachmark tests to have a look
+Backend. I ran some superficial Apache Benchmark tests to have a look
 at the gain change in performance.</p>
 <p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
 Devzone</a> and a missing function
@@ -3924,7 +4194,7 @@ getCache() in the code fragment:</p>
 <p>I loaded the Plugin into the front controller and initialized it with a
 Zend_Config_Ini object. This all works very smoothly and caching is
 ready to begin.</p>
-<p>Testing came to the result that with 1000 requests, 10 of them concurent
+<p>Testing came to the result that with 1000 requests, 10 of them concurrent
 (ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
 this blog, the request time dropped by half, from six to three seconds
 (still lot of time, but this isn’t the best webserver).</p>
@@ -3954,11 +4224,11 @@ Waiting:      650 3055 1731.4   2928    7190
 Total:        809 3245 1757.8   3135    7475</pre>
 </div>
 <p>As said before this testing is superficial, but its gives a broad sense
-of what perfomance gain is possible with just some lines of code and a
+of what performance gain is possible with just some lines of code and a
 temporary directory. Using memcache will probably speed up the process
 another good amount.</p>
 <p>Later I realized that complete page caching (rather than block element
-caching) sucks when you inject admin area linkes into the navigation,
+caching) sucks when you inject admin area links into the navigation,
 which would allow non-logged in users to see parts of the admin area so
 I had to disable caching totally. You never know in the first place (you
 should though). I have to rework my admin area or extend my
@@ -3982,7 +4252,7 @@ choice is Dojo.</p>
 <p>Since Dojo is not my library of choice I would have to write a JQuery
 View Helper on my own or wait until somebody else releases one.</p>
 <p>But why not write javascript? Its very easy with all those libraries and
-addresses most cross browser incompabilities: <a class="reference external" href="http://www.b-list.org/weblog/2006/jul/02/django-and-ajax/">One
+addresses most cross browser incompatibilities: <a class="reference external" href="http://www.b-list.org/weblog/2006/jul/02/django-and-ajax/">One
 Django</a>,
 <a class="reference external" href="http://www.builtfromsource.com/2006/12/20/does-ajax-have-a-place-in-the-application-framework/">one Zend Framework
 developer</a>
@@ -3990,7 +4260,7 @@ argue framework and javascript coupling is not the way to go based on
 the arguments that its breaks the MVC pattern, leads to function calls
 equal to those in javascript in its framework respective language, and
 that javascript is actually something any good webdeveloper should be
-able to programm, even when its just using library components.</p>
+able to program, even when its just using library components.</p>
 <p>Using <a class="reference external" href="http://jquery.com">JQuery</a> without any help from tools for
 about a year now I can say there are still those days where javascript
 drives me mad, but most of the time I its working perfect. Since Ajax
@@ -4011,7 +4281,7 @@ that save time on integration after the first initial setup.</p>
 <h1>Simplifying ZF: Scope of Variables in View and Controller</h1>
 <p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
 Ass!</a>
-article referend earlier I came up with some simplifications of the Zend
+article referenced earlier I came up with some simplifications of the Zend
 View and Controller variable coupling.</p>
 <p>Using some code in the article I created a new Zend_View_Extended
 class which offers the possibility to circumvent the access of variables
@@ -4031,11 +4301,11 @@ object as an own variable in the script template:</p>
 </div></blockquote>
 <p>Now rather than calling $this-&gt;data you can call $data in a script
 template. Of course this comes with additional overhead of each variable
-being registered twice. I dont know how this handles performance wise,
+being registered twice. I don’t know how this handles performance wise,
 but maybe unsetting $this variables after copying solves this. Also you
 have to overwrite the initView() method of your base Controller Action
 class.</p>
-<p>Another simplyfication would be to allow for the following direct
+<p>Another simplification would be to allow for the following direct
 variable settings in any Controller Action, which would shorten the
 $this-&gt;view-&gt;variable call, to derive the same functionality via
 $this-&gt;variable. I haven’t tested this though.</p>
@@ -4161,7 +4431,7 @@ pass a Model to the constructor as second argument:</p>
 
     /**
      * this overrides the original Zend_Form Constructor and skips
-     * the decorator initilisation, because this is now being handled
+     * the decorator initialisation, because this is now being handled
      * by View Helpers
      */
     public function __construct($options=null, $model=null)
@@ -4244,9 +4514,9 @@ supposed to do.</p>
 <p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
 with the alpha version, since I am currently searching for a good
 framework for a high performance application. My first benchmarks on
-ezcMvc just say: wh000pie! Alot faster as compared to the Zend
+ezcMvc just say: wh000pie! A lot faster as compared to the Zend
 Framework.
-Still ezcMvc is VERY loosly coupled and you have to write lots of lines
+Still ezcMvc is VERY loosely coupled and you have to write lots of lines
 to get where ZF gets you with less (more magic involved). As you can see
 from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
 component</a>
@@ -4346,7 +4616,7 @@ of work you have to cope with in the current standard setup.</p>
 <p>In the next days the next mini release of the Zend Framework will be
 released and I want to keep you up to date of my progress on it.
 I got lots of feedback on the jQuery component and also had the
-possiblity to fix some bugs and documentation issues. I also fixed some
+possibility to fix some bugs and documentation issues. I also fixed some
 minor bugs that have been in the Zend_Soap_Wsdl stuff i added for the
 1.7 release.
 And a question for the 1.8 release that is due around February 2009:
@@ -4367,7 +4637,7 @@ Zend Amf, the new component sponsored by Adobe to support Adobe Flash
 (or other tools) to PHP communications.</p>
 <p>Besides the buzz there is some stuff from me getting into the Zend
 Framework. jQuery View and Form Helpers will allow you to throw the Dojo
-stuff away and use the great jQuery. This is of course inheritly
+stuff away and use the great jQuery. This is of course inherently
 subjective, but still different opportunities are always great.</p>
 <p>Additionally I have been fixing quite some bugs on the Zend Soap
 component and will manage to fix further stuff until the 1.7 release I
@@ -4394,7 +4664,7 @@ be parsed into intermediate PHP code.</p>
 <ol class="arabic simple">
 <li>You cannot currently use UTF8 encoding since htmlentities deep in the
 escape mechanism cannot be given the utf-8 specification.</li>
-<li>Triple or higher inheritence may not work under some circumstances.
+<li>Triple or higher inheritance may not work under some circumstances.
 Which sucks.</li>
 </ol>
 <p>I sadly have no time currently to fix any of the issues poping up with
@@ -4495,7 +4765,7 @@ any description at all other than a link to where they are defined in
 the project. There are no short examples given to any function like
 <a class="reference external" href="http://www.jquery.com">jQuery</a> does.</p>
 <p>In general I think the Dojos Site is too complex and hard to navigate.
-The layout seems to change massivly on each click and you it is hard
+The layout seems to change massively on each click and you it is hard
 recognize common patterns. Dear Dojo Team, please make your project more
 accessible!</p>
 </div>]]></description>
@@ -4596,7 +4866,7 @@ powerful helper is reasonable.</p>
 <p>The usage of Zend_Soap is quite simple and straightforward as is
 PHP5’s internal SOAP Service and might therefore gain widespread
 use. I have never tested PEAR’s WSDL Autodiscovery, so i cannot draw
-comparissons.</p>
+comparisons.</p>
 </div></blockquote>
 </div>]]></description>
             <pubDate>Fri, 08 Aug 2008 00:00:00 +0200</pubDate>
@@ -4645,16 +4915,16 @@ following include strategies were tested (I’ve used the Zend Framework
 <ol class="arabic simple">
 <li>Zend_Loader Autoload, Default PHP Include Path</li>
 <li>Zend_Loader Autoload, Swapped Include Path</li>
-<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependancies,
+<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies,
 Zend_Loader Autoload, Swapped Include Path</li>
-<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependancies, no
+<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies, no
 autoload, used <a class="reference external" href="http://pecl.php.net/package/inclued">inclued</a> to
-find file dependancies and require (not _once) them all on startup.</li>
+find file dependencies and require (not _once) them all on startup.</li>
 </ol>
 <p>To strip all the require_once from the Zend Framework source code, i
 built a little script to do that for me. For the last test I wrote a
 little script that used the <strong>inclued_get_data()</strong> function to built a
-correct dependancy tree for all includes. I have put each configuration
+correct dependency tree for all includes. I have put each configuration
 of my Zend Framework install 30 seconds under siege with 5 concurrent
 requests. I have rerun all tests with APC and without APC.</p>
 <div class="section" id="results-without-apc">
@@ -4739,7 +5009,7 @@ faster than the default configuration.</p>
 what include strategy you are following (so there is excuse not using
 APC). But switching between different include strategies still makes a
 huge difference in performance. Percentage-wise this is a larger
-difference than without APC. Requiring all dependend scripts up front
+difference than without APC. Requiring all dependent scripts up front
 takes only about 63% of the default configuration time, which can make a
 major difference on any production server.</p>
 <p>In an application knowing which includes of the Zend Framework will be
@@ -4784,7 +5054,7 @@ repository.</p>
             <description><![CDATA[<div class="section" id="import-and-pythonpath-problems-with-pydev-and-linux">
 <h1>Import and PYTHONPATH Problems with PyDev and Linux</h1>
 <p>Today is began to configure my <a class="reference external" href="http://pydev.sf.net">PyDev</a> Eclipse
-enviroment since I want to learn Python and need it for a programming
+environment since I want to learn Python and need it for a programming
 aspect of my forthcoming diploma thesis. I ran into several difficulties
 getting the plugins run dialog to work. It seems that configuring the
 python interpreter under linux and adding all the correct include paths
@@ -4823,14 +5093,14 @@ JSON data from the server. I included a demo to show this feature.</p>
 <a class="reference external" href="http://www.beberlei.de/sources/calypso-dtl-0.1.tar.gz">Tarball</a> and
 there is also a
 <a class="reference external" href="http://www.beberlei.de/sources/README_Dtl.txt">README</a> with some
-information. I would appreciate if anbody would test the lib and gave
+information. I would appreciate if anybody would test the lib and gave
 some feedback.</p>
 <p>I will soon start to push this component in the ZF proposal process. I
 still have to finish the class structure before I can move to the Ready
 for Review stage. The library will max end up in Zend Extras. Therefore
 I will have to say again: This View Renderer shall be no replacement for
 the current Zend View. It is only an alternative which allows for some
-neat functionality and stricter View / Controller logic seperation.</p>
+neat functionality and stricter View / Controller logic separation.</p>
 <p><strong>UPDATE:</strong> I finished a little page for what I call the Calypso DTL.
 See it here: <a class="reference external" href="http://www.beberlei.de/calypso/">Calypso Site</a>. I have
 put up a little tutorial how to get the Template Engine running with
@@ -4845,8 +5115,8 @@ Zend Framework and as a standalone component.</p>
             <description><![CDATA[<div class="section" id="greaat-python-can-control-your-wiimote">
 <h1>Greaat, Python can control your Wiimote</h1>
 <p>In the last days I had lots of time to play with my Wiimote and its
-bluetooth capabilities. Sadly there is activly supported driver in non-C
-(and I am not the biggest C programmmer). I found this little prototype
+bluetooth capabilities. Sadly there is actively supported driver in non-C
+(and I am not the biggest C programmer). I found this little prototype
 driver written in Python by Will Woods which is using pyBluez to
 communicate with my wiimote and have extended it quite a bit.
 <a class="reference external" href="http://www.wiili.org">WiiLinux</a> is a huge resource that offers
@@ -4928,7 +5198,7 @@ of size n&gt;=3 given a starting position. I used a backtracking algorithm
 (at least that is what wikipedia tells me it is), by trying all possible
 combinations and setting steps back, when they do not lead to a
 solution.</p>
-<p>Beginning with n = 7 my algorithmus gets very slow, caused by the
+<p>Beginning with n = 7 my algorithms gets very slow, caused by the
 backtracking algorithm which is not very efficient. I found some
 interesting articles regarding this problem using graph theory to solve
 it. Some pretty big minds have thought about the problem, I guess its
@@ -5004,10 +5274,10 @@ perhaps I will do so.</p>
 so much the pro in writing desktop applications. I know little or no
 C/C++/Java, but want to change that soon. Since I use KDE for both my
 desktop and laptop it seems reasonable to write a KDE 4 application.</p>
-<p>What about idaes? I wanted to write a game for so long and in the last
+<p>What about ideas? I wanted to write a game for so long and in the last
 years my girlfriend and I tried lots of 2 person player games. One of
 them I wanted to re-create as a computer game.</p>
-<p>The possibilites are:</p>
+<p>The possibilities are:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Game_of_the_Amazons">The Game of the
 Amazons</a></li>
@@ -5016,9 +5286,9 @@ variant.</li>
 </ul>
 <p>All 3 games are time intensive and very strategic. Moruba can be played
 for lots of hours (My gf and I played one game for about 5-6 hours). Its
-propably more easy to write algorithms for the computer player of Oware
+probably more easy to write algorithms for the computer player of Oware
 or Moruba than for Amazons, but that should not affect my decision. I
-will decide in the next weeks, but I should propably concentrate on my
+will decide in the next weeks, but I should probably concentrate on my
 semesters final exams in the first place.</p>
 <p><strong>Update:</strong> Moruba seems to have different rules than the game we are
 playing. I will elaborate on that soon.</p>
@@ -5057,7 +5327,7 @@ Zend_Loader doesn’t seem to help at first, its just another command
 (Zend_Loader::loadClass or ::loadFile). It sucks to register lots of
 autoload paths too.</p>
 <p>I wrote my own Zend_Loader child class. It grabs all include paths from
-a config File using the Zend_Config class, and completly frees you of
+a config File using the Zend_Config class, and completely frees you of
 thinking about includes.</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class WWLoader extends Zend_Loader
@@ -5136,7 +5406,7 @@ Zend_Loader::registerAutoload('WWLoader');</pre>
 <p>Ok, the description of the Link referring to the <a class="reference external" href="http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework">version 0.9 solution
 for Managing 404
 errors</a>
-due to missing modules or actions is wrong. It is not enought to replace
+due to missing modules or actions is wrong. It is not enough to replace
 Zend::loadClass with Zend_Loader::loadClass. Other functions have been
 renamed, my current snippet is:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="x">/**</span>
@@ -5236,7 +5506,7 @@ Zend_Validate_Hostname, and the not empty message. To allow for user
 friendly messages one had to make child objects of each of the
 Validators and edit the error messages accordingly. I avoid this by
 printing my own errors from outside the Zend_Filter_Input, rather than
-using the object for what it is propably supposed to do.</p>
+using the object for what it is probably supposed to do.</p>
 </div>]]></description>
             <pubDate>Thu, 24 Jan 2008 00:00:00 +0100</pubDate>
         </item>
@@ -5291,32 +5561,32 @@ Mainz, Germany was the first php conference I have been to. It ended
 some hours ago and i am quite happy to have been there. I had several
 great discussions which pointed me to new stuff (to follow) and also met
 great people.</p>
-<p>First thing that completly fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
+<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
 support</a>. It feels much
 more easy to use than Eclipse PDT. Its faster (from the little tests i
 could make) and does not strike when you add several large libraries
 into the include path. It offers much more help on refactoring and
 organizing than Eclipse PDT does, for example it offers to generate
-getter/setter, constructor, inheritence methods. Much thanks to Petr who
+getter/setter, constructor, inheritance methods. Much thanks to Petr who
 explained to me in detail how NetBeans works.</p>
 <p>Ez had lots of people at the conference (to Kore and Tobias i spoke in
 more detail) and I had some talks with them about
 <a class="reference external" href="http://www.ezcomponents.org">ezComponents</a>. This was especially
-interesting after the great session on object persistence in ez, aswell
+interesting after the great session on object persistence in ez, as well
 when I heard that ezcMvc, a model-view-controller component, wil be
-included in the next release of ezc in Dezember 2008. ezComponents has a
+included in the next release of ezc in December 2008. ezComponents has a
 Database layer, that does not seem to enforce too much overhead on you
 but still offers great extensibility through a persistence layer and a
 library that offers to build Database Diffs. The latter feature is
-really great and I will definatly have a look at this.</p>
+really great and I will definitely have a look at this.</p>
 <p>Sebastian Bergmann had a great talk on MapReduce which is an old LISP
 programming paradigm to work with huge datasets. This style was recently
 <a class="reference external" href="http://labs.google.com/papers/mapreduce.html">revived by Google</a>
 because tasks can easily be split and distributed for computing on
-differend nodes with hundrets of threads. Implementing a working example
+different nodes with hundreds of threads. Implementing a working example
 in PHP is really easy, just finding a good way to process your large
 data seems to be a topic that needs lots of thinking.</p>
-<p>Addtional great things:</p>
+<p>Additional great things:</p>
 <ul class="simple">
 <li>Meet Thomas, the guy that wrote Weaverslave (I use it for years to
 build simple php applications).</li>
@@ -5327,19 +5597,19 @@ Feder that will process xdebug cachegrind files via a webinterface
 <li>Jan Lehnhart and Kore Nordmann had some great things to say about
 <a class="reference external" href="http://incubator.apache.org/couchdb/">CouchDB</a>.</li>
 <li>Brian Acker talked about <a class="reference external" href="https://launchpad.net/drizzle">Drizzle</a>,
-which is a forked MySQL that throws out lots of legecy stuff from
+which is a forked MySQL that throws out lots of legacy stuff from
 MySQL out, to build a micro-kernel database server that suites the
 web.</li>
 <li>Ulf Wendel talked about Mysqli + Mysqlnd.
 <a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd/">Mysqlnd</a>
 will be a new internal driver for PHP to access MySQL through Mysqli
 and optimizes processing and memory consumption. Additionally Mysqli
-will be extended to offer asynchroneous queries that can be fired at
+will be extended to offer asynchronous queries that can be fired at
 the database and polled latter. To be included in PHP 5.3</li>
 </ul>
-<p>Not so good things: There were absolutly to few power lines. People
+<p>Not so good things: There were absolutely to few power lines. People
 using their notebooks were packed on hotspots where power was available.
-Please more power plug possibilites next time!</p>
+Please more power plug possibilities next time!</p>
 </div>]]></description>
             <pubDate>Thu, 30 Oct 2008 00:00:00 +0100</pubDate>
         </item>
@@ -5351,7 +5621,7 @@ Please more power plug possibilites next time!</p>
 <h1>My recent ZF ongoings: JQuery, Action Controller, CouchDb</h1>
 <p>In the last weeks lots of stuff came up for me regarding the Zend
 Framework. My <a class="reference external" href="http://jquery.com">jQuery</a> component is finished, i
-have even commited the documentation into the SVN already. Do read it
+have even committed the documentation into the SVN already. Do read it
 you have to be either an XML fetishist or compile it using a docbook
 compiler. Lots of questions about ZF and jQuery come up regularly on the
 mailing lists so I really look forward for the first ZF 1.7 release
@@ -5362,7 +5632,7 @@ Nokia</a>.
 Microsoft will include jQuery as the framework to go into its Webbased
 ASP.Net applications and Nokia will include the library in their mobile
 phones.</p>
-<p>Additionaly i reported an <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-4385">important issue
+<p>Additionally i reported an <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-4385">important issue
 (ZF-4385)</a> that
 offers a patch to create an interface of the Action Controller and
 therefore allows everyone to implement their own action controller
@@ -5396,7 +5666,7 @@ integrates lots of stuff of the Zym component).</p>
 class</a> I
 realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
 calculate correlation coefficients like Mathlab has.</p>
-<p>Our assignement was to replicate the Dynamic Correlations graph in
+<p>Our assignment was to replicate the Dynamic Correlations graph in
 <a class="reference external" href="http://www.amazon.de/gp/redirect.html?ie=UTF8&amp;location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&amp;s=books-intl-de&amp;qid=1209289935&amp;sr=8-1&amp;site-redirect=de&amp;tag=economystuden-21&amp;linkCode=ur2&amp;camp=1638&amp;creative=6742">Walshs’ Monetary Theory and
 Policy</a>
 for European Data, which shows the cross-correlation of different
@@ -5502,31 +5772,31 @@ fun.</p>
             <description><![CDATA[<div class="section" id="dependency-injection-via-interface-in-php-an-example">
 <h1>Dependency Injection via Interface in PHP: An example</h1>
 <p>Personal projects and work currently both force me to think about
-application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came accross dependency
+application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
 injection</a> the
 other day. Its quite a complex Design Pattern and hard to grasp, even
 with the number of examples you can find in the internet. Basically
 Dependency Injection means you register components that might be a
 dependency for other components and when loading new classes via the
-dependency injection framework, it knows of this relationsships and
+dependency injection framework, it knows of this relationships and
 assembles the object in need and all its dependencies and returns them
-fully initialized. This pattern leads to completly encapsulated objects
+fully initialized. This pattern leads to completely encapsulated objects
 where any class in the object graph can be exchanged for a new
 implementation without breaking all its dependencies. It also makes
-testing complex components and object relationsships very easy.</p>
-<p>Asfar as I could find out, three different types of Dependency Injection
+testing complex components and object relationships very easy.</p>
+<p>As far as I could find out, three different types of Dependency Injection
 implementations exist: Via Constructor, via Setter and via Interfaces.
 There exist implementations of Dependency Injection for Java (Spring)
 that are configured via XML config files and seem very complex. They are
-also hard to read in code I pressume, since you always have to be aware
+also hard to read in code I presume, since you always have to be aware
 of the current application configuration. There are also some more
 lightweight implementations (PicoContainer) that assemble their
-relationsships in the application and work with config methods that act
-as configuration of the dependancies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
+relationships in the application and work with config methods that act
+as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
 implementation via
 interfaces</a>,
 which seems most accessible for me.</p>
-<p>All PHP clones of any dependancy injection framework seem to go the
+<p>All PHP clones of any dependency injection framework seem to go the
 complex way via configuration though. With traits and multiple class
 inheritance on the horizon, some kind of interface injection seems
 mighty powerful though. So I implemented a really lightweight
@@ -5555,12 +5825,12 @@ instantiated via:</p>
 injectDbAdapter with the given Database Adapter. A negative consequence
 of this approach is that you have to implement the inject methods for
 all interfaces in your concrete class implementations. With Traits
-(multiple class inheritence) being a new feature in PHP soon, injection
+(multiple class inheritance) being a new feature in PHP soon, injection
 via parent classes seems to become a very powerful approach though,
 which can handle the concrete implementations.</p>
-<p>The Container takes care of all the dependancy building, so when testing
+<p>The Container takes care of all the dependency building, so when testing
 your components you can register lots of mock objects. You can also
-exchange dependancies for only a subset of objects very easily. I
+exchange dependencies for only a subset of objects very easily. I
 implemented a method “Whitewashing_Container::registerClassComponent”,
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
@@ -5568,9 +5838,9 @@ parameter $localInterfaceOverride for the highest priority:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
 </pre></div>
 </div>
-<p>Speedwise the usage of the Container reduces class instatiation by about
+<p>Speedwise the usage of the Container reduces class instantiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
-on my machine. But naturally only classes with dependancies and lots of
+on my machine. But naturally only classes with dependencies and lots of
 them should be using this mechanism and with good application design,
 this shouldn’t be to many. You can download
 <a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
@@ -5618,7 +5888,7 @@ wraps around it and requires all the dependencies:</p>
     protected $front;
 
     /**
-     * Create Front Controller for Zend Framework using explicity dependencies created by Sphicy.
+     * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
      *
      * @param Zend_Controller_Request_Abstract      $request
      * @param Zend_Controller_Response_Abstract     $response
@@ -5739,7 +6009,7 @@ Zend_Form_Decorator_Form. What we then realize is, that this is just
 using a view helper to render, so what we need additionally is a
 “My_JQuery_View_Helper_AjaxForm” that extends from
 “Zend_View_Helper_Form”. The code of the view helper will have to
-look as follows to fullfil our needs:</p>
+look as follows to fulfil our needs:</p>
 <blockquote>
 <div><div class="highlight-python"><pre>require_once &quot;Zend/View/Helper/Form.php&quot;;class ZendX_JQuery_View_Helper_AjaxForm extends Zend_View_Helper_Form{  /**   * Contains reference to the jQuery view helper   *   * @var ZendX_JQuery_View_Helper_JQuery_Container   */  protected $jquery;  /**   * Set view and enable jQuery Core and UI libraries   *   * @param Zend_View_Interface $view   * @return ZendX_JQuery_View_Helper_Widget   */  public function setView(Zend_View_Interface $view)  {    parent::setView($view);    $this-&gt;jquery = $this-&gt;view-&gt;jQuery();    $this-&gt;jquery-&gt;enable()           -&gt;uiEnable();    return $this;  }  public function ajaxForm($name, $attribs = null, $content = false, array $options=array())  {    $id = $name;    if(isset($attribs['id'])) {      $id = $attribs['id'];    }    if(!isset($options['clearForm'])) {      $options['clearForm'] = true;    }    if(count($options) &gt; 0) {      require_once &quot;Zend/Json.php&quot;;      $jsonOptions = Zend_Json::encode($options);      // Fix Callbacks if present      if(isset($options['beforeSubmit'])) {        $jsonOptions = str_replace('&quot;beforeSubmit&quot;:&quot;'.$options['beforeSubmit'].'&quot;', '&quot;beforeSubmit&quot;:'.$options['beforeSubmit'], $jsonOptions);      }      if(isset($options['success'])) {        $jsonOptions = str_replace('&quot;success&quot;:&quot;'.$options['success'].'&quot;', '&quot;success&quot;:'.$options['success'], $jsonOptions);      }    } else {      $jsonOptions = &quot;{}&quot;;    }    $this-&gt;jquery-&gt;addOnLoad(sprintf(      '$(&quot;#%s&quot;).ajaxForm(%s)', $id, $jsonOptions    ));    return parent::form($name, $attribs, $content);  }}</pre>
 </div>
@@ -5771,7 +6041,7 @@ handling the Zend_Form instance.</p>
 </div></blockquote>
 <p>This has to be processed by a callback function of the AjaxForm and
 which may for example look like the following which uses a predefined
-div box (#formMessages, dont forget to implement it) to render either
+div box (#formMessages, don’t forget to implement it) to render either
 the success or the error messages.</p>
 <blockquote>
 <div><div class="highlight-python"><pre>$form-&gt;addDecorator(array('AjaxForm', array(  'jQueryParams' =&gt; array(    'success' =&gt; &quot;formCallback1&quot;,   ),)));$view-&gt;jQuery()-&gt;addJavascript('function formCallback1(data) {  if(data.errors) {    $(&quot;#formMessages&quot;).append(&quot;&lt;ul&gt;&quot;);    for each(var item in data.errors) {      $(&quot;#formMessages&quot;).append(&quot;&lt;li&gt;&quot;+item+&quot;&lt;/li&gt;&quot;);    }    $(&quot;#formMessages&quot;).append(&quot;&lt;/ul&gt;&quot;);  } else {    $(&quot;#formMessages&quot;).html(data.success);  }}');</pre>
@@ -5789,9 +6059,9 @@ of this series, so be aware of new content soonish.</p>
         <item>
             <link>http://www.whitewashing.de/2008/12/18/dependecy-injection-the-juicy-way.html</link>
             <guid>http://www.whitewashing.de/2008/12/18/dependecy-injection-the-juicy-way.html</guid>
-            <title>Dependecy Injection the juicy way</title>
-            <description><![CDATA[<div class="section" id="dependecy-injection-the-juicy-way">
-<h1>Dependecy Injection the juicy way</h1>
+            <title>Dependency Injection the juicy way</title>
+            <description><![CDATA[<div class="section" id="dependency-injection-the-juicy-way">
+<h1>Dependency Injection the juicy way</h1>
 <p>I have written on dependency injection before and <a class="reference external" href="http://www.whitewashing.de/blog/articles/83">came up with a
 solution for PHP via interface
 injection</a>. Thinking
@@ -5799,7 +6069,7 @@ about it twice I didn’t like it very much. Its too much overkill that
 you have to implement all setter methods again and again.</p>
 <p>Still dependency injection is the way to write good, testable and easily
 exchanged and re-wired object graphs. I tried to do lots of dependency
-injection via constructor lately and realized that it polutes my
+injection via constructor lately and realized that it pollutes my
 constructors when my object graph is too deep.</p>
 <p>An example: When I setup my database connection in the bootstrap file
 and encapsulate it in my model creation factory object, i have to insert
@@ -5815,7 +6085,7 @@ where he argues in favour of dependency injection and debunks singletons
 as being evil (he does that on his blog too). From there I learnt about
 <a class="reference external" href="http://code.google.com/p/google-guice/">Guice</a>, a dependency
 injection framework for Java by Google.</p>
-<p>What I like about Guice: Its easy to use and its immediatly obvious to
+<p>What I like about Guice: Its easy to use and its immediately obvious to
 someone without experience, why it works so good and you don’t have to
 hand down objects deep down the object graph. I cloned the basic
 functionality for PHP and an example would work as follows.</p>
@@ -6030,7 +6300,7 @@ the code. Its very simple but by default the most powerful mvc solution
 in the PHP market. People working with unittests will like it very much,
 since all the parts are perfectly separated from each other allowing to
 test controllers, views, routers and filters in complete separation.</p>
-<p>To show one very simple example howto benefit of the seperation of view
+<p>To show one very simple example howto benefit of the separation of view
 and controllers. If we need a view in both html and pdf, this should
 generally make no difference for the controller. We add two routes, one
 for the pdf one for the html view that execute the same controller and
@@ -6048,16 +6318,16 @@ response writer, nothing more.</p>
 </div></blockquote>
 <p>Now both <strong>myHtmlView</strong> and <strong>myPdfView</strong> can create their
 ezcMvcResponse objects that fill the response body depending on their
-type. Please note that overwritting createResponseBody() in myPdfView is
-a shortcut that circumventes me having to write a new PDF View Handler
+type. Please note that overwriting createResponseBody() in myPdfView is
+a shortcut that circumvents me having to write a new PDF View Handler
 (which would be the way to go).</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = &quot;application/pdf&quot;;   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}</pre>
 </div>
 </div></blockquote>
-<p>Now all the the logic that is potentially in the controller is completly
-seperated from the view handling that may depend on the routing
-information not on the controller. And views can be tested seperatly
+<p>Now all the the logic that is potentially in the controller is completely
+separated from the view handling that may depend on the routing
+information not on the controller. And views can be tested separately
 from the controller result. Testability is very high.</p>
 </div>]]></description>
             <pubDate>Wed, 03 Dec 2008 00:00:00 +0100</pubDate>
@@ -6103,7 +6373,7 @@ http request methods:</p>
 </div>
 </div></blockquote>
 <p>This very simple extension is independent of the advanced request parser
-given above, so you could use it separatly. In the light of our delete
+given above, so you could use it separately. In the light of our delete
 user example, you would use the new router in the following way:</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class myRouter extends ezcMvcRouter{  public function createRoutes()  {    return array(      new myMvcRestRoute( 'GET', '/users/:id/delete', 'UserController', 'deleteDialog' ),      new myMvcRestRoute( 'POST', '/users/:id/delete', 'UserController', 'delete' ),    );  }}</pre>
@@ -6123,13 +6393,13 @@ user example, you would use the new router in the following way:</p>
 blog</a> that
 <a class="reference external" href="http://ui.jquery.com">jQuery UI 1.6</a> will not be shipped with
 AutoComplete and Spinner Plugin support. No further delay, for the
-orginal august 2008 estimated release, is wanted.</p>
+original august 2008 estimated release, is wanted.</p>
 <p>This brings about a problem on
 <a class="reference external" href="http://framework.zend.com/manual/en/zendx.jquery.html">ZendX_JQuery</a>.
 All view helpers and decorators that depend on AutoComplete and Spinner
 Plugins can only be run with SVN trunk or 1.6 release candidates, which
 have known bugs and problems.</p>
-<p>I am adding a compability table to the ZendX jQuery manual today that
+<p>I am adding a compatibility table to the ZendX jQuery manual today that
 will make its way to the manual of the 1.7.2 release. This will
 hopefully help and guide everyone to the correct dependencies.</p>
 </div>]]></description>
@@ -6154,7 +6424,7 @@ function call you can generate an XmlHttpRequest that updates a
 specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
 Ajax</a>)</p>
 <p>Problematic are the next ideas: Additional Helpers will allow to
-specifiy the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
+specify the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
 (DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/">jQuery
 Autocomplete</a>
 or <a class="reference external" href="http://malsup.com/jquery/form/">jQuery Form</a> (AjaxForm and
@@ -6282,7 +6552,7 @@ Additionally you can also use the same template to render any new
 comment to the comment list using via an ajax form submit, returning the
 (model or form) filtered data via JSON and appending it to the comment
 list using the DojoX DTL parser. For non-JS browsers you can always use
-a &lt;noscript&gt; variant to render the templates completly server-side.</p>
+a &lt;noscript&gt; variant to render the templates completely server-side.</p>
 <p>This generally being a cool idea since it makes developing applications
 with AJAX technology very easy I began to port the DTL to the Zend
 Framework and the whole weekend later I got a working implementation
@@ -6315,9 +6585,9 @@ possibility for rapid development of Javascript/Ajax/Form components
 with jQuery and Zend Framework.</p>
 <p>One could offer a complete dependency downloadable archive with all the
 CSS, Javascript and Images inside, but this would be very complex to
-maintain. Looking at the future Zend Tool capabilites one possibilty
+maintain. Looking at the future Zend Tool capabilities one possibility
 would be to offer a download client for all the relevant jQuery plugins,
-but there would have to be a man-middle-server that maintaines the most
+but there would have to be a man-middle-server that maintains the most
 up to date locations of all the plugins, which also has to be
 maintained. Does anybody have a better solution to solve this problem?
 Perhaps the jQuery Team needs to be made aware that they need a CDN for
@@ -6327,12 +6597,12 @@ Helper (mostly copy paste and simple rewrites from Matthews Dojo
 component) and a HtmlElement Form Helper which constructs a Date-Picker
 from within the template. This is very easy to use and looks great. In
 the next days I will add further helpers for the jQuery plugins I use in
-my day to day work live and hope to present a demo. I might even optin
+my day to day work live and hope to present a demo. I might even opting
 for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
 <p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
 list</a>
 stating that a CDN is planned for the jQuery UI library. Sadly this does
-not include plugins for which one might desperatly need a View Helper
+not include plugins for which one might desperately need a View Helper
 except for maybe the Date Picker. I will post further comments on this
 issue in the near future.</p>
 </div>]]></description>

@@ -41,7 +41,7 @@ indexed before:
 
 The `Tutorial Talk on Search
 Lucene <http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf>`_
-(given abote) uses an extended version of this delete routine snippet
+(given above) uses an extended version of this delete routine snippet
 that also checks if an article is up to date and does not have to be
 reindexed and deletes multiple entries of one article.
 

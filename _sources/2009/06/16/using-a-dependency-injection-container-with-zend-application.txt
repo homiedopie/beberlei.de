@@ -17,12 +17,12 @@ or ORMs implemented in PHP, including two written by myself (an
 one <http://github.com/beberlei/yadif/tree/master>`_). Its an awesome
 pattern if used on a larger scale and can (re-) wire a complex business
 application according to a clients needs without having to change much
-of the domain code. It aims at a complete seperation of object
+of the domain code. It aims at a complete separation of object
 instantiation and dependency tracking from the business logic.
 
 Beginning with version 1.8 Zend Framework is able to integrate any of
 these DI containers into its **Zend\_Application** component easily. The
-Application component intializes a set of common resources and pushes
+Application component initializes a set of common resources and pushes
 them into the MVC stack as additional Front Controller parameters.
 Technically a **Zend\_Registry** instance holds all these resources with
 their respective resource names as keys. The resources are accessible
@@ -55,7 +55,7 @@ Injection in mind and is not tied to the use of Zend\_Registry. Only
 three magic methods are required by any container that wants to be
 Zend\_Application compliant: \_\_get(), \_\_set() and \_\_isset(). Each
 instantiated resource is pushed via \_\_set() into the container. If
-required by another resource, \_\_isset() is used to check wheater a
+required by another resource, \_\_isset() is used to check whether a
 resource with the given name exists inside the container and \_\_get()
 is used to retrieve the instances from the container.
 

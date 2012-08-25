@@ -33,6 +33,7 @@
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
     <link rel="next" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" />
+    <link rel="prev" title="Decoupling applications with Domains Events" href="../25/decoupling_applications_with_domain_events.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
   <body>
@@ -66,6 +67,9 @@
     
     <div class="related">
         <ul>
+            <li>
+                 &laquo; <a href="../25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+            </li>
             <li class="right">
                 <a href="../18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a> &raquo; 
             </li>
@@ -82,11 +86,11 @@ abstraction technology that converts rows to objects, then you will probably
 use getter/setter methods or properties (C#) to encapsulate object properties.</p>
 <p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
 at the default <tt class="docutils literal"><span class="pre">User</span></tt> entity from the Symfony2 FOSUserBundle plugin for
-example: A collosus of getter/setter methods with nearly no real business
+example: A colossus of getter/setter methods with nearly no real business
 logic. This is how most of our persistence related objects look like in PHP.
-A Rails ActiceRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines &#8220;Issue&#8221;</a> avoids
+A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines &#8220;Issue&#8221;</a> avoids
 the explicit getter/setters, however generates accessors magically for you.
-Nevertheless you have to add considerable amound of code to configure all the
+Nevertheless you have to add considerable amount of code to configure all the
 properties. And code using these active records becomes ambiguous as well.</p>
 <p>Why do we use getters/setters so much?</p>
 <ul class="simple">
@@ -98,7 +102,7 @@ automatically.</li>
 <li>It became natural in OOP to have write access to every field.</li>
 </ul>
 <p>However Getters/setters <a class="reference external" href="http://en.wikipedia.org/wiki/Open/closed_principle">violate the open/closed principle</a>, prevent information
-hiding and are <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
+hiding and <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
 (<a class="reference external" href="http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html">Long version</a>). Using
 getters and setters allows to <em>decouples</em> the business logic for setting values from the
 actual storage. Something that object-orientation was suppose to avoid.</p>
@@ -173,12 +177,12 @@ model, using the visitor pattern in combination with view models:</p>
 <li>Why use the Post model in memory, when you are only passing <tt class="docutils literal"><span class="pre">PostView</span></tt>
 instances to the controllers and views only anyways? Its much more efficient
 to have the database map to the view objects directly. This is what CQRS
-postulates as seperation of read- and write model.</li>
+postulates as separation of read- and write model.</li>
 <li>You have to write additional classes for every entity (Data transfer objects)
 instead of passing the entities directly to the view. But if you want to
-cleanly seperate the model from the application/framework, you don&#8217;t get
+cleanly separate the model from the application/framework, you don&#8217;t get
 around view model/data transfer objects anyways.</li>
-<li>It looks awkard in tests at first, but you can write some custom assertions
+<li>It looks awkward in tests at first, but you can write some custom assertions
 to get your sanity back for this task.</li>
 </ul>
 </div>
@@ -247,12 +251,12 @@ then pass these as commands into our &#8220;real model&#8221; through a service 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This way we seperated the business model from the application framework.</p>
+<p>This way we separated the business model from the application framework.</p>
 </div>
 <div class="section" id="a-word-about-rad">
 <h2>A word about RAD</h2>
 <p>Rapid-application development or rapid prototyping is a wide-spread approach in web
-development. My explicit approach seems to be completly against this kind of
+development. My explicit approach seems to be completely against this kind of
 development and much slower as well. But I think you don&#8217;t loose much time
 in the long run:</p>
 <ul class="simple">
@@ -273,7 +277,7 @@ that these prototypes normally have.</li>
 <div class="section" id="conclusion">
 <h2>Conclusion</h2>
 <p>If we take a step back from all our tools suggesting to generate getter/setters
-we find that there is a simple way to avoid using setters when focussing on the
+we find that there is a simple way to avoid using setters when focusing on the
 tasks that objects perform. This actually makes our code much more readable and
 is one building block towards clean object oriented code and domain driven design.</p>
 <p>I am very interested in your opinions on this topic and my attempt to avoid them,
@@ -323,6 +327,9 @@ please leave comments when leaving this website :-)</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="#">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -338,6 +345,9 @@ please leave comments when leaving this website :-)</p>
             <a href="../11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -345,12 +355,6 @@ please leave comments when leaving this website :-)</p>
         </li>
         <li class="recent_post">
             <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

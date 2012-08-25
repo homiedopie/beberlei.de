@@ -84,7 +84,7 @@
 <p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
 Matthews post on Zend Devzone</a>)
 into the Whitewashing blog software via Zend_Cache and the Filesystem
-Backend. I ran some superficial Apache Benachmark tests to have a look
+Backend. I ran some superficial Apache Benchmark tests to have a look
 at the gain change in performance.</p>
 <p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
 Devzone</a> and a missing function
@@ -102,7 +102,7 @@ getCache() in the code fragment:</p>
 <p>I loaded the Plugin into the front controller and initialized it with a
 Zend_Config_Ini object. This all works very smoothly and caching is
 ready to begin.</p>
-<p>Testing came to the result that with 1000 requests, 10 of them concurent
+<p>Testing came to the result that with 1000 requests, 10 of them concurrent
 (ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
 this blog, the request time dropped by half, from six to three seconds
 (still lot of time, but this isn&#8217;t the best webserver).</p>
@@ -132,11 +132,11 @@ Waiting:      650 3055 1731.4   2928    7190
 Total:        809 3245 1757.8   3135    7475</pre>
 </div>
 <p>As said before this testing is superficial, but its gives a broad sense
-of what perfomance gain is possible with just some lines of code and a
+of what performance gain is possible with just some lines of code and a
 temporary directory. Using memcache will probably speed up the process
 another good amount.</p>
 <p>Later I realized that complete page caching (rather than block element
-caching) sucks when you inject admin area linkes into the navigation,
+caching) sucks when you inject admin area links into the navigation,
 which would allow non-logged in users to see parts of the admin area so
 I had to disable caching totally. You never know in the first place (you
 should though). I have to rework my admin area or extend my
@@ -187,6 +187,9 @@ topic another time.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../../../2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="../../../2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -202,6 +205,9 @@ topic another time.</p>
             <a href="../../../2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="../../../2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="../../../2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -209,12 +215,6 @@ topic another time.</p>
         </li>
         <li class="recent_post">
             <a href="../../../2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

@@ -79,6 +79,128 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>May 18, 2008</span> 
+        </div>
+        <div class="section" id="my-2-cents-on-zend-search-lucene-update-problems">
+<h1><a href="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a></h1>
+<p><a class="reference external" href="http://framework.zend.com">Zend_Search_Lucene</a> (or Lucene in
+general) does not support an update statement, therefore we must check
+via find() if a specific article that should be updated already exists.</p>
+<p>Numerous solutions exist for this problem (<a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">for example this PDF
+Tutorial by a Zend
+Programmer</a>).
+Mine looks as follows. The first thing is to Set an Analyzer other from
+the default one. The Default Analyzer only looks at letters, not at
+numbers.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
+    Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
+);
+$index = Zend_Search_Lucene::open('/path/to/index/directory');</pre>
+</div>
+</div></blockquote>
+<p>We can now save an identifier containing letters and numbers, for
+example the md5 string of the Article Database ID.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$doc = new Zend_Search_Lucene_Document();
+$field = Zend_Search_Lucene_Field::Keyword('id', md5($data['id']));
+$doc-&gt;addField($field);
+$index-&gt;addDocument($doc);</pre>
+</div>
+</div></blockquote>
+<p>Before updating an entry you have to delete any entry that has been
+indexed before:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$hits = $index-&gt;find('id:'.md5($articleID));
+foreach($hits AS $hit) {
+    $index-&gt;delete($hit-&gt;id);
+}</pre>
+</div>
+</div></blockquote>
+<p>The <a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">Tutorial Talk on Search
+Lucene</a>
+(given above) uses an extended version of this delete routine snippet
+that also checks if an article is up to date and does not have to be
+reindexed and deletes multiple entries of one article.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html#disqus_thread" data-disqus-identifier="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>May 17, 2008</span> 
+        </div>
+        <div class="section" id="integrated-zend-layout-into-this-blog">
+<h1><a href="2008/05/17/integrated-zend-layout-into-this-blog.html">Integrated Zend_Layout into this blog</a></h1>
+<p>I finished with integrating Zend_Layout into this blog software today.
+At first I thought it is quite hard to use especially if you want to
+integrate dynamic navigational contents depending on the current
+module/controller/action setup. But I came up with a combination of
+actionStack and Named Response Sections as <a class="reference external" href="http://framework.zend.com/manual/en/zend.layout.quickstart.html#zend.layout.quickstart.mvc">described in the ZF
+Documentation of the Layout
+component</a>,
+which is quite easy to understand, use and extend.</p>
+<p>At each of the major Controllers I put different actions from a specific
+Navigation Controller on the
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.controller.actionhelpers.html#zend.controller.actionhelpers.actionstack">ActionStack</a>
+(mostly global per Controller using the init() class method).</p>
+<p>A typical controller looks like this:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class BlogController extends Zend_Controller_Action
+{
+    public function init()
+    {
+        $this-&gt;_helper-&gt;actionStack('tagcloud', 'Navigation');
+        $this-&gt;_helper-&gt;actionStack('userinfo', 'Navigation');
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>The NavigationController looks like this:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class NavigationController extends Zend_Controller_Action
+{
+    public function tagcloudAction()
+    {
+        // Do not render the content of this action to the default output.
+        $this-&gt;getHelper(&quot;ViewRenderer&quot;)-&gt;setNoRender();
+
+        [...]
+
+        // Append content to secondaryNavigation named response section
+        $this-&gt;getResponse()-&gt;append('secondaryNavigation', $this-&gt;view-&gt;render('navigation/tagcloud.phtml'));
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>The layout.pthml then just calls certain named sections, for example &lt;=?
+$this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/05/17/integrated-zend-layout-into-this-blog.html#disqus_thread" data-disqus-identifier="2008/05/17/integrated-zend-layout-into-this-blog">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>May 17, 2008</span> 
         </div>
         <div class="section" id="using-zend-http-client-to-ping-technorati">
@@ -139,12 +261,12 @@ existing Zend_Validate and Zend_Filter components as input for the
 generated form fields. Another plus is the handling of errors in input
 and re-entering/displaying text.</p>
 <p>There is also a neat feature of the Zend_Form component, which allows
-to <a class="reference external" href="http://framework.zend.com/manual/en/zend.form.quickstart.html#zend.form.quickstart.config">generate complete forms by passing an appropriatly formatted
+to <a class="reference external" href="http://framework.zend.com/manual/en/zend.form.quickstart.html#zend.form.quickstart.config">generate complete forms by passing an appropriately formatted
 Zend_Config_Ini object to the Zend_Form
 Constructor</a>.
 So my idea was, why not program an Eclipse Plugin allowing to rapidly
 generate and edit forms using a point-and-click plugin window approach,
-which would ultimatly generate your Form INI code.</p>
+which would ultimately generate your Form INI code.</p>
 <p>This might have been a great <a class="reference external" href="http://code.google.com/soc/">Google Summer of Code
 idea</a> for the Eclipse Foundation (since
 Zend is not taking part).</p>
@@ -176,7 +298,7 @@ caching</a>, which did not
 work in its original implementation due to different users groups
 sharing the same cached views.</p>
 <p>In the last days I came across two in depth tutorials on Zend_Acl and
-Zend_Auth integration to MVC. Most people propably saw the DevZone
+Zend_Auth integration to MVC. Most people probably saw the DevZone
 article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
 1)</a>”
 by Aldemar Bernal on the Frameworks Frontpage. Another good article was
@@ -288,14 +410,14 @@ that is held about three times a year, this last saturday on the topic:
 Frameworks and Content-Management-Systems.</p>
 <p>It was held in a very nice conference center in cologne, and from what I
 heard about 200 people attended. The first two topics were on
-<a class="reference external" href="http://www.joomla.org/">Joomla!</a> and bareer-free
+<a class="reference external" href="http://www.joomla.org/">Joomla!</a> and barrier-free
 <a class="reference external" href="http://www.typo3.org">Typo3</a>. Since I am more the framework guy, I
 did not enjoy them too much. At least I got some input on how a
-bareer-free website has to function. The Joomla! presentation supported
+barrier-free website has to function. The Joomla! presentation supported
 my prejudice, that programming in and for Joomla! produces ugly code.</p>
 <p>I did like the presentations on frameworks, the most interesting being
 the <a class="reference external" href="http://www.cakephp.org">CakePHP</a> presentation by <a class="reference external" href="http://teemow.com/">Timo
-Derstappen</a>, since I havent looked into Cake for
+Derstappen</a>, since I haven’t looked into Cake for
 about one and a half years. I have seen that with the new to come
 version 2, the framework became even better, now supporting easy code
 generation and flexible site generation. But its still somehow a Ruby
@@ -306,7 +428,7 @@ the creation of a blog using Zend Framework, being the Hello World
 example for frameworks. He specifically showed, that you can use
 anything you want as a model, a Zend_Db_Table object or any other
 object. He also showed something like a Data-Mapper pattern in his
-application. I got some ideas from this I propably will write about some
+application. I got some ideas from this I probably will write about some
 later time.</p>
 <p>I also enjoyed the <a class="reference external" href="http://www.rubyonrails.de">Rails</a> presentation,
 because I never got the chance to look the Ruby guys at work of the
@@ -339,7 +461,7 @@ highly recommend the Multimediatreff for the next time.</p>
 <p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
 Matthews post on Zend Devzone</a>)
 into the Whitewashing blog software via Zend_Cache and the Filesystem
-Backend. I ran some superficial Apache Benachmark tests to have a look
+Backend. I ran some superficial Apache Benchmark tests to have a look
 at the gain change in performance.</p>
 <p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
 Devzone</a> and a missing function
@@ -357,7 +479,7 @@ getCache() in the code fragment:</p>
 <p>I loaded the Plugin into the front controller and initialized it with a
 Zend_Config_Ini object. This all works very smoothly and caching is
 ready to begin.</p>
-<p>Testing came to the result that with 1000 requests, 10 of them concurent
+<p>Testing came to the result that with 1000 requests, 10 of them concurrent
 (ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
 this blog, the request time dropped by half, from six to three seconds
 (still lot of time, but this isn’t the best webserver).</p>
@@ -387,11 +509,11 @@ Waiting:      650 3055 1731.4   2928    7190
 Total:        809 3245 1757.8   3135    7475</pre>
 </div>
 <p>As said before this testing is superficial, but its gives a broad sense
-of what perfomance gain is possible with just some lines of code and a
+of what performance gain is possible with just some lines of code and a
 temporary directory. Using memcache will probably speed up the process
 another good amount.</p>
 <p>Later I realized that complete page caching (rather than block element
-caching) sucks when you inject admin area linkes into the navigation,
+caching) sucks when you inject admin area links into the navigation,
 which would allow non-logged in users to see parts of the admin area so
 I had to disable caching totally. You never know in the first place (you
 should though). I have to rework my admin area or extend my
@@ -426,7 +548,7 @@ choice is Dojo.</p>
 <p>Since Dojo is not my library of choice I would have to write a JQuery
 View Helper on my own or wait until somebody else releases one.</p>
 <p>But why not write javascript? Its very easy with all those libraries and
-addresses most cross browser incompabilities: <a class="reference external" href="http://www.b-list.org/weblog/2006/jul/02/django-and-ajax/">One
+addresses most cross browser incompatibilities: <a class="reference external" href="http://www.b-list.org/weblog/2006/jul/02/django-and-ajax/">One
 Django</a>,
 <a class="reference external" href="http://www.builtfromsource.com/2006/12/20/does-ajax-have-a-place-in-the-application-framework/">one Zend Framework
 developer</a>
@@ -434,7 +556,7 @@ argue framework and javascript coupling is not the way to go based on
 the arguments that its breaks the MVC pattern, leads to function calls
 equal to those in javascript in its framework respective language, and
 that javascript is actually something any good webdeveloper should be
-able to programm, even when its just using library components.</p>
+able to program, even when its just using library components.</p>
 <p>Using <a class="reference external" href="http://jquery.com">JQuery</a> without any help from tools for
 about a year now I can say there are still those days where javascript
 drives me mad, but most of the time I its working perfect. Since Ajax
@@ -466,7 +588,7 @@ that save time on integration after the first initial setup.</p>
 <h1><a href="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html">Simplifying ZF: Scope of Variables in View and Controller</a></h1>
 <p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
 Ass!</a>
-article referend earlier I came up with some simplifications of the Zend
+article referenced earlier I came up with some simplifications of the Zend
 View and Controller variable coupling.</p>
 <p>Using some code in the article I created a new Zend_View_Extended
 class which offers the possibility to circumvent the access of variables
@@ -486,11 +608,11 @@ object as an own variable in the script template:</p>
 </div></blockquote>
 <p>Now rather than calling $this-&gt;data you can call $data in a script
 template. Of course this comes with additional overhead of each variable
-being registered twice. I dont know how this handles performance wise,
+being registered twice. I don’t know how this handles performance wise,
 but maybe unsetting $this variables after copying solves this. Also you
 have to overwrite the initView() method of your base Controller Action
 class.</p>
-<p>Another simplyfication would be to allow for the following direct
+<p>Another simplification would be to allow for the following direct
 variable settings in any Controller Action, which would shorten the
 $this-&gt;view-&gt;variable call, to derive the same functionality via
 $this-&gt;variable. I haven’t tested this though.</p>
@@ -516,313 +638,6 @@ $this-&gt;variable. I haven’t tested this though.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html#disqus_thread" data-disqus-identifier="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>June 24, 2008</span> 
-        </div>
-        <div class="section" id="teaching-zend-form-some-mvc">
-<h1><a href="2008/06/24/teaching-zend-form-some-mvc.html">Teaching Zend_Form some MVC</a></h1>
-<p>Lots of people complain that Zend Form runs counter to the MVC spirit,
-because it handles validation, business logic and view elements all in
-one acting as Model, Controller and View.</p>
-<p>Extending the Zend Form component to handle all this different aspects
-in different layers of the application is rather easy though. What we
-want of a MVC compatible Form object is the following:</p>
-<ul class="simple">
-<li>The <strong>model</strong> escapes and validates all the data that is put into the
-form.</li>
-<li>The <strong>view</strong> decides on how the form is displayed.</li>
-<li>The <strong>controller</strong> moves data from the model to the view and back,
-handling the stages of the form request.</li>
-</ul>
-<p>The first step is, <strong>allowing any Model that implements
-Zend_Validator_Interface to hook into the Zend_Form Validation
-process</strong>. We generate a new class, WW_Form_Mvc and allow a function
-setModel() to insert any Model object that implements
-Zend_Validator_Interface into the form. We extend isValid(),
-getMessages() and getErrors() to not only check all the form elements
-validators, but also the models validators. Please note that the
-array_merge() solution is not the correct way of how this snippet
-should work. Any merge operation of the messages and errors has to be on
-a field key level, which is not currently done.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WW_Form_Mvc extends Zend_Form
-{
-    protected $model = null;
-
-    /**
-     * Extends isValid() method of Zend Form to check for validity of specified model
-     * @param Array $data
-     * @return Boolean
-     */
-    public function isValid($data)
-    {
-        $valid = parent::isValid($data);
-
-        if($valid == true &amp;&amp; !is_null($model)) {
-            $valid = $this-&gt;model-&gt;isValid($data) &amp;&amp; $valid;
-        }
-        return $valid;
-    }
-
-    /**
-     * Extends getMessages() Validator Interface implementation of Zend Form to also
-     * return the messages of the Model validation.
-     * @return Array
-     */
-    public function getMessages($name = null, $suppressArrayNotation = false)
-    {
-        $messages = parent::getMessages($name, $suppressArrayNotation);
-
-        if(!is_null($model)) {
-             $form_messages = $this-&gt;model-&gt;getMessages();
-
-             $messages = array_merge($messages, $form_messages);
-        }
-
-        return $messages;
-    }
-
-    /**
-     * Extends getErrors() Validator Interface implementation of Zend Form to also
-     * return the errors of the Model validation.
-     * @return Array
-     */
-    public function getErrors($name = null)
-    {
-         $messages = parent::getErrors($name);
-
-        if(!is_null($model)) {
-             $form_messages = $this-&gt;model-&gt;getErrors();
-
-             $messages = array_merge($messages, $form_messages);
-        }
-
-        return $messages;
-    }
-
-    /**
-     * Set a Model object, which has to implement Zend_Validate_Interface
-     * @throws Zend_Exception
-     */
-    public function setModel($model)
-    {
-        if($model instanceof Zend_Validate_Interface) {
-            $this-&gt;model = $model;
-        } else {
-             throw new Zend_Exception('WW_Form_Mvc expects a model of type Zend_Validate_Interface');
-        }
-    }
-}</pre>
-</div>
-<p>We then extend the WW_Form_Mvc class to disable the automatic
-loading of decorators in the Constructor and additionally allow to
-pass a Model to the constructor as second argument:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WW_Form_Mvc
-{
-    protected $model = null;
-
-    /**
-     * this overrides the original Zend_Form Constructor and skips
-     * the decorator initilisation, because this is now being handled
-     * by View Helpers
-     */
-    public function __construct($options=null, $model=null)
-    {
-        if (is_array($options)) {
-            $this-&gt;setOptions($options);
-        } elseif ($options instanceof Zend_Config) {
-            $this-&gt;setConfig($options);
-        }
-
-        // Extensions...
-        $this-&gt;init();
-
-        if(!is_null($model)) {
-             $this-&gt;setModel($model);
-        }
-    }
-
-    // All the other stuff here
-}</pre>
-</div>
-</div></blockquote>
-<p>In our views we want to <strong>use helper methods to manage the
-displaying of the form</strong>. For each different style of form
-displaying, we can generate different helpers. For example a helper
-that would only apply the default decorators would look like this:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WW_View_Helper_FormDefault
-{
-    /**
-     * Load only default decorators on this Zend_Form object
-     *
-     * @param Zend_Form $form
-     */
-    public function formDefault(Zend_Form $form)
-    {
-        if($form instanceof Zend_Form) {
-            $form-&gt;loadDefaultDecorators();
-            return $form;
-        }
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>We can now use this helper and in any template say: &lt;?=
-$this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
-controller action that implements this form and we will see that it
-does not look different from what we would have done before:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>function formAction()
-{
-    $model = new SomeModel();
-
-    $form = new WW_Form_Mvc();
-    $form-&gt;setModel($model);
-
-    // generate form here, adding elements and stuff
-
-    if($form-&gt;isValid($_POST)) {
-        $model-&gt;insert($form-&gt;getValues());
-        $this-&gt;view-&gt;form = &quot;Form was submitted!&quot;;
-    } else {
-        $this-&gt;view-&gt;form = $form;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Isnt that nice? Now each part of the equation is doing what its
-supposed to do.</p>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/24/teaching-zend-form-some-mvc.html#disqus_thread" data-disqus-identifier="2008/06/24/teaching-zend-form-some-mvc">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>November 05, 2008</span> 
-        </div>
-        <div class="section" id="overwrite-ezcmvccontroller-a-bit-more-rapid">
-<h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
-<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
-with the alpha version, since I am currently searching for a good
-framework for a high performance application. My first benchmarks on
-ezcMvc just say: wh000pie! Alot faster as compared to the Zend
-Framework.
-Still ezcMvc is VERY loosly coupled and you have to write lots of lines
-to get where ZF gets you with less (more magic involved). As you can see
-from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
-component</a>
-it is currently a bit unwieldily to work with ezcMvcController since you
-have to create and return result objects everywhere. This is very nice
-since it abstracts from the actual response type (could be www, mail,
-cli, anything).
-I have created a very little extension of the ezcMvcController class
-that hopefully serves you quite some time. You can append variables to
-the ezcMvcResult object by calling the magic __get and __set on the
-controller. Plus it offers a method to use the ezcMvcInternalRedirect
-instead of the result. See for yourself:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myController extends ezcMvcController
-{
-    protected $result;
-
-    public function createResult()
-    {
-        $actionMethod = $this-&gt;createActionMethodName();
-
-        if ( method_exists( $this, $actionMethod ) ) {
-            $status = $this-&gt;$actionMethod();
-            if($status != 0) {
-                $this-&gt;getResult()-&gt;status = $status;
-            }
-            return $this-&gt;getResult();
-        } else {
-            throw new ezcMvcActionNotFoundException( $this-&gt;action );
-        }
-    }
-
-    protected function _redirect($uri)
-    {
-        $request = clone $this-&gt;request;
-        $request-&gt;uri = $uri;
-        $this-&gt;result = new ezcMvcInternalRedirect($request);
-    }
-
-    public function __get($name)
-    {
-        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
-            return $this-&gt;getResult()-&gt;variables[$name];
-        }
-        return null;
-    }
-
-    public function __set($name, $value)
-    {
-        $this-&gt;getResult()-&gt;variables[$name] = $value;
-    }
-
-    public function __isset($name)
-    {
-        return isset($this-&gt;getResult()-&gt;variables[$name]);
-    }
-
-    protected function getResult()
-    {
-        if($this-&gt;result === null) {
-            $this-&gt;result = new ezcMvcResult();
-        }
-        return $this-&gt;result;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>You can now use a controller in the following way:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class dashboardController extends myController
-{
-    public function doIndex()
-    {
-        $this-&gt;cookie = &quot;Cookie!&quot;; // Proxy to $ezcMvcResult-&gt;variables['cookie']
-    }
-
-    public function doRedirect()
-    {
-        $this-&gt;_redirect(&quot;/&quot;);
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Very nice! The next thing I have to extend in ezcMvc is automagical
-matching of controller and action names to view output names with a
-special View Handler that takes care of this. This saves another bunch
-of work you have to cope with in the current standard setup.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html#disqus_thread" data-disqus-identifier="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid">Leave a comment</a>
         </div>
     </div>
     
@@ -870,6 +685,9 @@ of work you have to cope with in the current standard setup.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -885,6 +703,9 @@ of work you have to cope with in the current standard setup.</p>
             <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -892,12 +713,6 @@ of work you have to cope with in the current standard setup.</p>
         </li>
         <li class="recent_post">
             <a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

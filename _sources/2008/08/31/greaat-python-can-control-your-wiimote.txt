@@ -2,8 +2,8 @@ Greaat, Python can control your Wiimote
 =======================================
 
 In the last days I had lots of time to play with my Wiimote and its
-bluetooth capabilities. Sadly there is activly supported driver in non-C
-(and I am not the biggest C programmmer). I found this little prototype
+bluetooth capabilities. Sadly there is actively supported driver in non-C
+(and I am not the biggest C programmer). I found this little prototype
 driver written in Python by Will Woods which is using pyBluez to
 communicate with my wiimote and have extended it quite a bit.
 `WiiLinux <http://www.wiili.org>`_ is a huge resource that offers

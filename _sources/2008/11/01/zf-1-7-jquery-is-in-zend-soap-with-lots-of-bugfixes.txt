@@ -8,7 +8,7 @@ Zend Amf, the new component sponsored by Adobe to support Adobe Flash
 
 Besides the buzz there is some stuff from me getting into the Zend
 Framework. jQuery View and Form Helpers will allow you to throw the Dojo
-stuff away and use the great jQuery. This is of course inheritly
+stuff away and use the great jQuery. This is of course inherently
 subjective, but still different opportunities are always great.
 
 Additionally I have been fixing quite some bugs on the Zend Soap

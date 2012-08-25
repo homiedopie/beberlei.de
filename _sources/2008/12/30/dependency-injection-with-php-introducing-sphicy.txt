@@ -35,7 +35,7 @@ wraps around it and requires all the dependencies:
             protected $front;
 
             /**
-             * Create Front Controller for Zend Framework using explicity dependencies created by Sphicy.
+             * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
              *
              * @param Zend_Controller_Request_Abstract      $request
              * @param Zend_Controller_Response_Abstract     $response

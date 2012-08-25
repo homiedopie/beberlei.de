@@ -75,6 +75,84 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>December 12, 2008</span> 
+        </div>
+        <div class="section" id="bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">
+<h1><a href="2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete.html">Bad news: jQuery UI 1.6 ships without Spinner and AutoComplete</a></h1>
+<p>The jQuery UI team <a class="reference external" href="http://blog.jquery.com/2008/12/11/whats-up-with-jquery-ui/">announced yesterday on its
+blog</a> that
+<a class="reference external" href="http://ui.jquery.com">jQuery UI 1.6</a> will not be shipped with
+AutoComplete and Spinner Plugin support. No further delay, for the
+original august 2008 estimated release, is wanted.</p>
+<p>This brings about a problem on
+<a class="reference external" href="http://framework.zend.com/manual/en/zendx.jquery.html">ZendX_JQuery</a>.
+All view helpers and decorators that depend on AutoComplete and Spinner
+Plugins can only be run with SVN trunk or 1.6 release candidates, which
+have known bugs and problems.</p>
+<p>I am adding a compatibility table to the ZendX jQuery manual today that
+will make its way to the manual of the 1.7.2 release. This will
+hopefully help and guide everyone to the correct dependencies.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete.html#disqus_thread" data-disqus-identifier="2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>July 14, 2008</span> 
+        </div>
+        <div class="section" id="jquery-helper-what-is-to-include">
+<h1><a href="2008/07/14/jquery-helper-what-is-to-include.html">jQuery Helper - What is to include?</a></h1>
+<p>I took some time in the last days to develop the concept for a possible
+jQuery View Helper that could pass the integration into the <a class="reference external" href="http://framework.zend.com">ZF
+Core</a>. Since
+<a class="reference external" href="http://www.jquery.com">jQuery</a> is organized somewhat different than
+Dojo is, its possible implementation for ZF will differ.</p>
+<p>The jQuery Helper itself will manage inclusion of jQuery javascript
+files and the base library, much like the Dojo component works (Using
+the Google CDN). On top of this simple Helpers should mimic $.get,
+$.post, $.load and $.getJSON in a simple way, so that with a simple
+function call you can generate an XmlHttpRequest that updates a
+specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
+Ajax</a>)</p>
+<p>Problematic are the next ideas: Additional Helpers will allow to
+specify the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
+(DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/">jQuery
+Autocomplete</a>
+or <a class="reference external" href="http://malsup.com/jquery/form/">jQuery Form</a> (AjaxForm and
+AjaxSubmit). These libraries need additional javascript content to be
+downloaded and implemented in the Zend Framework project. There
+currently exists no way to implement them using a CDN. Therefore any
+documentation must clearly specify which additional content has to be
+installed and how. The helpers will have to be general enough to support
+this.</p>
+<p>My proposal is currently in the workings and will be on the ZF Wiki in
+the next couple of hours.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/07/14/jquery-helper-what-is-to-include.html#disqus_thread" data-disqus-identifier="2008/07/14/jquery-helper-what-is-to-include">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>July 22, 2008</span> 
         </div>
         <div class="section" id="multidimensional-array-via-spl">
@@ -208,7 +286,7 @@ Additionally you can also use the same template to render any new
 comment to the comment list using via an ajax form submit, returning the
 (model or form) filtered data via JSON and appending it to the comment
 list using the DojoX DTL parser. For non-JS browsers you can always use
-a &lt;noscript&gt; variant to render the templates completly server-side.</p>
+a &lt;noscript&gt; variant to render the templates completely server-side.</p>
 <p>This generally being a cool idea since it makes developing applications
 with AJAX technology very easy I began to port the DTL to the Zend
 Framework and the whole weekend later I got a working implementation
@@ -252,9 +330,9 @@ possibility for rapid development of Javascript/Ajax/Form components
 with jQuery and Zend Framework.</p>
 <p>One could offer a complete dependency downloadable archive with all the
 CSS, Javascript and Images inside, but this would be very complex to
-maintain. Looking at the future Zend Tool capabilites one possibilty
+maintain. Looking at the future Zend Tool capabilities one possibility
 would be to offer a download client for all the relevant jQuery plugins,
-but there would have to be a man-middle-server that maintaines the most
+but there would have to be a man-middle-server that maintains the most
 up to date locations of all the plugins, which also has to be
 maintained. Does anybody have a better solution to solve this problem?
 Perhaps the jQuery Team needs to be made aware that they need a CDN for
@@ -264,12 +342,12 @@ Helper (mostly copy paste and simple rewrites from Matthews Dojo
 component) and a HtmlElement Form Helper which constructs a Date-Picker
 from within the template. This is very easy to use and looks great. In
 the next days I will add further helpers for the jQuery plugins I use in
-my day to day work live and hope to present a demo. I might even optin
+my day to day work live and hope to present a demo. I might even opting
 for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
 <p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
 list</a>
 stating that a CDN is planned for the jQuery UI library. Sadly this does
-not include plugins for which one might desperatly need a View Helper
+not include plugins for which one might desperately need a View Helper
 except for maybe the Date Picker. I will post further comments on this
 issue in the near future.</p>
 </div>
@@ -354,6 +432,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -369,6 +450,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
             <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -376,12 +460,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
         </li>
         <li class="recent_post">
             <a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

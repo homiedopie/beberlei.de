@@ -32,7 +32,7 @@
     <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" />
+    <link rel="next" title="Setting up Development Machines with Puppet" href="../../06/03/setting_up_development_machines_with_puppet.html" />
     <link rel="prev" title="OOP Business Applications: Entity, Boundary, Interactor" href="../13/oop_business_applications_entity_boundary_interactor.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
@@ -71,7 +71,7 @@
                  &laquo; <a href="../13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
             </li>
             <li class="right">
-                <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a> &raquo; 
+                <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a> &raquo; 
             </li>
         </ul>
     </div>
@@ -95,8 +95,8 @@ introduction to a series about this approaches.</p>
 </ol>
 <p>The first produces code solving technical problems, often in a beautiful and
 dedicated way. The second regularly produces mess, hopefully still
-serving customers by optimizing their business. This differentation is an
-exageration, but from my experience its far easier to run a greenfield business
+serving customers by optimizing their business. This differentiation is an
+exaggeration, but from my experience its far easier to run a greenfield business
 project into the ground than a new library.</p>
 <p>There has to be a reason why so many programmers dedicate much free time to
 open source projects. It might be empirical prove, that all our business
@@ -111,14 +111,14 @@ of OOP business applications.</p>
 <p>This blog post is not about blaming customers (as the usual suspect), its about
 finding the problems in usual OOP code of business systems from my experience
 with PHP projects. To keep things short, I will list my <em>personal</em> list of
-techincal annoyances in business projects in no particular order. These are
+technical annoyances in business projects in no particular order. These are
 highly subjective points.</p>
 <ul class="simple">
 <li>Getter/Setter Madness of Objects that are used to store data into
 databases. Leading to huge objects that are essentially just meaningless
 stores of data.</li>
 <li>Updating complex object graphs from user input.</li>
-<li>Seperation of model, controller and views, especially when dealing with
+<li>Separation of model, controller and views, especially when dealing with
 forms. This is very complicated to achieve.</li>
 <li>Lazy Loading and Query performance problems when using an ORM. Additionally
 replacing parts of the views with hand-crafted SQL is often difficult and/or
@@ -129,7 +129,7 @@ change.</li>
 <li>Dependency mess leading to hard to test code, generally leading to untested
 applications. Too often frameworks create huge dependencies that
 make your domain model messy and complex to mock in tests.</li>
-<li>Focus on synchroneous request/response handling makes later usage of message
+<li>Focus on synchronous request/response handling makes later usage of message
 queues very complicated and expensive to refactor towards.</li>
 <li>Tight coupling of model against the framework code.</li>
 <li>Junior developers have too much freedom, when there is not much structure in
@@ -159,18 +159,18 @@ the problems listed above. But without changes in your mindest you end up with
 hand written mess, compared to getting there with tools.</p>
 <p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
 the problem even worse. It easily leads to lasagna code, where you have layers
-of layers that are very hard to understand. Personally I prefer spagetthi code
+of layers that are very hard to understand. Personally I prefer spaghetti code
 over lasagna code, because its comparatively simpler to understand.</p>
 </div>
 <div class="section" id="finding-new-approaches">
 <h2>Finding new Approaches</h2>
 <p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
-there has to be some solution to organize business models structurely to avoid
+there has to be some solution to organize business models structurally to avoid
 all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a>
 you have a powerful toolbox to avoid many of the problems above, but it is
 still not simple to write clean object oriented applications.</p>
 <p>After years of participation in both open source projects I still feel there is
-a missing puzzle piece, to reach a clean seperation of all the model concerns
+a missing puzzle piece, to reach a clean separation of all the model concerns
 from framework and persistence.</p>
 <p>At some point I would really like to close the gap between desired technical
 state of a project and the state it is actually in. I know there is no size
@@ -182,18 +182,18 @@ I was introduced to several approaches to OO application design that I
 started to explore in the past last months:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
-studied alot</li>
+studied a lot</li>
 <li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
 architecture or &#8220;Ports and adapters&#8221;. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
 at Ruby Midwest</a>
 last year.</li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
-<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blost post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
 day video class</a> by Greg Young.</li>
 </ul>
 <p>They are not new and have all been around for several years already. I would
 describe all three of them as architectural design patterns, though some people
-might probably disagreee with this classification. All three approaches make
+might probably disagree with this classification. All three approaches make
 you think about application development beyond just &#8220;service layers&#8221; in
 radically new ways. All three have helped me rethink business applications in
 different ways.</p>
@@ -250,6 +250,9 @@ Conference</a> in Sankt Augustin Germany on
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
             <a href="../22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
         <li class="recent_post">
@@ -265,6 +268,9 @@ Conference</a> in Sankt Augustin Germany on
             <a href="#">OOP Business Applications: Trying to escape the mess</a>
         </li>
         <li class="recent_post">
+            <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+        <li class="recent_post">
             <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
         <li class="recent_post">
@@ -272,12 +278,6 @@ Conference</a> in Sankt Augustin Germany on
         </li>
         <li class="recent_post">
             <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a>
         </li>
     </ul>
 </div>

@@ -75,6 +75,159 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 25, 2012</span> 
+        </div>
+        <div class="section" id="decoupling-applications-with-domains-events">
+<h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
+<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
+I have described 3 architectural patterns for business applications. Applying
+them to your software helps you decouple the business logic from the
+application/framework/UI. However given sufficient complexity, you will want to
+decouple different parts of your business model from each other as well.</p>
+<p>As an example, lets think of a batch process in your application that updates
+orders from a CRM or logistics system:</p>
+<ul class="simple">
+<li>You receive an XML with full users and order representations</li>
+<li>You need to update certain user fields</li>
+<li>You need to update certain order fields</li>
+<li>Some orders require creating accounts in different remote systems</li>
+<li>If the user has not confirmed his email yet he should receive an opt-in
+mail instead.</li>
+<li>If the user confirms his opt-in mail, all outstanding remote accounts are
+created.</li>
+</ul>
+<p>You can build all the steps into a single batch processing service. This will
+be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
+principle</a>.</p>
+<p>the part with updating of users and fields has nothing to with the sending of
+mails and creation of remote accounts.  We want to decouple them from each
+other.</p>
+<p>The first obvious choice is to decouple them into distinct services:</p>
+<ul class="simple">
+<li>Import Service</li>
+<li>Authentication Service</li>
+<li>Account Generation Service</li>
+</ul>
+<p>All these services have dependencies on infrastructure objects, database,
+mailer and so on. We could inject the authentication and account generation
+services into the Import Service, but with rising complexity this will lead to
+a lasagna of services and the execution path will dig deep into this and this
+is not nearly as tasty as eating real lasagna.</p>
+<div class="highlight-python"><pre>ImportService
+|_AuthenticationService
+| |_Mailer
+| |_Database
+|_AccountGenerationService
+| |_Database
+| \_RemoteFacade
+\_Database</pre>
+</div>
+<p>This becomes more complicated when transaction semantics need to be taken care
+of. For example dependencies between mailer and database services. Also you
+have to take into account that the code in entities and value objects
+participating in this use-case.</p>
+<p>What we want instead is a sequential execution of those nested services, but
+only if the parent service executed successfully:</p>
+<div class="highlight-python"><pre>ImportService
+\_Database
+
+AuthenticationService
+|_Mailer
+\_Database
+
+AccountGenerationService
+|_Database
+\_RemoteFacade</pre>
+</div>
+<p>We could use an event dispatcher in all of the services to notify each other,
+but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
+cleaner way:</p>
+<p>Every entity is an event provider and can emit events. Whenever a transaction
+is committed and an hence an operation is completed successfully, we take all
+the events emitted from all entities (looking at the identity map for example)
+and trigger observing event handlers. However if the operation fails, we do not
+trigger these event handlers.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">Order</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// 1. do something with $data</span>
+
+        <span class="c1">// 2. raise event</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s2">&quot;id&quot;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+        <span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The Event provider trait aggregates all the events, and offers
+and API for external services to pull them from the entity:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">trait</span> <span class="nx">EventProvider</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Our infrastructure must then trigger event handlers, based
+on the event names. It will use <tt class="docutils literal"><span class="pre">dequeueEmittedEvents</span></tt> and making
+sure the events are not emitted multiple times.</p>
+<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
+<ul class="simple">
+<li>Command executes</li>
+<li>Entities emit events</li>
+<li>Command transaction succeeds</li>
+<li>Events trigger event handlers</li>
+<li>Event handlers execute more commands</li>
+<li>Restart from 1.</li>
+</ul>
+<p>With this approach we can decouple all services from each other and avoid
+deep nesting in each other. Yet we still have transactional dependencies,
+by dropping all events when the parent command fails. Transactions over
+multiple commands will not have ACID properties though, instead you will have
+to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
+that are important in systems with eventual consistency. This is one downside
+that you need to take into account.</p>
+<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
+implementation of DomainEvent and EventProvider classes and integration into
+Symfony and Doctrine ORM. Generally this pattern is very easy to implement
+though, so that you can just have a look at the implementation and take the
+best parts for your own.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html#disqus_thread" data-disqus-identifier="2012/08/25/decoupling_applications_with_domain_events">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>August 22, 2012</span> 
         </div>
         <div class="section" id="building-an-object-model-no-setters-allowed">
@@ -84,11 +237,11 @@ abstraction technology that converts rows to objects, then you will probably
 use getter/setter methods or properties (C#) to encapsulate object properties.</p>
 <p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
 at the default <tt class="docutils literal"><span class="pre">User</span></tt> entity from the Symfony2 FOSUserBundle plugin for
-example: A collosus of getter/setter methods with nearly no real business
+example: A colossus of getter/setter methods with nearly no real business
 logic. This is how most of our persistence related objects look like in PHP.
-A Rails ActiceRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
+A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
 the explicit getter/setters, however generates accessors magically for you.
-Nevertheless you have to add considerable amound of code to configure all the
+Nevertheless you have to add considerable amount of code to configure all the
 properties. And code using these active records becomes ambiguous as well.</p>
 <p>Why do we use getters/setters so much?</p>
 <ul class="simple">
@@ -100,7 +253,7 @@ automatically.</li>
 <li>It became natural in OOP to have write access to every field.</li>
 </ul>
 <p>However Getters/setters <a class="reference external" href="http://en.wikipedia.org/wiki/Open/closed_principle">violate the open/closed principle</a>, prevent information
-hiding and are <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
+hiding and <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
 (<a class="reference external" href="http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html">Long version</a>). Using
 getters and setters allows to <em>decouples</em> the business logic for setting values from the
 actual storage. Something that object-orientation was suppose to avoid.</p>
@@ -175,12 +328,12 @@ model, using the visitor pattern in combination with view models:</p>
 <li>Why use the Post model in memory, when you are only passing <tt class="docutils literal"><span class="pre">PostView</span></tt>
 instances to the controllers and views only anyways? Its much more efficient
 to have the database map to the view objects directly. This is what CQRS
-postulates as seperation of read- and write model.</li>
+postulates as separation of read- and write model.</li>
 <li>You have to write additional classes for every entity (Data transfer objects)
 instead of passing the entities directly to the view. But if you want to
-cleanly seperate the model from the application/framework, you don’t get
+cleanly separate the model from the application/framework, you don’t get
 around view model/data transfer objects anyways.</li>
-<li>It looks awkard in tests at first, but you can write some custom assertions
+<li>It looks awkward in tests at first, but you can write some custom assertions
 to get your sanity back for this task.</li>
 </ul>
 </div>
@@ -249,12 +402,12 @@ then pass these as commands into our “real model” through a service layer,
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This way we seperated the business model from the application framework.</p>
+<p>This way we separated the business model from the application framework.</p>
 </div>
 <div class="section" id="a-word-about-rad">
 <h2>A word about RAD</h2>
 <p>Rapid-application development or rapid prototyping is a wide-spread approach in web
-development. My explicit approach seems to be completly against this kind of
+development. My explicit approach seems to be completely against this kind of
 development and much slower as well. But I think you don’t loose much time
 in the long run:</p>
 <ul class="simple">
@@ -275,7 +428,7 @@ that these prototypes normally have.</li>
 <div class="section" id="conclusion">
 <h2>Conclusion</h2>
 <p>If we take a step back from all our tools suggesting to generate getter/setters
-we find that there is a simple way to avoid using setters when focussing on the
+we find that there is a simple way to avoid using setters when focusing on the
 tasks that objects perform. This actually makes our code much more readable and
 is one building block towards clean object oriented code and domain driven design.</p>
 <p>I am very interested in your opinions on this topic and my attempt to avoid them,
@@ -308,12 +461,12 @@ mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">Entity, Boundary, Interactor</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
 </ul>
-<p>The last pattern for desigining your business logic is called
-“Command-Query-Responsiblity-Segregation” or short CQRS. It has its roots in
-the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Seperation”</a> principle that was
+<p>The last pattern for designing your business logic is called
+“Command-Query-Responsibility-Segregation” or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-python"><pre>Command-Query-Seperation states that every method should either be a
+<div class="highlight-python"><pre>Command-Query-Separation states that every method should either be a
 command that performs an action, or a query that returns data to the
 caller, but not both. In other words, asking a question should not change
 the answer. More formally, methods should return a value only if they are
@@ -329,7 +482,7 @@ all have their place. This post describes a simple variant that does
 use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
 with CQRS.</p>
 </div>
-<p>At its heart is the seperation of Read and Write methods. This can be easily
+<p>At its heart is the separation of Read and Write methods. This can be easily
 achieved by just having two different service layer classes instead of one.
 This insight alone is not really helpful, its just moving methods around.
 Coupled to this change however is the notion, that read and write models don’t
@@ -337,26 +490,26 @@ necessarily have to be the same:</p>
 <ul class="simple">
 <li>Getter/Setters: We don’t need setters in the write model, instead we use
 explicit methods for each write operation. Entities are also much simpler
-without bi-direcitional relationships that read/write models often need.
+without bi-directional relationships that read/write models often need.
 Read-only models (ViewModel) don’t need getters/setters. They could just use
 public properties or even be arrays.</li>
 <li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
 mostly need queries by primary key, changing only some objects. In
-read scenarios we need complex queries, joins and aggregations. A seperation
+read scenarios we need complex queries, joins and aggregations. A separation
 prevents both from affecting each other negatively.</li>
 <li>Mapping Data-Transfer objects becomes simple. Instead of sending the whole
 model back and forth, for the write scenario you define use-case specific
-tasks and upates. This is much simpler than generic mapping of Data Transfer
+tasks and updates. This is much simpler than generic mapping of Data Transfer
 objects to complex object graphs.</li>
-<li>Transformating SQL directly to a view model in a highly optimized way.
+<li>Transforming SQL directly to a view model in a highly optimized way.
 Simple concept, but it has huge implications: A pure read-only model is simple to
 maintain and refactor for any performance requirements that come up.</li>
 </ul>
 <p>Furthermore with CQRS our write service methods are not allowed to return data
 anymore (With the exceptions to the rule of course). This may increase the
 complexity at first, but it has benefits for scalability and decoupling.
-Following this principle allows us to turn every command from synchroneous to
-asynchroneous processing later without much problems. Services are allowed to
+Following this principle allows us to turn every command from synchronous to
+asynchronous processing later without much problems. Services are allowed to
 throw exceptions and refuse the execution. Proper validation of input data
 should happen before executing write operations though.</p>
 <p>One drawback of CQRS: A naive implementation doubles the amount of classes and
@@ -365,20 +518,20 @@ full blown read-model if you don’t apply CQRS religiously:</p>
 <ul class="simple">
 <li>Don’t use different data-stores for both models.</li>
 <li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
-very simple. You can easily generialize this to a simple object that gives
-efficent access to all your data.</li>
+very simple. You can easily generalize this to a simple object that gives
+efficient access to all your data.</li>
 <li>Share parts of the write and read models if you don’t have to compromise
 much.</li>
 </ul>
-<p>The important thing to take away from this seperation is, that the read part of
+<p>The important thing to take away from this separation is, that the read part of
 your application is seldom the part where business value lies in. Moving this
 code into a different part of your applications allows you to work with the
-underyling data-source much more directly, without need for much abstractions.</p>
+underlying data-source much more directly, without need for much abstractions.</p>
 <p>One thing that CQRS puts forward is the concept of Commands, Command Handlers
 and Command Bus and how they interact. Commands are simple objects that
 contain all the data necessary to execute an operation. Each command is
 processed by exactly one command handler. The Command Bus is responsible to
-route a command to its apporpriate command handler.</p>
+route a command to its appropriate command handler.</p>
 <div class="section" id="example">
 <h2>Example</h2>
 <p>Here is the most simple implementation of the Command Bus, just holds a hash map
@@ -437,7 +590,7 @@ oriented.</p>
 <ul class="simple">
 <li>Nesting handlers that take care of transactions, logging, 2 phase commits</li>
 <li>Order nested command calls sequentially instead of deep into each other.</li>
-<li>Asynchroneous processing with message queue become an option</li>
+<li>Asynchronous processing with message queue become an option</li>
 </ul>
 <p>The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:</p>
@@ -459,18 +612,18 @@ Entity-Boundary-Interactor pattern, usage is simple:</p>
 </div>
 <div class="section" id="pros-and-cons">
 <h2>Pros and Cons</h2>
-<p>I really like CQRS for multiple reasons. It offers excplicit guidance how solve
+<p>I really like CQRS for multiple reasons. It offers explicit guidance how solve
 tasks by making use of a range of different design patterns. This is very
 helpful, because the code-base is based on conventions that are simple to
 understand by everyone on the team. This structure liberates you from the curse
-of choice and gives you a cookbook of best-practicies how to solve problems.
-You want this struture for all your applications, regardless of what
-architectural patttern you have chosen.</p>
+of choice and gives you a cookbook of best-practices how to solve problems.
+You want this structure for all your applications, regardless of what
+architectural pattern you have chosen.</p>
 <p>Embracing the difference between read and write models is another plus of CQRS.
 It is very helpful, not to try fitting both read and write into one model.  You
 also don’t run into so many read-related problems with an ORM any more. You
 design the entities to be optimized for the write model only, loose the
-bidirectional associations and avoid all the optmizations here and there for
+bidirectional associations and avoid all the optimizations here and there for
 read performance.</p>
 <p>Compared to EBI, where we had to maintain a mapping between DTOs and entities,
 CQRS explicitly uses the command based approach to avoid the complexity of
@@ -509,23 +662,23 @@ topic that I will discuss in the next blog post.</p>
 <h1><a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a></h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Aplications: Trying to escape the
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
 mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
 </ul>
 <p>The next design pattern for technical system design is called “Data, Context,
 Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
-paradigm, in the context of PHPs langugage constraints it can be classified as
-architectural design pattern. I came accross this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
+paradigm, in the context of PHPs language constraints it can be classified as
+architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
 through the book on DCI and trying to understand this pattern with me.</p>
-<p>As in the EBI pattern, DCI seperates data objects (Data) from behavior implemented
+<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
 in use-cases (Context). Data objects are never directly involved in these
 use-cases, but are “casted” to their respective roles that they are taking in
 the use-case. This can be implemented with aggregation or traits in PHP.</p>
 <p>One goal of DCI is to get object-oriented programming to a place, where you
-can look at a use-case and its roles and be very sure that the programm is
+can look at a use-case and its roles and be very sure that the program is
 running correctly, because you can guarantee that there are no unexpected side
-effects. It also aims at keeping the amound of code required to keep in mind
+effects. It also aims at keeping the amount of code required to keep in mind
 for a given use-case as small as possible, allowing developers to reason about
 the code with more confidence.</p>
 <div class="section" id="terminology">
@@ -544,7 +697,7 @@ each other. These roles then modify the underlying data.</p>
 <h2>Example</h2>
 <p>Starting from the bank account example of the EBI post, we can introduce DCI
 quite easily by adding the missing concept of roles. In the use case of
-transfering money that would be:</p>
+transferring money that would be:</p>
 <ul class="simple">
 <li>TransferMoneySource</li>
 <li>TransferMoneySink (Destination)</li>
@@ -569,7 +722,7 @@ objects using them in the tests for this use-case.</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">desposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
 <span class="p">}</span>
@@ -608,7 +761,7 @@ on the execution of this use-case.</p>
 <p>The use-case <tt class="docutils literal"><span class="pre">TransferMoney</span></tt> would then be modified to create Roles instead
 of Data objects from the DAO. This can be a bit tricky when you have multiple
 data objects implementing the same role and you have no way of knowing which
-underyling data object to pick. The binding of data objects to roles happens
+underlying data object to pick. The binding of data objects to roles happens
 in the use-case. The use-case needs a means to retrieve objects with certain
 roles, which then access underlying data sources. To avoid that your use-cases
 have to know about how to bind roles to data, you could use GUIDs in your
@@ -635,7 +788,7 @@ corresponding data.</p>
 </pre></div>
 </div>
 <p>The simplicity of this is appealing, however don’t forget that we have
-abstracted I/O completley here. There has to be code that deals with that part
+abstracted I/O completely here. There has to be code that deals with that part
 of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
 implications.</p>
@@ -727,7 +880,7 @@ parts of the system.</p>
 <h1><a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Aplications: Trying to escape the
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
 mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
@@ -739,7 +892,7 @@ by Alistair Cockburn.</p>
 <p>In this pattern any client of the system talks to the model using a model
 request object and receives data from the model in form of model responses objects.
 Additionally when your model talks to any kind of persistence or subsystem it
-should go through an adapter that is replacable. For a model architecture
+should go through an adapter that is replaceable. For a model architecture
 designed this way, you can replace any part of the UI oder lower layers by
 writing new adapters and plug them in.</p>
 <div class="section" id="terminology">
@@ -749,7 +902,7 @@ writing new adapters and plug them in.</p>
 much logic except rules that are set in stone and are never going to change
 (based on physic or mathematical laws or something).</p>
 <p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
-in the current use-case and works with entities to fullfil their task.</p>
+in the current use-case and works with entities to fulfil their task.</p>
 <p>The <strong>boundary</strong> is responsible for translating model request/response into a
 format that the UI or actor can understand. They also mediate between model
 and lower levels, for example to manage database transactions.</p>
@@ -785,7 +938,7 @@ is the money transfer from one bank account (source) to another one
 </div>
 <p>It is straightforward to implement the <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>
 functionality. The Money object implementation is omitted here.</p>
-<p>The Interactor handles the use-case of transfering money from the
+<p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
@@ -870,7 +1023,7 @@ generic approach to getting this job done.</p>
 <a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
 (Reason below).  It allows you to wrap calls to the model by some sort of proxy
 that transforms the request and response and also handles transactions and
-such. Loosly spoken this was actually some kind of AOP library, using the
+such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
 <p>With context you would do something like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -901,7 +1054,7 @@ use.</p>
 <h2>Using with Symfony2</h2>
 <p>As I am currently exclusively developing Symfony2/Silex applications, applying
 EBI to Symfony2 framework based applications is very important to me. The
-biggest difficulty here is the Form layer, escpecially the request data-mapping and
+biggest difficulty here is the Form layer, especially the request data-mapping and
 validation concerns, which are normally part of the model. There are two
 approaches I came up with to solve this:</p>
 <ul class="simple">
@@ -927,7 +1080,7 @@ an object, but in this case you are using the Form API as the mapper.</li>
 <p>The problem with this approach is, that you cant really unit-test these methods
 anymore, because the complexity of the form layer mapping cannot be mocked with
 this API. Instead your tests always need the full form layer (with validation,
-depending services etc.) to allow for real-world esting. Additionally you have
+depending services etc.) to allow for real-world testing. Additionally you have
 to make the DataMapper throw an exception that you can catch in the controller,
 rendering the appropriate response. Using exceptions for controlling executions
 paths is not a very good practice though.</p>
@@ -943,7 +1096,7 @@ pattern in PoEAA. EBI is going a bit more into detail by naming individual
 parts of the pattern more explicit. Without more restrictions however using
 this pattern will drive you towards many of the problems described in my
 previous post.</p>
-<p>Clean seperation from frameworks is achieved, depending on the actual usage
+<p>Clean separation from frameworks is achieved, depending on the actual usage
 however only at a significant cost.  Never forget stepping back and thinking
 about further abstractions, otherwise applying EBI is leading to lots of code
 being manually written.</p>
@@ -974,7 +1127,7 @@ use-case”).</p>
 <p>In conclusion I can partially recommend using the EBI pattern. You have to be
 careful to find abstraction layers that keep your code DRY and SOLID however,
 something which does not come naturally with this pattern. If you are not
-careful you end up with all the “messy points” that I mentioned in my previoius
+careful you end up with all the “messy points” that I mentioned in my previous
 blog post.</p>
 <p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
 by using some code-generation for example to do parts of this job for you. The
@@ -1015,8 +1168,8 @@ introduction to a series about this approaches.</p>
 </ol>
 <p>The first produces code solving technical problems, often in a beautiful and
 dedicated way. The second regularly produces mess, hopefully still
-serving customers by optimizing their business. This differentation is an
-exageration, but from my experience its far easier to run a greenfield business
+serving customers by optimizing their business. This differentiation is an
+exaggeration, but from my experience its far easier to run a greenfield business
 project into the ground than a new library.</p>
 <p>There has to be a reason why so many programmers dedicate much free time to
 open source projects. It might be empirical prove, that all our business
@@ -1031,14 +1184,14 @@ of OOP business applications.</p>
 <p>This blog post is not about blaming customers (as the usual suspect), its about
 finding the problems in usual OOP code of business systems from my experience
 with PHP projects. To keep things short, I will list my <em>personal</em> list of
-techincal annoyances in business projects in no particular order. These are
+technical annoyances in business projects in no particular order. These are
 highly subjective points.</p>
 <ul class="simple">
 <li>Getter/Setter Madness of Objects that are used to store data into
 databases. Leading to huge objects that are essentially just meaningless
 stores of data.</li>
 <li>Updating complex object graphs from user input.</li>
-<li>Seperation of model, controller and views, especially when dealing with
+<li>Separation of model, controller and views, especially when dealing with
 forms. This is very complicated to achieve.</li>
 <li>Lazy Loading and Query performance problems when using an ORM. Additionally
 replacing parts of the views with hand-crafted SQL is often difficult and/or
@@ -1049,7 +1202,7 @@ change.</li>
 <li>Dependency mess leading to hard to test code, generally leading to untested
 applications. Too often frameworks create huge dependencies that
 make your domain model messy and complex to mock in tests.</li>
-<li>Focus on synchroneous request/response handling makes later usage of message
+<li>Focus on synchronous request/response handling makes later usage of message
 queues very complicated and expensive to refactor towards.</li>
 <li>Tight coupling of model against the framework code.</li>
 <li>Junior developers have too much freedom, when there is not much structure in
@@ -1079,18 +1232,18 @@ the problems listed above. But without changes in your mindest you end up with
 hand written mess, compared to getting there with tools.</p>
 <p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
 the problem even worse. It easily leads to lasagna code, where you have layers
-of layers that are very hard to understand. Personally I prefer spagetthi code
+of layers that are very hard to understand. Personally I prefer spaghetti code
 over lasagna code, because its comparatively simpler to understand.</p>
 </div>
 <div class="section" id="finding-new-approaches">
 <h2>Finding new Approaches</h2>
 <p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
-there has to be some solution to organize business models structurely to avoid
+there has to be some solution to organize business models structurally to avoid
 all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a>
 you have a powerful toolbox to avoid many of the problems above, but it is
 still not simple to write clean object oriented applications.</p>
 <p>After years of participation in both open source projects I still feel there is
-a missing puzzle piece, to reach a clean seperation of all the model concerns
+a missing puzzle piece, to reach a clean separation of all the model concerns
 from framework and persistence.</p>
 <p>At some point I would really like to close the gap between desired technical
 state of a project and the state it is actually in. I know there is no size
@@ -1102,18 +1255,18 @@ I was introduced to several approaches to OO application design that I
 started to explore in the past last months:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
-studied alot</li>
+studied a lot</li>
 <li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
 architecture or “Ports and adapters”. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
 at Ruby Midwest</a>
 last year.</li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
-<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blost post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
 day video class</a> by Greg Young.</li>
 </ul>
 <p>They are not new and have all been around for several years already. I would
 describe all three of them as architectural design patterns, though some people
-might probably disagreee with this classification. All three approaches make
+might probably disagree with this classification. All three approaches make
 you think about application development beyond just “service layers” in
 radically new ways. All three have helped me rethink business applications in
 different ways.</p>
@@ -1138,6 +1291,145 @@ Conference</a> in Sankt Augustin Germany on
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html#disqus_thread" data-disqus-identifier="2012/08/11/oop_business_applications__trying_to_escape_the_mess">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>June 03, 2012</span> 
+        </div>
+        <div class="section" id="setting-up-development-machines-with-puppet">
+<h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
+<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+dsecribe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
+<li>and I propably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
+via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I seperate the installation process into two puppet files, one that has to be
+run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
+my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
+
+# VIM Dot Files
+vcsrepo { 'vim-dotfiles':
+    path     =&gt; &quot;/home/$id/.vim&quot;,
+    ensure   =&gt; present,
+    provider =&gt; git,
+    source   =&gt; 'https://...'
+}
+
+file { 'vim-dotfiles-symlink':
+    path   =&gt; &quot;/home/$id/.vimrc&quot;,
+    ensure =&gt; link,
+    target =&gt; '.vim/vimrc',
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+
+exec { 'vim-make-command-t':
+    command =&gt; 'rake make',
+    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
+    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
+    require =&gt; Vcsrepo['vim-dotfiles']
+}</pre>
+</div>
+<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<div class="highlight-python"><pre># Configure Git
+exec { &quot;git-author-name&quot;:
+    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
+    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
+}
+
+exec { &quot;git-author-email&quot;:
+    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
+    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
+}
+
+exec { &quot;git-global-ignore&quot;:
+    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
+    unless  =&gt; 'git config -l --global|grep excludesfile'
+}
+
+file { &quot;git-global-ignorefile&quot;:
+    path =&gt; &quot;/home/$id/.gitignore&quot;,
+    ensure =&gt; present,
+    content =&gt; &quot;*.swo\n*.swp\n&quot;
+}</pre>
+</div>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html#disqus_thread" data-disqus-identifier="2012/06/03/setting_up_development_machines_with_puppet">Leave a comment</a>
         </div>
     </div><div class="separator post_separator"></div>
         
@@ -1225,7 +1517,7 @@ that we want to use with vagrant, do:</p>
 <span class="nv">$ </span>vagrant ssh
 </pre></div>
 </div>
-<p>Although the blog-title suggests it, Puppet hasnt been used much up to this
+<p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
 point. The use of puppet with Vagrant will be part of a next blog post.</p>
 </div>
         
@@ -1249,7 +1541,7 @@ point. The use of puppet with Vagrant will be part of a next blog post.</p>
 <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
-succesfully in roughly 4 weeks. For that we used a small web-based tool to
+successfully in roughly 4 weeks. For that we used a small web-based tool to
 ask the permission of 358 authors that contributed in the last 6 years.</div></blockquote>
 <p>The <a class="reference external" href="http://www.doctrine-project.org">Doctrine project</a> has been LGPL
 licensed since it was started in 2006. When I first started contributing in the
@@ -1268,12 +1560,12 @@ the original project.</div></blockquote>
 of this year we as Doctrine project first started to investigate how the task
 of switching the license could be done. After a short email with the <a class="reference external" href="http://www.fsf.org">FSF</a> it was clear that we had to get the approval of every
 single committer or remove their code.</p>
-<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">succesfully attempted a license change</a> last year from GPL to LGPL, so we
+<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">successfully attempted a license change</a> last year from GPL to LGPL, so we
 we’re hopeful to get this done. After discussing with Lukas we came up with the
 idea of a tool that helps this process, so <a class="reference external" href="http://dlm.beberlei.de">I wrote it</a>. It features:</p>
 <ul class="simple">
 <li>Import of all commits from one or many Github projects</li>
-<li>Aggregation of commits to authors based on e-mail adress from Git log</li>
+<li>Aggregation of commits to authors based on e-mail address from Git log</li>
 <li>Status approved/not-approved for every author.</li>
 <li>An e-mail engine to send a request for approval to every author using
 <a class="reference external" href="http://www.mailgun.net">the awesome Mailgun service</a>, who has not approved
@@ -1292,7 +1584,7 @@ eventually collected all e-mail addresses except maybe 6-8 missing ones.</p>
 <p>Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
 accepted the license change. No single person refused the change. All commits
 of the 16 people left we’re luckily not part of the code base anymore when we
-completly rewrote Doctrine 2 or trivial one-line changes.</p>
+completely rewrote Doctrine 2 or trivial one-line changes.</p>
 <p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.</p>
 </div>
@@ -1350,7 +1642,7 @@ application.</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="c1">// We dont need that Environment stuff, just one config</span>
+        <span class="c1">// We don't need that Environment stuff, just one config</span>
         <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -1441,7 +1733,7 @@ dependencies.</p>
 </pre></div>
 </div>
 <p>Now just run your web-test cases.</p>
-<p>If you want to debug the logging happing inside the Kernel just comment out
+<p>If you want to debug the logging happening inside the Kernel just comment out
 the Monolog lines to get the log-messages printed to the screen.</p>
 <p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
 control ignore files.</p>
@@ -1458,234 +1750,6 @@ control ignore files.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/02/25/symfony2_controller_testing.html#disqus_thread" data-disqus-identifier="2012/02/25/symfony2_controller_testing">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>February 07, 2010</span> 
-        </div>
-        <div class="section" id="resources-for-a-php-and-hudson-ci-integration">
-<h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
-<p>Yesterday I finally had the time to setup my first continuous
-integration environment. Possible solutions for CI are
-<a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
-<a class="reference external" href="http://www.hudson-ci.org">Hudson</a> or
-<a class="reference external" href="http://www.arbitracker.org">Arbit</a>. Although phpUnderControl is the
-most wide-spread, but from I heard complex to setup/maintain, solution
-[STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
-to give Hudson a shoot. Another reason for this decision, I heard it has
-a simple plugin architecture and is easy to install and use.
-Additionally Hudson is easily integrated into
-<a class="reference external" href="http://www.netbeans.org">Netbeans</a> and
-<a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
-development.</p>
-<p>My motivation to dive into CI is easily explained. I just never felt it
-was necessary to add a continuous integration enviroment to my projects,
-since I had one or two simple bash scripts that did the job. In general
-this is rather annoying, because they mostly only run PHPUnit and have
-to be done using a cronjob or manually, without any real process of
-notification. Additionally you have no way to navigate the test-results,
-code-coverage and no history of the last builds. For projects like
-<a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> we have the additional
-requirement to support 4 different database platforms, i.e. 4 different
-PHPUnit configurations. Currently that is solved by me using a Bash
-script that iterates over the configuration file names and invokes
-PHPUnit.</p>
-<p>There are already some awesome sources how to get Hudson and PHP
-working. I’ll list them here:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
-Screenshots</a></li>
-<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
-Hudson</a></li>
-<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
-Screenshots)</a></li>
-</ul>
-<p>All those guides are already awesome and I would recommend choosing one
-of those to install Hudson, I think i can’t add anything new to those. I
-have used Sebastians Howto, however i also like the third one. David
-Luhmans guide adds lots of details that are important to get the
-different parts of a build process to work.</p>
-<p>Now what these tutorials all do is that they use a bash command to
-execute the build process or specifiy an Ant Build file. However there
-is also a Phing Build process plugin for Hudson that allows to specify
-the build.xml targets to execute in the process. From the “Available
-Plugins” list you can choose the “Phing plugin”.</p>
-<p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
-Plugin Wiki
-Page</a> shows how
-to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
-look for Phing. There you find the dialog to configure your phing
-installations.</p>
-<p>In the context of choosing a build script for your project you can now
-choose “Phing” instead of Ant:</p>
-<div class="figure align-center">
-<img alt="" src="http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849/"/>
-</div>
-<p>You can enter the targets to build, for example on my local Hudson
-instance I only execute “test” for Doctrine 2, since I am not interested
-in the building and deployment onto the PEAR channel at this development
-stage.</p>
-<p>From inside Netbeans you can then start builds by pointing to the Hudson
-instance. See this tutorial by one of the <a class="reference external" href="http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6">Hudson + Netbeans
-Developers</a>.
-You can then start all the builds from inside Netbeans and be notified
-of the success or failure.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/02/07/resources-for-a-php-and-hudson-ci-integration.html#disqus_thread" data-disqus-identifier="2010/02/07/resources-for-a-php-and-hudson-ci-integration">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>May 02, 2010</span> 
-        </div>
-        <div class="section" id="testing-database-locks-with-phpunit-and-gearman">
-<h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
-<p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
-2</a> we plan to integrate pessimistic
-Database-level locks across all the supported vendors (MySQL, Oracle,
-PostgreSql, IBM DB2 so far). This means row-level locking as defined in
-the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
-optionally in DQL Queries and Finder methods. The Implementation of this
-extension to SELECT statements is rather trivial, however functional
-testing of this feature is not.</p>
-<p>A general approach would look like this:</p>
-<ol class="arabic simple">
-<li>Run Query 1 and 2 with FOR UPDATE into the background</li>
-<li>Have both queries lock the row for a specified time x (using sleep)</li>
-<li>Verify that one of the two processes/threads runs approximately 2*x
-the lock time.</li>
-</ol>
-<p>Since PHP does not support process forking or threads naturally you run
-into a serious problem. How do you execute two database queries in
-parallel and verify that indeed one query is locking read access for the
-second one?</p>
-<p>Side note: There are some drawbacks to this testing approach. It could
-be that one background threads finishes the lock sleep already when the
-second just starts. The locking would work in these cases, however the
-lock time would not nearly be 2*x seconds, producing a test-failure. We
-are talking about a functional test though and I will accept a failure
-from time to time just to be 99% sure that locking works.</p>
-<p>Solving this problem with Gearman provides a pretty nice “real-world”
-example for the Job-Server that I wanted to share. This blog post
-contains a stripped down code-example from the Doctrine 2 testsuite. If
-you are interested, you can see the complete Gearman Locking Tests in
-<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
-GitHub</a>.</p>
-<p>Gearman allows to register worker processes with the job-server and
-offers clients to execute jobs on those workers in parallel. After
-installing the Gearman job-server and PHP pecl/gearman extension
-(<a class="reference external" href="http://toys.lerdorf.com/archives/51-Playing-with-Gearman.html">Rasmus Lerdorf has a post on
-installation</a>)
-we can go on writing our locking tests with Gearman.</p>
-<p>The first bit is the worker, a PHP script that tries to acquire a
-database lock and then sleeps for a second. The return value of this
-script is the total time required for acquiring the lock and sleeping.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class LockAgentWorker</span>
-<span class="x">{</span>
-<span class="x">    public function findWithLock($job)</span>
-<span class="x">    {</span>
-<span class="x">        $fixture = $this-&gt;processWorkload($job); // setup doctrine in here</span>
-
-<span class="x">        $s = microtime(true);</span>
-<span class="x">        $this-&gt;em-&gt;beginTransaction();</span>
-
-<span class="x">        $entity = $this-&gt;em-&gt;find($fixture['entityName'], $fixture['entityId'], $fixture['lockMode']);</span>
-
-<span class="x">        sleep(1);</span>
-<span class="x">        $this-&gt;em-&gt;rollback(); // clean up doctrine</span>
-
-<span class="x">        return (microtime(true) - $s);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>The glue-code for the worker script contains of the registering of the
-worker method with the job-server and a simple infinite loop:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$lockAgent = new LockAgentWorker();</span>
-
-<span class="x">$worker = new \GearmanWorker();</span>
-<span class="x">$worker-&gt;addServer();</span>
-<span class="x">$worker-&gt;addFunction(&quot;findWithLock&quot;, array($lockAgent, &quot;findWithLock&quot;));</span>
-
-<span class="x">while($worker-&gt;work()) {</span>
-<span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
-<span class="x">        break;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>We need two running workers for this to work, since one worker only
-processes one task at a time. Just open up two terminals and launch the
-php scripts. They will wait for their first task to process.</p>
-<p>Now we need to write our PHPUnit TestCase, which will contain a
-GearmanClient to execute two of the “findWithLock” in parallel. Our
-locking assertion will work like this:</p>
-<ol class="arabic simple">
-<li>Register two tasks for the “findWithLock” method that access the same
-database row.</li>
-<li>Register a completed callback using
-“GearmanClient::setCompleteCallback()” that collects the run-time of
-the individual workers.</li>
-<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
-<li>Assert that the maximum run-time is around 2 seconds (since each
-worker sleeps 1 second)</li>
-</ol>
-<p>The code for this steps could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
-<span class="x">{</span>
-<span class="x">    private $gearman = null;</span>
-<span class="x">    private $maxRunTime = 0;</span>
-<span class="x">    private $articleId;</span>
-
-<span class="x">    public function testLockIsAquired()</span>
-<span class="x">    {</span>
-<span class="x">        // .. write fixture data into the database</span>
-
-<span class="x">        $gearman = new \GearmanClient();</span>
-<span class="x">        $gearman-&gt;addServer();</span>
-<span class="x">        $gearman-&gt;setCompleteCallback(array($this, &quot;gearmanTaskCompleted&quot;));</span>
-
-<span class="x">        $workload = array(); // necessary workload data to configure workers</span>
-<span class="x">        $gearman-&gt;addTask(&quot;findWithLock&quot;, serialize($workload));</span>
-<span class="x">        $gearman-&gt;addTask(&quot;findWithLock&quot;, serialize($workload));</span>
-
-<span class="x">        $gearman-&gt;runTasks();</span>
-
-<span class="x">        $this-&gt;assertTrue($this-&gt;maxRunTime &gt;= 2);</span>
-<span class="x">    }</span>
-
-<span class="x">    public function gearmanTaskCompleted($task)</span>
-<span class="x">    {</span>
-<span class="x">        $this-&gt;maxRunTime = max($this-&gt;maxRunTime, $task-&gt;data());</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>Now if both workers are waiting for processing the task we can run this
-test and get a green bar for a working lock support.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/05/02/testing-database-locks-with-phpunit-and-gearman.html#disqus_thread" data-disqus-identifier="2010/05/02/testing-database-locks-with-phpunit-and-gearman">Leave a comment</a>
         </div>
     </div>
     
