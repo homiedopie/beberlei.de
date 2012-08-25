@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/08/25/decoupling_applications_with_domain_events
    2012/08/22/building_an_object_model__no_setters_allowed
    2012/08/18/oop_business_applications__command_query_responsibility_seggregation
    2012/08/16/oop_business_applications__data__context__interaction
