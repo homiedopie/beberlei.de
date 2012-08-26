@@ -79,6 +79,60 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>October 01, 2008</span> 
+        </div>
+        <div class="section" id="my-recent-zf-ongoings-jquery-action-controller-couchdb">
+<h1><a href="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html">My recent ZF ongoings: JQuery, Action Controller, CouchDb</a></h1>
+<p>In the last weeks lots of stuff came up for me regarding the Zend
+Framework. My <a class="reference external" href="http://jquery.com">jQuery</a> component is finished, i
+have even committed the documentation into the SVN already. Do read it
+you have to be either an XML fetishist or compile it using a docbook
+compiler. Lots of questions about ZF and jQuery come up regularly on the
+mailing lists so I really look forward for the first ZF 1.7 release
+candidate which will include the helpers for a broader audience. This
+component comes at a good point, since <a class="reference external" href="http://jquery.com/blog/2008/09/28/jquery-microsoft-nokia/">a few days ago the jQuery team
+announced a deal with Microsoft and
+Nokia</a>.
+Microsoft will include jQuery as the framework to go into its Webbased
+ASP.Net applications and Nokia will include the library in their mobile
+phones.</p>
+<p>Additionally i reported an <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-4385">important issue
+(ZF-4385)</a> that
+offers a patch to create an interface of the Action Controller and
+therefore allows everyone to implement their own action controller
+classes. May it be lightweight implementations or like my current
+use-case webservice only controllers that route all their actions
+through soap, xml-rpc or a rest server. I would really appreciate if
+more people would vote +1 on this issue to get it included in 1.7</p>
+<p>In the last weeks i also played around with
+<a class="reference external" href="http://incubator.apache.org/couchdb/docs/overview.html">CouchDb</a>, a
+document based database. Its the perfect storage medium for blogs, wikis
+or other knowledge-based applications and comes with a lightweight and
+easy REST Api for ClientSide access. Within the
+<a class="reference external" href="http://www.zym-project.com">Zym</a> project i managed to implement a
+prototype that is based on Jurrien’s prototype for a CouchDb client.
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_Couch+-+Matthew+Weier+O'Phinney">Matthew of Zend Fame published a proposal for a Zend
+Couch</a>
+component yesterday and we teamed up to implement two prototypes
+(<a class="reference external" href="http://github.com/weierophinney/phly/tree/beberlei">mine</a> is based
+on <a class="reference external" href="http://github.com/weierophinney/phly/tree/master">Matthews</a> and
+integrates lots of stuff of the Zym component).</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html#disqus_thread" data-disqus-identifier="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>April 27, 2008</span> 
         </div>
         <div class="section" id="ox-cross-correlation-coefficients-with-lags">
@@ -851,68 +905,6 @@ from the controller result. Testability is very high.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html#disqus_thread" data-disqus-identifier="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 04, 2008</span> 
-        </div>
-        <div class="section" id="rest-and-ajax-aware-controllers-in-ezcmvctools">
-<h1><a href="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html">REST and Ajax Aware controllers in ezcMvcTools</a></h1>
-<p>There are essentially two major different ways to implement a restful
-application using a web framework. You either implement a router that
-routes to different controller actions based on the HTTP method used on
-a requested resource. This is the fancy way, which sadly is not always
-so practical because many browsers do not support sending more than GET
-and POST requests. The other way would be to define suburls of a
-resource such as <strong>/user/1/delete</strong> for the resource <strong>/user/1</strong> and
-take GET a a request for deleting and POST for the confirmation of the
-delete.</p>
-<p>ezcMvcTools HTTP Request Parser and routing mechanisms currently offer
-no real help to decide on this issues, but its easy to extend this
-missing functionality. What we first add are simple checks of the
-current http request method. We extend <strong>ezcMvcHttpRequestParser</strong> which
-will return a derived <strong>ezcMvcRequest</strong> object that implements 7 new
-methods: isPost(), isGet(), isDelete(), isPut(), isXmlHttpRequest(),
-isMethod() and getMethod(). These methods can now be easily used on the
-request object to determine which action will be undertaken:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myMvcRequest extends ezcMvcRequest{  public function isPost()  {    return $this-&gt;isMethod(&quot;POST&quot;);  }  public function isGet()  {    return $this-&gt;isMethod(&quot;GET&quot;);  }  public function isPut()  {    return $this-&gt;isMethod(&quot;PUT&quot;);  }  public function isDelete()  {    return $this-&gt;isMethod(&quot;DELETE&quot;);  }  public function isXmlHttpRequest()  {    if(isset($this-&gt;raw['HTTP_X_REQUESTED_WITH'])      &amp;&amp; strtolower($this-&gt;raw['HTTP_X_REQUESTED_WITH']) == &quot;xmlhttprequest&quot;) {      return true;    }    return false;  }    public function getMethod()  {    if(isset($this-&gt;raw['REQUEST_METHOD']))      return strtolower($this-&gt;raw['REQUEST_METHOD']);    }    return false;  }  public function isMethod($method)  {    if(isset($this-&gt;raw['REQUEST_METHOD']) &amp;&amp;       $this-&gt;getMethod() == strtolower($method)) {      return true;    }    return false;  }}class myMvcHttpRequestParser extends ezcMvcHttpRequestParser{  /**   * Uses the data from the superglobals.   *   * @return ezcMvcRequest   */  public function createRequest()  {    $this-&gt;request = new myMvcRequest;    $this-&gt;processStandardHeaders();    $this-&gt;processAcceptHeaders();    $this-&gt;processUserAgentHeaders();    $this-&gt;processFiles();    $this-&gt;processAuthVars();    $this-&gt;request-&gt;raw = &amp;$_SERVER;    return $this-&gt;request;  }}</pre>
-</div>
-</div></blockquote>
-<p>This helps us to implement simple decision mechanisms in a single
-controller action that takes both POST and GET requests. From the point
-separation of concerns this is not a good design decision. We need
-routes that can point to different controller actions based on their
-request method, so that two requests <strong>GET /user/1/delete</strong> and <strong>POST
-/user/1/delete</strong> lead to different methods, for example
-<strong>userController::doDeleteDialog</strong> and <strong>userController::doDelete</strong>. We
-will simply extend the <strong>ezcMvcRailsRoute</strong> to support decision based on
-http request methods:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myMvcRestRoute extends ezcMvcRailsRoute{  protected $method;  public function __construct( $method, $pattern, $controllerClassName, $action = null, array $defaultValues = array() )  {    $this-&gt;method = $method;    parent::__construct($pattern, $controllerClassName, $action, $defaultValues);  }  public function matches( ezcMvcRequest $request )  {    if(strtolower($this-&gt;method) == strtolower($request-&gt;raw['REQUEST_METHOD'])) {      return parent::matches($request);    }    return null;  }}</pre>
-</div>
-</div></blockquote>
-<p>This very simple extension is independent of the advanced request parser
-given above, so you could use it separately. In the light of our delete
-user example, you would use the new router in the following way:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myRouter extends ezcMvcRouter{  public function createRoutes()  {    return array(      new myMvcRestRoute( 'GET', '/users/:id/delete', 'UserController', 'deleteDialog' ),      new myMvcRestRoute( 'POST', '/users/:id/delete', 'UserController', 'delete' ),    );  }}</pre>
-</div>
-</div></blockquote>
-<p>We have now simple rest route support in our ezcMvcTools application.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html#disqus_thread" data-disqus-identifier="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -959,6 +951,9 @@ user example, you would use the new router in the following way:</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
         </li>
         <li class="recent_post">
@@ -984,9 +979,6 @@ user example, you would use the new router in the following way:</p>
         </li>
         <li class="recent_post">
             <a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a>
         </li>
     </ul>
 </div>
