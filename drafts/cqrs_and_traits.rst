@@ -35,7 +35,7 @@ Now you can have any approvable entity use this trait, for
 example the hours worked by an employer on a particular project,
 or the project offering to a customer:
 
-.. code-block::
+.. code-block:: php
 
     <?php
     class HoursWorked
