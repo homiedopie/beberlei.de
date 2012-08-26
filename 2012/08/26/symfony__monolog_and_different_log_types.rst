@@ -17,7 +17,7 @@ If you want to create a different logger service that is responsible for a
 different type of your application stack, just define it using the ``channels``
 option:
 
-.. code_block:: 
+.. code-block:: yaml
 
     monolog:
         handlers:
