@@ -79,6 +79,74 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>May 26, 2012</span> 
+        </div>
+        <div class="section" id="doctrine-switches-from-lgpl-to-mit">
+<h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
+<blockquote>
+<div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
+successfully in roughly 4 weeks. For that we used a small web-based tool to
+ask the permission of 358 authors that contributed in the last 6 years.</div></blockquote>
+<p>The <a class="reference external" href="http://www.doctrine-project.org">Doctrine project</a> has been LGPL
+licensed since it was started in 2006. When I first started contributing in the
+project late in 2009 we were constantly asked about changing the license to a
+permissive license such as <a class="reference external" href="http://en.wikipedia.org/wiki/MIT_License">MIT</a> or
+New-BSD.  My subjective feeling is that there are much more libraries with
+permissive licenses than 10 years ago. And there are others that <a class="reference external" href="http://news.cnet.com/8301-13556_3-20071811-61/the-open-source-license-landscape-is-changing/">back my
+feeling up with facts</a>.
+The fear of getting screwed when using a permissive license has probably
+declined in favor of the benefits. <a class="reference external" href="http://pooteeweet.org/blog/2084">As Lukas puts it</a>:</p>
+<blockquote>
+<div>Maybe with enough experience you start to realize that it happens close to
+never that a proprietary fork of an open source project ends up outpacing
+the original project.</div></blockquote>
+<p>We wanted all the benefits of permissive licenses as well.  So at the beginning
+of this year we as Doctrine project first started to investigate how the task
+of switching the license could be done. After a short email with the <a class="reference external" href="http://www.fsf.org">FSF</a> it was clear that we had to get the approval of every
+single committer or remove their code.</p>
+<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">successfully attempted a license change</a> last year from GPL to LGPL, so we
+we’re hopeful to get this done. After discussing with Lukas we came up with the
+idea of a tool that helps this process, so <a class="reference external" href="http://dlm.beberlei.de">I wrote it</a>. It features:</p>
+<ul class="simple">
+<li>Import of all commits from one or many Github projects</li>
+<li>Aggregation of commits to authors based on e-mail address from Git log</li>
+<li>Status approved/not-approved for every author.</li>
+<li>An e-mail engine to send a request for approval to every author using
+<a class="reference external" href="http://www.mailgun.net">the awesome Mailgun service</a>, who has not approved
+yet. We use Mailgun for fun and to have a way to act on bounces easily.</li>
+<li>Admin functionality to mark commits as “trivial or deleted”.</li>
+<li>An audit trail to account for all changes and who has done them.</li>
+<li>Symfony2/Doctrine2 application with debian packaging using FPM.</li>
+</ul>
+<p>This project is not yet open-sourced but will be when I have some time to clean
+up the hardcoded passwords and write a small README on how to adjust the
+templates.</p>
+<p>After importing the commits of all the LGPL licensed Doctrine projects we
+realized that we have 358 unique committers and about 40-50 without an e-mail
+address (from the old SVN days). So we started googling for nicknames and
+eventually collected all e-mail addresses except maybe 6-8 missing ones.</p>
+<p>Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
+accepted the license change. No single person refused the change. All commits
+of the 16 people left we’re luckily not part of the code base anymore when we
+completely rewrote Doctrine 2 or trivial one-line changes.</p>
+<p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
+fun with it.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/05/26/doctrine_goes_mit.html#disqus_thread" data-disqus-identifier="2012/05/26/doctrine_goes_mit">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>February 25, 2012</span> 
         </div>
         <div class="section" id="symfony2-controller-testing-without-application">
@@ -1075,48 +1143,6 @@ The stream wrapper to make this work looks like this:</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html#disqus_thread" data-disqus-identifier="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>February 25, 2009</span> 
-        </div>
-        <div class="section" id="git-is-great-helping-out-with-mutateme">
-<h1><a href="2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a></h1>
-<p>These last days I had fun with <a class="reference external" href="https://github.com/padraic/mutateme/tree">Padraic Bradys
-MutateMe</a> project. It
-dynamically changes your code (using PECL Runkit extension) and checks
-weather your test cases fetch the errors occurring from changing the
-source code. This is a great addition to having a test suite, because it
-finds all the problematic test cases, that try to do too much and fail
-to cover the code correctly.</p>
-<p>I have also contributed to the MutateMe project already and this was
-only possible due to Git and <a class="reference external" href="http://www.github.com">GitHub</a>, which
-makes contributing to any project easy like writing a hello world
-example in a random programing language. As such I have to agree with
-Padraic: <a class="reference external" href="http://blog.astrumfutura.com/archives/390-Mutation-Testing-MutateMe-0.2.0alpha-Released.html">I love Git,
-too!</a>
-He already integrated my and <a class="reference external" href="http://www.phpunit.de">Sebastians</a>
-changes back into the master and we didn’t have to focus on merging,
-communication and integration a lot.</p>
-<p>My <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PUMA project</a> is also
-hosted on GitHub (although nobody has looked into that yet), but I am
-beginning to write a complete Runner now that calls all three components
-<a class="reference external" href="http://www.phpunit.de">PHPUnit</a>, <a class="reference external" href="http://www.pdepend.org">PDepend</a>
-and CodeSniffer at once and directly processes the results. When this is
-done, I will pack it all up as a PEAR package for anyone to test out.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/02/25/git-is-great-helping-out-with-mutateme.html#disqus_thread" data-disqus-identifier="2009/02/25/git-is-great-helping-out-with-mutateme">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -1163,6 +1189,9 @@ done, I will pack it all up as a PEAR package for anyone to test out.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a>
         </li>
         <li class="recent_post">
@@ -1188,9 +1217,6 @@ done, I will pack it all up as a PEAR package for anyone to test out.</p>
         </li>
         <li class="recent_post">
             <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a>
         </li>
     </ul>
 </div>

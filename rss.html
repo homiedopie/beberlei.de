@@ -7,6 +7,47 @@
         <language>en-us</language>
         <pubDate>Sun, 26 Aug 2012 00:00:00 +0200</pubDate>
         <item>
+            <link>http://www.whitewashing.de/2012/08/26/symfony__monolog_and_different_log_types.html</link>
+            <guid>http://www.whitewashing.de/2012/08/26/symfony__monolog_and_different_log_types.html</guid>
+            <title>Symfony, Monolog and different log types</title>
+            <description><![CDATA[<div class="section" id="symfony-monolog-and-different-log-types">
+<h1>Symfony, Monolog and different log types</h1>
+<p>Symfony uses the excellent Monolog library for logging everything related
+to the symfony application stack. But sometimes you need a different logger
+that responds differently to the log error levels. Ideally you don’t want
+to reuse the application log mechanism to avoid messing with the
+fingers crossed listener of Monolog, that keeps the application log files small
+in case no errors occur.</p>
+<p>This can be easily done with Symfonys MonologBundle with a feature called
+channel. Every log handler, such as file, syslog, mail or
+fingers crossed is attached to the default logger called “app”. This is
+referenced by the dependency injection service called <tt class="docutils literal"><span class="pre">monolog.logger</span></tt>.</p>
+<p>If you want to create a different logger service that is responsible for a
+different type of your application stack, just define it using the <tt class="docutils literal"><span class="pre">channels</span></tt>
+option:</p>
+<p>To actually write to <tt class="docutils literal"><span class="pre">mychannel</span></tt> you have to tag all the services that use
+<tt class="docutils literal"><span class="pre">mychannel</span></tt> with the following tag:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">&quot;my_service&quot;</span> <span class="na">class=</span><span class="s">&quot;MyService&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">&quot;monolog.logger&quot;</span> <span class="na">channel=</span><span class="s">&quot;mychannel&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">&quot;service&quot;</span> <span class="na">id=</span><span class="s">&quot;logger&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/service&gt;</span>
+</pre></div>
+</div>
+<p>With this approach you are now as flexible as with the default channel <tt class="docutils literal"><span class="pre">app</span></tt>
+regarding to logging in development, testing and production environments for
+example. Once there is a channel created through the DIC tag, you can actually
+fetch it from the DIC with <tt class="docutils literal"><span class="pre">monolog.logger.mychannel</span></tt> in our example.
+I don’t like this approach too much, because it misuses tags for modifying
+arguments, where tags are actually for the services themselves. However it is
+usable and works.</p>
+<p>This feature is included starting with Symfony 2.1. It is <a class="reference external" href="http://symfony.com/doc/master/cookbook/logging/channels_handlers.html">documented in a
+cookbook entry</a>,
+however some insights of this blog post are still inside a pending Pull
+Request.</p>
+</div>]]></description>
+            <pubDate>Sun, 26 Aug 2012 00:00:00 +0200</pubDate>
+        </item>
+        <item>
             <link>http://www.whitewashing.de/2012/08/26/froscon_2012.html</link>
             <guid>http://www.whitewashing.de/2012/08/26/froscon_2012.html</guid>
             <title>FrOSCon 2012</title>
