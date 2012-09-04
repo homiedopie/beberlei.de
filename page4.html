@@ -79,6 +79,68 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>July 04, 2009</span> 
+        </div>
+        <div class="section" id="using-symfony-dependency-injection-with-zend-application">
+<h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
+<p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
+post</a> on Dependency
+Injection containers and Zend_Application I was eager to find out if
+its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
+Container</a>
+into the Zend Framework. To my surprise it’s possible without having to
+make any changes to one of the two components. An example use-case would
+look like:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$container = new sfServiceContainerBuilder();
+
+$loader = new sfServiceContainerLoaderFileXml($container);
+$loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();</pre>
+</div>
+</div></blockquote>
+<p>Resources instantiated by Zend_Application are then injected into the
+container by the name of the resource and are given the resource
+instance. Any object from the Symfony container can then use these
+dependencies in their object setup. The only drawback of the integration
+is the fact that the Symfony Container is case-sensitive in regards to
+the service names but Zend_Application lower-cases all service before
+injecting them into the container. The following code is a restatement
+of my previous example of a <strong>MyModel</strong> class which requires a
+<strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$container-&gt;register('myModel', 'MyModel')
+          -&gt;addArgument(new sfServiceReference('db'))
+          -&gt;addArgument(new sfServiceReference('cache'));</pre>
+</div>
+</div></blockquote>
+<p>Access to a MyModel instance with its dependencies is then granted
+through the call <strong>$container-&gt;myModel</strong> throughout the application.
+Make sure to call this after running Zend_Application::bootstrap, so
+that the Resource dependencies are injected first.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/07/04/using-symfony-dependency-injection-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/07/04/using-symfony-dependency-injection-with-zend-application">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>February 12, 2008</span> 
         </div>
         <div class="section" id="pdt-back-to-easyeclipse-with-php-extension">
@@ -588,88 +650,6 @@ highly recommend the Multimediatreff for the next time.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/06/25/multimediatreff-on-frameworks.html#disqus_thread" data-disqus-identifier="2008/06/25/multimediatreff-on-frameworks">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>June 22, 2008</span> 
-        </div>
-        <div class="section" id="zf-caching-pages-via-front-controller-plugin">
-<h1><a href="2008/06/22/zf-caching-pages-via-front-controller-plugin.html">ZF: Caching Pages via Front Controller Plugin</a></h1>
-<p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
-Matthews post on Zend Devzone</a>)
-into the Whitewashing blog software via Zend_Cache and the Filesystem
-Backend. I ran some superficial Apache Benchmark tests to have a look
-at the gain change in performance.</p>
-<p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
-Devzone</a> and a missing function
-getCache() in the code fragment:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>public function getCache()
-{
-    if( ($response = $this-&gt;cache-&gt;load($this-&gt;key)) != false) {
-        return $response;
-    }
-    return false;
-}</pre>
-</div>
-</div></blockquote>
-<p>I loaded the Plugin into the front controller and initialized it with a
-Zend_Config_Ini object. This all works very smoothly and caching is
-ready to begin.</p>
-<p>Testing came to the result that with 1000 requests, 10 of them concurrent
-(ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
-this blog, the request time dropped by half, from six to three seconds
-(still lot of time, but this isn’t the best webserver).</p>
-<div class="section" id="results-without-caching">
-<h2>Results without caching</h2>
-<div class="highlight-python"><pre>Requests per second:    1.49 [#/sec] (mean)
-Time per request:       6695.213 [ms] (mean)
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:       26   30   4.0     30      43
-Processing:  1556 6452 3372.1   5511   14768
-Waiting:     1436 6129 3174.1   5145   14595
-Total:       1583 6483 3373.2   5538   14810</pre>
-</div>
-</div>
-<div class="section" id="results-with-caching">
-<h2>Results with caching</h2>
-<div class="highlight-python"><pre>Requests per second:    3.03 [#/sec] (mean)
-Time per request:       3304.534 [ms] (mean)
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:       26   31   6.3     30      73
-Processing:   781 3214 1757.7   3103    7445
-Waiting:      650 3055 1731.4   2928    7190
-Total:        809 3245 1757.8   3135    7475</pre>
-</div>
-<p>As said before this testing is superficial, but its gives a broad sense
-of what performance gain is possible with just some lines of code and a
-temporary directory. Using memcache will probably speed up the process
-another good amount.</p>
-<p>Later I realized that complete page caching (rather than block element
-caching) sucks when you inject admin area links into the navigation,
-which would allow non-logged in users to see parts of the admin area so
-I had to disable caching totally. You never know in the first place (you
-should though). I have to rework my admin area or extend my
-authentication or the caching plugin somehow. This will probably be the
-topic another time.</p>
-</div>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/22/zf-caching-pages-via-front-controller-plugin.html#disqus_thread" data-disqus-identifier="2008/06/22/zf-caching-pages-via-front-controller-plugin">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -716,6 +696,9 @@ topic another time.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
         </li>
         <li class="recent_post">
@@ -741,9 +724,6 @@ topic another time.</p>
         </li>
         <li class="recent_post">
             <a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
     </ul>
 </div>

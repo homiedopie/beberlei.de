@@ -1,0 +1,252 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Assertions for validation &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.4.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Symfony, Monolog and different log types" href="../../08/26/symfony__monolog_and_different_log_types.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2012-09-04-using_assertions_for_validation">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>September 04, 2012</span> 
+        </div>
+    <div class="section" id="using-assertions-for-validation">
+<h1>Using Assertions for validation</h1>
+<p>We all know PHP is weakly typed and has some weird type-conversion rules.
+This can often complicate our code checking for invalid or illegal data.
+Using if/else clauses we can do all sorts of validation, but with standard
+coding styles (PSR, Zend, PEAR) we end up with at least 3 lines per check,
+cluttering the whole code-base.</p>
+<p>Take <a class="reference external" href="http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935">this example</a> from
+the old deprecated Windows Azure SDK, a method for putting a binary file into
+Azures blob storage:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">&#39;Container name is not specified.&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">self</span><span class="o">::</span><span class="na">isValidContainerName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">&#39;Container name does not adhere to container naming conventions. See http://msdn.microsoft.com/en-us/library/dd135715.aspx for more information.&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$blobName</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">&#39;Blob name is not specified.&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$localFileName</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">&#39;Local file name is not specified.&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">&#39;Local file not found.&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">&#39;$root&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$blobName</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">!==</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">&#39;Blobs stored in the root container can not have a name containing a forward slash (/).&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// rest of the code here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The rest of this components public API methods look about the same. It is a
+very complete validation of the input data, however its not very readable.
+Instead you have 6 if branches, which increase the complexity of the method
+and almost take up half the screen without even getting to the actual code.</p>
+<p>The assertion pattern is really helpful here to reduce the complexity of this
+code and hide the <tt class="docutils literal"><span class="pre">if/throw</span></tt> conditions into little helper methods. Have a
+look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="s1">&#39;Container name is not specified&#39;</span><span class="p">);</span>
+    <span class="nx">self</span><span class="o">::</span><span class="na">assertValidContainerName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">);</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$blobName</span><span class="p">,</span> <span class="s1">&#39;Blob name is not specified.&#39;</span><span class="p">);</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">,</span> <span class="s1">&#39;Local file name is not specified.&#39;</span><span class="p">);</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">file</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">,</span> <span class="s1">&#39;Local file name is not specified.&#39;</span><span class="p">);</span>
+    <span class="nx">self</span><span class="o">::</span><span class="na">assertValidRootContainerBlobName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="nv">$blobName</span><span class="p">);</span>
+
+    <span class="c1">// rest of the code</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is much more readable, using two custom assertions and some general
+assertions.</p>
+<p>There is one risk here though, you introduce additional coupling to another
+library/namespace. Especially when you start using this pattern on a large
+scale, you have to make sure this assertions are <strong>VERY</strong> stable and
+unit-tested.</p>
+<p>That is why you shoud extend from <tt class="docutils literal"><span class="pre">Assertion</span></tt> and use your own class when
+using the Assert library. This returns some control in your hands and even
+allows you to overwrite the exception class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Util</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Assert\Assertion</span> <span class="k">as</span> <span class="nx">BaseAssertion</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Assertion</span> <span class="k">extends</span> <span class="nx">BaseAssertion</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">protected</span> <span class="nv">$exceptionClass</span> <span class="o">=</span> <span class="s1">&#39;MyProject\Util\AssertionFailedException&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/09/04/using_assertions_for_validation";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Using Assertions for validation</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/26/froscon_2012.html">FrOSCon 2012</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

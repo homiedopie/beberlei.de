@@ -79,6 +79,41 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>December 07, 2010</span> 
+        </div>
+        <div class="section" id="blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">
+<h1><a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a></h1>
+<p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
+<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="s2">&quot;hello world with ReST and Zeta Components!&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home/">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
+<p>My next plans for the blog bundle are:</p>
+<ul class="simple">
+<li>WebDav support for authoring. All articles will be named “slug.inputformat”, for example “blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst”. For this I plan to write a custom backend for ezcWebdav.</li>
+<li>Making the Bundle simpler to re-use by others.</li>
+<li>More jQuery love to the backend.</li>
+<li>Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.</li>
+</ul>
+<p>Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html#disqus_thread" data-disqus-identifier="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>February 25, 2009</span> 
         </div>
         <div class="section" id="git-is-great-helping-out-with-mutateme">
@@ -887,76 +922,6 @@ subject with non-ASCII chars is displayed correctly.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html#disqus_thread" data-disqus-identifier="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 11, 2009</span> 
-        </div>
-        <div class="section" id="howto-file-a-good-bug-report-suggestions-for-framework-users">
-<h1><a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html">Howto file a good bug report: Suggestions for framework users</a></h1>
-<p>I have fixed quite a number of bugs for the ZF lately, which lead me to
-this post about how to file a good bug report. There are many annoying
-bug reports out there, where the reporter of the bug withholds important
-information to the bugfixer unintended. This advice applies bug reports
-in general of course.</p>
-<p>What are the benefits of a good bug report? The bug generally gets fixed
-faster, when the developer has more information at hand. Additionally
-other developers might come to rescue since they can understand the
-issue faster. These benefits are good for both parties. If you take no
-time for a good bug report, your issue might risk to end up getting old
-or closed unfixed.</p>
-<ul class="simple">
-<li><strong>Post the whole Exception Stack Trace</strong>: If the library throws an
-Exception into your application that is unexpected and may indicate
-an bug: Do not post the Message or Exception name only. The exception
-may be thrown in many different places or due to different reasons.
-The PHP exception class offers the method <strong>getTraceAsString()</strong>,
-which offers many information to the developer what the cause of the
-exception might be. Please use it!</li>
-<li><strong>Post codefixes in a patch format</strong>: When you find a bug in the
-framework, it is quite possible that you can offer a fix directly.
-Writing “Replace x in line y with z” does not help very often. The
-component might be in flux and the line positions change more often
-than you think. Please create a diff file of this changes that
-indicate the precise position of the change. This diff also includes
-2 lines above and below the patched code for direction of the
-developer. SVN Diffs are even more useful since they include the
-revision where you fixed the bug in.</li>
-<li><strong>Post reproducible cases as PHPUnit Test</strong>: If you find a bug and
-can show how to reproduce it: Write a unittest to prove it. It is ZF
-policy to create a unittest for each bugfix showing that the bug was
-indeed fixed and previous functionality remains the same, so this
-unit-test has to be written anyways. Many show-offs rely on massive
-<strong>echo</strong> statements or <strong>var_dump</strong>, which render them almost
-useless for the developer.</li>
-<li><strong>Attach a unit-test to a submitted patch</strong>: This is related to the
-previous point. If you add a unit test your patch will get more
-attention. It will prove that you have thought about the patch, its
-consequences and that you might have checked it does not break
-backwards compatibility. This is worth a lot.</li>
-<li><strong>Run the test suite with your patch</strong>: If you want to provide a
-patch. Run the testsuite of the Zend Framework. It might break
-expected behaviour. When you post a patch that will break BC, it will
-be recognized. Your bug report might be closed, which helps nobody.</li>
-</ul>
-<p>When you find a bug you have probably thought about it and how to fix
-it. This is valuable information. Disregarding one of this points will
-lead to missing information on part of the developer that he has to
-“learn” again. This takes time, which may make your bug last longer than
-it should.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html#disqus_thread" data-disqus-identifier="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -1003,6 +968,9 @@ it should.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
         </li>
         <li class="recent_post">
@@ -1028,9 +996,6 @@ it should.</p>
         </li>
         <li class="recent_post">
             <a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
         </li>
     </ul>
 </div>
