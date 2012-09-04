@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/09/04/using_assertions_for_validation
    2012/08/26/symfony__monolog_and_different_log_types
    2012/08/26/froscon_2012
    2012/08/25/decoupling_applications_with_domain_events

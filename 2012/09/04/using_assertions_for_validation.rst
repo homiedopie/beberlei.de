@@ -1,10 +1,11 @@
 Using Assertions for validation
 ===============================
 
-PHP is weakly typed and has some weird type-conversion rules. We all know that.
-Additionally our code needs to check for invalid or illegal data. We can check
-for these conditions in our code by validating the inputs of methods, however
-there are two different approaches doing so.
+We all know PHP is weakly typed and has some weird type-conversion rules.
+This can often complicate our code checking for invalid or illegal data.
+Using if/else clauses we can do all sorts of validation, but with standard
+coding styles (PSR, Zend, PEAR) we end up with at least 3 lines per check,
+cluttering the whole code-base.
 
 Take `this example
 <http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935>`_ from
@@ -69,6 +70,22 @@ There is one risk here though, you introduce additional coupling to another
 library/namespace. Especially when you start using this pattern on a large
 scale, you have to make sure this assertions are **VERY** stable and
 unit-tested.
+
+That is why you shoud extend from ``Assertion`` and use your own class when
+using the Assert library. This returns some control in your hands and even
+allows you to overwrite the exception class:
+
+.. code-block:: php
+
+    <?php
+    namespace MyProject\Util;
+
+    use Assert\Assertion as BaseAssertion;
+
+    class Assertion extends BaseAssertion
+    {
+        static protected $exceptionClass = 'MyProject\Util\AssertionFailedException';
+    }
 
 
 .. author:: default
