@@ -228,6 +228,6 @@ I am very interested in your opinions on this topic and my attempt to avoid them
 please leave comments when leaving this website :-)
 
 .. author:: default
-.. categories:: none
+.. categories:: PHP
 .. tags:: none
 .. comments::
