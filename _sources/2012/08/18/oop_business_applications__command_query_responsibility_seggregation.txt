@@ -211,6 +211,6 @@ This problem goes away however, if you combine CQRS with Event Sourcing. A
 topic that I will discuss in the next blog post.
 
 .. author:: default
-.. categories:: none
+.. categories:: PHP
 .. tags:: none
 .. comments::

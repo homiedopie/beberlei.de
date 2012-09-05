@@ -149,6 +149,6 @@ some examples and then wrap up my thoughts about all of them.
     25th/26th August of 2012. Feel free to drop by and discuss this topic!
 
 .. author:: default
-.. categories:: none
+.. categories:: PHP
 .. tags:: none
 .. comments::
