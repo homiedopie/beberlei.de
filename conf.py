@@ -67,7 +67,7 @@ html_sidebars = {
 }
 
 rss_for_categories = True
-rss_categories_to_build = ["PHP"]
+#rss_categories_to_build = ["PHP"]
 
 
 # **************************************************************
