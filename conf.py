@@ -66,6 +66,10 @@ html_sidebars = {
     "**": ["recent.html"]
 }
 
+rss_for_categories = True
+rss_categories_to_build = ["php"]
+
+
 # **************************************************************
 # Do not modify below lines as the values are required by
 # Tinkerer to play nice with Sphinx
