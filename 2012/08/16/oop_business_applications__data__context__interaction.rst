@@ -229,6 +229,6 @@ code and makes it much easier for developers to develop on small and isolated
 parts of the system.
 
 .. author:: default
-.. categories:: none
+.. categories:: PHP
 .. tags:: none
 .. comments::

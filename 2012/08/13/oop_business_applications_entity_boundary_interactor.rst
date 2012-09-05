@@ -296,6 +296,6 @@ worst outcome with this pattern is, when you manually code layers for HTTP
 Request/Form => DTO => Entity mapping and the other way around. 
 
 .. author:: default
-.. categories:: none
+.. categories:: PHP
 .. tags:: none
 .. comments::
