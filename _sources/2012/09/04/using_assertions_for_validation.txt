@@ -89,6 +89,6 @@ allows you to overwrite the exception class:
 
 
 .. author:: default
-.. categories:: none
+.. categories:: PHP
 .. tags:: none
 .. comments::
