@@ -19,7 +19,7 @@ So what is Tent and why bother?
 
 About two month ago a new distributed social networking protocol was launched called
 `Tent.io <http://tent.io>`_. It works over HTTP using JSON and distributes data
-using webhooks. This happend in the shadow of `app.net <http://www.app.net>`_
+using webhooks. This happened in the shadow of `app.net <http://www.app.net>`_
 funding, just two weeks after they collected over 500k USD. Tent.io got lots of
 attention but not as much as app.net sadly. Its distributed nature however is
 much more suited to achieving true independence of large companies and true privacy
@@ -33,10 +33,10 @@ the status application or setup your own tentd server on Heroku.
 
 As a user I can connect any application to the tent server I have registered
 with and control the visibility and sharing policies. Content can be private,
-public or visibile to certain groups only. A Tent server then makes sure to
+public or visible to certain groups only. A Tent server then makes sure to
 distribute content to the appropriate subscribers.
 
-In this early stadium of the protocol it makes sense to register on the central
+In this early state of the protocol it makes sense to register on the central
 tent.is service, however when the server gets more stable or alternative
 server implementations popup its easy to move all your data off tent.is to your
 own server. One feature that will hit tent.is soonish is registration of domain
