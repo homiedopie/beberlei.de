@@ -79,6 +79,145 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>June 03, 2012</span> 
+        </div>
+        <div class="section" id="setting-up-development-machines-with-puppet">
+<h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
+<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+dsecribe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
+<li>and I propably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
+via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I seperate the installation process into two puppet files, one that has to be
+run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
+my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
+
+# VIM Dot Files
+vcsrepo { 'vim-dotfiles':
+    path     =&gt; &quot;/home/$id/.vim&quot;,
+    ensure   =&gt; present,
+    provider =&gt; git,
+    source   =&gt; 'https://...'
+}
+
+file { 'vim-dotfiles-symlink':
+    path   =&gt; &quot;/home/$id/.vimrc&quot;,
+    ensure =&gt; link,
+    target =&gt; '.vim/vimrc',
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+
+exec { 'vim-make-command-t':
+    command =&gt; 'rake make',
+    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
+    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
+    require =&gt; Vcsrepo['vim-dotfiles']
+}</pre>
+</div>
+<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<div class="highlight-python"><pre># Configure Git
+exec { &quot;git-author-name&quot;:
+    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
+    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
+}
+
+exec { &quot;git-author-email&quot;:
+    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
+    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
+}
+
+exec { &quot;git-global-ignore&quot;:
+    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
+    unless  =&gt; 'git config -l --global|grep excludesfile'
+}
+
+file { &quot;git-global-ignorefile&quot;:
+    path =&gt; &quot;/home/$id/.gitignore&quot;,
+    ensure =&gt; present,
+    content =&gt; &quot;*.swo\n*.swp\n&quot;
+}</pre>
+</div>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html#disqus_thread" data-disqus-identifier="2012/06/03/setting_up_development_machines_with_puppet">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>May 31, 2012</span> 
         </div>
         <div class="section" id="virtual-machines-with-vagrant-veewee-and-puppet">
@@ -1072,143 +1211,6 @@ choose a global standard.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/04/18/new-netbeans-php-codesniffer-plugin-version.html#disqus_thread" data-disqus-identifier="2010/04/18/new-netbeans-php-codesniffer-plugin-version">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 18, 2010</span> 
-        </div>
-        <div class="section" id="generate-proxy-code-using-a-stream-wrapper">
-<h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
-<p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
-<p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <tt class="docutils literal"><span class="pre">stat()</span></tt> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
-<p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <tt class="docutils literal"><span class="pre">include()</span></tt>. The client code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">stream_wrapper_register</span><span class="p">(</span><span class="s2">&quot;dc2proxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Doctrine\ORM\Proxy\ProxyStreamWrapper&quot;</span><span class="p">);</span>
-
-<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">&quot;dc2proxy:///proxies&quot;</span><span class="p">;</span>
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$em</span><span class="p">;</span>
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$className</span><span class="p">;</span>
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$proxyClass</span><span class="p">;</span>
-
-<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;.php&quot;</span><span class="p">;</span>
-
-<span class="nb">unset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
-</pre></div>
-</div>
-<p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
-The stream wrapper to make this work looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$proxyCode</span><span class="p">;</span>
-
-    <span class="k">function</span> <span class="nf">stream_open</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$options</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$opened_path</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span>
-                <span class="o">-&gt;</span><span class="na">getProxyFactory</span><span class="p">()</span>
-                <span class="o">-&gt;</span><span class="na">getProxyClassCode</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
-
-        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">stream_stat</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
-        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">url_stat</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
-        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_read</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$ret</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$ret</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_write</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$left</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
-        <span class="nv">$right</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$left</span> <span class="o">.</span> <span class="nv">$data</span> <span class="o">.</span> <span class="nv">$right</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_tell</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_eof</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">&gt;=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_seek</span><span class="p">(</span><span class="nv">$offset</span><span class="p">,</span> <span class="nv">$whence</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">switch</span> <span class="p">(</span><span class="nv">$whence</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">case</span> <span class="nx">SEEK_SET</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nv">$offset</span><span class="p">;</span>
-                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">break</span><span class="p">;</span>
-
-            <span class="k">case</span> <span class="nx">SEEK_CUR</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nv">$offset</span><span class="p">;</span>
-                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">break</span><span class="p">;</span>
-
-            <span class="k">case</span> <span class="nx">SEEK_END</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span><span class="p">;</span>
-                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">break</span><span class="p">;</span>
-
-            <span class="k">default</span><span class="o">:</span>
-                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>What do you think about this approach? Are there any potential problems I am not seeing?</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/12/18/generate-proxy-code-using-a-stream-wrapper.html#disqus_thread" data-disqus-identifier="2010/12/18/generate-proxy-code-using-a-stream-wrapper">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -1255,6 +1257,9 @@ The stream wrapper to make this work looks like this:</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
         </li>
         <li class="recent_post">
@@ -1280,9 +1285,6 @@ The stream wrapper to make this work looks like this:</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a>
         </li>
     </ul>
 </div>

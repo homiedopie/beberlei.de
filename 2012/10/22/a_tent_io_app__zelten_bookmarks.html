@@ -10,7 +10,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Doctrine switches from LGPL to MIT &mdash; Whitewashing</title>
+    <title>A tent.io app: Zelten Bookmarks &mdash; Whitewashing</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -32,8 +32,7 @@
     <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Symfony2 Controller Testing without Application" href="../../02/25/symfony2_controller_testing.html" />
-    <link rel="prev" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../31/virtual_machines_with_vagrant__veewee_and_puppet.html" />
+    <link rel="next" title="Using Assertions for validation" href="../../09/04/using_assertions_for_validation.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
   <body>
@@ -61,74 +60,75 @@
     <div class="span-24 content">
       <div>
         <div>
-          <div id="2012-05-26-doctrine_goes_mit">
+          <div id="2012-10-22-a_tent_io_app__zelten_bookmarks">
             
             
     
     <div class="related">
         <ul>
-            <li>
-                 &laquo; <a href="../31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a>
-            </li>
             <li class="right">
-                <a href="../../02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a> &raquo; 
+                <a href="../../09/04/using_assertions_for_validation.html">Using Assertions for validation</a> &raquo; 
             </li>
         </ul>
     </div>
     
         <div class="timestamp postmeta">
-            <span>May 26, 2012</span> 
+            <span>October 22, 2012</span> 
         </div>
-    <div class="section" id="doctrine-switches-from-lgpl-to-mit">
-<h1>Doctrine switches from LGPL to MIT</h1>
-<blockquote>
-<div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
-successfully in roughly 4 weeks. For that we used a small web-based tool to
-ask the permission of 358 authors that contributed in the last 6 years.</div></blockquote>
-<p>The <a class="reference external" href="http://www.doctrine-project.org">Doctrine project</a> has been LGPL
-licensed since it was started in 2006. When I first started contributing in the
-project late in 2009 we were constantly asked about changing the license to a
-permissive license such as <a class="reference external" href="http://en.wikipedia.org/wiki/MIT_License">MIT</a> or
-New-BSD.  My subjective feeling is that there are much more libraries with
-permissive licenses than 10 years ago. And there are others that <a class="reference external" href="http://news.cnet.com/8301-13556_3-20071811-61/the-open-source-license-landscape-is-changing/">back my
-feeling up with facts</a>.
-The fear of getting screwed when using a permissive license has probably
-declined in favor of the benefits. <a class="reference external" href="http://pooteeweet.org/blog/2084">As Lukas puts it</a>:</p>
-<blockquote>
-<div>Maybe with enough experience you start to realize that it happens close to
-never that a proprietary fork of an open source project ends up outpacing
-the original project.</div></blockquote>
-<p>We wanted all the benefits of permissive licenses as well.  So at the beginning
-of this year we as Doctrine project first started to investigate how the task
-of switching the license could be done. After a short email with the <a class="reference external" href="http://www.fsf.org">FSF</a> it was clear that we had to get the approval of every
-single committer or remove their code.</p>
-<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">successfully attempted a license change</a> last year from GPL to LGPL, so we
-we&#8217;re hopeful to get this done. After discussing with Lukas we came up with the
-idea of a tool that helps this process, so <a class="reference external" href="http://dlm.beberlei.de">I wrote it</a>. It features:</p>
+    <div class="section" id="a-tent-io-app-zelten-bookmarks">
+<h1>A tent.io app: Zelten Bookmarks</h1>
+<p>Over the weekend I built a <a class="reference external" href="http://zelten.eu1.frbit.net">very simple bookmarking application</a> for <a class="reference external" href="http://tent.io">tent.io</a>. I wanted to try the tent functionality to create
+arbitrary entities of data using something as simple as a &#8220;Bookmark&#8221;.</p>
+<p>The application retrieves and stores bookmarks on your own tent-server,
+nothing is kept on the applications server and the user keeps full control over
+your content.</p>
+<p>The <a class="reference external" href="https://github.com/beberlei/zelten-bookmarks">code for the application</a>
+is on Github, as well as the <a class="reference external" href="https://github.com/beberlei/TentPHP">TentPHP library</a> I have written to support the protocol.</p>
+<div class="section" id="so-what-is-tent-and-why-bother">
+<h2>So what is Tent and why bother?</h2>
+<p>About two month ago a new distributed social networking protocol was launched called
+<a class="reference external" href="http://tent.io">Tent.io</a>. It works over HTTP using JSON and distributes data
+using webhooks. This happend in the shadow of <a class="reference external" href="http://www.app.net">app.net</a>
+funding, just two weeks after they collected over 500k USD. Tent.io got lots of
+attention but not as much as app.net sadly. Its distributed nature however is
+much more suited to achieving true independence of large companies and true privacy
+for the users though. Compared to Diaspora it has the benefit of being a protocol, not
+an application first.</p>
+<p>Now two month later, there are <a class="reference external" href="https://github.com/tent">reference implementations</a>
+for Server, Client and a Twitter like Status application. You can use <a class="reference external" href="http://tent.is">Tent.is</a> to create a free or payed tent account including access to
+the status application or setup your own tentd server on Heroku.</p>
+<p>As a user I can connect any application to the tent server I have registered
+with and control the visibility and sharing policies. Content can be private,
+public or visibile to certain groups only. A Tent server then makes sure to
+distribute content to the appropriate subscribers.</p>
+<p>In this early stadium of the protocol it makes sense to register on the central
+tent.is service, however when the server gets more stable or alternative
+server implementations popup its easy to move all your data off tent.is to your
+own server. One feature that will hit tent.is soonish is registration of domain
+records. That will be the first step to your own tent server, I am eagerly
+waiting to host all my content at <a class="reference external" href="https://tent.beberlei.de">https://tent.beberlei.de</a> at some day.</p>
+</div>
+<div class="section" id="tent-io-sounds-awesome-how-can-i-help">
+<h2>Tent.io sounds awesome, how can I help?</h2>
+<p>Right at the moment the tent software stack is developed by the team that also
+hosts <cite>Tent.is &lt;https://tent.is&gt;</cite>. If all you can provide is money, then
+signing up for the 12 USD per month is the way to go.</p>
+<p>If you are a developer, then take a look at the <a class="reference external" href="https://github.com/tent/tent.io/wiki/Related-projects">Wiki</a> where related
+projects are listed. You will find a bunch of client libraries for major
+languages already, helping you to get started.</p>
+<p>I suppose the major work lies in implementing Status-Post clients for all
+major smartphone platforms and desktops. As well as the host of applications
+that Facebook and other social networks provides:</p>
 <ul class="simple">
-<li>Import of all commits from one or many Github projects</li>
-<li>Aggregation of commits to authors based on e-mail address from Git log</li>
-<li>Status approved/not-approved for every author.</li>
-<li>An e-mail engine to send a request for approval to every author using
-<a class="reference external" href="http://www.mailgun.net">the awesome Mailgun service</a>, who has not approved
-yet. We use Mailgun for fun and to have a way to act on bounces easily.</li>
-<li>Admin functionality to mark commits as &#8220;trivial or deleted&#8221;.</li>
-<li>An audit trail to account for all changes and who has done them.</li>
-<li>Symfony2/Doctrine2 application with debian packaging using FPM.</li>
+<li>Manage and share Photo albums</li>
+<li>Plan and share events</li>
+<li>Managing contact data/address book</li>
+<li>Resume details (Linkedin/Xing)</li>
+<li>Track User Events (Timeline)</li>
+<li>Sharing Music and Videos (Myspace)</li>
+<li>Importing all sorts of existing content (RSS,..)</li>
 </ul>
-<p>This project is not yet open-sourced but will be when I have some time to clean
-up the hardcoded passwords and write a small README on how to adjust the
-templates.</p>
-<p>After importing the commits of all the LGPL licensed Doctrine projects we
-realized that we have 358 unique committers and about 40-50 without an e-mail
-address (from the old SVN days). So we started googling for nicknames and
-eventually collected all e-mail addresses except maybe 6-8 missing ones.</p>
-<p>Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
-accepted the license change. No single person refused the change. All commits
-of the 16 people left we&#8217;re luckily not part of the code base anymore when we
-completely rewrote Doctrine 2 or trivial one-line changes.</p>
-<p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
-fun with it.</p>
+</div>
 </div>
 
     
@@ -141,13 +141,13 @@ fun with it.</p>
         
         
     </div>
-    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/05/26/doctrine_goes_mit";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/10/22/a_tent_io_app__zelten_bookmarks";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
 
             <div id="disqus_thread"></div>
             <script type="text/javascript">
                 var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/2012/05/26/doctrine_goes_mit.html';
+                var disqus_url = 'http://www.whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html';
                 (function() {
                     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
@@ -173,7 +173,7 @@ fun with it.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
-            <a href="../../10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
+            <a href="#">A tent.io app: Zelten Bookmarks</a>
         </li>
         <li class="recent_post">
             <a href="../../09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
