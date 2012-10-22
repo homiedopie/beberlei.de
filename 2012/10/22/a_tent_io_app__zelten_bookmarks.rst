@@ -47,7 +47,7 @@ Tent.io sounds awesome, how can I help?
 ---------------------------------------
 
 Right at the moment the tent software stack is developed by the team that also
-hosts `Tent.is <https://tent.is>`. If all you can provide is money, then
+hosts `Tent.is <https://tent.is>`_. If all you can provide is money, then
 signing up for the 12 USD per month is the way to go.
 
 If you are a developer, then take a look at the `Wiki
