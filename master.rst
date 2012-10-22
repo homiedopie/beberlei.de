@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2012/10/22/a_tent_io_app__zelten_bookmarks
    2012/09/04/using_assertions_for_validation
    2012/08/26/symfony__monolog_and_different_log_types
    2012/08/26/froscon_2012
