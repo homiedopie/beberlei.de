@@ -15,12 +15,16 @@ output informs you about all the steps performed during deployment.
 Addtionally you can configure environment variables in the web-administration
 interface that are available in the application through ``$_SERVER``. You
 can easily use them to configure your application, if its hosted in a public
-repository.
+repository. Great to share sample applications on Github and host them from
+there.
 
 You get SSH access to the machines, where you can take a look at the apache
 and php error log files. You have vim available. Quite cool and very helpful
 for any kind of debugging necessary. Deployments overwrite every change you
 make, so its still a save environment.
+
+The composer support allows for post install scripts, which is cool to perform
+all sorts of cache warmup and other deployment tasks.
 
 You can host 3 applications for free, however they shutdown after 48 hours if
 you don't regularly click on a reset button. Its definately enough to get small
