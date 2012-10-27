@@ -79,6 +79,195 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 23, 2009</span> 
+        </div>
+        <div class="section" id="zend-form-and-the-model-yet-another-perspective-using-a-mediator">
+<h1><a href="2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html">Zend_Form and the Model: Yet another perspective using a Mediator</a></h1>
+<p><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weier O’Phinney</a> of the
+Zend Framework Devteam <a class="reference external" href="http://weierophinney.net/matthew/archives/200-Using-Zend_Form-in-Your-Models.html">wrote a controversial post on integrating
+Zend_Form and the Model last
+month</a>.
+He separated concerns of view and model that communicate via a Form, by
+calling just thee validation functions on the Form inside the mode. On
+request you could retrieve the model to the controller and view layers.
+I already wrote into his comments that I didn’t like the solution
+because it relies on implicit rules for the developers to use the Form
+component correctly in all layers. Additionally the building of the form
+using this approach would be performed inside the model, although
+strictly speaking this is responsibility of the View Layer. Another
+negative point is duplication of input filtering code that has to be
+performed to use certain variables inside the controller or when
+different forms talk with the same model.</p>
+<p><a class="reference external" href="http://codeutopia.net">Jani</a> took it up and <a class="reference external" href="http://codeutopia.net/blog/2009/01/07/another-idea-for-using-models-with-forms/">proposed writing
+validators for forms and attaching them to the
+Form</a>
+as sort of a mediator. I am not a fan of this approach either, because
+the validator would have to include domain logic but is not really a
+part of the domain logic anymore but just a validator. Developers might
+forget using the validator inside the model for all their actions or
+there would be duplication of code in some places. In a perfect world,
+only functions of the models public interface should be called for
+validation.</p>
+<p>My personal favorite for Form and Model integration is a <strong>mediator</strong>
+object between the two layers. Your model will have to include an
+additional interface with one function <strong>acceptFormRequest($values);</strong>
+which accepts an array of validated Zend Form field values. It then
+tries to apply the validated data into a record. Additional required
+validations of the model can take place in this function, which
+separates the concerns of Form validation and Model data validation.
+Still the mediator merges those differences together: You can throw an
+Exception and it will be attached as a custom error message to the Form.
+The following very short code will show the required interface and the
+mediator code. This code is very simple and might produce maintenance
+overhead fast, but I propose some refactoring enhancements later in the
+discussion.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>interface WW_Model_AcceptFormRequest
+{
+    /**
+     * Acceept a form request
+     * @param array $values
+     * @return WW_Record_Interface
+     */
+    public function acceptFormRequest($values);
+}
+class WW_Model_FormMediator
+{
+    /**
+     * Try to push the form request to the model
+     *
+     * @param Zend_Form $form
+     * @param WW_Model_AcceptFormRequest $model
+     * @return WW_Record_Interface
+     */
+    public function pushFormToModel(Zend_Form $form, WW_Model_AcceptFormRequest $model)
+    {
+        if(!$form-&gt;isValid()) {
+            throw new Exception(&quot;Form not valid!&quot;);
+        } else {
+            $values = $form-&gt;getValues();
+            try {
+                $record = $model-&gt;acceptFormRequest($values);
+            } catch(Exception $e) {
+                // This exception message comes from the model, because validation failed
+                $form-&gt;addErrorMessage($e-&gt;getMessage());
+                throw new Exception(&quot;Form request not accepted by model!&quot;);
+            }
+        }
+        return $record;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You can see the mediator has two different stages where errors can
+occur: When the form is not valid or the model is not valid. Both exits
+can be catched inside the controller and are the indicator that the form
+has to be displayed again for further input corrections. When successful
+the model returns a valid record that applies to the form and model
+requirements and can be displayed. If this record should be persistent
+this would have been done inside the <strong>acceptFormRequest</strong> function
+already. An example using a very simple Model using the a BankAccount
+example. We have a form that validates all the incoming request data for
+a withdrawal of money, though does not validate it against the models
+internal state. Our BankAccountModel implements the
+<strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
+BankAccount. If found the given amount is withdrawn.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class BankAccountModel implements WW_Model_AcceptFormRequest {
+    public function acceptFormRequest($values)
+    {
+        $bankAccount = $this-&gt;getBankAccountBy($values['bankAccountNumber'], $values['pin']);
+        if($values['action'] == &quot;withdraw&quot;) {
+            $bankAccount-&gt;withdraw($values['amount']);
+            $this-&gt;save($bankAccount);
+        } else {
+            // unknown action...
+        }
+    }
+    public function getBankAccountBy($key, $password) {
+        // Find by Primary Key returning 'BankAccount' instance or exception if not found.
+    }
+    public function save(BankAccount $ba) {
+        // Sql for saving the Bank Account
+    }
+}
+
+class BankAccount
+{
+    public function withdraw($amount)
+    {
+        if( ($this-&gt;getBalance()-$amount) &lt; 0 ) {
+            throw new Exception(&quot;You cannot withdraw more money than your bank account holds!&quot;);
+        }
+        $this-&gt;balance -= $amount;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Two exceptions might be thrown in this case: The Bank Account number
+does not exist or the password is wrong. Or you are not allowed to
+withdraw the given amount of money. If any of those exceptions is thrown
+the Model does not accept the form data and the form will have to be
+displayed again for the client showing the new error message that was
+returned from the model. The controller handling this process would lool
+like this:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class BankAccountController extends Zend_Controller_Action {
+    public function performWithdrawlAction() {
+        $form = new BankAccountWithdrawlForm(); // extends Zend_Form and builds the form
+
+        if($this-&gt;getRequest()-&gt;isPost()) {
+            $mediator         = new WW_Model_FormMediator();
+            $bankAccountModel = new BankAccountModel();
+            try {
+                $bankAccount = $mediator-&gt;pushFormToModel($form, $bankAccountModel);
+
+                $this-&gt;view-&gt;assign('bankAccount', $bankAccount); // Show new balance in view!
+            } catch(Exception $e) {
+                $this-&gt;view-&gt;assign('withdrawlForm', $form);
+                $this-&gt;_redirect('showWithdrawl');
+            }
+        } else {
+            $this-&gt;view-&gt;assign('withdrawlForm', $form);
+            $this-&gt;_redirect('showWithdrawl');
+        }
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You can see the mediator tightly integrates Form and Model without both
+components knowing too much of each other. Still you can add error
+messages recieved from the model into the Form and redisplay it. One
+negative point of this approach is the fact that you only have one
+method for accepting form data, which could result in variable checking
+and redispatching in the case of many different operations that can be
+performed on the same model. For this case you might want to either:</p>
+<ol class="arabic simple">
+<li>Rewrite the mediator to accept a specific model class (not the
+interface) and call the required custom method that matches the forms
+request. (Best approach for separation concerns)</li>
+<li>Rewrite the mediator to also pass the <strong>get_class($form);</strong> value to
+the model for decision making (Faster approach)</li>
+</ol>
+<p>There is still some overhead on using the mediator. Since its generic
+you could build an Action Helper for it and use the direct call
+mechanism to save some lines of code.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html#disqus_thread" data-disqus-identifier="2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 14, 2009</span> 
         </div>
         <div class="section" id="finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">
@@ -622,226 +811,6 @@ inline highlighting that did not refresh when lines in the file changed.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/10/05/php-codesniffer-for-netbeans-v0-2.html#disqus_thread" data-disqus-identifier="2009/10/05/php-codesniffer-for-netbeans-v0-2">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 19, 2009</span> 
-        </div>
-        <div class="section" id="trying-a-two-step-pear-phar-approach-to-develop-and-deploy">
-<h1><a href="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html">Trying a Two Step PEAR/PHAR approach to develop and deploy</a></h1>
-<p>With PHP 5.3 the PHAR extension is a pretty powerful concept for all
-your deployment needs, however it does not tell the complete story.
-Frameworks, Libraries and many different of them are used throughout
-applications and in recent times people even began to chery-pick the
-best components from each of the frameworks and package them together.
-With Pirum being a simple PEAR channel server there is also momentum for
-projects to distribute their code via PEAR.</p>
-<p>However PEAR is mostly used in the server-wide configuration use-case,
-which is not very useful if you plan to distribute your complete
-application in one PHAR file. I just recently had the idea for this
-scenario, so please bear with me and add all the feedback and comments
-you can come up with. I tested this with the ongoing rewrite of my blog
-software.</p>
-<p>First we’ll add a new user that we develop our application with:</p>
-<div class="highlight-python"><pre>sudo useradd -m -g www-data whitewashing
-sudo passwd whitewashing
-su - whitewashing</pre>
-</div>
-<p>Now there is the possibility that with this user PHP and PEAR is not in
-your $PATH environment, so you might have to add it. In my case on Ubuntu
-i also had to switch the console from /bin/sh to /bin/bash for this
-user. Then we need to setup our application, I am going to use the Zend
-Framework project style here but with a little twist. We will add a
-distinction between vendor and project libraries by adding a <em>vendor</em>
-directory into the main folder.</p>
-<p>But first we create a folder for our application, and create a Zend
-Framework project in the subfolder “trunk”, which will be the focus of
-our development.</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ mkdir whitewashing
-whitewashing@desktop:~$ zf create project whitewashing/trunk
-Creating project at /home/whitewashing/whitewashing/trunk
-whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor</pre>
-</div>
-<p>Now we can configure an Apache virtual host to point to our
-/home/whitewashing/whitewashing/public directory, i call this
-“whitewashing-dev” add it to my /etc/hosts and can visit the dummy
-project page.</p>
-<p>We then configure our PEAR installation for the specific application
-user and re-configure the bin and php library paths:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
-whitewashing@desktop:~$ pear config-set php_dir /home/whitewashing/whitewashing/trunk/vendor
-whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/trunk/bin</pre>
-</div>
-<p>This configuration assumes that we will install all our stuff into our
-development trunk. From there also the PEAR installed libraries might be
-copied into branches or tags. PEAR Project tests, configuration and
-web-files will still be put by default under $HOME/pear/*. We don’t
-need them for our applications.</p>
-<p>Now we install all the dependencies our project needs, in this case Zend
-Framework, Doctrine 2, HTML Purifier:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
-whitewashing@desktop:~$ pear install zfcampus/zf-alpha
-whitewashing@desktop:~$ pear channel-discover htmlpurifier.org
-whitewashing@desktop:~$ pear install hp/HTMLPurifier
-whitewashing@desktop:~$ pear channel-discover pear.phpdoctrine.org
-whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0</pre>
-</div>
-<p>Now we have all three of the packages installed in our project folder
-<cite>whitewashing/trunk/vendor</cite>, see:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
-total 680
-drwxr-xr-x  7 whitewashing www-data   4096 2009-12-13 14:45 ./
-drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:36 ../
-drwxr-xr-x  3 whitewashing www-data   4096 2009-12-13 14:43 .channels/
--rw-r--r--  1 whitewashing www-data     57 2009-12-13 14:45 .depdb
--rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .depdblock
-drwxr-xr-x  5 whitewashing www-data   4096 2009-12-13 14:45 Doctrine/
--rw-r--r--  1 whitewashing www-data 582208 2009-12-13 14:45 .filemap
-drwxr-xr-x 20 whitewashing www-data   4096 2009-12-13 14:39 HTMLPurifier/
--rw-r--r--  1 whitewashing www-data    629 2009-12-13 14:39 HTMLPurifier.autoload.php
--rw-r--r--  1 whitewashing www-data    274 2009-12-13 14:39 HTMLPurifier.auto.php
--rw-r--r--  1 whitewashing www-data    545 2009-12-13 14:39 HTMLPurifier.func.php
--rw-r--r--  1 whitewashing www-data   9299 2009-12-13 14:39 HTMLPurifier.includes.php
--rw-r--r--  1 whitewashing www-data    955 2009-12-13 14:39 HTMLPurifier.kses.php
--rw-r--r--  1 whitewashing www-data   8831 2009-12-13 14:39 HTMLPurifier.php
--rw-r--r--  1 whitewashing www-data  11901 2009-12-13 14:39 HTMLPurifier.safe-includes.php
--rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .lock
-drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:43 .registry/
-drwxr-xr-x 59 whitewashing www-data   4096 2009-12-13 14:36 Zend/
--rw-r--r--  1 whitewashing www-data  19537 2009-12-13 14:36 zf.php</pre>
-</div>
-<p>And both Doctrine and ZF registered their binary CLi tools inside the
-<cite>whitewashing/trunk/bin/</cite> folder:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ ls -aFl bin/
-total 20
-drwxr-xr-x 2 whitewashing www-data 4096 2009-12-13 14:45 ./
-drwxr-xr-x 8 whitewashing www-data 4096 2009-12-13 14:36 ../
--rwxr-xr-x 1 whitewashing www-data   50 2009-12-13 14:45 doctrine*
--rwxr-xr-x 1 whitewashing www-data  169 2009-12-13 14:45 doctrine.php*
--rwxr-xr-x 1 whitewashing www-data 1511 2009-12-13 14:36 zf*</pre>
-</div>
-<p>We now have the full control over the versions of our dependencies, we
-can call “pear upgrade ” whenever we want to update one of the ZF,
-Doctrine or HtmlPurifier libraries inside our application.</p>
-<p>Now some magic is gonna happen, we start to develop our application and
-such which is all not really interesting for this topic. At some point
-we want to package it all up into a PHAR file and distribute it. We want
-to package our application in one big phar file. We also want to make
-sure that the configuration files in
-<cite>whitewashing/trunk/application/configs/</cite> are not distributed, but have
-to be created on the server and are kept that way. We could write an
-installer script for this configuration management.</p>
-<p>The reference for PHAR files is the PHP Manual for the Basics and Cal
-Evans’ two posts
-(<a class="reference external" href="http://blog.calevans.com/2009/07/19/lessons-in-phar/">1</a>,
-<a class="reference external" href="http://blog.calevans.com/2009/07/26/packaging-zend-framework-as-a-phar-revisited/">2</a>)
-on this topic, aswell as <a class="reference external" href="http://geekmonkey.org/articles/PHP_Archives">a post on
-Geekmonkey</a>. Contrary to
-most other PHP extensions, PHAR has an extensive documentation, however
-its not organized terribly well. Also there are no real use-cases and
-scenarios discussed, methods are only looked at in isolation. Cals posts
-are very good on understanding how to package up different libraries,
-but there is no word on distributing web applications. That is where the
-Geekmonkey post comes in to wire it all together.</p>
-<p>For a Zend Framework application that should have both a web and a cli
-(cronjobs) entry point into the application we need a specific stub file
-for the PHAR bootstrapping. A stub is a little PHP script that is
-executed whenever your PHAR file is included into your php script. It is
-essentially a front-controller for your PHAR application. It also has
-mount capabilities that allow to import files or directories from
-outside into the PHAR context. This is a powerful feature that is
-required to distribute configurable applications like our blog.</p>
-<p>This screenshot shows how the application is currently structured in
-development mode. In production its structure should look like:</p>
-<div class="highlight-python"><pre>whitewashing
-|--application
-|  |--configs
-|     |-- my application config files are all here...
-|--bin
-|  |--whitewashing.php
-|--public
-|  |--index.php
-|  |--.htaccess
-|--whitewashing.phar</pre>
-</div>
-<p>The whitewashing.php and index.php files are the application entry
-points that only include the phar file and trigger the application
-bootstrapping that will be included in the Stub file. They both look
-like:</p>
-<div class="highlight-python"><pre>&lt;?php
-define('EXTERNAL_APPLICATION_ROOT', __DIR__.&quot;/../&quot;);
-include EXTERNAL_APPLICATION_ROOT.&quot;/whitewashing.phar&quot;;</pre>
-</div>
-<p>Including a PHAR file essentially has two consequences:</p>
-<ul class="simple">
-<li>The PHAR path will be added to your include path.</li>
-<li>The stub file will be executed.</li>
-</ul>
-<p>Our application stub looks like this:</p>
-<div class="highlight-python"><pre>&lt;?php
-
-if(defined('EXTERNAL_APPLICATION_ROOT')) {
-    // Mount the external application/configs directory as config if it exists.
-    if (file_exists(EXTERNAL_APPLICATION_ROOT.&quot;/application/configs&quot;)) {
-        Phar::mount(&quot;application/configs&quot;, EXTERNAL_APPLICATION_ROOT.&quot;/application/configs&quot;);
-    }
-}
-
-/** Zend_Loader_Autoloader */
-require_once 'Zend/Loader/Autoloader.php';
-$autoloader = Zend_Loader_Autoloader::getInstance();
-
-if (php_sapi_name() == &quot;cli&quot;) {
-    require_once 'bin/whitewashing.php';
-} else {
-    require_once 'public/index.php';
-}
-
-__HALT_COMPILER();</pre>
-</div>
-<p>The first bit of the stub mounts the external application configs
-directory into the stub and hides possible directories that are present
-at this location in the PHAR file. This allows us to distribute our
-application with a default configuration, but allows any user to replace
-the configuration files to fit the application to his need.</p>
-<p>The second bit loads Zend Framework Autoloader that is required by the
-bootstrapping mechanism. The third bit decides whether this request is
-executed from the CLI- or the Web-Entry point of the application. The
-fourth bit, <tt class="docutils literal"><span class="pre">__HALT_COMPILER();</span></tt> is a technically required call inside
-your stub-file.</p>
-<p>Now that we have a stub-file for our application, we can package it and
-distribute it. I am using a modified version of Cal Evans example for
-this. I have extracted his directory traversal to find all the relevant
-into a re-usable FilterIterator implementation. I <a class="reference external" href="https://gist.github.com/3b20264b857dbdabf526">pasted my package.php
-a Gist</a> on Github. Now
-this should probably be put into the build context of your application,
-possibly as a phing or ant task or something alike.</p>
-<p>Now what this build process does not manage is the creation of the
-application entry point php and .htaccess files, but since they won’t
-ever change its easy to add them to the build directory for now. An even
-more sophisticated version of the build script would lead to the
-creation of an additional tar.gz of the complete application folder. Our
-deployment process would then be as easy as:</p>
-<ul class="simple">
-<li>If the application is not installed yet, unpack the tarball into its
-location.</li>
-<li>If the application should be updated, just replace the PHAR file.</li>
-</ul>
-<p>If you need the ability to go back to any version of your application
-you could make use of symlinks.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html#disqus_thread" data-disqus-identifier="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -888,6 +857,9 @@ you could make use of symlinks.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
         </li>
         <li class="recent_post">
@@ -913,9 +885,6 @@ you could make use of symlinks.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
         </li>
     </ul>
 </div>
