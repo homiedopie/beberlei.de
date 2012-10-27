@@ -26,7 +26,7 @@ make, so its still a save environment.
 The composer support allows for post install scripts, which is cool to perform
 all sorts of cache warmup and other deployment tasks.
 
-You can host 3 applications for free, however they shutdown after 48 hours if
+You can host one application for free, however they shutdown after 48 hours if
 you don't regularly click on a reset button. Its definately enough to get small
 prototypes up and running. From there you can upgrade in many small steps from
 small plans (10€/month) to bigger ones (80€/month).
