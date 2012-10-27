@@ -1,11 +1,12 @@
 Babysteps with Fortrabbit PHP Cloud
 ===================================
 
-To host a simple application I wanted to check through some of the PHP Cloud
-providers again. One requirement was to deploy from Git and update dependencies
-from Composer. Apparently no PHP cloud I found supported Composer yet except
-this rather new one called `Fortrabbit <https://www.fortrabbit.com/>`_.
-It has some more features that I really digg:
+To host a simple application to play around with the `Tent Protocol
+<https://tent.io>`_. So I checked through some of the PHP Cloud providers again
+for the fun of it. One requirement was to deploy from Git and update
+dependencies from Composer. I found a new provider that i havent heard of
+before, `Fortrabbit <https://www.fortrabbit.com/>`_ thats supports this so I
+had to check it out. It has some more features that I really digg:
 
 Fortrabbit provides you with a Git url where you can push your repository.
 It is directly deployed during the push operation. You can trigger composer
