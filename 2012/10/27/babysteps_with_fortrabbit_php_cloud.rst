@@ -7,7 +7,7 @@ I wanted to host a simple application to play around with the `Tent Protocol
 I checked through some of the PHP Cloud providers again for the fun of it. One
 requirement was to deploy from Git and update dependencies from Composer. I
 found a new provider that i havent heard of before, `Fortrabbit
-<https://www.fortrabbit.com/>`_ thats supports this so I had to check it out.
+<http://www.fortrabbit.com/>`_ thats supports this so I had to check it out.
 It has some more features that I really digg:
 
 Fortrabbit provides you with a Git url where you can push your repository.
