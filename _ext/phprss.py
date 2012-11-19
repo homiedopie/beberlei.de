@@ -13,12 +13,6 @@ import email.utils
 import time
 from tinkerer.ext import patch
 
-def add_rss(app, context):
-    '''
-    Adds RSS service link to page context.
-    '''
-    context["rss_service"] = app.config.rss_service
-
 def generate_feed(app):
     '''
     Generates RSS feed.
@@ -61,11 +55,11 @@ def generate_feed(app):
     # feed pubDate is equal to latest post pubDate
     context["pubDate"] = context["items"][0]["pubDate"]
 
-    yield ("phprss", context, "php.xml")
+    yield ("rss", context, "php.xml")
+
 
 def setup(app):
     '''
     Sets up Facebook comment handler.
     '''
-    app.connect("html-page-context", add_rss)
     app.connect("html-collect-pages", generate_feed)
