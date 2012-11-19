@@ -37,7 +37,6 @@ def generate_feed(app):
         categories = [category[1] for category in env.blog_metadata[post].filing["categories"]]
 
         if 'PHP' not in categories:
-            print categories
             continue
 
         context["items"].append({
