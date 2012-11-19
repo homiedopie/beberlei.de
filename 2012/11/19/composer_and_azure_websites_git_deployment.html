@@ -114,7 +114,8 @@ deployment command. The actual implementation is up to you, my version is
 the most simple one:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">&#39;https://getcomposer.org/composer.phar&#39;</span><span class="p">));</span>
+    <span class="nv">$url</span> <span class="o">=</span> <span class="s1">&#39;https://getcomposer.org/composer.phar&#39;</span><span class="p">;</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
