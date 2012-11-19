@@ -52,7 +52,8 @@ the most simple one:
 
     <?php
     if (!file_exists("composer.phar")) {
-        file_put_contents("composer.phar", file_get_contents('https://getcomposer.org/composer.phar'));
+        $url = 'https://getcomposer.org/composer.phar';
+        file_put_contents("composer.phar", file_get_contents($url));
     }
 
     $_SERVER['argv'][1] = "update";
