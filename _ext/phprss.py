@@ -36,6 +36,9 @@ def generate_feed(app):
 
         categories = [category[1] for category in env.blog_metadata[post].filing["categories"]]
 
+        if 'php' not in categories:
+            continue
+
         context["items"].append({
                     "title": env.titles[post].astext(),
                     "link": link,
