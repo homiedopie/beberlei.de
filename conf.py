@@ -47,7 +47,6 @@ rss_service = None
 # **************************************************************
 
 # Add other Sphinx extensions here
-sys.path.append(os.path.abspath('_ext'))
 extensions = ['tinkerer.ext.blog', 'tinkerer.ext.disqus', 'phprss']
 
 # Add other template paths here
