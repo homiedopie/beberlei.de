@@ -7,6 +7,7 @@
             <fileset dir="${basedir}/blog/html" />
         </copy>
         <copy file="rss.html" tofile="rss.xml" overwrite="true" />
+        <copy file="php.html" tofile="php.xml" overwrite="true" />
         <exec executable="git" failonerror="true"><arg value="add" /><arg value="." /></exec>
         <exec executable="git" failonerror="false"><arg value="commit" /><arg value="-m" /><arg value="Release" /></exec>
         <exec executable="git" failonerror="true"><arg value="checkout" /><arg value="master" /></exec>
