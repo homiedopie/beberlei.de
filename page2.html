@@ -79,6 +79,116 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>April 27, 2010</span> 
+        </div>
+        <div class="section" id="doctrine-2-beta-1-released">
+<h1><a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a></h1>
+<p>Today we are happy to announce that the first beta of <a class="reference external" href="http://www.doctrine-project.org/blog/doctrine-2-0-0-beta1-released">Doctrine
+2</a>
+has been released and we fixed 165 issues kindly reported by several
+early adopters.</p>
+<p>You can grab the code from the Github project:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><a class="reference external" href="http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1">http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1</a></dt>
+<dd>git clone git://github.com/doctrine/doctrine2.git</dd>
+</dl>
+</div></blockquote>
+<p>Or download it from our website:</p>
+<blockquote>
+<div><a class="reference external" href="http://www.doctrine-project.org/download#2_0">http://www.doctrine-project.org/download#2_0</a></div></blockquote>
+<p>It is our believe that Doctrine 2 brings PHP ORMs to a new level. We are
+leaving behind the Active Record pattern because we think it hurts
+testability, project maintainability and is not a suitable abstraction
+(80/20) for models that exceed the complexity of a blog or otherwise
+simple web application. Instead we implemented a pure Data Mapper
+approach with help of the new Reflection functionalities of PHP 5.3, so
+your Domain Objects neither have to extend a base class nor implement an
+interface.</p>
+<p>We also dropped most of the magical features of Doctrine 1 in favour of
+a simple and standardized API that is loosely based on the <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_API">Java
+Persistence API</a>, a
+technical standard for Object Relational Mappers. However we try not to
+blindly follow the “Program PHP like Java” approach and and deviated
+from JPA where applicable to make the concepts fit better into the PHP
+environment, such as alternatively hydrating all results into nested
+array structures for very high read performance.</p>
+<p>The cornerstone of Doctrine 2 is the query language DQL. It allows to
+execute queries on the object level defined by your metadata in a
+similar fashion to SQL. You can even do Joins, Subselects and Aggregates
+and Group Clauses in DQL, eliminating the need to circumvent ORMs for
+more advanced SQL features. Nevertheless it is also possible to write
+plain SQL and let Doctrine 2 hydrate the results into an object graph.</p>
+<p>In the last three month since alpha 4 we have done considerable changes
+and integrated lots of feedback from our users. The most notable changes
+are:</p>
+<ul class="simple">
+<li>Allowing Constructors of your Domain Objects to have non-optional
+parameters.</li>
+<li>Allow to define a natural ordering of to Many Collections that is
+automatically enforced trough an SQL ORDER BY statement when
+retrieved from the database.</li>
+<li>Shipping the Symfony Console Component to replace our own Console
+Implementation</li>
+<li>New DQL syntax to load objects partially, omitting potentially
+expensive fields from retrieval for the current request.</li>
+<li>Changes to how bi-directional have to be defined in the mapping
+files.</li>
+<li>Several changes to the Events API inside the ORM, to make sure many
+possible extension scenarios work smoothly.</li>
+<li>Enhancements to our Console Tools</li>
+<li>Surpassed the 1000 unit-tests each running against Postgres, Mysql,
+Sqlite and Oci8 drivers.</li>
+<li>Moved from SVN to Git:
+<a class="reference external" href="http://github.com/doctrine/doctrine2">http://github.com/doctrine/doctrine2</a></li>
+</ul>
+<p>We also did several painful backwards incompatible changes that seemed
+necessary to clean up and optimize the API or allow the ORM to be even
+faster than before. The beta phase beginning today will not contain any
+larger BC breaks anymore, opening up this release for a broader testing
+audience.</p>
+<p>For the next iteration several enhancements are planned:</p>
+<ul class="simple">
+<li>Support for PDO IBM, IBM DB2, SqlSrv and PDO SqlSrv und MsSql drivers</li>
+<li>Pessimistic Lock Support (FOR UPDATE and SHARED)</li>
+<li>Support for Custom Hydration Modes</li>
+<li>Support for Custom Persister Implementations</li>
+<li>Support for handling very large collections of related objects
+without needing an in-memory representation of the collection</li>
+<li>Separation of Doctrine\Common, Doctrine\DBAL and Doctrine\ORM into
+three different projects</li>
+<li>Extend the documentation even further, adding quickstart tutorials,
+cookbook recipes and enhancing the existing chapters.</li>
+</ul>
+<p>We also plan to support several extensions for the 2.0 release such as:</p>
+<ul class="simple">
+<li>Migrations</li>
+<li>PHPUnit Database Testing Integration</li>
+<li>NestedSet Support</li>
+<li>Symfony 2 Support</li>
+<li>Zend Framework 2 Support</li>
+</ul>
+<p>Please try out the new Beta release If you find the time and leave your
+feedback in our <a class="reference external" href="http://www.doctrine-project.org/jira/secure/Dashboard.jspa">Issue
+Tracker</a>,
+the <a class="reference external" href="http://groups.google.com/group/doctrine-user">Mailing-List</a> or
+come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/04/27/doctrine-2-beta-1-released.html#disqus_thread" data-disqus-identifier="2010/04/27/doctrine-2-beta-1-released">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>April 18, 2010</span> 
         </div>
         <div class="section" id="new-netbeans-php-codesniffer-plugin-version">
@@ -759,110 +869,6 @@ page</a>.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html#disqus_thread" data-disqus-identifier="2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>August 31, 2009</span> 
-        </div>
-        <div class="section" id="enums-in-php">
-<h1><a href="2009/08/31/enums-in-php.html">Enums in PHP</a></h1>
-<p><a class="reference external" href="http://blog.tobias-olry.de">A colleague of mine</a> complained about the
-missing support for Enums in PHP and how one often wants to have a
-variable that is constant and has one of several specific values. We
-came up with an elegant solution that we want to share, maybe its even
-helpful to you.
-If you want to implement Enum behaviour with a simple string or int
-value you end up with having to validate the values at several different
-locations in the code rather than being able to strictly enforce the
-Enum structure by using typehints.</p>
-<p>We discussed several approaches to this problem that all seemed a bit
-ugly in one or another way. For example the <strong>SplEnum</strong> class is a step
-in the right direction, however you can only use a type hint for
-“SplEnum” or add another inheritance layer. Also you have to implement
-different classes for each enum type, which requires you to implement a
-factory method for your enum to help with creation of the different
-types.</p>
-<p>We came up with a very simple Enum concept. It uses reflection in the
-constructor to check if the given value is a valid Enum value by
-checking it against all the defined constants of the implementing class
-and throws an Exception if it is not. The __toString() magic method is
-implemented to allow for simple checks of the enums value. Strict
-type-checks are not possible with this construct, however in our opinion
-it is a very elegant solution to enforce a limited set of specific
-values throughout your code-base.</p>
-<p>Here is the code plus a small example:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>abstract class MyEnum
-{
-    final public function __construct($value)
-    {
-        $c = new ReflectionClass($this);
-        if(!in_array($value, $c-&gt;getConstants())) {
-            throw IllegalArgumentException();
-        }
-        $this-&gt;value = $value;
-    }
-
-    final public function __toString()
-    {
-        return $this-&gt;value;
-    }
-}
-
-class Foo extends MyEnum
-{
-    const FOO = &quot;foo&quot;;
-    const BAR = &quot;bar&quot;;
-}
-
-$a = new Foo(Foo::FOO);
-$b = new Foo(Foo::BAR);
-$c = new Foo(Foo::BAR);
-
-if($a == Foo::FOO) {
-    echo &quot;My value is Foo::FOO\n&quot;;
-} else {
-    echo &quot;I dont match!\n&quot;;
-}
-
-if($a == $b) {
-    echo &quot;a value equals b value!\n&quot;;
-}
-if($b == $c) {
-    echo &quot;b value equals c value!\n&quot;;
-}</pre>
-</div>
-</div></blockquote>
-<p>Now you could nice things such as:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>function doStuff(Foo $foo) {
-    switch($foo) {
-        case Foo::FOO:
-            echo &quot;do more here!\n&quot;;
-            break;
-        case Foo::BAR;
-            echo &quot;evil stop!\n&quot;;
-            break;
-    }
-}
-
-doStuff($a);</pre>
-</div>
-</div></blockquote>
-<p>What are your thoughts?</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/08/31/enums-in-php.html#disqus_thread" data-disqus-identifier="2009/08/31/enums-in-php">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -909,6 +915,9 @@ doStuff($a);</pre>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
         </li>
         <li class="recent_post">
@@ -934,9 +943,6 @@ doStuff($a);</pre>
         </li>
         <li class="recent_post">
             <a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
         </li>
     </ul>
 </div>

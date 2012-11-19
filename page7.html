@@ -79,6 +79,49 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 04, 2008</span> 
+        </div>
+        <div class="section" id="complete-django-template-engine-implementation-for-php5-downloadable-now">
+<h1><a href="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html">Complete Django Template Engine Implementation for PHP5 - Downloadable Now</a></h1>
+<p>I prepared a downloadable version of my <a class="reference external" href="http://www.djangoproject.com">Django Template
+Language</a> Engine Clone for PHP5 and the
+Zend Framework (although it can easily be used Standalone). It also
+implements two helpers that aid in rapid ajax/Dojox deployment. You can
+easily specify template blocks that should be rendered by Javascript via
+DojoX DTL, which are then marked, compiled and shown by the client using
+JSON data from the server. I included a demo to show this feature.</p>
+<p>You can grab the
+<a class="reference external" href="http://www.beberlei.de/sources/calypso-dtl-0.1.tar.gz">Tarball</a> and
+there is also a
+<a class="reference external" href="http://www.beberlei.de/sources/README_Dtl.txt">README</a> with some
+information. I would appreciate if anybody would test the lib and gave
+some feedback.</p>
+<p>I will soon start to push this component in the ZF proposal process. I
+still have to finish the class structure before I can move to the Ready
+for Review stage. The library will max end up in Zend Extras. Therefore
+I will have to say again: This View Renderer shall be no replacement for
+the current Zend View. It is only an alternative which allows for some
+neat functionality and stricter View / Controller logic separation.</p>
+<p><strong>UPDATE:</strong> I finished a little page for what I call the Calypso DTL.
+See it here: <a class="reference external" href="http://www.beberlei.de/calypso/">Calypso Site</a>. I have
+put up a little tutorial how to get the Template Engine running with
+Zend Framework and as a standalone component.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html#disqus_thread" data-disqus-identifier="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>August 31, 2008</span> 
         </div>
         <div class="section" id="greaat-python-can-control-your-wiimote">
@@ -381,100 +424,6 @@ as PHP code:</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html#disqus_thread" data-disqus-identifier="2008/01/20/zend-view-hack-for-implementation-of-rss-feed">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 20, 2008</span> 
-        </div>
-        <div class="section" id="using-a-self-defined-zend-loader">
-<h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
-<p>When you start writing with a Framework like Zend like I did in the last
-weeks, you probably are still haunted by all the bad habits of pseudo
-object orientated PHP design, using lots of require and include’s.
-Zend_Loader doesn’t seem to help at first, its just another command
-(Zend_Loader::loadClass or ::loadFile). It sucks to register lots of
-autoload paths too.</p>
-<p>I wrote my own Zend_Loader child class. It grabs all include paths from
-a config File using the Zend_Config class, and completely frees you of
-thinking about includes.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WWLoader extends Zend_Loader
-{
-    private static $dirs = NULL;
-
-    public static function loadClass($class)
-    {
-        if(self::$dirs===NULL) {
-            //
-            // Include directories of this application are saved in a configuration file. If it has not been
-            // loaded before do so now and safe everything to the private static variable $dirs which will
-            // then be used in further loadings
-            //
-            $dirs = array();
-            $conf_app_path = new Zend_Config_Ini(sprintf('%s%s', constant('ZEND_CONFIG_PATH'), 'application.ini'), 'appincludepath');
-            self::extractPaths($conf_app_path-&gt;toArray(), $dirs);
-            self::$dirs = $dirs;
-        }
-
-        parent::loadClass($class, self::$dirs, true);
-    }
-
-    public static function autoload($class)
-    {
-        try {
-            self::loadClass($class);
-            return $class;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Given an array with subkeys of include paths this function unifies this array to
-     * a single one and returns the result in the second argument $dirs which is given
-     * by reference.
-     *
-     * @param Array $array
-     * @param Array $dirs
-     */
-    public static function extractPaths($array, &amp;$dirs)
-    {
-        foreach($array AS $k =&gt; $v) {
-            if(is_array($v)) {
-                self::extractPaths($v, $dirs);
-            } else {
-                $dirs[] = $v;
-            }
-        }
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>ZEND_CONFIG_PATH is the only constant I use in my application. I
-initialize the following at the beginning of my bootstrap file:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>define('ZEND_CONFIG_PATH', dirname(__FILE__).&quot;/../application/config/&quot;);
-
-require_once 'Zend/Loader.php';
-require_once dirname(__FILE__).'/../application/include/WWLoader.php';
-Zend_Loader::registerAutoload();
-Zend_Loader::registerAutoload('WWLoader');</pre>
-</div>
-</div></blockquote>
-<p>After that, its just Objects.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/20/using-a-self-defined-zend-loader.html#disqus_thread" data-disqus-identifier="2008/01/20/using-a-self-defined-zend-loader">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -521,6 +470,9 @@ Zend_Loader::registerAutoload('WWLoader');</pre>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
         </li>
         <li class="recent_post">
@@ -546,9 +498,6 @@ Zend_Loader::registerAutoload('WWLoader');</pre>
         </li>
         <li class="recent_post">
             <a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
         </li>
     </ul>
 </div>

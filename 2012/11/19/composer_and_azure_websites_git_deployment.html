@@ -1,0 +1,248 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Composer and Azure Websites Git Deployment &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.4.1b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Babysteps with Fortrabbit PHP Cloud" href="../../10/27/babysteps_with_fortrabbit_php_cloud.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2012-11-19-composer_and_azure_websites_git_deployment">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>November 19, 2012</span> 
+        </div>
+    <div class="section" id="composer-and-azure-websites-git-deployment">
+<h1>Composer and Azure Websites Git Deployment</h1>
+<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
+research I found out Azure supports post deployment hooks to run
+Composer and allows you to configure environment variables from the Management
+console.</p>
+<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites/">Azure Websites</a> in June this
+year.  It is a platform as a service solution where you can deploy your
+websites via FTP or Git. With Azure Websites you can avoid having to deal with
+the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services/">Azure Hosted Cloud
+Services</a>.
+As long as your website only requires an SQLServer, MySQL or external APIs you
+can actually achieve quite a lot already.</p>
+<p>For a <a class="reference external" href="http://www.symfony.com">Symfony2</a>, <a class="reference external" href="http://www.silex-project.org">Silex</a> or any other modern project however you want
+<a class="reference external" href="http://www.getcomposer.org">Composer</a> support during the deployment as
+long as failures with Composer don&#8217;t break your site.</p>
+<p>It turns out that Azure Websites - to support other platforms that require
+compiling - actually has an extremly robust deployment system (as far as I
+understood its internals). The Git repository is seperated from the actual code
+that is served from the webserver and a number of old checkouts is kept to
+allow rollbacks through the Web interface. Once a Git push was recognized,
+Azure websites will execute a build step, and then copy all the files over to a
+directory with the name of the Git SHA hash. This directory is then symlinked
+to the document root.</p>
+<p>If Composer fails during this step, the website will still be served from the
+currently running version and you don&#8217;t have to face unexpected downtime.</p>
+<p>To actually run Composer as a post-deployment tool you have to do some manual
+work. Create a <tt class="docutils literal"><span class="pre">.deployment</span></tt> file in your project root folder:</p>
+<blockquote>
+<div>[config]
+command = &#8220;D:Program Files (x86)PHPv5.3php.exe&#8221; build_azure.php</div></blockquote>
+<p>If you are using PHP 5.4, then you probably have to change the command version
+name to &#8220;v5.4&#8221;, but I haven&#8217;t tested this.</p>
+<p>Then you need to create the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt> file that is referenced in the
+deployment command. The actual implementation is up to you, my version is
+the most simple one:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">&#39;https://getcomposer.org/composer.phar&#39;</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
+<span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This currently only works with a Composer version, where
+<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
+You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
+<tt class="docutils literal"><span class="pre">./bin/compile</span></tt> to generate a composer.phar that works.</p>
+</div>
+<p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
+You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="categories">
+            <span>
+                Filed under:
+                
+                    <a href="../../../categories/php.html">PHP</a>
+                
+            </span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                
+                    <a href="../../../tags/azure.html">Azure</a>
+                
+            </span>
+        </div>
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2012/11/19/composer_and_azure_websites_git_deployment";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Composer and Azure Websites Git Deployment</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/26/froscon_2012.html">FrOSCon 2012</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

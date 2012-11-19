@@ -79,6 +79,100 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 20, 2008</span> 
+        </div>
+        <div class="section" id="using-a-self-defined-zend-loader">
+<h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
+<p>When you start writing with a Framework like Zend like I did in the last
+weeks, you probably are still haunted by all the bad habits of pseudo
+object orientated PHP design, using lots of require and include’s.
+Zend_Loader doesn’t seem to help at first, its just another command
+(Zend_Loader::loadClass or ::loadFile). It sucks to register lots of
+autoload paths too.</p>
+<p>I wrote my own Zend_Loader child class. It grabs all include paths from
+a config File using the Zend_Config class, and completely frees you of
+thinking about includes.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class WWLoader extends Zend_Loader
+{
+    private static $dirs = NULL;
+
+    public static function loadClass($class)
+    {
+        if(self::$dirs===NULL) {
+            //
+            // Include directories of this application are saved in a configuration file. If it has not been
+            // loaded before do so now and safe everything to the private static variable $dirs which will
+            // then be used in further loadings
+            //
+            $dirs = array();
+            $conf_app_path = new Zend_Config_Ini(sprintf('%s%s', constant('ZEND_CONFIG_PATH'), 'application.ini'), 'appincludepath');
+            self::extractPaths($conf_app_path-&gt;toArray(), $dirs);
+            self::$dirs = $dirs;
+        }
+
+        parent::loadClass($class, self::$dirs, true);
+    }
+
+    public static function autoload($class)
+    {
+        try {
+            self::loadClass($class);
+            return $class;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Given an array with subkeys of include paths this function unifies this array to
+     * a single one and returns the result in the second argument $dirs which is given
+     * by reference.
+     *
+     * @param Array $array
+     * @param Array $dirs
+     */
+    public static function extractPaths($array, &amp;$dirs)
+    {
+        foreach($array AS $k =&gt; $v) {
+            if(is_array($v)) {
+                self::extractPaths($v, $dirs);
+            } else {
+                $dirs[] = $v;
+            }
+        }
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>ZEND_CONFIG_PATH is the only constant I use in my application. I
+initialize the following at the beginning of my bootstrap file:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>define('ZEND_CONFIG_PATH', dirname(__FILE__).&quot;/../application/config/&quot;);
+
+require_once 'Zend/Loader.php';
+require_once dirname(__FILE__).'/../application/include/WWLoader.php';
+Zend_Loader::registerAutoload();
+Zend_Loader::registerAutoload('WWLoader');</pre>
+</div>
+</div></blockquote>
+<p>After that, its just Objects.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/20/using-a-self-defined-zend-loader.html#disqus_thread" data-disqus-identifier="2008/01/20/using-a-self-defined-zend-loader">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 17, 2008</span> 
         </div>
         <div class="section" id="zf-managing-404-errors-with-version-1-0-3">
@@ -631,137 +725,6 @@ registered class instance.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/09/20/dependency-injection-via-interface-in-php-an-example.html#disqus_thread" data-disqus-identifier="2008/09/20/dependency-injection-via-interface-in-php-an-example">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 30, 2008</span> 
-        </div>
-        <div class="section" id="dependency-injection-with-php-introducing-sphicy">
-<h1><a href="2008/12/30/dependency-injection-with-php-introducing-sphicy.html">Dependency Injection with PHP: Introducing Sphicy</a></h1>
-<p>I have written <a class="reference external" href="http://www.whitewashing.de/blog/articles/101">on dependency
-injection</a> before
-christmas and how <a class="reference external" href="http://code.google.com/p/guice">Guice</a>, googles DI
-framework, offers a simple solution. I copied the functionality for a
-PHP clone of Guice and named it
-<a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a>. You saw an early prototype of
-it in the blogpost mentioned above.</p>
-<p><a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a> configures object dependencies
-with modules: You explicitly state which implementation should be bound
-to which interface. An injector then creates instances of these objects
-via reflection: All constructor dependencies are resolved by looking at
-the given type hints and initializes those according to the specified
-bindings.</p>
-<p>Two examples included in the <a class="reference external" href="http://www.beberlei.de/dev/svn/sphicy/">source code of
-Sphicy</a> are <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a> and
-<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a> MVC bootstrapping modules.
-Sadly both frameworks default front controllers are engineered in such a
-way that useful dependency injection needs some workarounds.</p>
-<p>As an example I will now discuss the Sphicy Module for Zend Framework
-MVC applications. To circumvent the singleton and protected Constructor
-of Zend_Controller_Front, we have to build a new front controller that
-wraps around it and requires all the dependencies:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class Sphicy_Controller_Front
-{
-    protected $front;
-
-    /**
-     * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
-     *
-     * @param Zend_Controller_Request_Abstract      $request
-     * @param Zend_Controller_Response_Abstract     $response
-     * @param Zend_Controller_Router_Interface      $router
-     * @param Zend_Controller_Dispatcher_Interface  $dispatcher
-     */
-    public function __construct(
-        Zend_Controller_Request_Abstract $request,
-        Zend_Controller_Response_Abstract $response,
-        Zend_Controller_Router_Interface $router,
-        Zend_Controller_Dispatcher_Interface $dispatcher=null
-    )
-    {
-        $front = Zend_Controller_Front::getInstance();
-        $front-&gt;setRequest($request);
-        $front-&gt;setResponse($response);
-        $front-&gt;setRouter($router);
-
-        if($dispatcher === null) {
-            $dispatcher = $front-&gt;getDispatcher();
-        }
-        $front-&gt;setDispatcher($dispatcher);
-    }
-
-    public function dispatch()
-    {
-        $this-&gt;front-&gt;dispatch();
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>You can see that the <strong>Sphicy_Controller_Front</strong> class requires
-dependencies in its constructor that are then forward injected into
-<strong>Zend_Controller_Front</strong>. You can now create a module that binds all
-the required dependencies to concrete implementations, for example a
-module for a Zend MVC Http Application might look like:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class Sphicy_ZendMvc_ExampleModule implements spModule {
-     public function configure(spBinder $binder) {
-         // Sphicy_Controller_Front does not extend Zend_Controller_Front, because of Singletonitis
-         // It offers the dispatch method to proxy against Zend_Controller_Front::dispatch.
-         $binder-&gt;bind(&quot;Sphicy_Controller_Front&quot;)-&gt;to(&quot;Sphicy_Controller_Front&quot;);
-         $binder-&gt;bind(&quot;Zend_Controller_Request_Abstract&quot;)-&gt;to(&quot;Zend_Controller_Request_Http&quot;);
-         $binder-&gt;bind(&quot;Zend_Controller_Response_Abstract&quot;)-&gt;to(&quot;Zend_Controller_Response_Http&quot;);
-         // loads all routes
-         $binder-&gt;bind(&quot;Zend_Controller_Router_Interface&quot;)-&gt;to(&quot;MyApplication_Router&quot;);
-     }
- }</pre>
-</div>
-</div></blockquote>
-<p>The class <strong>MyApplication_Router</strong> might look up all the routing
-information of the application via a hardcoded configuration mechanism.
-You may say this is a hard dependency, but actually you can just switch
-modules or implementations at this position to replace the router with
-another implementation. You can also see that no implementation for the
-dispatcher is bound. But this dependency is optional and will be created
-automatically as can be seen in the <strong>Sphicy_Controller_Front</strong> class.</p>
-<p>The front controllers is now created by calling:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$injector = new spDefaultInjector(new Sphicy_ZendMvc_ExampleModule());
-$front = $injector-&gt;getInstance(&quot;Sphicy_Controller_Front&quot;);
-$front-&gt;dispatch();</pre>
-</div>
-</div></blockquote>
-<p>What happens in the <strong>$injector-&gt;getInstance()</strong> line? Sphicy looks at
-<strong>Sphicy_Controller_Front</strong>‘s constructor and finds that four
-dependencies are needed: Request, Response, Router and Dispatcher
-implementations. It looks up the bindings and searches for them,
-creating Zend_Controller_Request_Http,
-Zend_Controller_Response_Http and MyApplication_Router objects. A
-dispatcher implementation is not found, but Sphicy recognizes that null
-is a valid paramater and injects it. The 3 concrete implementations and
-one null are instantiated and used to construct a valid
-<strong>Sphicy_Controller_Front</strong> instance.</p>
-<p>You have now stated the dependencies of the Zend Controller Front
-explicitly and can switch them instantaneously by switching the bindings
-of interface to implementations in the configuration module.</p>
-<p>Have a look at the <a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy Website</a> and
-<a class="reference external" href="http://www.beberlei.de/sphicy/documentation/faq.html">FAQ</a> to see
-more examples and information about the possibilites of this dependency
-injection framework.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/30/dependency-injection-with-php-introducing-sphicy.html#disqus_thread" data-disqus-identifier="2008/12/30/dependency-injection-with-php-introducing-sphicy">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -808,6 +771,9 @@ injection framework.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
+        </li>
+        <li class="recent_post">
             <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
         </li>
         <li class="recent_post">
@@ -833,9 +799,6 @@ injection framework.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a>
         </li>
     </ul>
 </div>
