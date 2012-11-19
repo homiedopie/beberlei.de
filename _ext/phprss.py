@@ -14,6 +14,10 @@ import time
 from tinkerer.ext import patch
 
 def add_rss(app, context):
+    '''
+    Adds RSS service link to page context.
+    '''
+    context["rss_service"] = app.config.rss_service
 
 def generate_feed(app):
     '''
