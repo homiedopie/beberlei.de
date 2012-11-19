@@ -63,3 +63,9 @@ def generate_feed(app):
 
     yield ("phprss", context, "php.xml")
 
+def setup(app):
+    '''
+    Sets up Facebook comment handler.
+    '''
+    app.connect("html-page-context", add_rss)
+    app.connect("html-collect-pages", generate_feed)
