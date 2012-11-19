@@ -61,5 +61,5 @@ def generate_feed(app):
     # feed pubDate is equal to latest post pubDate
     context["pubDate"] = context["items"][0]["pubDate"]
 
-    yield ("rss", context, "php.xml")
+    yield ("phprss", context, "php.xml")
 
