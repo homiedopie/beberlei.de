@@ -28,6 +28,9 @@ def generate_feed(app):
     # feed items
     context["items"] = []
     for post in env.blog_posts:
+        if 'php' not in env.blog_metadata[post].filing["categories"]:
+            continue
+
         link = "%s%s.html" % (app.config.website, post)
 
         timestamp = email.utils.formatdate(
@@ -35,9 +38,6 @@ def generate_feed(app):
                 localtime=True)
 
         categories = [category[1] for category in env.blog_metadata[post].filing["categories"]]
-
-        if 'php' not in categories:
-            continue
 
         context["items"].append({
                     "title": env.titles[post].astext(),
@@ -48,6 +48,9 @@ def generate_feed(app):
                     "categories": categories,
                     "pubDate": timestamp
                 })
+
+    if not context["items"]:
+        return
 
     # feed metadata 
     context["title"] = app.config.project
