@@ -29,6 +29,7 @@ def generate_feed(app):
     context["items"] = []
     for post in env.blog_posts:
         if 'PHP' not in env.blog_metadata[post].filing["categories"]:
+            print env.blog_metadata[post].filing["categories"]
             continue
 
         link = "%s%s.html" % (app.config.website, post)
