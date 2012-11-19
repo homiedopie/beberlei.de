@@ -36,7 +36,7 @@ currently running version and you don't have to face unexpected downtime.
 To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a ``.deployment`` file in your project root folder:
 
-::
+.. code-block:: ini
 
     [config]
     command = "D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php
