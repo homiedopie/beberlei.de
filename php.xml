@@ -39,7 +39,7 @@ currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <tt class="docutils literal"><span class="pre">.deployment</span></tt> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
+<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;&quot;%ProgramFiles(x86)%\PHP\v5.3\php.exe&quot;&quot; build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
@@ -59,12 +59,14 @@ the most simple one:</p>
 <span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This currently only works with the latest Composer dev version.</p>
-</div>
 <p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
 You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Update: Generalized the path to PHP.exe on Azure and removed note
+about having to build Composer yourself. Deployment work with latest
+Composer version.</p>
+</div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
             <pubDate>Mon, 19 Nov 2012 00:00:00 +0100</pubDate>
