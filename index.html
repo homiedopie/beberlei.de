@@ -77,8 +77,17 @@
         <div class="timestamp postmeta">
             <span>November 19, 2012</span> 
         </div>
-        <div class="section" id="composer-and-azure-websites-git-deployment">
-<h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
+        <div class="section" id="composer-and-azure-websites-git-deployment-update">
+<h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment (UPDATE)</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Update: Generalized the path to PHP.exe on Azure and removed note
+about having to build Composer yourself. Deployment work with latest
+Composer version.</p>
+<p class="last">Update 2: Fixed the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt> script. It needs to copy
+files into the webdirectory manually. The algorithm can be made
+much more efficient, the solution is the simplest one working now.</p>
+</div>
 <p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
@@ -120,20 +129,49 @@ the most simple one:</p>
     <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
+<span class="nb">register_shutdown_function</span><span class="p">(</span><span class="s1">'copyFiles'</span><span class="p">);</span>
+
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
 <span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
+
+<span class="k">function</span> <span class="nf">copyFiles</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_TARGET'</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Cannot find pyhsical path to application root.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;There should be an 'DEPLOYMENT_TARGET' env variable.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">echo</span> <span class="s2">&quot;Copying code to webroot</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="nx">copyDirectory</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_SOURCE'</span><span class="p">],</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_TARGET'</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="nf">copyDirectory</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$target</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$it</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveDirectoryIterator</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">RecursiveDirectoryIterator</span><span class="o">::</span><span class="na">SKIP_DOTS</span><span class="p">);</span>
+    <span class="nv">$ri</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="nv">$it</span><span class="p">,</span> <span class="nx">RecursiveIteratorIterator</span><span class="o">::</span><span class="na">SELF_FIRST</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$target</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$target</span><span class="p">,</span> <span class="mo">0777</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$ri</span> <span class="k">as</span> <span class="nv">$file</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$targetPath</span> <span class="o">=</span> <span class="nv">$target</span> <span class="o">.</span> <span class="nx">DIRECTORY_SEPARATOR</span> <span class="o">.</span> <span class="nv">$ri</span><span class="o">-&gt;</span><span class="na">getSubPathName</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">isDir</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">||</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">()))</span> <span class="p">{</span>
+            <span class="nb">copy</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">(),</span> <span class="nv">$targetPath</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
 You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Update: Generalized the path to PHP.exe on Azure and removed note
-about having to build Composer yourself. Deployment work with latest
-Composer version.</p>
-</div>
 </div>
         
     <div class="postmeta">
