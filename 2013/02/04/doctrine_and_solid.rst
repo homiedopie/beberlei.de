@@ -170,13 +170,16 @@ Another benefit is that you can test the shipping cost calculator directly in a
 unit-test and avoid checking for the correctness indirectly through a getter
 method for the shipping costs.
 
+Extracting every method of an entity into a method object is obviously
+overkill. You should excercise caution and common sense when performing this
+refactoring.
+
 Conclusion
 ----------
 
 Not all the techniques to implement SOLID code can be exploited when using Doctrine
 for technical reasons. In the future I hope to support value objects in
 Doctrine to make this possible.
-
 
 .. author:: default
 .. categories:: PHP
