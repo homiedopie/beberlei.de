@@ -19,12 +19,13 @@ maximizing clarity
 Extracting Value Objects: Minimize Duplication
 ----------------------------------------------
 
-Entity classes responsibility here are the state transformations of their
-internal fields.  This can simply be done by using setter methods or `with real
-code, when avoiding setters
-<http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html>`_.
-These state transformations can be part of different responsibilities,
-specificially when properties belong to different groups of concepts.
+Entity classes responsibility are the state transformations of their internal
+fields.  This can simply be done by using setter methods or `when avoiding
+setters
+<http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html>`_,
+with use-case driven methods.  These state transformations can be part of
+different responsibilities, specificially when properties belong to different
+groups of concepts.
 
 Take a very simple entity that contains updated/created at logic:
 
@@ -107,7 +108,9 @@ See how all the code could be moved into ``Timestamped`` and is now reusable
 in other entities.
 
 Doctrine has no support for embedded objects, which is very sad. I am working
-very hard to get this feature into Doctrine as soon as possible.
+very hard to get this feature into Doctrine as soon as possible. You can use
+the "object" type as a workaround and ``serialize()`` the value object into
+the database. However this is beyond ugly in my opinion.
 
 Extract Method Objects: Maximizing clarity
 ------------------------------------------
@@ -176,6 +179,6 @@ Doctrine to make this possible.
 
 
 .. author:: default
-.. categories:: php
-.. tags:: php
+.. categories:: PHP
+.. tags:: PHP
 .. comments::
