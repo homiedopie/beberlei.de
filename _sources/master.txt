@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/02/04/doctrine_and_solid
    2012/11/19/composer_and_azure_websites_git_deployment
    2012/10/27/babysteps_with_fortrabbit_php_cloud
    2012/10/22/a_tent_io_app__zelten_bookmarks

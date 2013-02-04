@@ -1,15 +1,5 @@
-Composer and Azure Websites Git Deployment (UPDATE)
-===================================================
-
-.. note::
-
-    Update: Generalized the path to PHP.exe on Azure and removed note
-    about having to build Composer yourself. Deployment work with latest
-    Composer version.
-
-    Update 2: Fixed the ``build_azure.php`` script. It needs to copy
-    files into the webdirectory manually. The algorithm can be made
-    much more efficient, the solution is the simplest one working now.
+Composer and Azure Websites Git Deployment
+==========================================
 
 Continuing my series on PHP PaaS Clouds (`Fortrabbit
 <http://fortrabbit.com/>`_), I turn to Microsoft Azure today. After some
@@ -49,7 +39,7 @@ work. Create a ``.deployment`` file in your project root folder:
 .. code-block:: ini
 
     [config]
-    command = ""%ProgramFiles(x86)%\PHP\v5.3\php.exe"" build_azure.php
+    command = "D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php
 
 If you are using PHP 5.4, then you probably have to change the command version
 name to "v5.4", but I haven't tested this.
@@ -66,46 +56,18 @@ the most simple one:
         file_put_contents("composer.phar", file_get_contents($url));
     }
 
-    register_shutdown_function('copyFiles');
-
     $_SERVER['argv'][1] = "update";
     $_SERVER['argv'][2] = "--prefer-dist";
     $_SERVER['argv'][3] = "-v";
     require "composer.phar";
 
-    function copyFiles()
-    {
-        if (!isset($_SERVER['DEPLOYMENT_TARGET'])) {
-            echo "Cannot find pyhsical path to application root.\n";
-            echo "There should be an 'DEPLOYMENT_TARGET' env variable.\n";
-            exit(1);
-        }
+.. note::
 
-        echo "Copying code to webroot\n";
-        copyDirectory($_SERVER['DEPLOYMENT_SOURCE'], $_SERVER['DEPLOYMENT_TARGET']);
-    }
-
-    function copyDirectory($source, $target)
-    {
-        $it = new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS);
-        $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
-
-        if ( !file_exists($target)) {
-            mkdir($target, 0777, true);
-        }
-
-        foreach ($ri as $file) {
-            $targetPath = $target . DIRECTORY_SEPARATOR . $ri->getSubPathName();
-            if ($file->isDir()) {
-                if ( ! file_exists($targetPath)) {
-                    mkdir($targetPath);
-                }
-            } else if (!file_exists($targetPath) || filemtime($targetPath) < filemtime($file->getPathname())) {
-                copy($file->getPathname(), $targetPath);
-            }
-        }
-    }
-
+    This currently only works with a Composer version, where
+    `PR-1341 <https://github.com/composer/composer/pull/1341>`_ is applied.
+    You can check out `my Composer fork
+    <https://github.com/beberlei/composer/tree/GH-1339>`_ and run
+    ``./bin/compile`` to generate a composer.phar that works.
 
 Instead of using this approach, you could ship ``composer.phar`` with your repository for example.
 You can of course execute additional steps in the ``build_azure.php``, for example warmup caches.

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.4.1b',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -44,7 +44,10 @@
         <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-11" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
     </div>
     <div class="span-5 last">
         <p class="buttons" style="text-align: right">
@@ -77,6 +80,36 @@
             </li>
         </ul>
     </div>
+        
+        <div class="timestamp postmeta">
+            <span>January 20, 2008</span> 
+        </div>
+        <div class="section" id="zend-view-hack-for-implementation-of-rss-feed">
+<h1><a href="2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html">Zend_View Hack for implementation of RSS Feed</a></h1>
+<p>Using Zend_View for your site and want to implement an RSS Feed? You
+might run into the problem that the XML header definition is interpreted
+as PHP code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="cp">?&gt;</span><span class="x"/>
+</pre></div>
+</div>
+<p>Before you start cursing the world try this (rather obvious) workaround:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="s1">'&lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;'</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"/>
+</pre></div>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html#disqus_thread" data-disqus-identifier="2008/01/20/zend-view-hack-for-implementation-of-rss-feed">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
         
         <div class="timestamp postmeta">
             <span>January 20, 2008</span> 
@@ -626,105 +659,6 @@ fun.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/09/11/new-calypso-dtl-version-0-2.html#disqus_thread" data-disqus-identifier="2008/09/11/new-calypso-dtl-version-0-2">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>September 20, 2008</span> 
-        </div>
-        <div class="section" id="dependency-injection-via-interface-in-php-an-example">
-<h1><a href="2008/09/20/dependency-injection-via-interface-in-php-an-example.html">Dependency Injection via Interface in PHP: An example</a></h1>
-<p>Personal projects and work currently both force me to think about
-application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
-injection</a> the
-other day. Its quite a complex Design Pattern and hard to grasp, even
-with the number of examples you can find in the internet. Basically
-Dependency Injection means you register components that might be a
-dependency for other components and when loading new classes via the
-dependency injection framework, it knows of this relationships and
-assembles the object in need and all its dependencies and returns them
-fully initialized. This pattern leads to completely encapsulated objects
-where any class in the object graph can be exchanged for a new
-implementation without breaking all its dependencies. It also makes
-testing complex components and object relationships very easy.</p>
-<p>As far as I could find out, three different types of Dependency Injection
-implementations exist: Via Constructor, via Setter and via Interfaces.
-There exist implementations of Dependency Injection for Java (Spring)
-that are configured via XML config files and seem very complex. They are
-also hard to read in code I presume, since you always have to be aware
-of the current application configuration. There are also some more
-lightweight implementations (PicoContainer) that assemble their
-relationships in the application and work with config methods that act
-as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
-implementation via
-interfaces</a>,
-which seems most accessible for me.</p>
-<p>All PHP clones of any dependency injection framework seem to go the
-complex way via configuration though. With traits and multiple class
-inheritance on the horizon, some kind of interface injection seems
-mighty powerful though. So I implemented a really lightweight
-implementation of Interface Dependency Injection for PHP. The Container
-works with static method only, is therefore in the global scope, such
-that configuration is reduced to a minimum. Generally you have to write
-interfaces for object injection, for example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">interface InjectDbAdapter</span>
-<span class="x">{</span>
-<span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>Other potential examples include “InjectLogger”, “InjectSoapClient”, or
-“InjectAppConfig”. You then have to register a component for usage with
-this interface:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</span>
-</pre></div>
-</div>
-<p>Now any class that implements the InjectDbAdapter interface can be
-instantiated via:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class');</span>
-</pre></div>
-</div>
-<p>and the loader takes care of calling the ‘Class’ implementation of
-injectDbAdapter with the given Database Adapter. A negative consequence
-of this approach is that you have to implement the inject methods for
-all interfaces in your concrete class implementations. With Traits
-(multiple class inheritance) being a new feature in PHP soon, injection
-via parent classes seems to become a very powerful approach though,
-which can handle the concrete implementations.</p>
-<p>The Container takes care of all the dependency building, so when testing
-your components you can register lots of mock objects. You can also
-exchange dependencies for only a subset of objects very easily. I
-implemented a method “Whitewashing_Container::registerClassComponent”,
-which registers a dependency component that is used with higher priority
-in construction of the given class. You can also specify a third
-parameter $localInterfaceOverride for the highest priority:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
-</pre></div>
-</div>
-<p>Speedwise the usage of the Container reduces class instantiation by about
-50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
-on my machine. But naturally only classes with dependencies and lots of
-them should be using this mechanism and with good application design,
-this shouldn’t be to many. You can download
-<a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
-and <a class="reference external" href="http://www.beberlei.de/sources/di.phps">Example</a> sourcecode, to
-take a look. Currently this Container is not really creating new
-dependencies for each new class generation but rather inverts the usage
-of a registry. It should be an easy task to extend the registering
-method to decide between new class generation and using the globally
-registered class instance.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/09/20/dependency-injection-via-interface-in-php-an-example.html#disqus_thread" data-disqus-identifier="2008/09/20/dependency-injection-via-interface-in-php-an-example">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -771,7 +705,10 @@ registered class instance.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
-            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment (UPDATE)</a>
+            <a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
+        </li>
+        <li class="recent_post">
+            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
         </li>
         <li class="recent_post">
             <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
@@ -796,9 +733,6 @@ registered class instance.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
         </li>
     </ul>
 </div>

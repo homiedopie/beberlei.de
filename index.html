@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.4.1b',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -43,7 +43,10 @@
         <a href="#"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-11" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
     </div>
     <div class="span-5 last">
         <p class="buttons" style="text-align: right">
@@ -75,19 +78,201 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>February 04, 2013</span> 
+        </div>
+        <div class="section" id="doctrine-and-solid">
+<h1><a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a></h1>
+<p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
+time. It bugs me having to reply: It is not really possible.  Because Doctrine2
+does not support value-objects (or embedded-objects), it is very hard to pull
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
+<p>These problems are related to the inability to share behavioral code through
+aggregation and the complexity of state transformations. Combining both, your
+average entity with 5-15 fields can end up with hundrets or thousands lines of
+code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
+maximizing clarity</a>.</p>
+<div class="section" id="extracting-value-objects-minimize-duplication">
+<h2>Extracting Value Objects: Minimize Duplication</h2>
+<p>Entity classes responsibility are the state transformations of their internal
+fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
+setters</a>,
+with use-case driven methods.  These state transformations can be part of
+different responsibilities, specificially when properties belong to different
+groups of concepts.</p>
+<p>Take a very simple entity that contains updated/created at logic:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\HasLifecycleCallbacks</span>
+<span class="sd"> **/</span>
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type=&quot;datetime&quot;)</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type=&quot;datetime&quot;)</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\PreUpdate</span>
+<span class="sd">     **/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you want to duplicate this logic to another second entity, then in Doctrine
+the solution for this is using traits. <a class="reference external" href="http://kore-nordmann.de/blog.html">Kore</a> will dismiss this solution, because
+traits create a hard dependency. Even if we accept the static dependency,
+traits are not perfect even for this very simple example, because its very
+likely that you cannot override the constructor of every entity.</p>
+<p>The solution is to extract a value object <tt class="docutils literal"><span class="pre">Timestamped</span></tt> that contains
+all the logic:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Timestamped</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$timestamped</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">timestamped</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamped</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See how all the code could be moved into <tt class="docutils literal"><span class="pre">Timestamped</span></tt> and is now reusable
+in other entities.</p>
+<p>Doctrine has no support for embedded objects, which is very sad. I am working
+very hard to get this feature into Doctrine as soon as possible. You can use
+the “object” type as a workaround and <tt class="docutils literal"><span class="pre">serialize()</span></tt> the value object into
+the database. However this is beyond ugly in my opinion.</p>
+</div>
+<div class="section" id="extract-method-objects-maximizing-clarity">
+<h2>Extract Method Objects: Maximizing clarity</h2>
+<p>Once you have identified groups of fields that are modified, then the
+complexity of the state transformations can attract lots of code.</p>
+<p>Take an <tt class="docutils literal"><span class="pre">Order</span></tt> object that has a method for calculating the shipping costs,
+depending all the order items and products.
+To seperate calculations from state transformations you can extract
+method objects instead of inlining the code into the <tt class="docutils literal"><span class="pre">Order</span></tt> object.</p>
+<p>For this kind of extraction I create a folder <tt class="docutils literal"><span class="pre">Order</span></tt> and put all
+the extracted method objects in the <tt class="docutils literal"><span class="pre">Order</span></tt> subnamespace.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">Order</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="nv">$calculator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ShippingCostCalculator</span><span class="p">();</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">namespace</span> <span class="nx">MyProject\Entity\Order</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">ShippingCostCalculator</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nx">Order</span> <span class="nv">$order</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>From this step its easy to make the code reusable by passing the shipping cost
+calculator:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Order</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Another benefit is that you can test the shipping cost calculator directly in a
+unit-test and avoid checking for the correctness indirectly through a getter
+method for the shipping costs.</p>
+<p>Extracting every method of an entity into a method object is obviously
+overkill. You should excercise caution and common sense when performing this
+refactoring.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Not all the techniques to implement SOLID code can be exploited when using Doctrine
+for technical reasons. In the future I hope to support value objects in
+Doctrine to make this possible.</p>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="categories">
+            <span>
+                Filed under:
+                
+                    <a href="categories/php.html">PHP</a>
+                
+            </span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                
+                    <a href="tags/php.html">PHP</a>
+                
+            </span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html#disqus_thread" data-disqus-identifier="2013/02/04/doctrine_and_solid">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>November 19, 2012</span> 
         </div>
-        <div class="section" id="composer-and-azure-websites-git-deployment-update">
-<h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment (UPDATE)</a></h1>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>Update: Generalized the path to PHP.exe on Azure and removed note
-about having to build Composer yourself. Deployment work with latest
-Composer version.</p>
-<p class="last">Update 2: Fixed the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt> script. It needs to copy
-files into the webdirectory manually. The algorithm can be made
-much more efficient, the solution is the simplest one working now.</p>
-</div>
+        <div class="section" id="composer-and-azure-websites-git-deployment">
+<h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
 <p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
@@ -115,7 +300,7 @@ currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <tt class="docutils literal"><span class="pre">.deployment</span></tt> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;&quot;%ProgramFiles(x86)%\PHP\v5.3\php.exe&quot;&quot; build_azure.php</span>
+<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
@@ -129,46 +314,18 @@ the most simple one:</p>
     <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="nb">register_shutdown_function</span><span class="p">(</span><span class="s1">'copyFiles'</span><span class="p">);</span>
-
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
 <span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
-
-<span class="k">function</span> <span class="nf">copyFiles</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_TARGET'</span><span class="p">]))</span> <span class="p">{</span>
-        <span class="k">echo</span> <span class="s2">&quot;Cannot find pyhsical path to application root.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-        <span class="k">echo</span> <span class="s2">&quot;There should be an 'DEPLOYMENT_TARGET' env variable.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-        <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">echo</span> <span class="s2">&quot;Copying code to webroot</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-    <span class="nx">copyDirectory</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_SOURCE'</span><span class="p">],</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_TARGET'</span><span class="p">]);</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="nf">copyDirectory</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$target</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$it</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveDirectoryIterator</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">RecursiveDirectoryIterator</span><span class="o">::</span><span class="na">SKIP_DOTS</span><span class="p">);</span>
-    <span class="nv">$ri</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="nv">$it</span><span class="p">,</span> <span class="nx">RecursiveIteratorIterator</span><span class="o">::</span><span class="na">SELF_FIRST</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$target</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$target</span><span class="p">,</span> <span class="mo">0777</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$ri</span> <span class="k">as</span> <span class="nv">$file</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$targetPath</span> <span class="o">=</span> <span class="nv">$target</span> <span class="o">.</span> <span class="nx">DIRECTORY_SEPARATOR</span> <span class="o">.</span> <span class="nv">$ri</span><span class="o">-&gt;</span><span class="na">getSubPathName</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">isDir</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">))</span> <span class="p">{</span>
-                <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">||</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">()))</span> <span class="p">{</span>
-            <span class="nb">copy</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">(),</span> <span class="nv">$targetPath</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This currently only works with a Composer version, where
+<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
+You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
+<tt class="docutils literal"><span class="pre">./bin/compile</span></tt> to generate a composer.phar that works.</p>
 </div>
 <p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
 You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
@@ -1121,232 +1278,6 @@ topic that I will discuss in the next blog post.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html#disqus_thread" data-disqus-identifier="2012/08/18/oop_business_applications__command_query_responsibility_seggregation">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>August 16, 2012</span> 
-        </div>
-        <div class="section" id="oop-business-applications-data-context-interaction">
-<h1><a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a></h1>
-<p>Other posts in this series:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
-mess</a></li>
-<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
-</ul>
-<p>The next design pattern for technical system design is called “Data, Context,
-Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
-paradigm, in the context of PHPs language constraints it can be classified as
-architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
-through the book on DCI and trying to understand this pattern with me.</p>
-<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
-in use-cases (Context). Data objects are never directly involved in these
-use-cases, but are “casted” to their respective roles that they are taking in
-the use-case. This can be implemented with aggregation or traits in PHP.</p>
-<p>One goal of DCI is to get object-oriented programming to a place, where you
-can look at a use-case and its roles and be very sure that the program is
-running correctly, because you can guarantee that there are no unexpected side
-effects. It also aims at keeping the amount of code required to keep in mind
-for a given use-case as small as possible, allowing developers to reason about
-the code with more confidence.</p>
-<div class="section" id="terminology">
-<h2>Terminology</h2>
-<p>In DCI, <strong>data</strong> are objects that encapsulate the state of the application.
-As in EBI, they only contain logic that is true for all the possible use-cases.
-These classes represent <em>what the system is</em>.</p>
-<p><strong>Roles</strong> and <strong>Context</strong> represent <em>what the system does</em> and are supposed to
-capture the End User’s Mental Model as close as possible.</p>
-<p><strong>Roles</strong> add behavior to the data objects by either wrapping them or
-acting as traits for the data objects.</p>
-<p><strong>Context</strong> is the use-case and fulfils its role by making roles <strong>interact</strong> with
-each other. These roles then modify the underlying data.</p>
-</div>
-<div class="section" id="example">
-<h2>Example</h2>
-<p>Starting from the bank account example of the EBI post, we can introduce DCI
-quite easily by adding the missing concept of roles. In the use case of
-transferring money that would be:</p>
-<ul class="simple">
-<li>TransferMoneySource</li>
-<li>TransferMoneySink (Destination)</li>
-</ul>
-<p>We can do this by either introducing two interfaces and two concrete
-implementations that accept the <tt class="docutils literal"><span class="pre">BankAccount</span></tt> as object to work on
-or by building two traits. I will go down the route with traits, to show
-one possible use-case for this new PHP 5.4 feature. The idea here is to
-implement all the behavior necessary on a trait and then have simple dummy
-objects using them in the tests for this use-case.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">trait</span> <span class="nx">TransferMoneySource</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">transferFrom</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="nx">trait</span> <span class="nx">TransferMoneySink</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Any checks for balances, credit limits or other things would also happen
-here. The <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>  on the data objects should be as
-dumb as possible, so that their implementation does not cause any side-effects
-on the execution of this use-case.</p>
-<p>The bank account would then be modified to look:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">BankAccount</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">TransferMoneySource</span><span class="p">,</span> <span class="nx">TransferMoneySink</span><span class="p">;</span>
-
-    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The use-case <tt class="docutils literal"><span class="pre">TransferMoney</span></tt> would then be modified to create Roles instead
-of Data objects from the DAO. This can be a bit tricky when you have multiple
-data objects implementing the same role and you have no way of knowing which
-underlying data object to pick. The binding of data objects to roles happens
-in the use-case. The use-case needs a means to retrieve objects with certain
-roles, which then access underlying data sources. To avoid that your use-cases
-have to know about how to bind roles to data, you could use GUIDs in your
-application and fetch all objects from one data store. Another way would be to
-implement data access objects for roles, that then know how to retrieve their
-corresponding data.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">MoneyTransfer</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span><span class="o">-&gt;</span><span class="na">transferTo</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The simplicity of this is appealing, however don’t forget that we have
-abstracted I/O completely here. There has to be code that deals with that part
-of the system somewhere. However this again is not at the heart of all the DCI
-examples out there, making it difficult to reason about the actual practical
-implications.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">One drawback with this example is, that PHP does not support typehinting for
-traits.</p>
-</div>
-<p>Here is an example of how the bank application service could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">BankApplicationService</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">);</span>
-        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$destinationId</span><span class="p">);</span>
-
-        <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$destination</span><span class="p">);</span>
-
-        <span class="nv">$conn</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">conn</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
-
-        <span class="k">try</span> <span class="p">{</span>
-            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$amount</span><span class="p">);</span>
-            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
-
-            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The <tt class="docutils literal"><span class="pre">ObjectStorage</span></tt> here is a service (repository) that can find any
-persistent data object by a global ID. This is necessary, because it
-doesn’t actually matter what data object uses the necessary traits
-for this use-case.</p>
-<p>Again as in EBI, in a bigger system you would need to find some abstraction
-layer that does this in a more generic way.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>When Gordon started showing me this pattern we were both puzzled as how
-to actually implement this in the real world. Especially the concept
-of binding roles to data objects still confuses us. Most notably why the use
-of traits or aggregates should actually constitute a new programming paradigm
-instead of just another way to do OOP.</p>
-<p>In Scala casting data objects to roles is actually possible by binding traits
-to objects at runtime. This is not possible in PHP however and has to be done
-statically.</p>
-<p>Compared to EBI, DCI focuses drastically on transaction script domain logic, by
-suggesting to implement roles for every use-case for the sake of avoiding
-side-effects. This is actually is very valuable lesson from this pattern.
-Finding means to decrease the complexity of software is always a good thing.
-And the explicit definition of this concept as <strong>roles</strong> is actually easy to
-explain to other programmers.</p>
-<p>One thing that is lacking in DCI is that there is no concrete mechanism to deal
-with the boundary to other parts of the system. This is actually a step back
-from EBI and I suggest using EBI pattern in combination with DCI to solve this.</p>
-<p>The largest benefit from DCI (and its self proclaimed goal) is the mapping from
-the users/customers mental model directly into the code by using Use-Cases and
-Roles. The communication with the customer about behavior can exclusively focus
-on the current context and its use-case. Mapping this behavior to actual data
-can then be done in a different step.</p>
-<p>This simplification of use-cases and reduction of side-effects between
-different parts of the system has other benefits: It can lead to easier to test
-code and makes it much easier for developers to develop on small and isolated
-parts of the system.</p>
-</div>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="categories">
-            <span>
-                Filed under:
-                
-                    <a href="categories/php.html">PHP</a>
-                
-            </span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html#disqus_thread" data-disqus-identifier="2012/08/16/oop_business_applications__data__context__interaction">Leave a comment</a>
         </div>
     </div>
     

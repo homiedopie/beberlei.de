@@ -10,7 +10,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Composer and Azure Websites Git Deployment (UPDATE) &mdash; Whitewashing</title>
+    <title>Composer and Azure Websites Git Deployment &mdash; Whitewashing</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.1b',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -33,6 +33,7 @@
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
     <link rel="next" title="Babysteps with Fortrabbit PHP Cloud" href="../../10/27/babysteps_with_fortrabbit_php_cloud.html" />
+    <link rel="prev" title="Doctrine and SOLID" href="../../../2013/02/04/doctrine_and_solid.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
   <body>
@@ -41,7 +42,10 @@
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-11" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
     </div>
     <div class="span-5 last">
         <p class="buttons" style="text-align: right">
@@ -66,6 +70,9 @@
     
     <div class="related">
         <ul>
+            <li>
+                 &laquo; <a href="../../../2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
+            </li>
             <li class="right">
                 <a href="../../10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a> &raquo; 
             </li>
@@ -75,17 +82,8 @@
         <div class="timestamp postmeta">
             <span>November 19, 2012</span> 
         </div>
-    <div class="section" id="composer-and-azure-websites-git-deployment-update">
-<h1>Composer and Azure Websites Git Deployment (UPDATE)</h1>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>Update: Generalized the path to PHP.exe on Azure and removed note
-about having to build Composer yourself. Deployment work with latest
-Composer version.</p>
-<p class="last">Update 2: Fixed the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt> script. It needs to copy
-files into the webdirectory manually. The algorithm can be made
-much more efficient, the solution is the simplest one working now.</p>
-</div>
+    <div class="section" id="composer-and-azure-websites-git-deployment">
+<h1>Composer and Azure Websites Git Deployment</h1>
 <p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
@@ -113,7 +111,7 @@ currently running version and you don&#8217;t have to face unexpected downtime.<
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <tt class="docutils literal"><span class="pre">.deployment</span></tt> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;&quot;%ProgramFiles(x86)%\PHP\v5.3\php.exe&quot;&quot; build_azure.php</span>
+<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
@@ -127,46 +125,18 @@ the most simple one:</p>
     <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="nb">register_shutdown_function</span><span class="p">(</span><span class="s1">&#39;copyFiles&#39;</span><span class="p">);</span>
-
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;argv&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
 <span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
-
-<span class="k">function</span> <span class="nf">copyFiles</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;DEPLOYMENT_TARGET&#39;</span><span class="p">]))</span> <span class="p">{</span>
-        <span class="k">echo</span> <span class="s2">&quot;Cannot find pyhsical path to application root.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-        <span class="k">echo</span> <span class="s2">&quot;There should be an &#39;DEPLOYMENT_TARGET&#39; env variable.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-        <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">echo</span> <span class="s2">&quot;Copying code to webroot</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-    <span class="nx">copyDirectory</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;DEPLOYMENT_SOURCE&#39;</span><span class="p">],</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;DEPLOYMENT_TARGET&#39;</span><span class="p">]);</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="nf">copyDirectory</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$target</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$it</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveDirectoryIterator</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">RecursiveDirectoryIterator</span><span class="o">::</span><span class="na">SKIP_DOTS</span><span class="p">);</span>
-    <span class="nv">$ri</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="nv">$it</span><span class="p">,</span> <span class="nx">RecursiveIteratorIterator</span><span class="o">::</span><span class="na">SELF_FIRST</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$target</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$target</span><span class="p">,</span> <span class="mo">0777</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$ri</span> <span class="k">as</span> <span class="nv">$file</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$targetPath</span> <span class="o">=</span> <span class="nv">$target</span> <span class="o">.</span> <span class="nx">DIRECTORY_SEPARATOR</span> <span class="o">.</span> <span class="nv">$ri</span><span class="o">-&gt;</span><span class="na">getSubPathName</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">isDir</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">))</span> <span class="p">{</span>
-                <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">||</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">()))</span> <span class="p">{</span>
-            <span class="nb">copy</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">(),</span> <span class="nv">$targetPath</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This currently only works with a Composer version, where
+<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
+You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
+<tt class="docutils literal"><span class="pre">./bin/compile</span></tt> to generate a composer.phar that works.</p>
 </div>
 <p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
 You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
@@ -230,7 +200,10 @@ You can of course execute additional steps in the <tt class="docutils literal"><
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
-            <a href="#">Composer and Azure Websites Git Deployment (UPDATE)</a>
+            <a href="../../../2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
+        </li>
+        <li class="recent_post">
+            <a href="#">Composer and Azure Websites Git Deployment</a>
         </li>
         <li class="recent_post">
             <a href="../../10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
@@ -255,9 +228,6 @@ You can of course execute additional steps in the <tt class="docutils literal"><
         </li>
         <li class="recent_post">
             <a href="../../08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
         </li>
     </ul>
 </div>

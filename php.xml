@@ -5,22 +5,178 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Mon, 19 Nov 2012 00:00:00 +0100</pubDate>
+        <pubDate>Mon, 04 Feb 2013 00:00:00 +0100</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</link>
+            <guid>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</guid>
+            <title><![CDATA[Doctrine and SOLID]]></title>
+            <description><![CDATA[<div class="section" id="doctrine-and-solid">
+<h1>Doctrine and SOLID</h1>
+<p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
+time. It bugs me having to reply: It is not really possible.  Because Doctrine2
+does not support value-objects (or embedded-objects), it is very hard to pull
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
+<p>These problems are related to the inability to share behavioral code through
+aggregation and the complexity of state transformations. Combining both, your
+average entity with 5-15 fields can end up with hundrets or thousands lines of
+code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
+maximizing clarity</a>.</p>
+<div class="section" id="extracting-value-objects-minimize-duplication">
+<h2>Extracting Value Objects: Minimize Duplication</h2>
+<p>Entity classes responsibility are the state transformations of their internal
+fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
+setters</a>,
+with use-case driven methods.  These state transformations can be part of
+different responsibilities, specificially when properties belong to different
+groups of concepts.</p>
+<p>Take a very simple entity that contains updated/created at logic:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\HasLifecycleCallbacks</span>
+<span class="sd"> **/</span>
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type=&quot;datetime&quot;)</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type=&quot;datetime&quot;)</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\PreUpdate</span>
+<span class="sd">     **/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you want to duplicate this logic to another second entity, then in Doctrine
+the solution for this is using traits. <a class="reference external" href="http://kore-nordmann.de/blog.html">Kore</a> will dismiss this solution, because
+traits create a hard dependency. Even if we accept the static dependency,
+traits are not perfect even for this very simple example, because its very
+likely that you cannot override the constructor of every entity.</p>
+<p>The solution is to extract a value object <tt class="docutils literal"><span class="pre">Timestamped</span></tt> that contains
+all the logic:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Timestamped</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$timestamped</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">timestamped</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamped</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See how all the code could be moved into <tt class="docutils literal"><span class="pre">Timestamped</span></tt> and is now reusable
+in other entities.</p>
+<p>Doctrine has no support for embedded objects, which is very sad. I am working
+very hard to get this feature into Doctrine as soon as possible. You can use
+the “object” type as a workaround and <tt class="docutils literal"><span class="pre">serialize()</span></tt> the value object into
+the database. However this is beyond ugly in my opinion.</p>
+</div>
+<div class="section" id="extract-method-objects-maximizing-clarity">
+<h2>Extract Method Objects: Maximizing clarity</h2>
+<p>Once you have identified groups of fields that are modified, then the
+complexity of the state transformations can attract lots of code.</p>
+<p>Take an <tt class="docutils literal"><span class="pre">Order</span></tt> object that has a method for calculating the shipping costs,
+depending all the order items and products.
+To seperate calculations from state transformations you can extract
+method objects instead of inlining the code into the <tt class="docutils literal"><span class="pre">Order</span></tt> object.</p>
+<p>For this kind of extraction I create a folder <tt class="docutils literal"><span class="pre">Order</span></tt> and put all
+the extracted method objects in the <tt class="docutils literal"><span class="pre">Order</span></tt> subnamespace.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">Order</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="nv">$calculator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ShippingCostCalculator</span><span class="p">();</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">namespace</span> <span class="nx">MyProject\Entity\Order</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">ShippingCostCalculator</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nx">Order</span> <span class="nv">$order</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>From this step its easy to make the code reusable by passing the shipping cost
+calculator:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Order</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Another benefit is that you can test the shipping cost calculator directly in a
+unit-test and avoid checking for the correctness indirectly through a getter
+method for the shipping costs.</p>
+<p>Extracting every method of an entity into a method object is obviously
+overkill. You should excercise caution and common sense when performing this
+refactoring.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Not all the techniques to implement SOLID code can be exploited when using Doctrine
+for technical reasons. In the future I hope to support value objects in
+Doctrine to make this possible.</p>
+</div>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+            <pubDate>Mon, 04 Feb 2013 00:00:00 +0100</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</link>
             <guid>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</guid>
-            <title>Composer and Azure Websites Git Deployment (UPDATE)</title>
-            <description><![CDATA[<div class="section" id="composer-and-azure-websites-git-deployment-update">
-<h1>Composer and Azure Websites Git Deployment (UPDATE)</h1>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>Update: Generalized the path to PHP.exe on Azure and removed note
-about having to build Composer yourself. Deployment work with latest
-Composer version.</p>
-<p class="last">Update 2: Fixed the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt> script. It needs to copy
-files into the webdirectory manually. The algorithm can be made
-much more efficient, the solution is the simplest one working now.</p>
-</div>
+            <title><![CDATA[Composer and Azure Websites Git Deployment]]></title>
+            <description><![CDATA[<div class="section" id="composer-and-azure-websites-git-deployment">
+<h1>Composer and Azure Websites Git Deployment</h1>
 <p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
@@ -48,7 +204,7 @@ currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <tt class="docutils literal"><span class="pre">.deployment</span></tt> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;&quot;%ProgramFiles(x86)%\PHP\v5.3\php.exe&quot;&quot; build_azure.php</span>
+<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
@@ -62,46 +218,18 @@ the most simple one:</p>
     <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="nb">register_shutdown_function</span><span class="p">(</span><span class="s1">'copyFiles'</span><span class="p">);</span>
-
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
 <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
 <span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
-
-<span class="k">function</span> <span class="nf">copyFiles</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_TARGET'</span><span class="p">]))</span> <span class="p">{</span>
-        <span class="k">echo</span> <span class="s2">&quot;Cannot find pyhsical path to application root.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-        <span class="k">echo</span> <span class="s2">&quot;There should be an 'DEPLOYMENT_TARGET' env variable.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-        <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">echo</span> <span class="s2">&quot;Copying code to webroot</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-    <span class="nx">copyDirectory</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_SOURCE'</span><span class="p">],</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DEPLOYMENT_TARGET'</span><span class="p">]);</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="nf">copyDirectory</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$target</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$it</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveDirectoryIterator</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">RecursiveDirectoryIterator</span><span class="o">::</span><span class="na">SKIP_DOTS</span><span class="p">);</span>
-    <span class="nv">$ri</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="nv">$it</span><span class="p">,</span> <span class="nx">RecursiveIteratorIterator</span><span class="o">::</span><span class="na">SELF_FIRST</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$target</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$target</span><span class="p">,</span> <span class="mo">0777</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$ri</span> <span class="k">as</span> <span class="nv">$file</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$targetPath</span> <span class="o">=</span> <span class="nv">$target</span> <span class="o">.</span> <span class="nx">DIRECTORY_SEPARATOR</span> <span class="o">.</span> <span class="nv">$ri</span><span class="o">-&gt;</span><span class="na">getSubPathName</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">isDir</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">))</span> <span class="p">{</span>
-                <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">||</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$targetPath</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">()))</span> <span class="p">{</span>
-            <span class="nb">copy</span><span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">getPathname</span><span class="p">(),</span> <span class="nv">$targetPath</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This currently only works with a Composer version, where
+<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
+You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
+<tt class="docutils literal"><span class="pre">./bin/compile</span></tt> to generate a composer.phar that works.</p>
 </div>
 <p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
 You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
@@ -112,7 +240,7 @@ You can of course execute additional steps in the <tt class="docutils literal"><
         <item>
             <link>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</link>
             <guid>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</guid>
-            <title>Using Assertions for validation</title>
+            <title><![CDATA[Using Assertions for validation]]></title>
             <description><![CDATA[<div class="section" id="using-assertions-for-validation">
 <h1>Using Assertions for validation</h1>
 <p>We all know PHP is weakly typed and has some weird type-conversion rules.
@@ -196,7 +324,7 @@ allows you to overwrite the exception class:</p>
         <item>
             <link>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</link>
             <guid>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</guid>
-            <title>Building an Object Model: No setters allowed</title>
+            <title><![CDATA[Building an Object Model: No setters allowed]]></title>
             <description><![CDATA[<div class="section" id="building-an-object-model-no-setters-allowed">
 <h1>Building an Object Model: No setters allowed</h1>
 <p>If you are using an object relational mapper or any other database
@@ -408,7 +536,7 @@ please leave comments when leaving this website :-)</p>
         <item>
             <link>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</link>
             <guid>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</guid>
-            <title>OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</title>
+            <title><![CDATA[OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)]]></title>
             <description><![CDATA[<div class="section" id="oop-business-applications-command-query-responsibility-segregation-cqrs">
 <h1>OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</h1>
 <p>Other posts in this series about OOP Business Applications:</p>
@@ -604,7 +732,7 @@ topic that I will discuss in the next blog post.</p>
         <item>
             <link>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</link>
             <guid>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</guid>
-            <title>OOP Business Applications: Data, Context, Interaction</title>
+            <title><![CDATA[OOP Business Applications: Data, Context, Interaction]]></title>
             <description><![CDATA[<div class="section" id="oop-business-applications-data-context-interaction">
 <h1>OOP Business Applications: Data, Context, Interaction</h1>
 <p>Other posts in this series:</p>
@@ -812,7 +940,7 @@ parts of the system.</p>
         <item>
             <link>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</link>
             <guid>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</guid>
-            <title>OOP Business Applications: Entity, Boundary, Interactor</title>
+            <title><![CDATA[OOP Business Applications: Entity, Boundary, Interactor]]></title>
             <description><![CDATA[<div class="section" id="oop-business-applications-entity-boundary-interactor">
 <h1>OOP Business Applications: Entity, Boundary, Interactor</h1>
 <p>Other posts in this series:</p>
@@ -1078,7 +1206,7 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
         <item>
             <link>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</link>
             <guid>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</guid>
-            <title>OOP Business Applications: Trying to escape the mess</title>
+            <title><![CDATA[OOP Business Applications: Trying to escape the mess]]></title>
             <description><![CDATA[<div class="section" id="oop-business-applications-trying-to-escape-the-mess">
 <h1>OOP Business Applications: Trying to escape the mess</h1>
 <div class="admonition note">

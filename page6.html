@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.4.1b',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -44,7 +44,10 @@
         <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
     </div>
     <div class="span-11" id="about">
-        <p>Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development, programming and databases.</p>
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
     </div>
     <div class="span-5 last">
         <p class="buttons" style="text-align: right">
@@ -77,6 +80,42 @@
             </li>
         </ul>
     </div>
+        
+        <div class="timestamp postmeta">
+            <span>November 01, 2008</span> 
+        </div>
+        <div class="section" id="zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes">
+<h1><a href="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html">ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.</a></h1>
+<p>The next version of <a class="reference external" href="http://framework.zend.com">Zend Framework</a> will
+appear quite soon (16th November) and there will be lots of buzz about
+Zend Amf, the new component sponsored by Adobe to support Adobe Flash
+(or other tools) to PHP communications.</p>
+<p>Besides the buzz there is some stuff from me getting into the Zend
+Framework. jQuery View and Form Helpers will allow you to throw the Dojo
+stuff away and use the great jQuery. This is of course inherently
+subjective, but still different opportunities are always great.</p>
+<p>Additionally I have been fixing quite some bugs on the Zend Soap
+component and will manage to fix further stuff until the 1.7 release I
+hope. This will make especially Wsdl and AutoDiscover produce valid WSDL
+XML plus adds setObject() support to Zend_Soap_Server.</p>
+<p>You can now choose between several strategies to evaluate complex types
+in WSDL Autodiscovering. Array of Datatypes (simple or complex) via
+type[] syntax and complex objects can be parsed differently now based on
+settings.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html#disqus_thread" data-disqus-identifier="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
         
         <div class="timestamp postmeta">
             <span>November 01, 2008</span> 
@@ -572,46 +611,6 @@ repository.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/08/16/zendx-jquery-is-ready-for-recommendation.html#disqus_thread" data-disqus-identifier="2008/08/16/zendx-jquery-is-ready-for-recommendation">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>August 10, 2008</span> 
-        </div>
-        <div class="section" id="import-and-pythonpath-problems-with-pydev-and-linux">
-<h1><a href="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html">Import and PYTHONPATH Problems with PyDev and Linux</a></h1>
-<p>Today is began to configure my <a class="reference external" href="http://pydev.sf.net">PyDev</a> Eclipse
-environment since I want to learn Python and need it for a programming
-aspect of my forthcoming diploma thesis. I ran into several difficulties
-getting the plugins run dialog to work. It seems that configuring the
-python interpreter under linux and adding all the correct include paths
-is not enough, even when following the <a class="reference external" href="http://pydev.sourceforge.net/faq.html#how_do_i_configure_my_pythonpath">PyDev
-FAQ</a>.</p>
-<p>Nearly giving up I came up with sort of a hack to get it running.
-Eclipse can execute arbitrary “External Tools” (Find it at: “<strong>Run -&gt;
-External Tools -&gt; Open External Tools Dioalog</strong>”). I used this facility
-to integrate an external tool “Python” with path “<strong>/usr/bin/python</strong>”.
-Now to automatically execute the currently active python script, you can
-specify the line: “<strong>${resource_loc}</strong>” in the arguments field of the
-dialog and you’re good to go.</p>
-<p>You now circumvented the PyDev internal execution scheme and work with
-the pure command line interpreter. This way all the problems of PyDev
-with the PythonPath, Symlinks and whatever are gone.</p>
-<p><strong>Update:</strong> Another note maybe, you can also add the action “running the
-last used external tool again” as keyboard shortcut in the Eclipse
-preferences. This simplifies the execution even more.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html#disqus_thread" data-disqus-identifier="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -658,7 +657,10 @@ preferences. This simplifies the execution even more.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
-            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment (UPDATE)</a>
+            <a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
+        </li>
+        <li class="recent_post">
+            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
         </li>
         <li class="recent_post">
             <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
@@ -683,9 +685,6 @@ preferences. This simplifies the execution even more.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a>
         </li>
     </ul>
 </div>
