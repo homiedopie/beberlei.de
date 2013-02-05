@@ -1,8 +1,8 @@
 What will be new in ZF 1.8
 ==========================
 
-In Februar or March 2009 the 1.8 version of the `Zend
-Framework <http://framework.zend.com>`_ is schedulded to be released. I
+In February or March 2009 the 1.8 version of the `Zend
+Framework <http://framework.zend.com>`_ is scheduled to be released. I
 have contributed some stuff already regarding ZendX\_JQuery and
 Zend\_Soap.
 

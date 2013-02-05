@@ -9,7 +9,7 @@ dive into Puppet in combination with Vagrant I want to share my general
 experiences with Puppet (beginners level, I just played with this today).
 
 Puppet is a configuration management tool. It uses a declarative language to
-dsecribe how a system should look like. Upon invocation of puppet it attempts
+describe how a system should look like. Upon invocation of puppet it attempts
 to get the system from its current state into the desired state by installing
 packages, executing programs/scripts and creating files/directories.
 
@@ -33,7 +33,7 @@ have to install to get this machine productive:
 - Some open source projects I always have around (Doctrine, ...)
 - Setup automatic backup with my cloud storage provider (`Strato Hidrive
   <https://www.free-hidrive.com/>`_ - they support rsync)
-- and I propably forgot a bunch of tools just thinking about this today.
+- and I probably forgot a bunch of tools just thinking about this today.
 
 I realized not only virtual machines, but also their hosts (my development
 machines) could be automatically setup with Puppet.
@@ -48,7 +48,7 @@ The idea is to define Puppet resources in a way that they are performed once and
 then the system has this resource. This means you can run puppet as often as
 you want and it will only activate the missing resources.
 
-I seperate the installation process into two puppet files, one that has to be
+I separate the installation process into two puppet files, one that has to be
 run with root ``~/.puppet/devmachine-root.pp`` and another one that has to be run with
 my own user ``~/.puppet/devmachine.pp``.
 

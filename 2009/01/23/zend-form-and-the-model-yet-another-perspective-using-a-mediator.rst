@@ -131,7 +131,7 @@ does not exist or the password is wrong. Or you are not allowed to
 withdraw the given amount of money. If any of those exceptions is thrown
 the Model does not accept the form data and the form will have to be
 displayed again for the client showing the new error message that was
-returned from the model. The controller handling this process would lool
+returned from the model. The controller handling this process would look
 like this:
 
     ::
@@ -160,7 +160,7 @@ like this:
 
 You can see the mediator tightly integrates Form and Model without both
 components knowing too much of each other. Still you can add error
-messages recieved from the model into the Form and redisplay it. One
+messages received from the model into the Form and redisplay it. One
 negative point of this approach is the fact that you only have one
 method for accepting form data, which could result in variable checking
 and redispatching in the case of many different operations that can be

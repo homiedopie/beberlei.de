@@ -11,7 +11,7 @@ the `Single Responsibility Principle
 
 These problems are related to the inability to share behavioral code through
 aggregation and the complexity of state transformations. Combining both, your
-average entity with 5-15 fields can end up with hundrets or thousands lines of
+average entity with 5-15 fields can end up with hundreds or thousands lines of
 code. The solutions to both problems boil down to `minimizing duplication and
 maximizing clarity
 <http://www.jbrains.ca/permalink/the-four-elements-of-simple-design>`_.
@@ -24,7 +24,7 @@ fields.  This can simply be done by using setter methods or `when avoiding
 setters
 <http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html>`_,
 with use-case driven methods.  These state transformations can be part of
-different responsibilities, specificially when properties belong to different
+different responsibilities, specifically when properties belong to different
 groups of concepts.
 
 Take a very simple entity that contains updated/created at logic:
@@ -120,7 +120,7 @@ complexity of the state transformations can attract lots of code.
 
 Take an ``Order`` object that has a method for calculating the shipping costs,
 depending all the order items and products.
-To seperate calculations from state transformations you can extract
+To separate calculations from state transformations you can extract
 method objects instead of inlining the code into the ``Order`` object.
 
 For this kind of extraction I create a folder ``Order`` and put all
@@ -171,7 +171,7 @@ unit-test and avoid checking for the correctness indirectly through a getter
 method for the shipping costs.
 
 Extracting every method of an entity into a method object is obviously
-overkill. You should excercise caution and common sense when performing this
+overkill. You should exercise caution and common sense when performing this
 refactoring.
 
 Conclusion
