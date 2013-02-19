@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/02/19/extending_symfony2__paramconverter
    2013/02/05/avoid_implementing_business_rules_with_annotations
    2013/02/04/doctrine_and_solid
    2012/11/19/composer_and_azure_websites_git_deployment
