@@ -1,7 +1,7 @@
 Extending Symfony2: ParamConverter
 ==================================
 
-Symfony2 is an extremly extendable framework, everything is extendable or
+Symfony2 is an extremely extendable framework, everything is extendable or
 overwritable through the Dependency Injection Container. The problem developers
 face is knowing about the extension points and when to use them.  If you don't
 know the extension points, your Symfony application will end up with code
@@ -123,7 +123,7 @@ looks like this:
     use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
     use Doctrine\ORM\EntityManager;
 
-    class UserParamConverter implements ParamConverter
+    class UserParamConverter implements ParamConverterInterface
     {
         private $entityManager;
 
@@ -174,7 +174,7 @@ Now we only need to register this class in the dependency injection container:
         <tag name="request.param_converter" converter="user" priority="10" />
     </service>
 
-With the priority configuration the ``User`` entity is now alway handled
+With the priority configuration the ``User`` entity is now always handled
 by our custom param converter and not by the default Doctrine converter.
 
 In a next step, we should extract the query logic from the ParamConverter

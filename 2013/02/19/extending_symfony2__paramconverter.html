@@ -80,7 +80,7 @@
         </div>
     <div class="section" id="extending-symfony2-paramconverter">
 <h1>Extending Symfony2: ParamConverter</h1>
-<p>Symfony2 is an extremly extendable framework, everything is extendable or
+<p>Symfony2 is an extremely extendable framework, everything is extendable or
 overwritable through the Dependency Injection Container. The problem developers
 face is knowing about the extension points and when to use them.  If you don&#8217;t
 know the extension points, your Symfony application will end up with code
@@ -187,7 +187,7 @@ looks like this:</p>
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Exception\NotFoundHttpException</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
 
-<span class="k">class</span> <span class="nc">UserParamConverter</span> <span class="k">implements</span> <span class="nx">ParamConverter</span>
+<span class="k">class</span> <span class="nc">UserParamConverter</span> <span class="k">implements</span> <span class="nx">ParamConverterInterface</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$entityManager</span><span class="p">;</span>
 
@@ -237,7 +237,7 @@ looks like this:</p>
 <span class="nt">&lt;/service&gt;</span>
 </pre></div>
 </div>
-<p>With the priority configuration the <tt class="docutils literal"><span class="pre">User</span></tt> entity is now alway handled
+<p>With the priority configuration the <tt class="docutils literal"><span class="pre">User</span></tt> entity is now always handled
 by our custom param converter and not by the default Doctrine converter.</p>
 <p>In a next step, we should extract the query logic from the ParamConverter
 into a custom Doctrine entity repository. But that is a task for another blog
