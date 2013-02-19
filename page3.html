@@ -82,184 +82,6 @@
     </div>
         
         <div class="timestamp postmeta">
-            <span>May 01, 2009</span> 
-        </div>
-        <div class="section" id="explicit-code-requires-no-comments-only-bad-code-does">
-<h1><a href="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html">Explicit Code requires no comments - Only bad code does</a></h1>
-<p>Following the recent discussion on commenting source code by <a class="reference external" href="http://www.brandonsavage.net/on-code-commenting-and-technical-debt/">Brandon
-Savage</a>
-and <a class="reference external" href="http://mtabini.blogspot.com/2009/04/myth-of-myth-of-self-commenting-code.html">Marco
-Tabini</a>,
-I wanted to add upon Marcos code example to show that it not even needs
-any inline comments and can be greatly enhanced in readability with
-taking 2-5 minutes of time and refactoring the code. The original code
-sample was:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>function __construct(array $pathInfo) {
-    $section = $pathInfo[0];
-    $file = $pathInfo[1];
-
-    // Assume that the location of this file is inside the main trunk, and that pathInfo has already been filtered.
-
-    $path = dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
-
-    if (!file_exists($path)) {
-        Controller::singleton()-&gt;doError(404);
-    }
-
-    parent::__construct('main/xsl/template.xsl', $path);
-}</pre>
-</div>
-</div></blockquote>
-<p>This sample is somehow related to the response and view rendering of an
-application and its pretty understandable. For me there are some squirks
-though that would make me have to scroll to other classes to see how
-they interact. For example the path information falls from heaven. Why
-is it an array of 2 values and are these sections set the same all the
-time? And what exactly happens when the front controller does the 404
-error? Is there a die() or exit in the <strong>doError()</strong></p>
-<p>The Agile movement postulates the phase of refactoring for a finished
-piece of code. Rebuilding the hacked solutions that did it to make them
-more understandable. I applied this to Marcos code snippet. The
-refactoring produces about double the code, but its done entirely by
-using NetBeans nice Rename variable and copy paste on extracting
-methods, which takes not more than 5 minutes.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class StaticXmlXsltRendererImpl extends AbstractXsltView
-{
-    function render(array $filteredPathInfo) {
-        $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
-
-        if(!$this-&gt;templateExists($templateValuesXmlPath)) {
-            Controller::singleton()-&gt;doError(404);
-        } else {
-            parent::render('main/xsl/template.xsl', $templateValuesXmlPath);
-        }
-    }
-
-    private function getTemplateValuesXmlFile($filteredPathInfo) {
-        $section = $this-&gt;getSection($filteredPathInfo);
-        $file = $this-&gt;getFile($filteredPathInfo);
-
-        // Assume that the location of this file is inside the main trunk
-        return dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
-    }
-
-
-    private function getSection($pathInfo) {
-        return $pathInfo[0];
-    }
-
-    private function getFile($pathInfo) {
-        return $pathInfo[1];
-    }
-
-    private function templateExists($path) {
-        return file_exists($path);
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>In this code snippet the class name, variable names and methods clearly
-communicate what is done, which wasn’t the case in the previous example.
-The only change for the clients is the change of using the constructor
-to using the <strong>render()</strong> method, which communicates the intend more.
-Also the render method now clearly communicates that either the error or
-the parent rendering is executed and leaves no doubt about it.</p>
-<p>The <strong>getTemplateValuesXmlFile()</strong> method still uses the comment to show
-the assumption about relative paths, but this is only the case because
-application configuration is made implicit into the code. This has to be
-extracted to be an explicit configuration constant and the comment can
-go.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>private function getTemplateValuesXmlFile($filteredPathInfo) {
-    $section = $this-&gt;getSection($filteredPathInfo);
-    $file = $this-&gt;getFile($filteredPathInfo);
-
-    return APPLICATION_ROOT . '/' . $section . '/xml/static/' . $file . '.xml';
-}</pre>
-</div>
-<p>In my opinion commenting code is necessary only for non-refactored
-code that has been hacked into existence and is hard to understand.
-Either the programmer has to get it done and has no chance to
-clearly communicate the intend. Or what is even worse the to be
-changed legacy code is hard to understand but you can’t take the
-chances to refactor it because its also already in production and
-has no tests. Now from the second point it is obvious that upon ugly
-code you put only more and more ugly code to fix the problems. This
-is what leads to the legacy maintenance problems that pretty much
-every programmer faces. And then commenting comes into play: You
-have to add a new feature X and it has to be done fast. You don’t
-really understand the code or how it works together but you know you
-can put the new code for the feature into existence but its really
-unintuitive. So you begin to comment it excessively, because its the
-only way to clearly show its intend.</p>
-<p>There are two mindestting factors that help to write code that is
-understandable without having to excessively comment it:</p>
-<ul class="simple">
-<li>From the beginning, do not write code for the computer but for
-developers. Changing this attitude really helps to write
-understandable code like the one above.</li>
-<li>Only leave code better than it was before, never worse.</li>
-</ul>
-<p>There are five technical practices that - when followed - allow to
-write clearly communicating code from the beginning:</p>
-<ol class="arabic simple">
-<li>Giving classes, variables and methods good names. This is a
-no-brainer but few people seem to follow it anyways.</li>
-<li>Following the object-oriented <strong>Single Responsibility Principle</strong>
-by never giving a class more than one responsibility. Macros
-example seems to follow this one.</li>
-<li>Methods should never switch in the level of detail. Micro-work at
-the datastructure level should never be mixed with macro level
-delegation to executing large chunks of code. Macros code
-violates this by mixing the path building micro-level work with
-the macro-level work of rendering the XSLT template. The path
-building code can be hidden behind a method to communicate intend
-more clearly.</li>
-<li>Exchange if conditions with private methods that explain the
-condition being checked for. In Marcos example this is not really
-necessary, because file_exists already is quite a good
-description to the condition. But in cases of logical
-combinations of conditions the method extracting is a superior
-way to explain the conditions intend without having to write a
-comment.</li>
-<li><strong>Seperate Query and Command</strong>: A method never should do a query
-which returns the state of an object and a command which executes
-a set of rules on the state.</li>
-</ol>
-<p>These practices sum up to one guideline: Make code explicit. This
-obviously requires less commenting since a comment of explicit code
-would be duplication and duplication is bad. What if you have a
-project that does not follow this guidelines? Then of course
-comments should be used to explain code, but in the long run this
-should be refactored to self-explaining code. Additionally every new
-feature should be programmed explicitly to follow the “leave code
-better than before” principle.</p>
-<p>In my opinion two refactoring tools are missing that would greatly
-help PHP programmers write nice to read code: Extract method and
-Replace magic value with constant. Can someone integrate them into
-NetBeans please?</p>
-<p><strong>Update:</strong> Fixed a creepy copy-paste code bug, thanks to azeroth
-for pointing out. Moved methods around a bit to be more reading
-friendly.</p>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html#disqus_thread" data-disqus-identifier="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
             <span>June 16, 2009</span> 
         </div>
         <div class="section" id="using-a-dependency-injection-container-with-zend-application">
@@ -1027,6 +849,66 @@ awesome NetBeans PHP support.</li>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/01/07/seven-things.html#disqus_thread" data-disqus-identifier="2009/01/07/seven-things">Leave a comment</a>
         </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>March 11, 2009</span> 
+        </div>
+        <div class="section" id="using-zend-soap-server-and-autodiscover-in-a-controller">
+<h1><a href="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html">Using Zend_Soap Server and Autodiscover in a Controller</a></h1>
+<p>I am in a dilemma. I have condemned the usage of Zend_Soap_Server (or
+any other webservice server handler) <a class="reference external" href="http://www.whitewashing.de/blog/articles/106">inside a Model-View-Controller
+application</a> before.
+Still I get questions about <a class="reference external" href="http://www.whitewashing.de/blog/articles/65">my old Zend_Soap_Server and
+Zend_Soap_AutoDiscover
+example</a> not working in
+the MVC scenario. The following example provides you with a working Soap
+server inside a Zend_Controller_Action, although I discourage the use
+of it and would suggest using a dedicated script outside the dispatching
+process to gain multitudes of performance, which webservices often
+require.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>require_once &quot;/path/to/HelloWorldService.php&quot;;
+
+class MyDiscouragedSoapServerController extends Zend_Controller_Action
+{
+    public function serverAction()
+    {
+        $server = new Zend_Soap_Server(&quot;http://example.com/pathto/wsdl&quot;);
+        $server-&gt;setClass('HelloWorldService');
+        $server-&gt;handle();
+    }
+
+    public function wsdlAction()
+    {
+        $wsdl = new Zend_Soap_AutoDiscover();
+        $wsdl-&gt;setUri('http://example.com/pathto/server');
+        $wsdl-&gt;setClass('HelloWorldService');
+        $wsdl-&gt;handle();
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Now all you have to do is create two routes, one that makes
+<strong>http://example.com/pathto/server</strong> point to
+<strong>MyDiscouragedSoapServerController::serverAction</strong> and the other route
+that makes <strong>http://example.com/pathto/wsdl</strong> point to
+<strong>MyDiscouragedSoapServerController::wsdlAction</strong>. The wrong version
+(Version Mismatch) error comes from sending a request for the WSDL file
+to the actual Soap Server, which he doesn’t like.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html#disqus_thread" data-disqus-identifier="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller">Leave a comment</a>
+        </div>
     </div>
     
     <div class="related">
@@ -1076,9 +958,6 @@ awesome NetBeans PHP support.</li>
             <a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
         </li>
         <li class="recent_post">
-            <a href="2013/02/05/avoid_implementing_business_rules_with_annotations.html">Avoid implementing business rules with Annotations</a>
-        </li>
-        <li class="recent_post">
             <a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
         </li>
         <li class="recent_post">
@@ -1101,6 +980,9 @@ awesome NetBeans PHP support.</li>
         </li>
         <li class="recent_post">
             <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
     </ul>
 </div>

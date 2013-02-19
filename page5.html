@@ -84,69 +84,6 @@
         <div class="timestamp postmeta">
             <span>May 17, 2008</span> 
         </div>
-        <div class="section" id="integrated-zend-layout-into-this-blog">
-<h1><a href="2008/05/17/integrated-zend-layout-into-this-blog.html">Integrated Zend_Layout into this blog</a></h1>
-<p>I finished with integrating Zend_Layout into this blog software today.
-At first I thought it is quite hard to use especially if you want to
-integrate dynamic navigational contents depending on the current
-module/controller/action setup. But I came up with a combination of
-actionStack and Named Response Sections as <a class="reference external" href="http://framework.zend.com/manual/en/zend.layout.quickstart.html#zend.layout.quickstart.mvc">described in the ZF
-Documentation of the Layout
-component</a>,
-which is quite easy to understand, use and extend.</p>
-<p>At each of the major Controllers I put different actions from a specific
-Navigation Controller on the
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.controller.actionhelpers.html#zend.controller.actionhelpers.actionstack">ActionStack</a>
-(mostly global per Controller using the init() class method).</p>
-<p>A typical controller looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class BlogController extends Zend_Controller_Action
-{
-    public function init()
-    {
-        $this-&gt;_helper-&gt;actionStack('tagcloud', 'Navigation');
-        $this-&gt;_helper-&gt;actionStack('userinfo', 'Navigation');
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>The NavigationController looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class NavigationController extends Zend_Controller_Action
-{
-    public function tagcloudAction()
-    {
-        // Do not render the content of this action to the default output.
-        $this-&gt;getHelper(&quot;ViewRenderer&quot;)-&gt;setNoRender();
-
-        [...]
-
-        // Append content to secondaryNavigation named response section
-        $this-&gt;getResponse()-&gt;append('secondaryNavigation', $this-&gt;view-&gt;render('navigation/tagcloud.phtml'));
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>The layout.pthml then just calls certain named sections, for example &lt;=?
-$this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/17/integrated-zend-layout-into-this-blog.html#disqus_thread" data-disqus-identifier="2008/05/17/integrated-zend-layout-into-this-blog">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>May 17, 2008</span> 
-        </div>
         <div class="section" id="using-zend-http-client-to-ping-technorati">
 <h1><a href="2008/05/17/using-zend-http-client-to-ping-technorati.html">Using Zend_Http_Client to Ping Technorati</a></h1>
 <p>Send a ping to Technorati manually is a pain in the ass. Writing a
@@ -777,6 +714,119 @@ supposed to do.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/06/24/teaching-zend-form-some-mvc.html#disqus_thread" data-disqus-identifier="2008/06/24/teaching-zend-form-some-mvc">Leave a comment</a>
         </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>November 05, 2008</span> 
+        </div>
+        <div class="section" id="overwrite-ezcmvccontroller-a-bit-more-rapid">
+<h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
+<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
+with the alpha version, since I am currently searching for a good
+framework for a high performance application. My first benchmarks on
+ezcMvc just say: wh000pie! A lot faster as compared to the Zend
+Framework.
+Still ezcMvc is VERY loosely coupled and you have to write lots of lines
+to get where ZF gets you with less (more magic involved). As you can see
+from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
+component</a>
+it is currently a bit unwieldily to work with ezcMvcController since you
+have to create and return result objects everywhere. This is very nice
+since it abstracts from the actual response type (could be www, mail,
+cli, anything).
+I have created a very little extension of the ezcMvcController class
+that hopefully serves you quite some time. You can append variables to
+the ezcMvcResult object by calling the magic __get and __set on the
+controller. Plus it offers a method to use the ezcMvcInternalRedirect
+instead of the result. See for yourself:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myController extends ezcMvcController
+{
+    protected $result;
+
+    public function createResult()
+    {
+        $actionMethod = $this-&gt;createActionMethodName();
+
+        if ( method_exists( $this, $actionMethod ) ) {
+            $status = $this-&gt;$actionMethod();
+            if($status != 0) {
+                $this-&gt;getResult()-&gt;status = $status;
+            }
+            return $this-&gt;getResult();
+        } else {
+            throw new ezcMvcActionNotFoundException( $this-&gt;action );
+        }
+    }
+
+    protected function _redirect($uri)
+    {
+        $request = clone $this-&gt;request;
+        $request-&gt;uri = $uri;
+        $this-&gt;result = new ezcMvcInternalRedirect($request);
+    }
+
+    public function __get($name)
+    {
+        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
+            return $this-&gt;getResult()-&gt;variables[$name];
+        }
+        return null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this-&gt;getResult()-&gt;variables[$name] = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this-&gt;getResult()-&gt;variables[$name]);
+    }
+
+    protected function getResult()
+    {
+        if($this-&gt;result === null) {
+            $this-&gt;result = new ezcMvcResult();
+        }
+        return $this-&gt;result;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You can now use a controller in the following way:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class dashboardController extends myController
+{
+    public function doIndex()
+    {
+        $this-&gt;cookie = &quot;Cookie!&quot;; // Proxy to $ezcMvcResult-&gt;variables['cookie']
+    }
+
+    public function doRedirect()
+    {
+        $this-&gt;_redirect(&quot;/&quot;);
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Very nice! The next thing I have to extend in ezcMvc is automagical
+matching of controller and action names to view output names with a
+special View Handler that takes care of this. This saves another bunch
+of work you have to cope with in the current standard setup.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html#disqus_thread" data-disqus-identifier="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid">Leave a comment</a>
+        </div>
     </div>
     
     <div class="related">
@@ -826,9 +876,6 @@ supposed to do.</p>
             <a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
         </li>
         <li class="recent_post">
-            <a href="2013/02/05/avoid_implementing_business_rules_with_annotations.html">Avoid implementing business rules with Annotations</a>
-        </li>
-        <li class="recent_post">
             <a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
         </li>
         <li class="recent_post">
@@ -851,6 +898,9 @@ supposed to do.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
         </li>
     </ul>
 </div>
