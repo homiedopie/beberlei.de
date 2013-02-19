@@ -2,10 +2,10 @@ Extending Symfony2: ParamConverter
 ==================================
 
 Symfony2 is an extremly extendable framework, everything is extendable or
-overwritable through the Dependency Injection Container. The problem
-developers face is knowing about the extension points and when to use them.
-If you don't know the extension points, your Symfony application will
-end up with code duplication, too much inheritance and spaghetti code.
+overwritable through the Dependency Injection Container. The problem developers
+face is knowing about the extension points and when to use them.  If you don't
+know the extension points, your Symfony application will end up with code
+duplication, too much inheritance and very little unit-testable code.
 
 This blog post will be the first in a series, describing Symfony2 extension
 points that help you achieve clean and duplicateless code. In my experience,
