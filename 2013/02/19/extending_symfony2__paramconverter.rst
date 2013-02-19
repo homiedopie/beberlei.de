@@ -123,7 +123,7 @@ looks like this:
     use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
     use Doctrine\ORM\EntityManager;
 
-    class UserParamConverter implements ParamConverter
+    class UserParamConverter implements ParamConverterInterface
     {
         private $entityManager;
 
