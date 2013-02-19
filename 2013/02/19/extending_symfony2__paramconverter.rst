@@ -182,6 +182,6 @@ into a custom Doctrine entity repository. But that is a task for another blog
 post in this series.
 
 .. author:: default
-.. categories:: none
-.. tags:: none
+.. categories:: Symfony2
+.. tags:: Symfony2 ExtendingSymfony2
 .. comments::
