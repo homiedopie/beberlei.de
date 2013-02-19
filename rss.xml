@@ -5,7 +5,434 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Mon, 04 Feb 2013 00:00:00 +0100</pubDate>
+        <pubDate>Tue, 19 Feb 2013 00:00:00 +0100</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html</link>
+            <guid>http://www.whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html</guid>
+            <title><![CDATA[Extending Symfony2: ParamConverter]]></title>
+            <description><![CDATA[<div class="section" id="extending-symfony2-paramconverter">
+<h1>Extending Symfony2: ParamConverter</h1>
+<p>Symfony2 is an extremly extendable framework, everything is extendable or
+overwritable through the Dependency Injection Container. The problem developers
+face is knowing about the extension points and when to use them.  If you don’t
+know the extension points, your Symfony application will end up with code
+duplication, too much inheritance and very little unit-testable code.</p>
+<p>This blog post will be the first in a series, describing Symfony2 extension
+points that help you achieve clean and duplicateless code. In my experience,
+using Symfony extension points to avoid code duplication helps you avoid
+writing thousands of lines of code in your controllers.</p>
+<div class="section" id="the-problem-duplicate-finder-logic">
+<h2>The problem: Duplicate finder logic</h2>
+<p>Inside controllers you can easily end with lots of duplication using the same
+general finder logic again in several actions. Take this following example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT u, d, a</span>
+<span class="s2">                  FROM MyBundle\Entity\User u</span>
+<span class="s2">                  JOIN u.details d</span>
+<span class="s2">                  JOIN u.addresses a</span>
+<span class="s2">                  WHERE u.id = ?1&quot;</span><span class="p">;</span>
+
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If we need this block of code in several actions of different controllers, we
+will end up with duplication that has to be eliminated.</p>
+</div>
+<div class="section" id="the-quick-and-dirty-solution">
+<h2>The Quick and Dirty Solution</h2>
+<p>One way of resolving the duplication appearing in this case, is moving the
+finder + not found logic into a common controller base class or into a trait.
+But this leaves us with a helper method buried in the code and a static
+dependency to a base class or a trait that we want to avoid.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">AbstractController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">findUser</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT u, d, a</span>
+<span class="s2">                  FROM MyBundle\Entity\User u</span>
+<span class="s2">                  JOIN u.details d</span>
+<span class="s2">                  JOIN u.addresses a</span>
+<span class="s2">                  WHERE u.id = ?1&quot;</span><span class="p">;</span>
+
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$user</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are two problems with this sort of refactoring:</p>
+<ol class="arabic simple">
+<li>We are using inheritance for code-reuse.</li>
+<li>We hide the <tt class="docutils literal"><span class="pre">findUser</span></tt> behavior in an abstract class and make it hard to test.</li>
+</ol>
+</div>
+<div class="section" id="the-preferred-solution">
+<h2>The Preferred Solution</h2>
+<p>The <a class="reference external" href="http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html">SensioFrameworkExtraBundle</a>
+offers an extension hook called <strong>Parameter Converters</strong> to transform Request
+attributes to objects directly for controller method arguments. They hook into
+the <tt class="docutils literal"><span class="pre">kernel.controller</span></tt> event that you can use yourself to achieve the same
+goal.</p>
+<p>Lets see how the action will look like after our refactoring:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">User</span> <span class="nv">$user</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Very concise and easy to read. The param converter doing the heavy lifting
+looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Request\ParamConverter</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Exception\NotFoundHttpException</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">UserParamConverter</span> <span class="k">implements</span> <span class="nx">ParamConverter</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$entityManager</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">EntityManager</span> <span class="nv">$entityManager</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">apply</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$id</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+
+        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT u, d, a</span>
+<span class="s2">                  FROM MyBundle\Entity\User u</span>
+<span class="s2">                  JOIN u.details d</span>
+<span class="s2">                  JOIN u.addresses a</span>
+<span class="s2">                  WHERE u.id = ?1&quot;</span><span class="p">;</span>
+
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="nv">$param</span> <span class="o">=</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+        <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="p">(</span><span class="nv">$param</span><span class="p">,</span> <span class="nv">$user</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">supports</span><span class="p">(</span><span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s2">&quot;MyProject\Entity\User&quot;</span> <span class="o">===</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getClass</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we only need to register this class in the dependency injection container:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">&quot;my_project.user_param_converter&quot;</span>
+      <span class="na">class=</span><span class="s">&quot;MyProject\Request\ParamConverter\UserParamConverter&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">&quot;service&quot;</span> <span class="na">id=</span><span class="s">&quot;doctrine.orm.default_entity_manager&quot;</span> <span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">&quot;request.param_converter&quot;</span> <span class="na">converter=</span><span class="s">&quot;user&quot;</span> <span class="na">priority=</span><span class="s">&quot;10&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/service&gt;</span>
+</pre></div>
+</div>
+<p>With the priority configuration the <tt class="docutils literal"><span class="pre">User</span></tt> entity is now alway handled
+by our custom param converter and not by the default Doctrine converter.</p>
+<p>In a next step, we should extract the query logic from the ParamConverter
+into a custom Doctrine entity repository. But that is a task for another blog
+post in this series.</p>
+</div>
+</div>]]></description>
+            <category><![CDATA[ Symfony2 ]]></category>
+            <pubDate>Tue, 19 Feb 2013 00:00:00 +0100</pubDate>
+        </item>
+        <item>
+            <link>http://www.whitewashing.de/2013/02/05/avoid_implementing_business_rules_with_annotations.html</link>
+            <guid>http://www.whitewashing.de/2013/02/05/avoid_implementing_business_rules_with_annotations.html</guid>
+            <title><![CDATA[Avoid implementing business rules with Annotations]]></title>
+            <description><![CDATA[<div class="section" id="avoid-implementing-business-rules-with-annotations">
+<h1>Avoid implementing business rules with Annotations</h1>
+<p>In January I was participating at the awesome <a class="reference external" href="http://conference.phpbenelux.eu/2013/schedule/">PHP Benelux 2013</a> conference and attended
+<a class="reference external" href="http://www.rafaeldohms.com.br/">Raphael Dohms</a> talk on “PHP Annotations -
+They exist!”. It was a very good talk about the history, current state and
+actual implementations for Annotations in PHP.</p>
+<p>At the end of the talk there was an important question from one person in the
+audiance about how to test code that is using annotations to drive the business
+rules. I try to answer the question in this blog post.</p>
+<p>Lets start by the beginning and define annotations. Annotations are metadata to
+code blocks. Comparable to INI, XML or YAML they provide a way to load
+configuration. In contrast to the other configuration mechanisms however,
+annotations are right next to PHP code they configure. They allow you to
+configure classes, properties, methods in context without having to move around
+in several of configuration files.</p>
+<p>The Doctrine Annotations library has spawned several new libraries that allow
+to configuration through annotations. Should we just use them, because they are
+so convenient?</p>
+<p>No! In my opinion it is important to differentiate between different use-cases
+of annotations. Take a look at Doctrine ORM Mapping or Raphaels DMS Filter library.
+Using their annotations looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">DMS\Filter\Rules</span> <span class="k">as</span> <span class="nx">Filter</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\Table(name=&quot;users&quot;)</span>
+<span class="sd"> **/</span>
+<span class="k">class</span> <span class="nc">User</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Id @ORM\GeneratedValue @ORM\Column(type=&quot;integer&quot;)</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$id</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type=&quot;string&quot;)</span>
+<span class="sd">     * @Filter\Trim()</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$email</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Both libraries solve problems of the infrastructure layer and not of the
+business domain. Both libraries could probably also be configurable through
+PHP code, XML and YAML and this would be completly fine.</p>
+<p>The use of annotations in this case is just a substitute for XML, INI or YAML
+configuration files, allowing your business model to integrate into infrastructure
+libraries.</p>
+<p>The same holds for the Serialization-, WSDL- or Routing configuration using
+annotations.</p>
+<div class="section" id="problematic-use-cases">
+<h2>Problematic Use-Cases</h2>
+<p>There are use-cases when I am careful about the use of annotations (any kind
+of configuration actually): When I am configuring how my business
+objects works. The following real-world use-cases come to mind:</p>
+<ul class="simple">
+<li>Validation</li>
+<li>Aspects</li>
+<li>Dependency Injection</li>
+</ul>
+<p>When libraries allow you to configure how your business objects work based on
+annotations, coupled to the respective libraries way of doing things, problems
+are going to appear. Depending on the implementation this can end up very
+badly, with serious coupling of the library towards your business objects.</p>
+<div class="section" id="validation">
+<h3>Validation</h3>
+<p>Symfony Validator allows you to add assertions for validation rules on the
+properties or methods of your business models.</p>
+<p>If you think about it, validation is a cross-cutting concern. It is part of the
+infastructure for simple validation rules like checking if the user input data
+is valid, but it can also be used for business logic of your domain.</p>
+<p>See this code example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Validator\Constraints</span> <span class="k">as</span> <span class="nx">Assert</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">MyProject\Validator\Constraints\EmailBlacklist</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">User</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Assert\NotBlank</span>
+<span class="sd">     * @Assert\Email</span>
+<span class="sd">     * @EmailBlacklist</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$email</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We added three validation rules here, two from the Symfony core validating the
+email syntax and not blank, another one from my own project, validating the
+email aginst some blacklist.</p>
+<p>Now in Symfony you can use this code either directly through the Validation
+service or indirectly through the Form component:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$validator</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'validator'</span><span class="p">);</span>
+
+<span class="nv">$user</span>          <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+<span class="nv">$violationList</span> <span class="o">=</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This sort of tangling of critical business logic to framework services is a
+problem. The reason for this is that you want to be able to unit-test your
+business logic. A deep integration of your business logic into the Symfony
+Validation component will prevent you from actually doing this.</p>
+<p>To test this validation constraint, you need to:</p>
+<ul class="simple">
+<li>Call the validator service with a user object and a blacklisted email</li>
+<li>Call the validator service with a user object and a non-blacklisted email</li>
+</ul>
+<p>In addition to testing the actual email blacklist validation, they verify
+annotation parsing and the full Symfony Validator stack. In general these tests
+are slow and I know this from experience, not following my own advice.</p>
+<p>Instead you should write a completely independent E-Mail Blacklist Service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Validator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">EmailBlacklistService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isBlacklisted</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span> <span class="c1">// logic here</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This service can be unit-tested and is part of your actual business domain,
+independent of Symfony. You can now integrate this into a Symfony Validator:</p>
+<blockquote>
+<div><p>&lt;?php</p>
+<p>namespace MyProjectValidatorConstraints;</p>
+<p>use SymfonyComponentValidatorConstraint;
+use MyProjectValidatorEmailBlacklistService;</p>
+<dl class="docutils">
+<dt>/**</dt>
+<dd><ul class="first simple">
+<li>@Annotation</li>
+</ul>
+<p class="last"><a href="#id1"><span class="problematic" id="id2">**</span></a>/</p>
+</dd>
+</dl>
+<p>class EmailBlacklist extends Constraint
+{</p>
+<blockquote>
+<div>public $message = ‘Your email %email% is on our blacklist.’;</div></blockquote>
+<p>}</p>
+<p>class EmailBlacklistValidator
+{</p>
+<blockquote>
+<div><p>private $blacklist;</p>
+<p>public function __construct(EmailBlacklistService $blacklist)
+{</p>
+<blockquote>
+<div>$this-&gt;blacklist = $blacklist;</div></blockquote>
+<p>}</p>
+<p>public function validate($value, Constraint $constraint)
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>if ($this-&gt;blacklist-&gt;isBlacklisted($value)) {</dt>
+<dd><dl class="first docutils">
+<dt>$this-&gt;context-&gt;addViolation(</dt>
+<dd>$constraint-&gt;message,
+array(‘%email%’ =&gt; $value)</dd>
+</dl>
+<p class="last">);</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>Now actually what we can do is write a unit-test for this Symfony validator
+using mock objects. We can add a single functional tests to actually verify
+the configuration is present on the <tt class="docutils literal"><span class="pre">User$email</span></tt> property, but we don’t
+actually need to test the validation logic through the full stack.</p>
+<p>Inside our business model you can reuse the Blacklist Service without having to
+depend on Symfony code. So instead of injecting the full validator service,
+you can just inject the much more explicit blacklist service.</p>
+<p>Validation libraries are a tricky problem when combined with validation rules
+from your business domain. Be careful not to depend on them too much with
+your business logic and keep it seperate.</p>
+</div>
+<div class="section" id="dependency-injection">
+<h3>Dependency Injection</h3>
+<p>Using Annotations for Dependency Injection is not necessarily bad,
+however the way its implemented in some frameworks may lead to
+code that is unusable without the Dependency Injection container.</p>
+<p>FLOW3 allows to inject dependencies into properties of instances:</p>
+<blockquote>
+<div><p>class BlogService
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>/**</dt>
+<dd><ul class="first simple">
+<li>@Inject</li>
+</ul>
+<p class="last"><a href="#id3"><span class="problematic" id="id4">**</span></a>/</p>
+</dd>
+</dl>
+<p>private $blogRepository;</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>This even works when you are instantiating the object yourself using <tt class="docutils literal"><span class="pre">new</span></tt>.
+So inside FLOW3, the call to <tt class="docutils literal"><span class="pre">new</span> <span class="pre">BlogService</span></tt> automatically injects the
+repository.</p>
+<p>The problem here is easy to spot. If you use framework supported Dependency
+Injection with Reflection, then you don’t need to write constructors or setters
+anymore that actually asign the repository. This prevents you from actually
+testing the code, because the classes are not easily instantiatable in a
+Unit-Test anymore. Additionally you might rely on the automagic injection
+in your code, so much that it is not executable without the Injection
+framework being present in your unit-tests.</p>
+<p>You can of course start providing constructors or setters, but this feature
+still affects your control flow in production, using reflection instead
+of the “expected” control flow.</p>
+</div>
+<div class="section" id="aspects">
+<h3>Aspects</h3>
+<p>In FLOW3 Annotations are used to change the control flow of the applications.
+As a developer you can introduce code and make it execute around arbitrary
+other code. The way its implemented with code generation you can never
+actually unit-test this yourself, because any test-setup requires the Aspect
+Engine to run.</p>
+<p>This is obviously a huge change of control flow, configured through
+annotations. Additionally there is the code generation involved. I am very
+skeptical about large scale usage of this kind of feature if it affects
+the way your business logic works.</p>
+<p>Testing this kind of feature is obviously not possible without the
+AOP framework. This effectively means that its impossible to unit-test
+your domain objects.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>There is a difference between using Annotations for configuration of
+infrastructure services and business model interaction. The first one is
+perfectly fine, its replacable by any other sort of configuration or explicit
+programmatic code and doesn’t hinder you writing unit-tests for your business
+model. The second one makes it hard to actually do unit-testing without using
+the libraries that perform the actual operations.</p>
+</div>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+            <pubDate>Tue, 05 Feb 2013 00:00:00 +0100</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</link>
             <guid>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</guid>
@@ -18,7 +445,7 @@ does not support value-objects (or embedded-objects), it is very hard to pull
 the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
 <p>These problems are related to the inability to share behavioral code through
 aggregation and the complexity of state transformations. Combining both, your
-average entity with 5-15 fields can end up with hundrets or thousands lines of
+average entity with 5-15 fields can end up with hundreds or thousands lines of
 code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
 maximizing clarity</a>.</p>
 <div class="section" id="extracting-value-objects-minimize-duplication">
@@ -27,7 +454,7 @@ maximizing clarity</a>.</p>
 fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
 setters</a>,
 with use-case driven methods.  These state transformations can be part of
-different responsibilities, specificially when properties belong to different
+different responsibilities, specifically when properties belong to different
 groups of concepts.</p>
 <p>Take a very simple entity that contains updated/created at logic:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -113,7 +540,7 @@ the database. However this is beyond ugly in my opinion.</p>
 complexity of the state transformations can attract lots of code.</p>
 <p>Take an <tt class="docutils literal"><span class="pre">Order</span></tt> object that has a method for calculating the shipping costs,
 depending all the order items and products.
-To seperate calculations from state transformations you can extract
+To separate calculations from state transformations you can extract
 method objects instead of inlining the code into the <tt class="docutils literal"><span class="pre">Order</span></tt> object.</p>
 <p>For this kind of extraction I create a folder <tt class="docutils literal"><span class="pre">Order</span></tt> and put all
 the extracted method objects in the <tt class="docutils literal"><span class="pre">Order</span></tt> subnamespace.</p>
@@ -158,7 +585,7 @@ calculator:</p>
 unit-test and avoid checking for the correctness indirectly through a getter
 method for the shipping costs.</p>
 <p>Extracting every method of an entity into a method object is obviously
-overkill. You should excercise caution and common sense when performing this
+overkill. You should exercise caution and common sense when performing this
 refactoring.</p>
 </div>
 <div class="section" id="conclusion">
@@ -192,8 +619,8 @@ can actually achieve quite a lot already.</p>
 <a class="reference external" href="http://www.getcomposer.org">Composer</a> support during the deployment as
 long as failures with Composer don’t break your site.</p>
 <p>It turns out that Azure Websites - to support other platforms that require
-compiling - actually has an extremly robust deployment system (as far as I
-understood its internals). The Git repository is seperated from the actual code
+compiling - actually has an extremely robust deployment system (as far as I
+understood its internals). The Git repository is separated from the actual code
 that is served from the webserver and a number of old checkouts is kept to
 allow rollbacks through the Web interface. Once a Git push was recognized,
 Azure websites will execute a build step, and then copy all the files over to a
@@ -246,13 +673,13 @@ You can of course execute additional steps in the <tt class="docutils literal"><
 <p>I wanted to host a simple application to play around with the <a class="reference external" href="https://tent.io">Tent Protocol</a> (see <a class="reference external" href="http://whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html">my last blogpost</a>), so
 I checked through some of the PHP Cloud providers again for the fun of it. One
 requirement was to deploy from Git and update dependencies from Composer. I
-found a new provider that i havent heard of before, <a class="reference external" href="http://www.fortrabbit.com/">Fortrabbit</a> thats supports this so I had to check it out.
-It has some more features that I really digg:</p>
+found a new provider that i haven’t heard of before, <a class="reference external" href="http://www.fortrabbit.com/">Fortrabbit</a> that supports this so I had to check it out.
+It has some more features that I really dig:</p>
 <p>Fortrabbit provides you with a Git url where you can push your repository.
 It is directly deployed during the push operation. You can trigger composer
 updates by having a special syntax in the commit message. The push
 output informs you about all the steps performed during deployment.</p>
-<p>Addtionally you can configure environment variables in the web-administration
+<p>Additionally you can configure environment variables in the web-administration
 interface that are available in the application through <tt class="docutils literal"><span class="pre">$_SERVER</span></tt>. You
 can easily use them to configure your application, if its hosted in a public
 repository. Great to share sample applications on Github and host them from
@@ -264,7 +691,7 @@ make, so its still a save environment.</p>
 <p>The composer support allows for post install scripts, which is cool to perform
 all sorts of cache warmup and other deployment tasks.</p>
 <p>You can host one application for free, however they shutdown after 48 hours if
-you don’t regularly click on a reset button. Its definately enough to get small
+you don’t regularly click on a reset button. Its definitely enough to get small
 prototypes up and running. From there you can upgrade in many small steps from
 small plans (10€/month) to bigger ones (80€/month).</p>
 </div>]]></description>
@@ -398,7 +825,7 @@ assertions.</p>
 library/namespace. Especially when you start using this pattern on a large
 scale, you have to make sure this assertions are <strong>VERY</strong> stable and
 unit-tested.</p>
-<p>That is why you shoud extend from <tt class="docutils literal"><span class="pre">Assertion</span></tt> and use your own class when
+<p>That is why you should extend from <tt class="docutils literal"><span class="pre">Assertion</span></tt> and use your own class when
 using the Assert library. This returns some control in your hands and even
 allows you to overwrite the exception class:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -485,10 +912,10 @@ optimized. Well done to Volker and Sebastian to the new version.</p>
 <p>Igors talk about building an HTTP server in PHP was interesting to see the
 stream/socket server APIs of PHP at work. Ever since I took part in <a class="reference external" href="https://github.com/conradmueller/maexchen">the
 SoCraTes 2012 Conference Maexchen UDP Bot</a> challenge I think network
-programming is an interessting topic for learning about languages and
+programming is an interesting topic for learning about languages and
 programming itself.</p>
 <p>Volker did a second talk on sunday about Clean Code that was both entertaining
-and interesting. He was reminding the audiance that shipping the code is what
+and interesting. He was reminding the audience that shipping the code is what
 actually creates the value in our profession. Hence clean code is not about
 the beauty of code itself, but its ability to be shippable, changeable and
 adaptable to the business.</p>
@@ -1669,7 +2096,7 @@ mentioned to talk about <a class="reference external" href="http://puppetlabs.co
 dive into Puppet in combination with Vagrant I want to share my general
 experiences with Puppet (beginners level, I just played with this today).</p>
 <p>Puppet is a configuration management tool. It uses a declarative language to
-dsecribe how a system should look like. Upon invocation of puppet it attempts
+describe how a system should look like. Upon invocation of puppet it attempts
 to get the system from its current state into the desired state by installing
 packages, executing programs/scripts and creating files/directories.</p>
 <p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
@@ -1689,7 +2116,7 @@ and a bunch of development tools such as tree, ack-grep.</li>
 <li>A bunch of .bashrc initializations</li>
 <li>Some open source projects I always have around (Doctrine, ...)</li>
 <li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
-<li>and I propably forgot a bunch of tools just thinking about this today.</li>
+<li>and I probably forgot a bunch of tools just thinking about this today.</li>
 </ul>
 <p>I realized not only virtual machines, but also their hosts (my development
 machines) could be automatically setup with Puppet.</p>
@@ -1701,7 +2128,7 @@ via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre"
 <p>The idea is to define Puppet resources in a way that they are performed once and
 then the system has this resource. This means you can run puppet as often as
 you want and it will only activate the missing resources.</p>
-<p>I seperate the installation process into two puppet files, one that has to be
+<p>I separate the installation process into two puppet files, one that has to be
 run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
 my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
@@ -3469,7 +3896,7 @@ does not exist or the password is wrong. Or you are not allowed to
 withdraw the given amount of money. If any of those exceptions is thrown
 the Model does not accept the form data and the form will have to be
 displayed again for the client showing the new error message that was
-returned from the model. The controller handling this process would lool
+returned from the model. The controller handling this process would look
 like this:</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class BankAccountController extends Zend_Controller_Action {
@@ -3497,7 +3924,7 @@ like this:</p>
 </div></blockquote>
 <p>You can see the mediator tightly integrates Form and Model without both
 components knowing too much of each other. Still you can add error
-messages recieved from the model into the Form and redisplay it. One
+messages received from the model into the Form and redisplay it. One
 negative point of this approach is the fact that you only have one
 method for accepting form data, which could result in variable checking
 and redispatching in the case of many different operations that can be
@@ -3610,8 +4037,8 @@ it should.</p>
             <title><![CDATA[What will be new in ZF 1.8]]></title>
             <description><![CDATA[<div class="section" id="what-will-be-new-in-zf-1-8">
 <h1>What will be new in ZF 1.8</h1>
-<p>In Februar or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a> is schedulded to be released. I
+<p>In February or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
+Framework</a> is scheduled to be released. I
 have contributed some stuff already regarding ZendX_JQuery and
 Zend_Soap.</p>
 <p>Both components have seen numerous bugfixes and I managed to get the

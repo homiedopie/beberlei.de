@@ -82,6 +82,316 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>May 01, 2009</span> 
+        </div>
+        <div class="section" id="explicit-code-requires-no-comments-only-bad-code-does">
+<h1><a href="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html">Explicit Code requires no comments - Only bad code does</a></h1>
+<p>Following the recent discussion on commenting source code by <a class="reference external" href="http://www.brandonsavage.net/on-code-commenting-and-technical-debt/">Brandon
+Savage</a>
+and <a class="reference external" href="http://mtabini.blogspot.com/2009/04/myth-of-myth-of-self-commenting-code.html">Marco
+Tabini</a>,
+I wanted to add upon Marcos code example to show that it not even needs
+any inline comments and can be greatly enhanced in readability with
+taking 2-5 minutes of time and refactoring the code. The original code
+sample was:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>function __construct(array $pathInfo) {
+    $section = $pathInfo[0];
+    $file = $pathInfo[1];
+
+    // Assume that the location of this file is inside the main trunk, and that pathInfo has already been filtered.
+
+    $path = dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
+
+    if (!file_exists($path)) {
+        Controller::singleton()-&gt;doError(404);
+    }
+
+    parent::__construct('main/xsl/template.xsl', $path);
+}</pre>
+</div>
+</div></blockquote>
+<p>This sample is somehow related to the response and view rendering of an
+application and its pretty understandable. For me there are some squirks
+though that would make me have to scroll to other classes to see how
+they interact. For example the path information falls from heaven. Why
+is it an array of 2 values and are these sections set the same all the
+time? And what exactly happens when the front controller does the 404
+error? Is there a die() or exit in the <strong>doError()</strong></p>
+<p>The Agile movement postulates the phase of refactoring for a finished
+piece of code. Rebuilding the hacked solutions that did it to make them
+more understandable. I applied this to Marcos code snippet. The
+refactoring produces about double the code, but its done entirely by
+using NetBeans nice Rename variable and copy paste on extracting
+methods, which takes not more than 5 minutes.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class StaticXmlXsltRendererImpl extends AbstractXsltView
+{
+    function render(array $filteredPathInfo) {
+        $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
+
+        if(!$this-&gt;templateExists($templateValuesXmlPath)) {
+            Controller::singleton()-&gt;doError(404);
+        } else {
+            parent::render('main/xsl/template.xsl', $templateValuesXmlPath);
+        }
+    }
+
+    private function getTemplateValuesXmlFile($filteredPathInfo) {
+        $section = $this-&gt;getSection($filteredPathInfo);
+        $file = $this-&gt;getFile($filteredPathInfo);
+
+        // Assume that the location of this file is inside the main trunk
+        return dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
+    }
+
+
+    private function getSection($pathInfo) {
+        return $pathInfo[0];
+    }
+
+    private function getFile($pathInfo) {
+        return $pathInfo[1];
+    }
+
+    private function templateExists($path) {
+        return file_exists($path);
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>In this code snippet the class name, variable names and methods clearly
+communicate what is done, which wasn’t the case in the previous example.
+The only change for the clients is the change of using the constructor
+to using the <strong>render()</strong> method, which communicates the intend more.
+Also the render method now clearly communicates that either the error or
+the parent rendering is executed and leaves no doubt about it.</p>
+<p>The <strong>getTemplateValuesXmlFile()</strong> method still uses the comment to show
+the assumption about relative paths, but this is only the case because
+application configuration is made implicit into the code. This has to be
+extracted to be an explicit configuration constant and the comment can
+go.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>private function getTemplateValuesXmlFile($filteredPathInfo) {
+    $section = $this-&gt;getSection($filteredPathInfo);
+    $file = $this-&gt;getFile($filteredPathInfo);
+
+    return APPLICATION_ROOT . '/' . $section . '/xml/static/' . $file . '.xml';
+}</pre>
+</div>
+<p>In my opinion commenting code is necessary only for non-refactored
+code that has been hacked into existence and is hard to understand.
+Either the programmer has to get it done and has no chance to
+clearly communicate the intend. Or what is even worse the to be
+changed legacy code is hard to understand but you can’t take the
+chances to refactor it because its also already in production and
+has no tests. Now from the second point it is obvious that upon ugly
+code you put only more and more ugly code to fix the problems. This
+is what leads to the legacy maintenance problems that pretty much
+every programmer faces. And then commenting comes into play: You
+have to add a new feature X and it has to be done fast. You don’t
+really understand the code or how it works together but you know you
+can put the new code for the feature into existence but its really
+unintuitive. So you begin to comment it excessively, because its the
+only way to clearly show its intend.</p>
+<p>There are two mindestting factors that help to write code that is
+understandable without having to excessively comment it:</p>
+<ul class="simple">
+<li>From the beginning, do not write code for the computer but for
+developers. Changing this attitude really helps to write
+understandable code like the one above.</li>
+<li>Only leave code better than it was before, never worse.</li>
+</ul>
+<p>There are five technical practices that - when followed - allow to
+write clearly communicating code from the beginning:</p>
+<ol class="arabic simple">
+<li>Giving classes, variables and methods good names. This is a
+no-brainer but few people seem to follow it anyways.</li>
+<li>Following the object-oriented <strong>Single Responsibility Principle</strong>
+by never giving a class more than one responsibility. Macros
+example seems to follow this one.</li>
+<li>Methods should never switch in the level of detail. Micro-work at
+the datastructure level should never be mixed with macro level
+delegation to executing large chunks of code. Macros code
+violates this by mixing the path building micro-level work with
+the macro-level work of rendering the XSLT template. The path
+building code can be hidden behind a method to communicate intend
+more clearly.</li>
+<li>Exchange if conditions with private methods that explain the
+condition being checked for. In Marcos example this is not really
+necessary, because file_exists already is quite a good
+description to the condition. But in cases of logical
+combinations of conditions the method extracting is a superior
+way to explain the conditions intend without having to write a
+comment.</li>
+<li><strong>Seperate Query and Command</strong>: A method never should do a query
+which returns the state of an object and a command which executes
+a set of rules on the state.</li>
+</ol>
+<p>These practices sum up to one guideline: Make code explicit. This
+obviously requires less commenting since a comment of explicit code
+would be duplication and duplication is bad. What if you have a
+project that does not follow this guidelines? Then of course
+comments should be used to explain code, but in the long run this
+should be refactored to self-explaining code. Additionally every new
+feature should be programmed explicitly to follow the “leave code
+better than before” principle.</p>
+<p>In my opinion two refactoring tools are missing that would greatly
+help PHP programmers write nice to read code: Extract method and
+Replace magic value with constant. Can someone integrate them into
+NetBeans please?</p>
+<p><strong>Update:</strong> Fixed a creepy copy-paste code bug, thanks to azeroth
+for pointing out. Moved methods around a bit to be more reading
+friendly.</p>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html#disqus_thread" data-disqus-identifier="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>June 16, 2009</span> 
+        </div>
+        <div class="section" id="using-a-dependency-injection-container-with-zend-application">
+<h1><a href="2009/06/16/using-a-dependency-injection-container-with-zend-application.html">Using a Dependency Injection Container with Zend_Application</a></h1>
+<p>Much has been written on Dependency Injection lately, mostly by Padraic
+Brady
+(<a class="reference external" href="http://blog.astrumfutura.com/archives/394-The-Case-For-Dependency-Injection-Part-1.html">1</a>,
+<a class="reference external" href="http://blog.astrumfutura.com/archives/395-The-Case-For-Dependency-Injection-Part-2.html">2</a>)
+and Fabien Potencier
+(<a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">1</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/12/do-you-need-a-dependency-injection-container">2</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/13/introduction-to-the-symfony-service-container">3</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/14/symfony-service-container-using-a-builder-to-create-services">4</a>,
+<a class="reference external" href="http://github.com/fabpot/Pimple/tree/master">5</a>). My subjective
+feeling tells me there are now more PHP DI containers out there than CMS
+or ORMs implemented in PHP, including two written by myself (an
+<a class="reference external" href="http://www.beberlei.de/sphicy/">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
+one</a>). Its an awesome
+pattern if used on a larger scale and can (re-) wire a complex business
+application according to a clients needs without having to change much
+of the domain code. It aims at a complete separation of object
+instantiation and dependency tracking from the business logic.</p>
+<p>Beginning with version 1.8 Zend Framework is able to integrate any of
+these DI containers into its <strong>Zend_Application</strong> component easily. The
+Application component initializes a set of common resources and pushes
+them into the MVC stack as additional Front Controller parameters.
+Technically a <strong>Zend_Registry</strong> instance holds all these resources with
+their respective resource names as keys. The resources are accessible
+inside the Front Controller and the Action Controller classes. Assume
+the resource ‘Db’ is initialized in your application, you can access it
+with:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$front = Zend_Controller_Front::getInstance();
+$container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
+$db = $container-&gt;db;
+
+// or:
+class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $db = $container-&gt;db;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>This is pretty much dependency injection already, but the default
+registry approach suffers from two serious problem: New instances can
+only be added to the Container by implementing new Zend_Application
+resources and these instances cannot be lazy loaded. All resources used
+by Zend_Application are always loaded on every request. But the
+application container implementation was developed with Dependency
+Injection in mind and is not tied to the use of Zend_Registry. Only
+three magic methods are required by any container that wants to be
+Zend_Application compliant: __get(), __set() and __isset(). Each
+instantiated resource is pushed via __set() into the container. If
+required by another resource, __isset() is used to check whether a
+resource with the given name exists inside the container and __get()
+is used to retrieve the instances from the container.</p>
+<p>Some month ago I extended
+<a class="reference external" href="http://github.com/beberlei/yadif/tree/master">Yadif</a>, a lightweight
+PicoContainer-like DI container for PHP written by Thomas McKelvey, with
+several features that make it a very powerful DI container in my
+opinion. It has a detailed documentation and examples on the GitHub Page
+if you want to check it out. I extended Yadif to be Zend_Application
+compliant in a way that the application-wide Zend_Application resources
+can be used as dependencies for objects that are lazy-loaded from the
+container. Skipping the tech-talk, here is an example. First we have to
+replace the default Container with Yadif:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH.&quot;/config/objects.xml&quot;);
+$container = new Yadif_Container($objects);
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+// Set Yadif as Container
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();</pre>
+</div>
+</div></blockquote>
+<p>Assume you run Zend_Application with a “Db” and a “Cache” resource.
+These resources are loaded on every request. The objects configured in
+Yadif however are not instantiated until they are requested for the
+first time from the container. We can merge these two worlds and make
+use of the Application resources inside the Yadif Configuration
+“objects.xml”, which looks like:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>&lt;?xml version=&quot;1.0&quot; ?&gt;
+&lt;objects&gt;
+    &lt;myModel&gt;
+        &lt;class&gt;MyModel&lt;/class&gt;
+        &lt;arguments arg1=&quot;db&quot; arg2=&quot;cache&quot; /&gt;
+    &lt;/myModel&gt;
+&lt;/objects&gt;</pre>
+</div>
+<p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
+the the Database and Cache resources as constructor arguments:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $myModel = $container-&gt;myModel;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Given the possibilites by the Yadif_Container you are now empowered
+to use Dependency Injection for all your application objects and
+make use of Zend_Applications resource system. Furthermore any
+other dependency injection container, simple or complex, can also be
+integrated easily.</p>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/06/16/using-a-dependency-injection-container-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/06/16/using-a-dependency-injection-container-with-zend-application">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>November 14, 2009</span> 
         </div>
         <div class="section" id="netbeans-php-codesniffer-plugin-now-with-options-dialog">
@@ -353,7 +663,7 @@ does not exist or the password is wrong. Or you are not allowed to
 withdraw the given amount of money. If any of those exceptions is thrown
 the Model does not accept the form data and the form will have to be
 displayed again for the client showing the new error message that was
-returned from the model. The controller handling this process would lool
+returned from the model. The controller handling this process would look
 like this:</p>
 <blockquote>
 <div><div class="highlight-python"><pre>class BankAccountController extends Zend_Controller_Action {
@@ -381,7 +691,7 @@ like this:</p>
 </div></blockquote>
 <p>You can see the mediator tightly integrates Form and Model without both
 components knowing too much of each other. Still you can add error
-messages recieved from the model into the Form and redisplay it. One
+messages received from the model into the Form and redisplay it. One
 negative point of this approach is the fact that you only have one
 method for accepting form data, which could result in variable checking
 and redispatching in the case of many different operations that can be
@@ -527,8 +837,8 @@ it should.</p>
         </div>
         <div class="section" id="what-will-be-new-in-zf-1-8">
 <h1><a href="2009/01/11/what-will-be-new-in-zf-1-8.html">What will be new in ZF 1.8</a></h1>
-<p>In Februar or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a> is schedulded to be released. I
+<p>In February or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
+Framework</a> is scheduled to be released. I
 have contributed some stuff already regarding ZendX_JQuery and
 Zend_Soap.</p>
 <p>Both components have seen numerous bugfixes and I managed to get the
@@ -717,157 +1027,6 @@ awesome NetBeans PHP support.</li>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/01/07/seven-things.html#disqus_thread" data-disqus-identifier="2009/01/07/seven-things">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>March 11, 2009</span> 
-        </div>
-        <div class="section" id="using-zend-soap-server-and-autodiscover-in-a-controller">
-<h1><a href="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html">Using Zend_Soap Server and Autodiscover in a Controller</a></h1>
-<p>I am in a dilemma. I have condemned the usage of Zend_Soap_Server (or
-any other webservice server handler) <a class="reference external" href="http://www.whitewashing.de/blog/articles/106">inside a Model-View-Controller
-application</a> before.
-Still I get questions about <a class="reference external" href="http://www.whitewashing.de/blog/articles/65">my old Zend_Soap_Server and
-Zend_Soap_AutoDiscover
-example</a> not working in
-the MVC scenario. The following example provides you with a working Soap
-server inside a Zend_Controller_Action, although I discourage the use
-of it and would suggest using a dedicated script outside the dispatching
-process to gain multitudes of performance, which webservices often
-require.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>require_once &quot;/path/to/HelloWorldService.php&quot;;
-
-class MyDiscouragedSoapServerController extends Zend_Controller_Action
-{
-    public function serverAction()
-    {
-        $server = new Zend_Soap_Server(&quot;http://example.com/pathto/wsdl&quot;);
-        $server-&gt;setClass('HelloWorldService');
-        $server-&gt;handle();
-    }
-
-    public function wsdlAction()
-    {
-        $wsdl = new Zend_Soap_AutoDiscover();
-        $wsdl-&gt;setUri('http://example.com/pathto/server');
-        $wsdl-&gt;setClass('HelloWorldService');
-        $wsdl-&gt;handle();
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Now all you have to do is create two routes, one that makes
-<strong>http://example.com/pathto/server</strong> point to
-<strong>MyDiscouragedSoapServerController::serverAction</strong> and the other route
-that makes <strong>http://example.com/pathto/wsdl</strong> point to
-<strong>MyDiscouragedSoapServerController::wsdlAction</strong>. The wrong version
-(Version Mismatch) error comes from sending a request for the WSDL file
-to the actual Soap Server, which he doesn’t like.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html#disqus_thread" data-disqus-identifier="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>March 27, 2009</span> 
-        </div>
-        <div class="section" id="test-your-legacy-php-application-with-function-mocks">
-<h1><a href="2009/03/27/test-your-legacy-php-application-with-function-mocks.html">Test your Legacy PHP Application with Function Mocks!</a></h1>
-<p>Much talking is going on about Unittesting, Mocks and TDD in the PHP
-world. For the most this discussions surround object-oriented PHP code,
-frameworks and applications.</p>
-<p>Yet I would assert that the reality for PHP developers (me included) is
-dealing with PHP 4, PHP 5 migrated, or non-object oriented legacy
-applications which are near to impossible to bring under test. Still
-this code works, is in production and needs maintenance and possibly
-extension for new features.</p>
-<p>For example many applications may still use <strong>mysql_*</strong> functions at
-length inside their model or have multiple nested function levels
-(Example: Wordpress). <a class="reference external" href="http://pecl.php.net/package/runkit">Runkit</a> to
-the rescue: A PECL extension that can hack your running PHP code, such
-that method or functions are repointed to execute new implementations.
-Using this extension you can actually mock out internal PHP functions,
-which is great to bring legacy code under test.</p>
-<p>Consider this following proof of concept, <a class="reference external" href="http://github.com/padraic/runkit/tree/master">using the Runkit extension
-build by Padraic Brady</a>
-(the one from pecl.php.net does not compile on PHP 5.2), which replaces
-the functionality of <strong>mysql_query()</strong>. You have to set the following
-option in your php.ini: <strong>runkit.internal_override = On</strong> for this to
-work. By default only user-defined functions may be overwritten by
-Runkit.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class FunctionMocker
-{
-    protected $_mockedFuncBehaviourMap = array();
-
-    public function mock($funcName, $return=null)
-    {
-        $newFuncCode = 'return &quot;'.$return.'&quot;;';
-
-        $renamedName = &quot;__&quot;.$funcName.&quot;_mockOriginalCopy&quot;;
-        runkit_function_copy($funcName, $renamedName);
-        runkit_function_redefine($funcName, '', $newFuncCode);
-
-        $this-&gt;_mockedFuncBehaviourMap[$funcName] = $renamedName;
-    }
-
-    public function reset()
-    {
-        foreach($this-&gt;_mockedFuncBehaviourMap AS $funcName =&gt; $renamedName) {
-            runkit_function_remove($funcName);
-            runkit_function_copy($renamedName, $funcName);
-            runkit_function_remove($renamedName);
-        }
-        $this-&gt;_mockedFuncBehaviourMap = array();
-    }
-}
-
-$mocker = new FunctionMocker();
-$mocker-&gt;mock('mysql_query', 'hello world!');
-
-echo mysql_query(); // hello world
-
-$mocker-&gt;reset();
-
-mysql_query(); // error</pre>
-</div>
-<p>This example, only allows for string return values of the mock and
-has no support for replacing the arguments of the mocked function.
-Also chaining of different return values based on input or call
-number might be interesting. Some kind of Code Generator Tool would
-have to be implemented to support this functionality. Additionally
-Assertions and Verifying should be implemented for the function
-arguments. All in all this would allow to mock functions as you
-would mock interfaces/classes, which would be a great addition for
-all those legacy applications that use procedural PHP.</p>
-<p>Additionally what the real killer for runkit would be: The
-possibility to insert PHP callbacks instead of real PHP code into
-the <strong>runkit_function_redefine</strong>.</p>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/03/27/test-your-legacy-php-application-with-function-mocks.html#disqus_thread" data-disqus-identifier="2009/03/27/test-your-legacy-php-application-with-function-mocks">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -914,6 +1073,12 @@ the <strong>runkit_function_redefine</strong>.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+        </li>
+        <li class="recent_post">
+            <a href="2013/02/05/avoid_implementing_business_rules_with_annotations.html">Avoid implementing business rules with Annotations</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
         </li>
         <li class="recent_post">
@@ -936,12 +1101,6 @@ the <strong>runkit_function_redefine</strong>.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
         </li>
     </ul>
 </div>

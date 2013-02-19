@@ -22,8 +22,8 @@ For a `Symfony2 <http://www.symfony.com>`_, `Silex
 long as failures with Composer don't break your site.
 
 It turns out that Azure Websites - to support other platforms that require
-compiling - actually has an extremly robust deployment system (as far as I
-understood its internals). The Git repository is seperated from the actual code
+compiling - actually has an extremely robust deployment system (as far as I
+understood its internals). The Git repository is separated from the actual code
 that is served from the webserver and a number of old checkouts is kept to
 allow rollbacks through the Web interface. Once a Git push was recognized,
 Azure websites will execute a build step, and then copy all the files over to a

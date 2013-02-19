@@ -1,0 +1,445 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Avoid implementing business rules with Annotations &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Doctrine and SOLID" href="../04/doctrine_and_solid.html" />
+    <link rel="prev" title="Extending Symfony2: ParamConverter" href="../19/extending_symfony2__paramconverter.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2013-02-05-avoid_implementing_business_rules_with_annotations">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li>
+                 &laquo; <a href="../19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+            </li>
+            <li class="right">
+                <a href="../04/doctrine_and_solid.html">Doctrine and SOLID</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>February 05, 2013</span> 
+        </div>
+    <div class="section" id="avoid-implementing-business-rules-with-annotations">
+<h1>Avoid implementing business rules with Annotations</h1>
+<p>In January I was participating at the awesome <a class="reference external" href="http://conference.phpbenelux.eu/2013/schedule/">PHP Benelux 2013</a> conference and attended
+<a class="reference external" href="http://www.rafaeldohms.com.br/">Raphael Dohms</a> talk on &#8220;PHP Annotations -
+They exist!&#8221;. It was a very good talk about the history, current state and
+actual implementations for Annotations in PHP.</p>
+<p>At the end of the talk there was an important question from one person in the
+audiance about how to test code that is using annotations to drive the business
+rules. I try to answer the question in this blog post.</p>
+<p>Lets start by the beginning and define annotations. Annotations are metadata to
+code blocks. Comparable to INI, XML or YAML they provide a way to load
+configuration. In contrast to the other configuration mechanisms however,
+annotations are right next to PHP code they configure. They allow you to
+configure classes, properties, methods in context without having to move around
+in several of configuration files.</p>
+<p>The Doctrine Annotations library has spawned several new libraries that allow
+to configuration through annotations. Should we just use them, because they are
+so convenient?</p>
+<p>No! In my opinion it is important to differentiate between different use-cases
+of annotations. Take a look at Doctrine ORM Mapping or Raphaels DMS Filter library.
+Using their annotations looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">DMS\Filter\Rules</span> <span class="k">as</span> <span class="nx">Filter</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\Table(name=&quot;users&quot;)</span>
+<span class="sd"> **/</span>
+<span class="k">class</span> <span class="nc">User</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Id @ORM\GeneratedValue @ORM\Column(type=&quot;integer&quot;)</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$id</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type=&quot;string&quot;)</span>
+<span class="sd">     * @Filter\Trim()</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$email</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Both libraries solve problems of the infrastructure layer and not of the
+business domain. Both libraries could probably also be configurable through
+PHP code, XML and YAML and this would be completly fine.</p>
+<p>The use of annotations in this case is just a substitute for XML, INI or YAML
+configuration files, allowing your business model to integrate into infrastructure
+libraries.</p>
+<p>The same holds for the Serialization-, WSDL- or Routing configuration using
+annotations.</p>
+<div class="section" id="problematic-use-cases">
+<h2>Problematic Use-Cases</h2>
+<p>There are use-cases when I am careful about the use of annotations (any kind
+of configuration actually): When I am configuring how my business
+objects works. The following real-world use-cases come to mind:</p>
+<ul class="simple">
+<li>Validation</li>
+<li>Aspects</li>
+<li>Dependency Injection</li>
+</ul>
+<p>When libraries allow you to configure how your business objects work based on
+annotations, coupled to the respective libraries way of doing things, problems
+are going to appear. Depending on the implementation this can end up very
+badly, with serious coupling of the library towards your business objects.</p>
+<div class="section" id="validation">
+<h3>Validation</h3>
+<p>Symfony Validator allows you to add assertions for validation rules on the
+properties or methods of your business models.</p>
+<p>If you think about it, validation is a cross-cutting concern. It is part of the
+infastructure for simple validation rules like checking if the user input data
+is valid, but it can also be used for business logic of your domain.</p>
+<p>See this code example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Validator\Constraints</span> <span class="k">as</span> <span class="nx">Assert</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">MyProject\Validator\Constraints\EmailBlacklist</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">User</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Assert\NotBlank</span>
+<span class="sd">     * @Assert\Email</span>
+<span class="sd">     * @EmailBlacklist</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$email</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We added three validation rules here, two from the Symfony core validating the
+email syntax and not blank, another one from my own project, validating the
+email aginst some blacklist.</p>
+<p>Now in Symfony you can use this code either directly through the Validation
+service or indirectly through the Form component:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$validator</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;validator&#39;</span><span class="p">);</span>
+
+<span class="nv">$user</span>          <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+<span class="nv">$violationList</span> <span class="o">=</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This sort of tangling of critical business logic to framework services is a
+problem. The reason for this is that you want to be able to unit-test your
+business logic. A deep integration of your business logic into the Symfony
+Validation component will prevent you from actually doing this.</p>
+<p>To test this validation constraint, you need to:</p>
+<ul class="simple">
+<li>Call the validator service with a user object and a blacklisted email</li>
+<li>Call the validator service with a user object and a non-blacklisted email</li>
+</ul>
+<p>In addition to testing the actual email blacklist validation, they verify
+annotation parsing and the full Symfony Validator stack. In general these tests
+are slow and I know this from experience, not following my own advice.</p>
+<p>Instead you should write a completely independent E-Mail Blacklist Service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Validator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">EmailBlacklistService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isBlacklisted</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span> <span class="c1">// logic here</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This service can be unit-tested and is part of your actual business domain,
+independent of Symfony. You can now integrate this into a Symfony Validator:</p>
+<blockquote>
+<div><p>&lt;?php</p>
+<p>namespace MyProjectValidatorConstraints;</p>
+<p>use SymfonyComponentValidatorConstraint;
+use MyProjectValidatorEmailBlacklistService;</p>
+<dl class="docutils">
+<dt>/**</dt>
+<dd><ul class="first simple">
+<li>&#64;Annotation</li>
+</ul>
+<p class="last"><a href="#id1"><span class="problematic" id="id2">**</span></a>/</p>
+</dd>
+</dl>
+<p>class EmailBlacklist extends Constraint
+{</p>
+<blockquote>
+<div>public $message = &#8216;Your email %email% is on our blacklist.&#8217;;</div></blockquote>
+<p>}</p>
+<p>class EmailBlacklistValidator
+{</p>
+<blockquote>
+<div><p>private $blacklist;</p>
+<p>public function __construct(EmailBlacklistService $blacklist)
+{</p>
+<blockquote>
+<div>$this-&gt;blacklist = $blacklist;</div></blockquote>
+<p>}</p>
+<p>public function validate($value, Constraint $constraint)
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>if ($this-&gt;blacklist-&gt;isBlacklisted($value)) {</dt>
+<dd><dl class="first docutils">
+<dt>$this-&gt;context-&gt;addViolation(</dt>
+<dd>$constraint-&gt;message,
+array(&#8216;%email%&#8217; =&gt; $value)</dd>
+</dl>
+<p class="last">);</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>Now actually what we can do is write a unit-test for this Symfony validator
+using mock objects. We can add a single functional tests to actually verify
+the configuration is present on the <tt class="docutils literal"><span class="pre">User$email</span></tt> property, but we don&#8217;t
+actually need to test the validation logic through the full stack.</p>
+<p>Inside our business model you can reuse the Blacklist Service without having to
+depend on Symfony code. So instead of injecting the full validator service,
+you can just inject the much more explicit blacklist service.</p>
+<p>Validation libraries are a tricky problem when combined with validation rules
+from your business domain. Be careful not to depend on them too much with
+your business logic and keep it seperate.</p>
+</div>
+<div class="section" id="dependency-injection">
+<h3>Dependency Injection</h3>
+<p>Using Annotations for Dependency Injection is not necessarily bad,
+however the way its implemented in some frameworks may lead to
+code that is unusable without the Dependency Injection container.</p>
+<p>FLOW3 allows to inject dependencies into properties of instances:</p>
+<blockquote>
+<div><p>class BlogService
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>/**</dt>
+<dd><ul class="first simple">
+<li>&#64;Inject</li>
+</ul>
+<p class="last"><a href="#id3"><span class="problematic" id="id4">**</span></a>/</p>
+</dd>
+</dl>
+<p>private $blogRepository;</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>This even works when you are instantiating the object yourself using <tt class="docutils literal"><span class="pre">new</span></tt>.
+So inside FLOW3, the call to <tt class="docutils literal"><span class="pre">new</span> <span class="pre">BlogService</span></tt> automatically injects the
+repository.</p>
+<p>The problem here is easy to spot. If you use framework supported Dependency
+Injection with Reflection, then you don&#8217;t need to write constructors or setters
+anymore that actually asign the repository. This prevents you from actually
+testing the code, because the classes are not easily instantiatable in a
+Unit-Test anymore. Additionally you might rely on the automagic injection
+in your code, so much that it is not executable without the Injection
+framework being present in your unit-tests.</p>
+<p>You can of course start providing constructors or setters, but this feature
+still affects your control flow in production, using reflection instead
+of the &#8220;expected&#8221; control flow.</p>
+</div>
+<div class="section" id="aspects">
+<h3>Aspects</h3>
+<p>In FLOW3 Annotations are used to change the control flow of the applications.
+As a developer you can introduce code and make it execute around arbitrary
+other code. The way its implemented with code generation you can never
+actually unit-test this yourself, because any test-setup requires the Aspect
+Engine to run.</p>
+<p>This is obviously a huge change of control flow, configured through
+annotations. Additionally there is the code generation involved. I am very
+skeptical about large scale usage of this kind of feature if it affects
+the way your business logic works.</p>
+<p>Testing this kind of feature is obviously not possible without the
+AOP framework. This effectively means that its impossible to unit-test
+your domain objects.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>There is a difference between using Annotations for configuration of
+infrastructure services and business model interaction. The first one is
+perfectly fine, its replacable by any other sort of configuration or explicit
+programmatic code and doesn&#8217;t hinder you writing unit-tests for your business
+model. The second one makes it hard to actually do unit-testing without using
+the libraries that perform the actual operations.</p>
+</div>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="categories">
+            <span>
+                Filed under:
+                
+                    <a href="../../../categories/php.html">PHP</a>
+                
+            </span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                
+                    <a href="../../../tags/php.html">PHP</a>
+                
+            </span>
+        </div>
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/02/05/avoid_implementing_business_rules_with_annotations";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2013/02/05/avoid_implementing_business_rules_with_annotations.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="../19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+        </li>
+        <li class="recent_post">
+            <a href="#">Avoid implementing business rules with Annotations</a>
+        </li>
+        <li class="recent_post">
+            <a href="../04/doctrine_and_solid.html">Doctrine and SOLID</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/08/26/froscon_2012.html">FrOSCon 2012</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

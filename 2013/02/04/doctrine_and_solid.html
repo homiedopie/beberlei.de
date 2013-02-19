@@ -33,6 +33,7 @@
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
     <link rel="next" title="Composer and Azure Websites Git Deployment" href="../../../2012/11/19/composer_and_azure_websites_git_deployment.html" />
+    <link rel="prev" title="Avoid implementing business rules with Annotations" href="../05/avoid_implementing_business_rules_with_annotations.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
   <body>
@@ -69,6 +70,9 @@
     
     <div class="related">
         <ul>
+            <li>
+                 &laquo; <a href="../05/avoid_implementing_business_rules_with_annotations.html">Avoid implementing business rules with Annotations</a>
+            </li>
             <li class="right">
                 <a href="../../../2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a> &raquo; 
             </li>
@@ -86,7 +90,7 @@ does not support value-objects (or embedded-objects), it is very hard to pull
 the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
 <p>These problems are related to the inability to share behavioral code through
 aggregation and the complexity of state transformations. Combining both, your
-average entity with 5-15 fields can end up with hundrets or thousands lines of
+average entity with 5-15 fields can end up with hundreds or thousands lines of
 code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
 maximizing clarity</a>.</p>
 <div class="section" id="extracting-value-objects-minimize-duplication">
@@ -95,7 +99,7 @@ maximizing clarity</a>.</p>
 fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
 setters</a>,
 with use-case driven methods.  These state transformations can be part of
-different responsibilities, specificially when properties belong to different
+different responsibilities, specifically when properties belong to different
 groups of concepts.</p>
 <p>Take a very simple entity that contains updated/created at logic:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -181,7 +185,7 @@ the database. However this is beyond ugly in my opinion.</p>
 complexity of the state transformations can attract lots of code.</p>
 <p>Take an <tt class="docutils literal"><span class="pre">Order</span></tt> object that has a method for calculating the shipping costs,
 depending all the order items and products.
-To seperate calculations from state transformations you can extract
+To separate calculations from state transformations you can extract
 method objects instead of inlining the code into the <tt class="docutils literal"><span class="pre">Order</span></tt> object.</p>
 <p>For this kind of extraction I create a folder <tt class="docutils literal"><span class="pre">Order</span></tt> and put all
 the extracted method objects in the <tt class="docutils literal"><span class="pre">Order</span></tt> subnamespace.</p>
@@ -226,7 +230,7 @@ calculator:</p>
 unit-test and avoid checking for the correctness indirectly through a getter
 method for the shipping costs.</p>
 <p>Extracting every method of an entity into a method object is obviously
-overkill. You should excercise caution and common sense when performing this
+overkill. You should exercise caution and common sense when performing this
 refactoring.</p>
 </div>
 <div class="section" id="conclusion">
@@ -295,6 +299,12 @@ Doctrine to make this possible.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+        </li>
+        <li class="recent_post">
+            <a href="../05/avoid_implementing_business_rules_with_annotations.html">Avoid implementing business rules with Annotations</a>
+        </li>
+        <li class="recent_post">
             <a href="#">Doctrine and SOLID</a>
         </li>
         <li class="recent_post">
@@ -317,12 +327,6 @@ Doctrine to make this possible.</p>
         </li>
         <li class="recent_post">
             <a href="../../../2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
         </li>
     </ul>
 </div>
