@@ -71,7 +71,7 @@ library/namespace. Especially when you start using this pattern on a large
 scale, you have to make sure this assertions are **VERY** stable and
 unit-tested.
 
-That is why you shoud extend from ``Assertion`` and use your own class when
+That is why you should extend from ``Assertion`` and use your own class when
 using the Assert library. This returns some control in your hands and even
 allows you to overwrite the exception class:
 

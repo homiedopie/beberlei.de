@@ -26,11 +26,11 @@ Igors talk about building an HTTP server in PHP was interesting to see the
 stream/socket server APIs of PHP at work. Ever since I took part in `the
 SoCraTes 2012 Conference Maexchen UDP Bot
 <https://github.com/conradmueller/maexchen>`_ challenge I think network
-programming is an interessting topic for learning about languages and
+programming is an interesting topic for learning about languages and
 programming itself.
 
 Volker did a second talk on sunday about Clean Code that was both entertaining
-and interesting. He was reminding the audiance that shipping the code is what
+and interesting. He was reminding the audience that shipping the code is what
 actually creates the value in our profession. Hence clean code is not about
 the beauty of code itself, but its ability to be shippable, changeable and
 adaptable to the business.
