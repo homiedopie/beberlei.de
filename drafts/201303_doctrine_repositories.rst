@@ -66,7 +66,7 @@ side of the repository:
          * @param UserCriteria $criteria
          * @return array<User>|array<array>
          ***/
-        public function match(UserCriteria $criteria)
+        public function match(UserCriteria $criteria);
     }
 
 Put in a ``$criteria`` get back users or array data. Very nice and simple!
