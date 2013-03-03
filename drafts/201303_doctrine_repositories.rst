@@ -9,7 +9,7 @@ growing amount of query responsibilities. I want to respond to this blog post
 with some alternative approaches, because I have seen Anne's approach multiple
 times in different projects and think it can be approved upon alot.
 
-The problems I see with the approach outlined are:
+The problems with the approach outlined are:
 
 - The Repository API does not hide implementation details of the ORM,
   the QueryBuilder API is returned to the client code. This might seen
@@ -88,7 +88,7 @@ side of the repository:
         /**
          * @param UserCriteria $criteria
          * @return array<User>|array<array>
-         */
+         ***/
         public function match(UserCriteria $criteria)
     }
 
@@ -101,7 +101,7 @@ The implementation would look like this:
     /**
      * @param UserCriteria $criteria
      * @return array<User>
-     */
+     ***/
     public function match(UserCriteria $criteria)
     {
         $qb = $this->createQueryBuilder('u');
@@ -276,12 +276,12 @@ responsibility principle by introducing three specifications:
          * @param string $dqlAlias
          * 
          * @return \Doctrine\ORM\Query\Expr
-         */
+         ***/
         public function match(QueryBuilder $qb, $dqlAlias);
 
         /**
          * @param \Doctrine\ORM\Query $query
-         */
+         ***/
         public function modifyQuery(Query $query);
     }
 
@@ -299,7 +299,7 @@ responsibility principle by introducing three specifications:
             $query->setHydrationMode(Query::HYDRATE_ARRAY);
         }
 
-        public function match(QueryBuilder $qb, $dqlAlias) { /* empty */ }
+        public function match(QueryBuilder $qb, $dqlAlias) { /* empty ***/ }
     }
 
     class FilterGroup
@@ -318,7 +318,7 @@ responsibility principle by introducing three specifications:
             return $qb->expr()->eq($dqlAlias . '.group', ':group');
         }
 
-        public function modifyQuery(Query $query) { /* empty */ }
+        public function modifyQuery(Query $query) { /* empty ***/ }
     }
 
     class FilterPermission
@@ -335,7 +335,7 @@ responsibility principle by introducing three specifications:
             // ...
         }
 
-        public function modifyQuery(Query $query) { /* empty */ }
+        public function modifyQuery(Query $query) { /* empty ***/ }
     }
 
 Now we need a new And-Specification to combine this in our code:
@@ -402,7 +402,7 @@ functionality to check if a specification supports a given entity.
         /**
          * @param string $className
          * @return bool
-         */
+         ***/
         public function supports($className);
     }
 
@@ -479,3 +479,8 @@ Before we were not able to unit-test this code, because of the Doctrine
 EntityManager, Query + QueryBuilder dependencies.  Now We can inject the
 repositories into our controllers and services and then use mock objects in the
 tests.
+
+.. author:: default
+.. categories:: PHP
+.. tags:: PHP
+.. comments::
