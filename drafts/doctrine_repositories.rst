@@ -439,6 +439,16 @@ a domain language for your specifications that is composed of more simple specif
         {
             return $this->spec->match($qb, $dqlAlias);
         }
+
+        public function modifyQuery(Query $query)
+        {
+            $this->spec->modifyQuery($query);
+        }
+
+        public function supports($className)
+        {
+            return ($className === 'EasyBib\Api\Entity\User');
+        }
     }
 
     $top20powerUsers = new Spec\PowerUsers($groupId, $permissions, 20);
