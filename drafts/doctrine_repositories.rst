@@ -412,7 +412,11 @@ specification in its match method:
             $qb = $this->createQueryBuilder('r');
             $expr = $specification->match($qb, 'r');
 
-            return $qb->where($expr)->getResult();
+            $query = $qb->where($expr)->getQuery();
+
+            $specification->modifyQuery($query);
+
+            return $query->getResult();
         }
     }
 
