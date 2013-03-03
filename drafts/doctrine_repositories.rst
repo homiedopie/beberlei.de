@@ -283,7 +283,7 @@ responsibility principle by introducing three specifications:
         }
     }
 
-    class FilterGroup
+    class FilterGroup implements Specification
     {
         private $group;
 
@@ -302,7 +302,7 @@ responsibility principle by introducing three specifications:
         public function modifyQuery(Query $query) { /* empty ***/ }
     }
 
-    class FilterPermission
+    class FilterPermission implements Specification
     {
         private $permissions;
 
