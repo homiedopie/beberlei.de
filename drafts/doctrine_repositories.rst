@@ -45,8 +45,6 @@ alternative refactoring. I will introduce a ``Criteria`` class for the ``User``:
 .. code-block:: php
 
     <?php
-    namespace MyProject\Model\Criteria;
-
     class UserCriteria
     {
         public $groupId;
