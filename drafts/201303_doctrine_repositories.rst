@@ -53,6 +53,10 @@ alternative refactoring. I will introduce a ``Criteria`` class for the ``User``:
         public $hydrateMode = Query::HYDRATE_OBJECT;
     }
 
+It is important not to introduce a constructor here, because when we add
+more and more criterions, the constructor will get bloated. Static
+factory methods that create a criteria do make sense however.
+
 Now we can introduce a ``match`` method on the ``UserRepository``. Lets see
 that on an interface level first, to see how simple usage is for the client
 side of the repository:
