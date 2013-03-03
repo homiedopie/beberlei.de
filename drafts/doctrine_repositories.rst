@@ -6,8 +6,8 @@ Over at the `easybib/dev
 <http://drafts.easybib.com/post/44139111915/taiming-repository-classes-in-doctrine-with-the>`_
 Blog Anne posted an entry about their usage of Doctrine Repositories with a
 growing amount of query responsibilities. I want to respond to this blog post
-with two alternative approaches, because I have seen Anne's approach multiple
-times in different projects and think it can be approved upon alot.
+with two alternative approaches, because I have seen the easybib approach multiple
+times in different projects by different teams and think it can be approved upon alot.
 
 The problems with the approach outlined are:
 
@@ -16,9 +16,6 @@ The problems with the approach outlined are:
   like nitpicking, however it leads to bloated client code doing the
   query builder work over and over again. For example the
   ``->getQuery()->getSingleResult(AbstractQuery::HYDRATE_ARRAY)`` call.
-
-  Generally introducing a new object such as a repository should pass
-  the "`Composite is simpler than the sum of its parts <http://www.growing-object-oriented-software.com/toc.html>`_" rule.
 
 - Different parts of the QueryBuilder filtering cannot be composed together,
   because of the way the API is created. Assume we have the
@@ -31,9 +28,11 @@ The problems with the approach outlined are:
   find the right one is never fun, most importantly when the naming of methods
   is imprecise.
 
-  This is essentially a violation of "Composite simpler than the sum of its
-  parts" again, however it also clearly demonstrates bad abstraction. In OOP the
-  primary goal is avoiding changes to affect the whole system.
+Generally introducing a new object such as a repository should pass the
+"`Composite is simpler than the sum of its parts
+<http://www.growing-object-oriented-software.com/toc.html>`_" rule.  However it
+also clearly demonstrates a bad abstraction. In OOP the primary goal is avoiding
+changes to affect the whole system.
 
 
 Introduce Criteria Objects
