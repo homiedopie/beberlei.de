@@ -299,7 +299,10 @@ responsibility principle by introducing three specifications:
             $query->setHydrationMode(Query::HYDRATE_ARRAY);
         }
 
-        public function match(QueryBuilder $qb, $dqlAlias) { /* empty ***/ }
+        public function match(QueryBuilder $qb, $dqlAlias)
+        {
+            return $this->parent->match($qb, $dqlAlias);
+        }
     }
 
     class FilterGroup
