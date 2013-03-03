@@ -6,7 +6,7 @@ Over at the `easybib/dev
 <http://drafts.easybib.com/post/44139111915/taiming-repository-classes-in-doctrine-with-the>`_
 Blog Anne posted an entry about their usage of Doctrine Repositories with a
 growing amount of query responsibilities. I want to respond to this blog post
-with some alternative approaches, because I have seen Anne's approach multiple
+with two alternative approaches, because I have seen Anne's approach multiple
 times in different projects and think it can be approved upon alot.
 
 The problems with the approach outlined are:
@@ -35,29 +35,6 @@ The problems with the approach outlined are:
   parts" again, however it also clearly demonstrates bad abstraction. In OOP the
   primary goal is avoiding changes to affect the whole system.
 
-Testability of Doctrine Repositories
-------------------------------------
-
-One reasons outlined by Anne for this design is testability: Because the
-Repository returns the QueryBuilder you have access to the generated SQL.
-However testing Doctrine Repositories should never be verifying the generated SQL. I see
-alot of people doing this and it is very fragile and dangerous. Doctrine is a
-third party library and as such a rather complex one. Possible changes that break the test are:
-
-- Doctrine adds/removes whitespaces to SQL in a next version
-- Doctrine performs SQL optimizations in certain cases, the result is the same though.
-- You add a field/column to any of the tables involved that does not affect the result.
-- You change something in the Doctrine mapping files, that leads to a reordering of SQL.
-
-These are 4 changes that have absolutly nothing to do with the feature you are
-actually testing, making the test code very fragile. In terms of abstraction
-SQL generation is an implementation detail of the Doctrine ORM and you as
-developer are only interested in the public API, which the SQL generation is
-not part of.
-
-The code should really be tested against Doctrine itself. Since you are using
-Doctrine to get rid of SQL query generation for some use-cases, why should you
-use them as measure of quality in your testing efforts. 
 
 Introduce Criteria Objects
 --------------------------
@@ -341,7 +318,9 @@ responsibility principle by introducing three specifications:
         public function modifyQuery(Query $query) { /* empty ***/ }
     }
 
-Now we need a new And-Specification to combine this in our code:
+Now we need a new And-Specification to combine this in our code. This
+looks rather abstract and complex on the inside, but for clients
+of this object, the usage is simple and obvious.
 
 .. code-block:: php
 
@@ -372,8 +351,9 @@ Now we need a new And-Specification to combine this in our code:
         }
     }
 
-Now take a look at our client code, assuming we import all specifications
-from a namespace ``Spec``.
+Assuming we import all specifications
+from a common namespace ``Spec``, our client code will look
+like this:
 
 .. code-block:: php
 
@@ -387,7 +367,7 @@ from a namespace ``Spec``.
         ->getRepository('\EasyBib\Api\Entity\Group')
         ->match($specification);
 
-In constrast to the criteria, we could now even go and implement
+In constrast to the criteria, we could now implement
 or and not specifications to enhance query capabilities. 
 
 Improving Specifications
@@ -463,19 +443,38 @@ Hiding this kind of composition inside another specification allows
 you to reuse query logic in different places in the application
 easily and in terms of the domain language.
 
-Testability Revisted
---------------------
+Testability of Doctrine Repositories
+------------------------------------
 
-As one of the primary goals of repositories is testability
-and abstraction of query generation, lets revist this point:
+One reasons outlined by Anne for this design is testability: Because the
+Repository returns the QueryBuilder you have access to the generated SQL.
+However testing Doctrine Repositories should never be verifying the generated
+SQL. I see alot of people doing this and it is very fragile and dangerous.
+Doctrine is a third party library and as such a rather complex one. Possible
+changes that break the test are:
 
-Testing repositories with the Specification pattern is testing
-the different specifications in isolation against a real Doctrine
-database backend. This will not be super simple to setup, but
-the isolation of specifications and their reusability  accross
-repositories actually allows us to keep the number of tests
-very small. The pattern avoids the problem of combinatorial
-explosion of test-cases very neatly.
+- Doctrine adds/removes whitespaces to SQL in a next version - Doctrine
+  performs SQL optimizations in certain cases, the result is the same though.
+  - You add a field/column to any of the tables involved that does not affect
+    the result.  - You change something in the Doctrine mapping files, that
+    leads to a reordering of SQL.
+
+These are 4 changes that have absolutly nothing to do with the feature you are
+actually testing, making the test code very fragile. In terms of abstraction
+SQL generation is an implementation detail of the Doctrine ORM and you as
+developer are only interested in the public API, which the SQL generation is
+not part of.
+
+The code should really be tested against Doctrine itself. Since you are using
+Doctrine to get rid of SQL query generation for some use-cases, why should you
+use them as measure of quality in your testing efforts. 
+
+Testing repositories with the Specification pattern is testing the different
+specifications in isolation against a real Doctrine database backend. This will
+not be super simple to setup, but the isolation of specifications and their
+reusability  accross repositories actually allows us to keep the number of
+tests very small. The pattern avoids the problem of combinatorial explosion of
+test-cases very neatly.
 
 The real benefit of testabilty is achieved in tests of repository client code.
 Before we were not able to unit-test this code, because of the Doctrine
