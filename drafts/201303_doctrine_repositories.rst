@@ -238,7 +238,7 @@ and puts the result into the ``where()`` method of the builder
 
 Stricly speaking, the ``UserSpecification`` violates the single reponsibility
 principle, which prevents the composability of specifications and reuse in
-different repositories. This is apparent by the ``$expr = "1=1`` line that is
+different repositories. This is apparent by the ``$expr = "1=1";`` line that is
 required to make the combination of conditions possible.
 Lets factor away the violation of the single
 responsibility principle by introducing three specifications:
