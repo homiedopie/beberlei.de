@@ -30,8 +30,8 @@ The problems with the approach outlined are:
 
 Generally introducing a new object such as a repository should pass the
 "`Composite is simpler than the sum of its parts
-<http://www.growing-object-oriented-software.com/toc.html>`_" rule.  However it
-also clearly demonstrates a bad abstraction. In OOP the primary goal is avoiding
+<http://www.growing-object-oriented-software.com/toc.html>`_" rule. However the
+approach also clearly demonstrates a bad abstraction. In OOP the primary goal is avoiding
 changes to affect the whole system.
 
 
