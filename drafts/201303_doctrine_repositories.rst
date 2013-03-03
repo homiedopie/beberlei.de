@@ -453,11 +453,10 @@ SQL. I see alot of people doing this and it is very fragile and dangerous.
 Doctrine is a third party library and as such a rather complex one. Possible
 changes that break the test are:
 
-- Doctrine adds/removes whitespaces to SQL in a next version - Doctrine
-  performs SQL optimizations in certain cases, the result is the same though.
-  - You add a field/column to any of the tables involved that does not affect
-    the result.  - You change something in the Doctrine mapping files, that
-    leads to a reordering of SQL.
+-  Doctrine adds/removes whitespaces to SQL in a next version
+-  Doctrine performs SQL optimizations in certain cases, the result is the same though.
+-  You add a field/column to any of the tables involved that does not affect the result.
+-  You change something in the Doctrine mapping files, that leads to a reordering of SQL.
 
 These are 4 changes that have absolutly nothing to do with the feature you are
 actually testing, making the test code very fragile. In terms of abstraction

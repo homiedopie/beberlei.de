@@ -1,5 +1,5 @@
 Dependency Injection the juicy way
-=================================
+==================================
 
 I have written on dependency injection before and `came up with a
 solution for PHP via interface
