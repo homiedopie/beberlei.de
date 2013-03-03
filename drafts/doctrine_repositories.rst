@@ -338,7 +338,7 @@ of this object, the usage is simple and obvious.
         public function match(QueryBuilder $qb, $dqlAlias)
         {
             return call_user_func_array(
-                array($qb->expr(), 'andX')
+                array($qb->expr(), 'andX'),
                 array_map(function ($specification) use ($qb, $dqlAlias) {
                     return $specification->match($qb, $dqlAlias);
                 }, $this->children
