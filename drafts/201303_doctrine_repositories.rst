@@ -435,8 +435,7 @@ a domain language for your specifications that is composed of more simple specif
 
 .. code-block:: php
 
-    $top20powerUsers = new Spec\PowerUsers($groupId, $permissions, 20);
-
+    <?php
     class PowerUsers implements Specification
     {
         private $spec;
@@ -454,6 +453,8 @@ a domain language for your specifications that is composed of more simple specif
             return $this->spec->match($qb, $dqlAlias);
         }
     }
+
+    $top20powerUsers = new Spec\PowerUsers($groupId, $permissions, 20);
 
 Hiding this kind of composition inside another specification allows
 you to reuse query logic in different places in the application
