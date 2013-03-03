@@ -431,7 +431,7 @@ a domain language for your specifications that is composed of more simple specif
     {
         private $spec;
 
-        public function __construct($groupId, $permissions, $count)
+        public function __construct()
         {
             $this->spec = new OnlyPage(1, new AndX(
                 new UsersWithInteraction(),
@@ -455,7 +455,7 @@ a domain language for your specifications that is composed of more simple specif
         }
     }
 
-    $top20powerUsers = new Spec\PowerUsers($groupId, $permissions, 20);
+    $top20powerUsers = new Spec\PowerUsers();
 
 Hiding this kind of composition inside another specification allows
 you to reuse query logic in different places in the application
