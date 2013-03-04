@@ -87,7 +87,7 @@ trigger these event handlers.
 
     <?php
 
-    class Order
+    class Order implements EventProviderInterface
     {
         use EventProvider;
 
@@ -103,13 +103,18 @@ trigger these event handlers.
         }
     }
 
+    interface EventProviderInterface
+    {
+        public function dequeueEmittedEvents();
+    }
+
 The Event provider trait aggregates all the events, and offers
 and API for external services to pull them from the entity:
 
 .. code-block:: php
 
     <?php
-    trait EventProvider implements EventProviderInterface
+    trait EventProvider
     {
         private $emittedEvents = array();
 
