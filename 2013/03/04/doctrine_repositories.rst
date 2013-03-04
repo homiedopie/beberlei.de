@@ -7,7 +7,7 @@ Over at the `easybib/dev
 Blog Anne posted an entry about their usage of Doctrine Repositories with a
 growing amount of query responsibilities. I want to respond to this blog post
 with two alternative approaches, because I have seen the easybib approach multiple
-times in different projects by different teams and think it can be approved upon alot.
+times in different projects by different teams and think it can be approved upon a lot.
 
 The problems with the approach outlined are:
 
@@ -166,7 +166,7 @@ behind a very simple API, but it fails short when:
   only solve this by having all repositories extend a base repository.
   But `Inheritance is evil <http://c2.com/cgi/wiki?ImplementationInheritanceIsEvil>`_.
 
-The `Specfication pattern <http://en.wikipedia.org/wiki/Specification_pattern>`_ solves
+The `Specification pattern <http://en.wikipedia.org/wiki/Specification_pattern>`_ solves
 this issue. There are several ways to implement it, in the spirit of refactoring I will
 approach it from our existing Criteria.
 
@@ -237,7 +237,7 @@ and puts the result into the ``where()`` method of the builder
         }
     }
 
-Stricly speaking, the ``UserSpecification`` violates the single reponsibility
+Strictly speaking, the ``UserSpecification`` violates the single responsibility
 principle, which prevents the composability of specifications and reuse in
 different repositories. This is apparent by the ``$expr = "1=1";`` line that is
 required to make the combination of conditions possible.
@@ -369,13 +369,13 @@ like this:
         ->getRepository('\EasyBib\Api\Entity\Group')
         ->match($specification);
 
-In constrast to the criteria, we could now implement
+In contrast to the criteria, we could now implement
 or and not specifications to enhance query capabilities. 
 
 Improving Specifications
 ------------------------
 
-You can now introduce reusability accross different repositories by adding
+You can now introduce reusability across different repositories by adding
 functionality to check if a specification supports a given entity.
 
 .. code-block:: php
@@ -404,7 +404,7 @@ specification in its match method:
         public function match(Specification $specification)
         {
             if ( ! $specification->supports($this->getEntityName())) {
-                throw new \InvalidArgumentExcetion("Specification not supported by this repository.");
+                throw new \InvalidArgumentException("Specification not supported by this repository.");
             }
 
             $qb = $this->createQueryBuilder('r');
@@ -465,7 +465,7 @@ Testability of Doctrine Repositories
 One reasons outlined by Anne for this design is testability: Because the
 Repository returns the QueryBuilder you have access to the generated SQL.
 However testing Doctrine Repositories should never be verifying the generated
-SQL. I see alot of people doing this and it is very fragile and dangerous.
+SQL. I see a lot of people doing this and it is very fragile and dangerous.
 Doctrine is a third party library and as such a rather complex one. Possible
 changes that break the test are:
 
@@ -474,7 +474,7 @@ changes that break the test are:
 -  You add a field/column to any of the tables involved that does not affect the result.
 -  You change something in the Doctrine mapping files, that leads to a reordering of SQL.
 
-These are 4 changes that have absolutly nothing to do with the feature you are
+These are 4 changes that have absolutely nothing to do with the feature you are
 actually testing, making the test code very fragile. In terms of abstraction
 SQL generation is an implementation detail of the Doctrine ORM and you as
 developer are only interested in the public API, which the SQL generation is
@@ -487,11 +487,11 @@ use them as measure of quality in your testing efforts.
 Testing repositories with the Specification pattern is testing the different
 specifications in isolation against a real Doctrine database backend. This will
 not be super simple to setup, but the isolation of specifications and their
-reusability  accross repositories actually allows us to keep the number of
+reusability across repositories actually allows us to keep the number of
 tests very small. The pattern avoids the problem of combinatorial explosion of
 test-cases very neatly.
 
-The real benefit of testabilty is achieved in tests of repository client code.
+The real benefit of testability is achieved in tests of repository client code.
 Before we were not able to unit-test this code, because of the Doctrine
 EntityManager, Query + QueryBuilder dependencies.  Now We can inject the
 repositories into our controllers and services and then use mock objects in the
