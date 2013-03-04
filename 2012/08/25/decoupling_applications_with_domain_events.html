@@ -154,7 +154,7 @@ and trigger observing event handlers. However if the operation fails, we do not
 trigger these event handlers.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">class</span> <span class="nc">Order</span>
+<span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
 <span class="p">{</span>
     <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
 
@@ -169,12 +169,17 @@ trigger these event handlers.</p>
         <span class="p">)));</span>
     <span class="p">}</span>
 <span class="p">}</span>
+
+<span class="k">interface</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>The Event provider trait aggregates all the events, and offers
 and API for external services to pull them from the entity:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">trait</span> <span class="nx">EventProvider</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
+<span class="nx">trait</span> <span class="nx">EventProvider</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
 
