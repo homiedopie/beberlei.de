@@ -93,7 +93,7 @@ The implementation would look like this:
 
     private function matchGroup($qb, $criteria)
     {
-        $qb->where('u.group = :group')->setParameter(1, $criteria->groupId);
+        $qb->where('u.group = :group')->setParameter('group', $criteria->groupId);
     }
 
 The benefit here is, that we can add additional conditions and processing
@@ -187,11 +187,11 @@ code to use expressions that can be composed.
         {
             $expr = "1=1";
 
-            if ($criteria->groupId !== null) {
+            if ($this->groupId !== null) {
                 $expr = $qb->expr()->and($expr, $this->matchGroup($qb));
             }
 
-            if ($criteria->permissions !== null) {
+            if ($this->permissions !== null) {
                 $expr = $qb->expr()->and($expr, $this->matchPermissions($qb));
             }
 
