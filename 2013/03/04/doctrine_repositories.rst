@@ -93,7 +93,7 @@ The implementation would look like this:
 
     private function matchGroup($qb, $criteria)
     {
-        $qb->where('u.group = :group')->setParameter(1, $criteria->groupId);
+        $qb->where('u.group = :group')->setParameter('group', $criteria->groupId);
     }
 
 The benefit here is, that we can add additional conditions and processing
