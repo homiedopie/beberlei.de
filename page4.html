@@ -82,6 +82,77 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 07, 2009</span> 
+        </div>
+        <div class="section" id="seven-things">
+<h1><a href="2009/01/07/seven-things.html">Seven Things</a></h1>
+<p>I have been tagged by
+<a class="reference external" href="http://dolfschimmel.freeaqingme.com/?p=78">Freeaqingme</a> and the blog
+letter machinery. So read on for seven things you probably may not know
+about me.</p>
+<ul class="simple">
+<li>I will get my degree in some weeks, currently intensively writting on
+my thesis. My major is economics though. I probably won’t get a job
+with that sooner or later. I actually don’t want to, I have a job as
+programmer already.</li>
+<li>One christmas many years ago (Pentium PCs to 200Mhz were the coolest
+thing around) i wished and wished for a computer for playing Command
+and Conquer and stuff. What i got was a 3/86 i could only run crap
+with. So i had to start programming.</li>
+<li>In 11th grade (7 years ago) I took part in the german computer
+science olympics (<a class="reference external" href="http://www.bwinf.de/uploads/media/bwi20/runde1/20bwinf.pdf">exercise still
+online</a>)
+using PHP and writing thousands of lines of nested aray and for loop
+code and print the solution to the browser. No need to say I utterly
+failed, because I didn’t know a bit about algorithms, pointers and
+objects at all.</li>
+<li>I have only learned about what good programming practices are (OO,
+functional, whatever) really means in the last two years, spending
+almost every free minute of those many i had on projects to test
+around with patterns and programming styles.</li>
+<li>I went to my first conference last year september, the IPC in Mainz,
+getting to know lots of great people in the community.</li>
+<li>I don’t have a license at all (<a class="reference external" href="http://blog.libssh2.org/index.php?/archives/122-Seven-Things.html">Reference to
+Sara</a>).
+I am afraid of driving cars, although I drive my bike through the
+biggest crossroads in town like nuts.</li>
+<li>I am a timeline oriented reader, having made me masterplans to read
+both all the Discworld and Ian Rankin novels in the correct order to
+not miss a single reference.</li>
+</ul>
+<p>Its sad that everyone I would want to tag was already tagged by someone
+else, still for the head count:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weierophinney</a>, because
+he helped me understand Zend Framework alot.</li>
+<li><a class="reference external" href="http://www.dasprids.de/">Ben Scholzen</a>, because he is a fun guy to
+be around <strong>#zftalk.dev</strong>.</li>
+<li><a class="reference external" href="http://www.thomasweidner.com/flatpress/">Thomas Weidner</a>, because
+I like his dedication towards his ZF components.</li>
+<li><a class="reference external" href="http://kore-nordmann.de/blog.html">Kore Nordmann</a>, Bastian Feder
+and Thomas Weinert, because I had great discussions with him on IPC.</li>
+<li><a class="reference external" href="http://codeutopia.net/blog/">zomg aka Jani</a> because of his skills
+to be referenced by PHPDeveloper.org (joke) and the good IRC
+discussions.</li>
+<li><a class="reference external" href="http://blogs.sun.com/netbeansphp/">Petr Pisl</a> because of the
+awesome NetBeans PHP support.</li>
+</ul>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/07/seven-things.html#disqus_thread" data-disqus-identifier="2009/01/07/seven-things">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>March 11, 2009</span> 
         </div>
         <div class="section" id="using-zend-soap-server-and-autodiscover-in-a-controller">
@@ -777,65 +848,6 @@ administration.</li>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/05/25/introducing-zend-controller-scaffolding.html#disqus_thread" data-disqus-identifier="2008/05/25/introducing-zend-controller-scaffolding">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>May 18, 2008</span> 
-        </div>
-        <div class="section" id="my-2-cents-on-zend-search-lucene-update-problems">
-<h1><a href="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a></h1>
-<p><a class="reference external" href="http://framework.zend.com">Zend_Search_Lucene</a> (or Lucene in
-general) does not support an update statement, therefore we must check
-via find() if a specific article that should be updated already exists.</p>
-<p>Numerous solutions exist for this problem (<a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">for example this PDF
-Tutorial by a Zend
-Programmer</a>).
-Mine looks as follows. The first thing is to Set an Analyzer other from
-the default one. The Default Analyzer only looks at letters, not at
-numbers.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
-    Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
-);
-$index = Zend_Search_Lucene::open('/path/to/index/directory');</pre>
-</div>
-</div></blockquote>
-<p>We can now save an identifier containing letters and numbers, for
-example the md5 string of the Article Database ID.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$doc = new Zend_Search_Lucene_Document();
-$field = Zend_Search_Lucene_Field::Keyword('id', md5($data['id']));
-$doc-&gt;addField($field);
-$index-&gt;addDocument($doc);</pre>
-</div>
-</div></blockquote>
-<p>Before updating an entry you have to delete any entry that has been
-indexed before:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$hits = $index-&gt;find('id:'.md5($articleID));
-foreach($hits AS $hit) {
-    $index-&gt;delete($hit-&gt;id);
-}</pre>
-</div>
-</div></blockquote>
-<p>The <a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">Tutorial Talk on Search
-Lucene</a>
-(given above) uses an extended version of this delete routine snippet
-that also checks if an article is up to date and does not have to be
-reindexed and deletes multiple entries of one article.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html#disqus_thread" data-disqus-identifier="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -882,6 +894,9 @@ reindexed and deletes multiple entries of one article.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
         </li>
         <li class="recent_post">
@@ -907,9 +922,6 @@ reindexed and deletes multiple entries of one article.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
         </li>
     </ul>
 </div>

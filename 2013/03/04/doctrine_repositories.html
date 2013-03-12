@@ -33,6 +33,7 @@
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
     <link rel="next" title="Extending Symfony2: ParamConverter" href="../../02/19/extending_symfony2__paramconverter.html" />
+    <link rel="prev" title="Code &amp; Coffee Bonn" href="../12/code_coffee_bonn.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
   <body>
@@ -69,6 +70,9 @@
     
     <div class="related">
         <ul>
+            <li>
+                 &laquo; <a href="../12/code_coffee_bonn.html">Code &amp; Coffee Bonn</a>
+            </li>
             <li class="right">
                 <a href="../../02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a> &raquo; 
             </li>
@@ -84,7 +88,7 @@
 Blog Anne posted an entry about their usage of Doctrine Repositories with a
 growing amount of query responsibilities. I want to respond to this blog post
 with two alternative approaches, because I have seen the easybib approach multiple
-times in different projects by different teams and think it can be approved upon alot.</p>
+times in different projects by different teams and think it can be approved upon a lot.</p>
 <p>The problems with the approach outlined are:</p>
 <ul>
 <li><p class="first">The Repository API does not hide implementation details of the ORM,
@@ -157,7 +161,7 @@ The implementation would look like this:</p>
 
 <span class="k">private</span> <span class="k">function</span> <span class="nf">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$criteria</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;u.group = :group&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span><span class="p">);</span>
+    <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;u.group = :group&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -222,7 +226,7 @@ have similar conditions, limit or ordering requirements then you can
 only solve this by having all repositories extend a base repository.
 But <a class="reference external" href="http://c2.com/cgi/wiki?ImplementationInheritanceIsEvil">Inheritance is evil</a>.</li>
 </ul>
-<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Specification_pattern">Specfication pattern</a> solves
+<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Specification_pattern">Specification pattern</a> solves
 this issue. There are several ways to implement it, in the spirit of refactoring I will
 approach it from our existing Criteria.</p>
 <p>Lets move the QueryBuilder code from the repository, into the Criteria object and
@@ -239,11 +243,11 @@ code to use expressions that can be composed.</p>
     <span class="p">{</span>
         <span class="nv">$expr</span> <span class="o">=</span> <span class="s2">&quot;1=1&quot;</span><span class="p">;</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
             <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
             <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchPermissions</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
         <span class="p">}</span>
 
@@ -288,7 +292,7 @@ and puts the result into the <tt class="docutils literal"><span class="pre">wher
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Stricly speaking, the <tt class="docutils literal"><span class="pre">UserSpecification</span></tt> violates the single reponsibility
+<p>Strictly speaking, the <tt class="docutils literal"><span class="pre">UserSpecification</span></tt> violates the single responsibility
 principle, which prevents the composability of specifications and reuse in
 different repositories. This is apparent by the <tt class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">&quot;1=1&quot;;</span></tt> line that is
 required to make the combination of conditions possible.
@@ -414,12 +418,12 @@ like this:</p>
     <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$specification</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In constrast to the criteria, we could now implement
+<p>In contrast to the criteria, we could now implement
 or and not specifications to enhance query capabilities.</p>
 </div>
 <div class="section" id="improving-specifications">
 <h2>Improving Specifications</h2>
-<p>You can now introduce reusability accross different repositories by adding
+<p>You can now introduce reusability across different repositories by adding
 functionality to check if a specification supports a given entity.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Specification</span>
@@ -443,7 +447,7 @@ specification in its match method:</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$specification</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">supports</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEntityName</span><span class="p">()))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentExcetion</span><span class="p">(</span><span class="s2">&quot;Specification not supported by this repository.&quot;</span><span class="p">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentException</span><span class="p">(</span><span class="s2">&quot;Specification not supported by this repository.&quot;</span><span class="p">);</span>
         <span class="p">}</span>
 
         <span class="nv">$qb</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
@@ -502,7 +506,7 @@ easily and in terms of the domain language.</p>
 <p>One reasons outlined by Anne for this design is testability: Because the
 Repository returns the QueryBuilder you have access to the generated SQL.
 However testing Doctrine Repositories should never be verifying the generated
-SQL. I see alot of people doing this and it is very fragile and dangerous.
+SQL. I see a lot of people doing this and it is very fragile and dangerous.
 Doctrine is a third party library and as such a rather complex one. Possible
 changes that break the test are:</p>
 <ul class="simple">
@@ -511,7 +515,7 @@ changes that break the test are:</p>
 <li>You add a field/column to any of the tables involved that does not affect the result.</li>
 <li>You change something in the Doctrine mapping files, that leads to a reordering of SQL.</li>
 </ul>
-<p>These are 4 changes that have absolutly nothing to do with the feature you are
+<p>These are 4 changes that have absolutely nothing to do with the feature you are
 actually testing, making the test code very fragile. In terms of abstraction
 SQL generation is an implementation detail of the Doctrine ORM and you as
 developer are only interested in the public API, which the SQL generation is
@@ -522,10 +526,10 @@ use them as measure of quality in your testing efforts.</p>
 <p>Testing repositories with the Specification pattern is testing the different
 specifications in isolation against a real Doctrine database backend. This will
 not be super simple to setup, but the isolation of specifications and their
-reusability  accross repositories actually allows us to keep the number of
+reusability across repositories actually allows us to keep the number of
 tests very small. The pattern avoids the problem of combinatorial explosion of
 test-cases very neatly.</p>
-<p>The real benefit of testabilty is achieved in tests of repository client code.
+<p>The real benefit of testability is achieved in tests of repository client code.
 Before we were not able to unit-test this code, because of the Doctrine
 EntityManager, Query + QueryBuilder dependencies.  Now We can inject the
 repositories into our controllers and services and then use mock objects in the
@@ -591,6 +595,9 @@ tests.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="../12/code_coffee_bonn.html">Code & Coffee Bonn</a>
+        </li>
+        <li class="recent_post">
             <a href="#">On Taming Repository Classes in Doctrine</a>
         </li>
         <li class="recent_post">
@@ -616,9 +623,6 @@ tests.</p>
         </li>
         <li class="recent_post">
             <a href="../../../2012/08/26/froscon_2012.html">FrOSCon 2012</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
         </li>
     </ul>
 </div>

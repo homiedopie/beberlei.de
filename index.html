@@ -78,6 +78,39 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>March 12, 2013</span> 
+        </div>
+        <div class="section" id="code-coffee-bonn">
+<h1><a href="2013/03/12/code_coffee_bonn.html">Code &amp; Coffee Bonn</a></h1>
+<p>On last years <a class="reference external" href="http://www.socrates-conference.de/">SoCraTes Conference</a> I had
+the pleasure to meet <a class="reference external" href="https://twitter.com/sandromancuso">Sandro Mancuso</a> from
+the London Software Craftsmanship Community (LSCC). Following his Twitter
+account I stumbled upon a meetup concept called “Code &amp; Coffee” which the LSCC
+organizes very regularly. At a “Code &amp; Coffee” developers would meet up early
+in the morning before work to discuss and hack at some coffee place.</p>
+<p>I liked the idea very much and started such an event in Bonn. Our first
+test-event was a success, so that we now open up the concept to anyone who
+wants to join.</p>
+<p>There is a <a class="reference external" href="https://plus.google.com/u/0/communities/118268893445703199868">Google+ Community Code &amp; Coffee Bonn</a> where you can
+join and get regular invites to the events.</p>
+<p>Our next event is on March 26th. For more details see the Google+ page.</p>
+<p>Looking forward to seeing you there!</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/03/12/code_coffee_bonn.html#disqus_thread" data-disqus-identifier="2013/03/12/code_coffee_bonn">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>March 04, 2013</span> 
         </div>
         <div class="section" id="on-taming-repository-classes-in-doctrine">
@@ -86,7 +119,7 @@
 Blog Anne posted an entry about their usage of Doctrine Repositories with a
 growing amount of query responsibilities. I want to respond to this blog post
 with two alternative approaches, because I have seen the easybib approach multiple
-times in different projects by different teams and think it can be approved upon alot.</p>
+times in different projects by different teams and think it can be approved upon a lot.</p>
 <p>The problems with the approach outlined are:</p>
 <ul>
 <li><p class="first">The Repository API does not hide implementation details of the ORM,
@@ -159,7 +192,7 @@ The implementation would look like this:</p>
 
 <span class="k">private</span> <span class="k">function</span> <span class="nf">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$criteria</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">'u.group = :group'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span><span class="p">);</span>
+    <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">'u.group = :group'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">'group'</span><span class="p">,</span> <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -224,7 +257,7 @@ have similar conditions, limit or ordering requirements then you can
 only solve this by having all repositories extend a base repository.
 But <a class="reference external" href="http://c2.com/cgi/wiki?ImplementationInheritanceIsEvil">Inheritance is evil</a>.</li>
 </ul>
-<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Specification_pattern">Specfication pattern</a> solves
+<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Specification_pattern">Specification pattern</a> solves
 this issue. There are several ways to implement it, in the spirit of refactoring I will
 approach it from our existing Criteria.</p>
 <p>Lets move the QueryBuilder code from the repository, into the Criteria object and
@@ -241,11 +274,11 @@ code to use expressions that can be composed.</p>
     <span class="p">{</span>
         <span class="nv">$expr</span> <span class="o">=</span> <span class="s2">&quot;1=1&quot;</span><span class="p">;</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
             <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
             <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchPermissions</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
         <span class="p">}</span>
 
@@ -290,7 +323,7 @@ and puts the result into the <tt class="docutils literal"><span class="pre">wher
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Stricly speaking, the <tt class="docutils literal"><span class="pre">UserSpecification</span></tt> violates the single reponsibility
+<p>Strictly speaking, the <tt class="docutils literal"><span class="pre">UserSpecification</span></tt> violates the single responsibility
 principle, which prevents the composability of specifications and reuse in
 different repositories. This is apparent by the <tt class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">&quot;1=1&quot;;</span></tt> line that is
 required to make the combination of conditions possible.
@@ -416,12 +449,12 @@ like this:</p>
     <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$specification</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In constrast to the criteria, we could now implement
+<p>In contrast to the criteria, we could now implement
 or and not specifications to enhance query capabilities.</p>
 </div>
 <div class="section" id="improving-specifications">
 <h2>Improving Specifications</h2>
-<p>You can now introduce reusability accross different repositories by adding
+<p>You can now introduce reusability across different repositories by adding
 functionality to check if a specification supports a given entity.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Specification</span>
@@ -445,7 +478,7 @@ specification in its match method:</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$specification</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">supports</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEntityName</span><span class="p">()))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentExcetion</span><span class="p">(</span><span class="s2">&quot;Specification not supported by this repository.&quot;</span><span class="p">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentException</span><span class="p">(</span><span class="s2">&quot;Specification not supported by this repository.&quot;</span><span class="p">);</span>
         <span class="p">}</span>
 
         <span class="nv">$qb</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">(</span><span class="s1">'r'</span><span class="p">);</span>
@@ -504,7 +537,7 @@ easily and in terms of the domain language.</p>
 <p>One reasons outlined by Anne for this design is testability: Because the
 Repository returns the QueryBuilder you have access to the generated SQL.
 However testing Doctrine Repositories should never be verifying the generated
-SQL. I see alot of people doing this and it is very fragile and dangerous.
+SQL. I see a lot of people doing this and it is very fragile and dangerous.
 Doctrine is a third party library and as such a rather complex one. Possible
 changes that break the test are:</p>
 <ul class="simple">
@@ -513,7 +546,7 @@ changes that break the test are:</p>
 <li>You add a field/column to any of the tables involved that does not affect the result.</li>
 <li>You change something in the Doctrine mapping files, that leads to a reordering of SQL.</li>
 </ul>
-<p>These are 4 changes that have absolutly nothing to do with the feature you are
+<p>These are 4 changes that have absolutely nothing to do with the feature you are
 actually testing, making the test code very fragile. In terms of abstraction
 SQL generation is an implementation detail of the Doctrine ORM and you as
 developer are only interested in the public API, which the SQL generation is
@@ -524,10 +557,10 @@ use them as measure of quality in your testing efforts.</p>
 <p>Testing repositories with the Specification pattern is testing the different
 specifications in isolation against a real Doctrine database backend. This will
 not be super simple to setup, but the isolation of specifications and their
-reusability  accross repositories actually allows us to keep the number of
+reusability across repositories actually allows us to keep the number of
 tests very small. The pattern avoids the problem of combinatorial explosion of
 test-cases very neatly.</p>
-<p>The real benefit of testabilty is achieved in tests of repository client code.
+<p>The real benefit of testability is achieved in tests of repository client code.
 Before we were not able to unit-test this code, because of the Doctrine
 EntityManager, Query + QueryBuilder dependencies.  Now We can inject the
 repositories into our controllers and services and then use mock objects in the
@@ -1367,164 +1400,6 @@ to the next FrOSCon 2013.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/08/26/froscon_2012.html#disqus_thread" data-disqus-identifier="2012/08/26/froscon_2012">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>August 25, 2012</span> 
-        </div>
-        <div class="section" id="decoupling-applications-with-domains-events">
-<h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
-<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
-I have described 3 architectural patterns for business applications. Applying
-them to your software helps you decouple the business logic from the
-application/framework/UI. However given sufficient complexity, you will want to
-decouple different parts of your business model from each other as well.</p>
-<p>As an example, lets think of a batch process in your application that updates
-orders from a CRM or logistics system:</p>
-<ul class="simple">
-<li>You receive an XML with full users and order representations</li>
-<li>You need to update certain user fields</li>
-<li>You need to update certain order fields</li>
-<li>Some orders require creating accounts in different remote systems</li>
-<li>If the user has not confirmed his email yet he should receive an opt-in
-mail instead.</li>
-<li>If the user confirms his opt-in mail, all outstanding remote accounts are
-created.</li>
-</ul>
-<p>You can build all the steps into a single batch processing service. This will
-be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
-principle</a>.</p>
-<p>the part with updating of users and fields has nothing to with the sending of
-mails and creation of remote accounts.  We want to decouple them from each
-other.</p>
-<p>The first obvious choice is to decouple them into distinct services:</p>
-<ul class="simple">
-<li>Import Service</li>
-<li>Authentication Service</li>
-<li>Account Generation Service</li>
-</ul>
-<p>All these services have dependencies on infrastructure objects, database,
-mailer and so on. We could inject the authentication and account generation
-services into the Import Service, but with rising complexity this will lead to
-a lasagna of services and the execution path will dig deep into this and this
-is not nearly as tasty as eating real lasagna.</p>
-<div class="highlight-python"><pre>ImportService
-|_AuthenticationService
-| |_Mailer
-| |_Database
-|_AccountGenerationService
-| |_Database
-| \_RemoteFacade
-\_Database</pre>
-</div>
-<p>This becomes more complicated when transaction semantics need to be taken care
-of. For example dependencies between mailer and database services. Also you
-have to take into account that the code in entities and value objects
-participating in this use-case.</p>
-<p>What we want instead is a sequential execution of those nested services, but
-only if the parent service executed successfully:</p>
-<div class="highlight-python"><pre>ImportService
-\_Database
-
-AuthenticationService
-|_Mailer
-\_Database
-
-AccountGenerationService
-|_Database
-\_RemoteFacade</pre>
-</div>
-<p>We could use an event dispatcher in all of the services to notify each other,
-but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
-cleaner way:</p>
-<p>Every entity is an event provider and can emit events. Whenever a transaction
-is committed and an hence an operation is completed successfully, we take all
-the events emitted from all entities (looking at the identity map for example)
-and trigger observing event handlers. However if the operation fails, we do not
-trigger these event handlers.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// 1. do something with $data</span>
-
-        <span class="c1">// 2. raise event</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-            <span class="s2">&quot;id&quot;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
-            <span class="s2">&quot;data&quot;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
-        <span class="p">)));</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">interface</span> <span class="nx">EventProviderInterface</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The Event provider trait aggregates all the events, and offers
-and API for external services to pull them from the entity:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">trait</span> <span class="nx">EventProvider</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Our infrastructure must then trigger event handlers, based
-on the event names. It will use <tt class="docutils literal"><span class="pre">dequeueEmittedEvents</span></tt> and making
-sure the events are not emitted multiple times.</p>
-<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
-<ul class="simple">
-<li>Command executes</li>
-<li>Entities emit events</li>
-<li>Command transaction succeeds</li>
-<li>Events trigger event handlers</li>
-<li>Event handlers execute more commands</li>
-<li>Restart from 1.</li>
-</ul>
-<p>With this approach we can decouple all services from each other and avoid
-deep nesting in each other. Yet we still have transactional dependencies,
-by dropping all events when the parent command fails. Transactions over
-multiple commands will not have ACID properties though, instead you will have
-to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
-that are important in systems with eventual consistency. This is one downside
-that you need to take into account.</p>
-<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
-implementation of DomainEvent and EventProvider classes and integration into
-Symfony and Doctrine ORM. Generally this pattern is very easy to implement
-though, so that you can just have a look at the implementation and take the
-best parts for your own.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html#disqus_thread" data-disqus-identifier="2012/08/25/decoupling_applications_with_domain_events">Leave a comment</a>
         </div>
     </div>
     

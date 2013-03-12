@@ -82,6 +82,65 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>May 18, 2008</span> 
+        </div>
+        <div class="section" id="my-2-cents-on-zend-search-lucene-update-problems">
+<h1><a href="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a></h1>
+<p><a class="reference external" href="http://framework.zend.com">Zend_Search_Lucene</a> (or Lucene in
+general) does not support an update statement, therefore we must check
+via find() if a specific article that should be updated already exists.</p>
+<p>Numerous solutions exist for this problem (<a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">for example this PDF
+Tutorial by a Zend
+Programmer</a>).
+Mine looks as follows. The first thing is to Set an Analyzer other from
+the default one. The Default Analyzer only looks at letters, not at
+numbers.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
+    Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
+);
+$index = Zend_Search_Lucene::open('/path/to/index/directory');</pre>
+</div>
+</div></blockquote>
+<p>We can now save an identifier containing letters and numbers, for
+example the md5 string of the Article Database ID.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$doc = new Zend_Search_Lucene_Document();
+$field = Zend_Search_Lucene_Field::Keyword('id', md5($data['id']));
+$doc-&gt;addField($field);
+$index-&gt;addDocument($doc);</pre>
+</div>
+</div></blockquote>
+<p>Before updating an entry you have to delete any entry that has been
+indexed before:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$hits = $index-&gt;find('id:'.md5($articleID));
+foreach($hits AS $hit) {
+    $index-&gt;delete($hit-&gt;id);
+}</pre>
+</div>
+</div></blockquote>
+<p>The <a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">Tutorial Talk on Search
+Lucene</a>
+(given above) uses an extended version of this delete routine snippet
+that also checks if an article is up to date and does not have to be
+reindexed and deletes multiple entries of one article.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html#disqus_thread" data-disqus-identifier="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>May 17, 2008</span> 
         </div>
         <div class="section" id="integrated-zend-layout-into-this-blog">
@@ -583,200 +642,6 @@ $this-&gt;variable. I haven’t tested this though.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html#disqus_thread" data-disqus-identifier="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>June 24, 2008</span> 
-        </div>
-        <div class="section" id="teaching-zend-form-some-mvc">
-<h1><a href="2008/06/24/teaching-zend-form-some-mvc.html">Teaching Zend_Form some MVC</a></h1>
-<p>Lots of people complain that Zend Form runs counter to the MVC spirit,
-because it handles validation, business logic and view elements all in
-one acting as Model, Controller and View.</p>
-<p>Extending the Zend Form component to handle all this different aspects
-in different layers of the application is rather easy though. What we
-want of a MVC compatible Form object is the following:</p>
-<ul class="simple">
-<li>The <strong>model</strong> escapes and validates all the data that is put into the
-form.</li>
-<li>The <strong>view</strong> decides on how the form is displayed.</li>
-<li>The <strong>controller</strong> moves data from the model to the view and back,
-handling the stages of the form request.</li>
-</ul>
-<p>The first step is, <strong>allowing any Model that implements
-Zend_Validator_Interface to hook into the Zend_Form Validation
-process</strong>. We generate a new class, WW_Form_Mvc and allow a function
-setModel() to insert any Model object that implements
-Zend_Validator_Interface into the form. We extend isValid(),
-getMessages() and getErrors() to not only check all the form elements
-validators, but also the models validators. Please note that the
-array_merge() solution is not the correct way of how this snippet
-should work. Any merge operation of the messages and errors has to be on
-a field key level, which is not currently done.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WW_Form_Mvc extends Zend_Form
-{
-    protected $model = null;
-
-    /**
-     * Extends isValid() method of Zend Form to check for validity of specified model
-     * @param Array $data
-     * @return Boolean
-     */
-    public function isValid($data)
-    {
-        $valid = parent::isValid($data);
-
-        if($valid == true &amp;&amp; !is_null($model)) {
-            $valid = $this-&gt;model-&gt;isValid($data) &amp;&amp; $valid;
-        }
-        return $valid;
-    }
-
-    /**
-     * Extends getMessages() Validator Interface implementation of Zend Form to also
-     * return the messages of the Model validation.
-     * @return Array
-     */
-    public function getMessages($name = null, $suppressArrayNotation = false)
-    {
-        $messages = parent::getMessages($name, $suppressArrayNotation);
-
-        if(!is_null($model)) {
-             $form_messages = $this-&gt;model-&gt;getMessages();
-
-             $messages = array_merge($messages, $form_messages);
-        }
-
-        return $messages;
-    }
-
-    /**
-     * Extends getErrors() Validator Interface implementation of Zend Form to also
-     * return the errors of the Model validation.
-     * @return Array
-     */
-    public function getErrors($name = null)
-    {
-         $messages = parent::getErrors($name);
-
-        if(!is_null($model)) {
-             $form_messages = $this-&gt;model-&gt;getErrors();
-
-             $messages = array_merge($messages, $form_messages);
-        }
-
-        return $messages;
-    }
-
-    /**
-     * Set a Model object, which has to implement Zend_Validate_Interface
-     * @throws Zend_Exception
-     */
-    public function setModel($model)
-    {
-        if($model instanceof Zend_Validate_Interface) {
-            $this-&gt;model = $model;
-        } else {
-             throw new Zend_Exception('WW_Form_Mvc expects a model of type Zend_Validate_Interface');
-        }
-    }
-}</pre>
-</div>
-<p>We then extend the WW_Form_Mvc class to disable the automatic
-loading of decorators in the Constructor and additionally allow to
-pass a Model to the constructor as second argument:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WW_Form_Mvc
-{
-    protected $model = null;
-
-    /**
-     * this overrides the original Zend_Form Constructor and skips
-     * the decorator initialisation, because this is now being handled
-     * by View Helpers
-     */
-    public function __construct($options=null, $model=null)
-    {
-        if (is_array($options)) {
-            $this-&gt;setOptions($options);
-        } elseif ($options instanceof Zend_Config) {
-            $this-&gt;setConfig($options);
-        }
-
-        // Extensions...
-        $this-&gt;init();
-
-        if(!is_null($model)) {
-             $this-&gt;setModel($model);
-        }
-    }
-
-    // All the other stuff here
-}</pre>
-</div>
-</div></blockquote>
-<p>In our views we want to <strong>use helper methods to manage the
-displaying of the form</strong>. For each different style of form
-displaying, we can generate different helpers. For example a helper
-that would only apply the default decorators would look like this:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class WW_View_Helper_FormDefault
-{
-    /**
-     * Load only default decorators on this Zend_Form object
-     *
-     * @param Zend_Form $form
-     */
-    public function formDefault(Zend_Form $form)
-    {
-        if($form instanceof Zend_Form) {
-            $form-&gt;loadDefaultDecorators();
-            return $form;
-        }
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>We can now use this helper and in any template say: &lt;?=
-$this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
-controller action that implements this form and we will see that it
-does not look different from what we would have done before:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>function formAction()
-{
-    $model = new SomeModel();
-
-    $form = new WW_Form_Mvc();
-    $form-&gt;setModel($model);
-
-    // generate form here, adding elements and stuff
-
-    if($form-&gt;isValid($_POST)) {
-        $model-&gt;insert($form-&gt;getValues());
-        $this-&gt;view-&gt;form = &quot;Form was submitted!&quot;;
-    } else {
-        $this-&gt;view-&gt;form = $form;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Isnt that nice? Now each part of the equation is doing what its
-supposed to do.</p>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/24/teaching-zend-form-some-mvc.html#disqus_thread" data-disqus-identifier="2008/06/24/teaching-zend-form-some-mvc">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -823,6 +688,9 @@ supposed to do.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
         </li>
         <li class="recent_post">
@@ -848,9 +716,6 @@ supposed to do.</p>
         </li>
         <li class="recent_post">
             <a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
         </li>
     </ul>
 </div>
