@@ -2,22 +2,25 @@ Bounded Contexts
 ================
 
 I regularly fall into the same trap with applications, by thinking of the one
-model that unifies all the use-cases and allows to solve every problem. This is
-a natural human trait to find the one puzzle piece that connects everything.
-However in software design there is a case to be made for the separation of
-different contexts. Eric Evans described this in detail in his `"Bounded
-Context" <http://domaindrivendesign.org/node/91/>`_ pattern in Domain Driven
-Design. According to an interview with Evans I read, he considers it
-the most important pattern in the whole book.
+model that unifies all the use-cases and allows to solve every problem. From
+talking to other developers I know that I am not the only one making this
+mistake.
 
-The essence of this architectural pattern is, that it makes sense to separate
-different parts of an application and develop different models, when they have
-different contexts. The goal is to simplify the different parts and free us
-from the burden of finding that one model that fits all use cases. Those
-different application parts talk to each other through their public APIs, maybe
-even seperated by a protocol such as HTTP.
+It is propably a human trait, trying to find the one puzzle piece that
+connects everything. However in software design there is a case to be made for
+the separation of different contexts. Eric Evans described this in detail in
+his `"Bounded Context" <http://domaindrivendesign.org/node/91/>`_ pattern in
+Domain Driven Design. According to an interview with Evans I read, he considers
+it the most important pattern in the whole book.
 
-We should remember this pattern more often when doing application design.
+The essence of this strategic pattern is to embrance the separation of
+different parts of an application and develop different models, when the parts
+have different contexts. The goal is simplication and freeing us from the
+burden of finding that one model that fits all use cases. Those different
+application parts talk to each other through their public APIs, maybe even
+seperated by a protocol such as HTTP.
+
+We should remember this pattern more often when designing applications.
 
 It is much less awkward to have some parts of the model reimplemented for
 different purposes than creating God objects that try to unify everything,
@@ -53,7 +56,9 @@ Another drawback might be necessary synchronization between contexts.  One way
 to solve this in your application is the `Domain Event
 <http://martinfowler.com/eaaDev/DomainEvent.html>`_ pattern that integrates
 nicelly into Domain Driven Design and simplifies the synchronization with other
-parts of an application.
+parts of an application. You can solve this by cleanly separating data of the 
+same entity into the different contexts as well and using a correlation id
+to connect them.
 
 .. author:: default
 .. categories:: none
