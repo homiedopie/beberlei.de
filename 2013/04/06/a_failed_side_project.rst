@@ -58,7 +58,7 @@ Today I took the day to migrate the Doctrine Pull Request workflow to a
 `simple hardcoded application <https://github.com/beberlei/githubpr_to_jira>`_
 and disabled my projects website entirely.
 
-I want to use this moment to share my personal lessons learnt:
+I want to use this moment to share my personal lessons learned:
 
 - Choosing a scope that allows you to finish a working prototype within 1-2 months
   is an important key to success.
@@ -94,7 +94,7 @@ I want to use this moment to share my personal lessons learnt:
   time to implement them. When they do, execution is even more important than
   the idea itself.
 
-What are your lessons learnt from failed side projects? I would be happy to
+What are your lessons learned from failed side projects? I would be happy to
 hear other stories.
 
 .. author:: default
