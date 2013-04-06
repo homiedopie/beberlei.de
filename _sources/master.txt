@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/04/06/a_failed_side_project
    2013/03/12/code_coffee_bonn
    2013/03/04/doctrine_repositories
    2013/02/19/extending_symfony2__paramconverter

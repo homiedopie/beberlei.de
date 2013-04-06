@@ -1,0 +1,266 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Lessons learned: A failed side project &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Code &amp; Coffee Bonn" href="../../03/12/code_coffee_bonn.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2013-04-06-a_failed_side_project">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../03/12/code_coffee_bonn.html">Code &amp; Coffee Bonn</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>April 06, 2013</span> 
+        </div>
+    <div class="section" id="lessons-learned-a-failed-side-project">
+<h1>Lessons learned: A failed side project</h1>
+<p>Side projects have always been an important part of how I learn new skills and
+technologies. This usually ends with me dumping some prototype on <a class="reference external" href="https://github.com/beberlei?tab=repositories">Github</a>, sometimes even with an open
+source project that I commit to maintain over a long time.</p>
+<p>Two years ago, for the first time, I pursued a project idea which should
+not be open-source but a commercial SAAS product. It grew out of the
+<a class="reference external" href="http://www.doctrine-project.org">Doctrine</a> teams desire to synchronize
+Github Pull Requests with our Jira instance: A workflow engine for HTTP
+services. <a class="reference external" href="https://ifttt.com/">If this, then that (IFTTT)</a> already existed at
+that point, but was far too limited for my use-case. I wanted something to
+allow:</p>
+<ul class="simple">
+<li>Accept a Github Pull Request Event</li>
+<li>Open a Jira Ticket</li>
+<li>Comment back on the Pull Request with a link to the Pull Request</li>
+<li>Optionally mention that the Pull Request should be made to master, instead of
+<tt class="docutils literal"><span class="pre">$BRANCH</span></tt></li>
+</ul>
+<p>I started developing this in my free time based on PHP, Symfony2, CouchDB,
+PostgreSQL and Backbone.js and got a prototype working early. However
+instead of reaching the state where I could release the project to others I
+hit some hurdles:</p>
+<ol class="arabic simple">
+<li>The project had a UI where you could add/remove and reconnect tasks through
+a graphical workflow editor. The javascript became very messy fast, because
+I didn&#8217;t understand Backbone fully and also didn&#8217;t know patterns for
+decoupling and testing Javascript code.</li>
+<li>I had to restart with the core domain service side code, because I based it
+on the Zeta Components workflow library and it was too unflexible for my
+special requirements, messing the code up.</li>
+<li>I wanted to implement way too many features and had a huge backlog of
+issues to implement before &#8220;beta&#8221;.</li>
+</ol>
+<p>Last year in July, when I finally had something remotely usable <a class="reference external" href="https://zapier.com/">Zapier</a> hit the market with a beautiful product and support
+for gazillions of services. At that point my service just had support for
+Github, Twitter and Jira and for generic HTTP POST requests and a UI that
+could not be operated by anyone else but me. I was quite demotivated
+that day I found out about Zapier.</p>
+<p>Nevertheless I continued to work on the project and tried to make it even more
+powerful than Zapier, by introducing more features that neither IFTTT nor
+Zapier had. Adding this complexity ended up being the nail into the coffin of
+the project.</p>
+<p>Each week I worked less and less on the project, because I couldn&#8217;t find the
+motivation. When Zapier got funded in October I was both sad and happy:
+Apparently my idea was a good one, however somebody else executed this idea
+much better than myself. I stopped working on the project that week.</p>
+<p>Today I took the day to migrate the Doctrine Pull Request workflow to a
+<a class="reference external" href="https://github.com/beberlei/githubpr_to_jira">simple hardcoded application</a>
+and disabled my projects website entirely.</p>
+<p>I want to use this moment to share my personal lessons learnt:</p>
+<ul>
+<li><p class="first">Choosing a scope that allows you to finish a working prototype within 1-2 months
+is an important key to success.</p>
+<p>The longer it takes to get something working and useable for others, the less
+motiviation you have. I know from my open-source experience that people using your project
+is a huge motiviation boost.</p>
+<p>The side projects I started since last October are much smaller in scope.</p>
+</li>
+<li><p class="first">You can actually get burned out by a side project: by designing its scope
+way too big.</p>
+</li>
+<li><p class="first">You cannot compete feature-wise with startups that put their full attention into
+a project from morning to night. Either make something small working better
+than commercial products or quit your job and put your full time into this.</p>
+</li>
+<li><p class="first">Side projects are either about learning new technologies or about trying
+to build something commercially succesful. Don&#8217;t try to combine this or
+you might get frustrated by choosing the wrong technology for the job.</p>
+</li>
+<li><p class="first">Never ever use an existing open-source library as the core of your
+complicated business domain. If your domain is something remotely interesting
+you will fail to achieve your goals with the restrictions of the library.</p>
+</li>
+<li><p class="first">Starting a big project alone is not a good idea. I found out that
+discussing ideas with people is very valuable and at the point where I
+started sharing my idea with others I was already too far into the project
+to be able to take most of the advice into account.</p>
+</li>
+<li><p class="first">Keeping a project idea secret is completly useless. Others will come up with the
+same idea regardless. People have ideas all the day, however nobody ever has
+time to implement them. When they do, execution is even more important than
+the idea itself.</p>
+</li>
+</ul>
+<p>What are your lessons learnt from failed side projects? I would be happy to
+hear other stories.</p>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/04/06/a_failed_side_project";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2013/04/06/a_failed_side_project.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Lessons learned: A failed side project</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
