@@ -1,11 +1,10 @@
 Lessons learned: A failed side project
 ======================================
 
-For me side projects in my free time have always been an important part of how
-I learn new skills and technologies. This usually ends with me dumping some
-prototype on `Github <https://github.com/beberlei?tab=repositories>`_,
-sometimes even with an open source project that I commit to maintain over a
-long time.
+Side projects have always been an important part of how I learn new skills and
+technologies. This usually ends with me dumping some prototype on `Github
+<https://github.com/beberlei?tab=repositories>`_, sometimes even with an open
+source project that I commit to maintain over a long time.
 
 Two years ago, for the first time, I pursued a project idea which should
 not be open-source but a commercial SAAS product. It grew out of the
@@ -27,9 +26,9 @@ instead of reaching the state where I could release the project to others I
 hit some hurdles:
 
 1. The project had a UI where you could add/remove and reconnect tasks through
-   a graphical editor for the workflow. The javascript became very messy fast,
-   because I didn't understand Backbone fully and also didn't know patterns
-   for decoupling and testing Javascript code.
+   a graphical workflow editor. The javascript became very messy fast, because
+   I didn't understand Backbone fully and also didn't know patterns for
+   decoupling and testing Javascript code.
 
 2. I had to restart with the core domain service side code, because I based it
    on the Zeta Components workflow library and it was too unflexible for my
@@ -43,10 +42,10 @@ Last year in July, when I finally had something remotely usable `Zapier
 for gazillions of services. At that point my service just had support for
 Github, Twitter and Jira and for generic HTTP POST requests and a UI that
 could not be operated by anyone else but me. I was quite demotivated
-the day I found out about Zapier.
+that day I found out about Zapier.
 
-Still I continued to work on the project and tried to make it even more
-flexible than Zapier, by introducing even more features that neither IFTTT nor
+Nevertheless I continued to work on the project and tried to make it even more
+powerful than Zapier, by introducing more features that neither IFTTT nor
 Zapier had. Adding this complexity ended up being the nail into the coffin of
 the project.
 
@@ -70,7 +69,7 @@ I want to use this moment to share my personal lessons learnt:
 
   The side projects I started since last October are much smaller in scope.
 
-- You can actually get burned out by a side project by designing its scope
+- You can actually get burned out by a side project: by designing its scope
   way too big. 
 
 - You cannot compete feature-wise with startups that put their full attention into
