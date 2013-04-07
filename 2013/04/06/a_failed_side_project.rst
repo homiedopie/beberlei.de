@@ -64,8 +64,8 @@ I want to use this moment to share my personal lessons learned:
   is an important key to success.
 
   The longer it takes to get something working and useable for others, the less
-  motiviation you have. I know from my open-source experience that people using your project 
-  is a huge motiviation boost.
+  motivation you have. I know from my open-source experience that people using your project
+  is a huge motivation boost.
 
   The side projects I started since last October are much smaller in scope.
 
@@ -77,7 +77,7 @@ I want to use this moment to share my personal lessons learned:
   than commercial products or quit your job and put your full time into this.
 
 - Side projects are either about learning new technologies or about trying
-  to build something commercially succesful. Don't try to combine this or
+  to build something commercially successful. Don't try to combine this or
   you might get frustrated by choosing the wrong technology for the job.
 
 - Never ever use an existing open-source library as the core of your
@@ -89,7 +89,7 @@ I want to use this moment to share my personal lessons learned:
   started sharing my idea with others I was already too far into the project
   to be able to take most of the advice into account.
 
-- Keeping a project idea secret is completly useless. Others will come up with the
+- Keeping a project idea secret is completely useless. Others will come up with the
   same idea regardless. People have ideas all the day, however nobody ever has
   time to implement them. When they do, execution is even more important than
   the idea itself.
