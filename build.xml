@@ -3,7 +3,7 @@
     <target name="build">
         <exec executable="tinker"><arg value="--build" /></exec>
     </target>
-    <target name="deploy">
+    <target name="deploy" depends="build">
         <exec executable="git" failonerror="true"><arg value="checkout" /><arg value="gh-pages" /></exec>
         <copy todir="." overwrite="true">
             <fileset dir="${basedir}/blog/html" />
