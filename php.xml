@@ -5,7 +5,206 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Mon, 04 Mar 2013 00:00:00 +0100</pubDate>
+        <pubDate>Fri, 12 Apr 2013 00:00:00 +0200</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</link>
+            <guid>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</guid>
+            <title><![CDATA[Traits are Static Access]]></title>
+            <description><![CDATA[<div class="section" id="traits-are-static-access">
+<h1>Traits are Static Access</h1>
+<p>In a Twitter discussion yesterday I formulated my negative opinion
+about traits and Matthew asked me to clarify it:</p>
+<img alt="http://www.whitewashing.de/images/traits_are_static_access.png" src="http://www.whitewashing.de/images/traits_are_static_access.png"/>
+<p>I used to look forward to traits as a feature in PHP 5.4, but after discussions
+with <a class="reference external" href="http://twitter.com/koredn">Kore</a> I came to the conclusion that traits
+are nothing else than static access in disguise. They actually lead to the
+exact same code smells. Familiar with the outcome of too much static use,
+we should reject traits as just another way of statically coupling your code
+to other classes.</p>
+<p>Let’s step back and take a look at the code smells that Static code produces:</p>
+<ul class="simple">
+<li>Tight coupling, no way to exchange at runtime</li>
+<li>Not mockable</li>
+<li>Static code cannot be overwritten through inheritance</li>
+<li>Global state (increases likelihood of unwanted side effects)</li>
+</ul>
+<p>This blog post shows that Traits actually have the first three problems
+themselves and exhibit the same code smells. But they even have some additional
+problems on their own:</p>
+<ul class="simple">
+<li>Not testable in isolation</li>
+<li>Theoretically stateless, but not enforced in PHP</li>
+<li>Very high impact on the code base (Code-Rank)</li>
+</ul>
+<p>Take the following code, which tries to implement reusable
+controller code through traits:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyController</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">Redirector</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">(</span><span class="s2">&quot;route_xyz&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">trait</span> <span class="nx">Redirector</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectResponse</span><span class="p">(</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'router'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span>
+            <span class="nv">$routeName</span><span class="p">,</span>
+            <span class="nv">$parameters</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Lets spot the problems:</p>
+<ol class="arabic">
+<li><p class="first"><tt class="docutils literal"><span class="pre">Redirector</span></tt> is tightly coupled to <tt class="docutils literal"><span class="pre">MyController</span></tt>. There is no way to
+change this during runtime, by using a different type of redirector, it has
+to be exactly the trait used at compile time. This is exactly what static
+access enforces as well.</p>
+</li>
+<li><p class="first">The trait accesses <tt class="docutils literal"><span class="pre">$this-&gt;container</span></tt> without defining it and couples itself against
+the implementing classes. We can actually refactor this to include an
+abstract method <tt class="docutils literal"><span class="pre">getContainer()</span></tt> in the trait. But if we have multiple
+traits now, all having a <tt class="docutils literal"><span class="pre">getContainer()</span></tt> method then we run into method
+class problems that cannot be solved. We could pass the container as an
+argument to the method, but that actually defeats the purpose of the
+abstraction here.</p>
+<p>Traits using state of their “parents” usually create bidirectional
+coupling between classes, something which should be avoided for good
+software design.</p>
+</li>
+<li><p class="first">No way to overwrite subset of functionality. If I want to use only one
+method of a trait and a second one slighty different, then I cannot
+overwrite this function of <tt class="docutils literal"><span class="pre">Redirector</span></tt> for example in <tt class="docutils literal"><span class="pre">MyController</span></tt>.</p>
+</li>
+<li><p class="first">I cannot mock the traits functionality, therefore I cannot test
+<tt class="docutils literal"><span class="pre">MyController</span></tt> as a unit only in combination with a trait.</p>
+</li>
+<li><p class="first">I cannot test the trait as a unit, I always have to create a class
+that uses the trait to be able to write a test for it.
+This prevents me from testing traits in isolation.</p>
+</li>
+<li><p class="first">Once you start using <tt class="docutils literal"><span class="pre">Redirector</span></tt> in many controllers, its impact
+on your code base (see <a class="reference external" href="http://pdepend.org/documentation/software-metrics/index.html">Code Rank</a>) increases
+a lot. Traits are concrete implementations and therefore violate the
+Dependency Inversion SOLID principle: Changes in the trait require adoptions
+in all the implementing classes.</p>
+<p>With aggregation you could depend on an abstraction <tt class="docutils literal"><span class="pre">Redirector</span></tt> or
+turn it into an abstraction in the moment that you need different
+functionality.</p>
+</li>
+</ol>
+<p>The discovery of this properties of traits me to the conclusion that traits are
+just static access in disguise.</p>
+<p>To see this argument a bit more drastically, you can “rewrite” a PHP 5.4 trait
+into “pseudo” static code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="s2">&quot;route_xyz&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Redirector</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectResponse</span><span class="p">(</span>
+            <span class="nx">self</span><span class="o">::</span><span class="na">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'router'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span>
+            <span class="nv">$routeName</span><span class="p">,</span>
+            <span class="nv">$parameters</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Calling dynamic methods statically actually works right now (and access to
+<tt class="docutils literal"><span class="pre">$this</span></tt> of the parent class will luckily be removed in PHP 5.5). Let’s
+reformulate it into something that is actually using static methods and
+will work on 5.5, requires changes to the visibility of properties though:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s2">&quot;route_xyz&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Redirector</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$thiz</span><span class="p">,</span> <span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectResponse</span><span class="p">(</span>
+            <span class="nx">self</span><span class="o">::</span><span class="na">generateUrl</span><span class="p">(</span><span class="nv">$thiz</span><span class="p">,</span> <span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">generateUrl</span><span class="p">(</span><span class="nv">$thiz</span><span class="p">,</span> <span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$thiz</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'router'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span>
+            <span class="nv">$routeName</span><span class="p">,</span>
+            <span class="nv">$parameters</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Can you see the familiarity? If Traits can be rewritten as calls to static methods,
+how can they be any better than static methods? They exhibit the exact same
+problems and produce the same code smells.</p>
+<p>Conclusion: Traits should be avoided at all costs, just like static methods.</p>
+<p>Rule of Thumb: If you want to use a trait, try to think how to solve the
+problem with aggregation.</p>
+<p>If you want to read more about problems with traits,
+<a class="reference external" href="http://blog.ircmaxell.com/2011/07/are-traits-new-eval.html">Anthony</a> wrote
+about them quite a while ago.</p>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+            <pubDate>Fri, 12 Apr 2013 00:00:00 +0200</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</link>
             <guid>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</guid>

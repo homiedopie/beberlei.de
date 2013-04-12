@@ -82,6 +82,80 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>October 30, 2008</span> 
+        </div>
+        <div class="section" id="php-conference-recap-netbeans-ezcomponents-mapreduce">
+<h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
+<p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
+Mainz, Germany was the first php conference I have been to. It ended
+some hours ago and i am quite happy to have been there. I had several
+great discussions which pointed me to new stuff (to follow) and also met
+great people.</p>
+<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
+support</a>. It feels much
+more easy to use than Eclipse PDT. Its faster (from the little tests i
+could make) and does not strike when you add several large libraries
+into the include path. It offers much more help on refactoring and
+organizing than Eclipse PDT does, for example it offers to generate
+getter/setter, constructor, inheritance methods. Much thanks to Petr who
+explained to me in detail how NetBeans works.</p>
+<p>Ez had lots of people at the conference (to Kore and Tobias i spoke in
+more detail) and I had some talks with them about
+<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a>. This was especially
+interesting after the great session on object persistence in ez, as well
+when I heard that ezcMvc, a model-view-controller component, wil be
+included in the next release of ezc in December 2008. ezComponents has a
+Database layer, that does not seem to enforce too much overhead on you
+but still offers great extensibility through a persistence layer and a
+library that offers to build Database Diffs. The latter feature is
+really great and I will definitely have a look at this.</p>
+<p>Sebastian Bergmann had a great talk on MapReduce which is an old LISP
+programming paradigm to work with huge datasets. This style was recently
+<a class="reference external" href="http://labs.google.com/papers/mapreduce.html">revived by Google</a>
+because tasks can easily be split and distributed for computing on
+different nodes with hundreds of threads. Implementing a working example
+in PHP is really easy, just finding a good way to process your large
+data seems to be a topic that needs lots of thinking.</p>
+<p>Additional great things:</p>
+<ul class="simple">
+<li>Meet Thomas, the guy that wrote Weaverslave (I use it for years to
+build simple php applications).</li>
+<li>He is working on a cool open source project <a class="reference external" href="http://sourceforge.net/projects/ccg/">Carica
+Cachegrind</a> with Bastian
+Feder that will process xdebug cachegrind files via a webinterface
+(They told me webgrind is actually calculating the numbers wrong).</li>
+<li>Jan Lehnhart and Kore Nordmann had some great things to say about
+<a class="reference external" href="http://incubator.apache.org/couchdb/">CouchDB</a>.</li>
+<li>Brian Acker talked about <a class="reference external" href="https://launchpad.net/drizzle">Drizzle</a>,
+which is a forked MySQL that throws out lots of legacy stuff from
+MySQL out, to build a micro-kernel database server that suites the
+web.</li>
+<li>Ulf Wendel talked about Mysqli + Mysqlnd.
+<a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd/">Mysqlnd</a>
+will be a new internal driver for PHP to access MySQL through Mysqli
+and optimizes processing and memory consumption. Additionally Mysqli
+will be extended to offer asynchronous queries that can be fired at
+the database and polled latter. To be included in PHP 5.3</li>
+</ul>
+<p>Not so good things: There were absolutely to few power lines. People
+using their notebooks were packed on hotspots where power was available.
+Please more power plug possibilities next time!</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html#disqus_thread" data-disqus-identifier="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>October 01, 2008</span> 
         </div>
         <div class="section" id="my-recent-zf-ongoings-jquery-action-controller-couchdb">
@@ -846,68 +920,6 @@ and look like the following:</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/12/03/ezcomponents-view-handler-for-zend-pdf.html#disqus_thread" data-disqus-identifier="2008/12/03/ezcomponents-view-handler-for-zend-pdf">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 03, 2008</span> 
-        </div>
-        <div class="section" id="ezcomponents-2008-2-beta-mvc-separation-for-win">
-<h1><a href="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html">ezComponents 2008.2 Beta - Mvc separation for win</a></h1>
-<p><a class="reference external" href="http://www.whitewashing.de/blog/articles/88">I have written</a> on the
-<a class="reference external" href="http://ezcomponents.org">new ezComponents MvcTools</a> component before
-already. Just yesterday the beta of this component was released with the
-<a class="reference external" href="http://ezcomponents.org/resources/news/news-2008-12-01">general beta of the 2008.2
-version</a> of
-ezComponents. Several bugfixes and enhancements were included into the
-MvcTools which make it a perfect component for any Mvc based
-application.</p>
-<p>I reviewed lots of the code myself and can only say i love the beauty of
-the code. Its very simple but by default the most powerful mvc solution
-in the PHP market. People working with unittests will like it very much,
-since all the parts are perfectly separated from each other allowing to
-test controllers, views, routers and filters in complete separation.</p>
-<p>To show one very simple example howto benefit of the separation of view
-and controllers. If we need a view in both html and pdf, this should
-generally make no difference for the controller. We add two routes, one
-for the pdf one for the html view that execute the same controller and
-action:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myRouter extends ezcMvcRouter{ public function createRoutes() {  return array(   new ezcMvcRailsRoute( '/pdf', 'SomeController', 'index'),   new ezcMvcRailsRoute( '/', 'SomeController', index' ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables['items'] = Model::retrieveLotsOfItems();  return $result; }}</pre>
-</div>
-</div></blockquote>
-<p>Now howto decide between PDF and Html view? We use the createView method
-of our dispatcher configuration, but we still only need the http
-response writer, nothing more.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, &quot;/pdf&quot;)) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}</pre>
-</div>
-</div></blockquote>
-<p>Now both <strong>myHtmlView</strong> and <strong>myPdfView</strong> can create their
-ezcMvcResponse objects that fill the response body depending on their
-type. Please note that overwriting createResponseBody() in myPdfView is
-a shortcut that circumvents me having to write a new PDF View Handler
-(which would be the way to go).</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = &quot;application/pdf&quot;;   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}</pre>
-</div>
-</div></blockquote>
-<p>Now all the the logic that is potentially in the controller is completely
-separated from the view handling that may depend on the routing
-information not on the controller. And views can be tested separately
-from the controller result. Testability is very high.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html#disqus_thread" data-disqus-identifier="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -954,6 +966,9 @@ from the controller result. Testability is very high.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
         </li>
         <li class="recent_post">
@@ -979,9 +994,6 @@ from the controller result. Testability is very high.</p>
         </li>
         <li class="recent_post">
             <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a>
         </li>
     </ul>
 </div>
