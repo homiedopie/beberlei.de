@@ -2,6 +2,8 @@
 <project name="Whitewashing" basedir="." default="build">
     <target name="build">
         <exec executable="tinker"><arg value="--build" /></exec>
+    </target>
+    <target name="deploy">
         <exec executable="git" failonerror="true"><arg value="checkout" /><arg value="gh-pages" /></exec>
         <copy todir="." overwrite="true">
             <fileset dir="${basedir}/blog/html" />
@@ -11,8 +13,6 @@
         <exec executable="git" failonerror="true"><arg value="add" /><arg value="." /></exec>
         <exec executable="git" failonerror="false"><arg value="commit" /><arg value="-m" /><arg value="Release" /></exec>
         <exec executable="git" failonerror="true"><arg value="checkout" /><arg value="master" /></exec>
-    </target>
-    <target name="deploy">
         <exec executable="git" failonerror="true"><arg value="push" /><arg value="origin" /><arg value="gh-pages" /></exec>
     </target>
 </project>

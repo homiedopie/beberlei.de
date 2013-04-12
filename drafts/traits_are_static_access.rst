@@ -4,12 +4,14 @@ Traits are Static Access
 In a Twitter discussion yesterday I formulated my negative opinion
 about traits and Matthew asked me to clarify it:
 
-.. image:: http://www.whitewashing.de/images/traits_are_static_access.png
+.. image:: http://www.whitewashing.de/_static/traits_are_static_access.png
 
 I used to look forward to traits as a feature in PHP 5.4, but after discussions
 with `Kore <http://twitter.com/koredn>`_ I came to the conclusion that traits
 are nothing else than static access in disguise. They actually lead to the
-exact same code smells. 
+exact same code smells. Familiar with the outcome of too much static use,
+we should reject traits as just another way of statically coupling your code
+to other classes.
 
 Let's step back and take a look at the code smells that Static code produces:
 
@@ -24,7 +26,7 @@ problems on their own:
 
 - Not testable in isolation
 - Theoretically stateless, but not enforced in PHP
-- Traits can have very high impact on the code base
+- Very high impact on the code base (Code-Rank)
 
 Take the following code, which tries to implement reusable
 controller code through traits:
