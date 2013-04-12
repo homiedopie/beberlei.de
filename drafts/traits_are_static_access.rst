@@ -1,23 +1,30 @@
 Traits are Static Access
 ========================
 
-I used to look forward to traits as a feature in PHP 5.4, but after
-thinking about their use and discussions with `Kore <http://twitter.com/koredn>`_
-I came to the conclusion that traits are nothing else than static access in
-disguise and actually lead to the exact same code smells:
+In a Twitter discussion yesterday I formulated my negative opinion
+about traits and Matthew asked me to clarify it:
 
-Static code inhibits the following problems:
+.. image:: http://www.whitewashing.de/images/traits_are_static_access.png
+
+I used to look forward to traits as a feature in PHP 5.4, but after discussions
+with `Kore <http://twitter.com/koredn>`_ I came to the conclusion that traits
+are nothing else than static access in disguise. They actually lead to the
+exact same code smells. 
+
+Let's step back and take a look at the code smells that Static code produces:
 
 - Tight coupling, no way to exchange at runtime
 - Not mockable
 - Static code cannot be overwritten through inheritance
 - Global state (increases likelihood of unwanted side effects)
 
-Traits actually have the first three problems themselves and exhibit
-the same code smells. But they even have some additional problems on their own:
+This blog post shows that Traits actually have the first three problems
+themselves and exhibit the same code smells. But they even have some additional
+problems on their own:
 
 - Not testable in isolation
 - Theoretically stateless, but not enforced in PHP
+- Traits can have very high impact on the code base
 
 Take the following code, which tries to implement reusable
 controller code through traits:
@@ -90,8 +97,22 @@ Lets spot the problems:
    that uses the trait to be able to write a test for it.
    This prevents me from testing traits in isolation.
 
-This leads me to the conclusion that traits are just static access in disguise.
-Actually you can "rewrite" a PHP 5.4 trait into "pseudo" static code.
+6. Once you start using ``Redirector`` in many controllers, its impact
+   on your code base (see `Code Rank
+   <http://pdepend.org/documentation/software-metrics/index.html>`_) increases
+   a lot. Traits are concrete implementations and therefore violate the
+   Dependency Inversion SOLID principle: Changes in the trait require adoptions
+   in all the implementing classes.
+   
+   With aggregation you could depend on an abstraction ``Redirector`` or
+   turn it into an abstraction in the moment that you need different
+   functionality.
+
+The discovery of this properties of traits me to the conclusion that traits are
+just static access in disguise.
+
+To see this argument a bit more drastically, you can "rewrite" a PHP 5.4 trait
+into "pseudo" static code:
 
 .. code-block:: php
 
@@ -129,8 +150,10 @@ Actually you can "rewrite" a PHP 5.4 trait into "pseudo" static code.
         }
     }
 
-This actually works right now (and will luckily be removed in PHP 5.5).
-Lets reformulate it into something that is actually using static methods:
+Calling dynamic methods statically actually works right now (and access to
+``$this`` of the parent class will luckily be removed in PHP 5.5). Let's
+reformulate it into something that is actually using static methods and
+will work on 5.5, requires changes to the visibility of properties though:
 
 .. code-block:: php
 
@@ -168,10 +191,18 @@ Lets reformulate it into something that is actually using static methods:
         }
     }
 
-See the familiarity? If Traits can be rewritten as calls to static methods,
+Can you see the familiarity? If Traits can be rewritten as calls to static methods,
 how can they be any better than static methods? They exhibit the exact same
-problems and produce the same code smells. Traits should be avoided at all
-costs, just like static methods.
+problems and produce the same code smells.
+
+Conclusion: Traits should be avoided at all costs, just like static methods.
+
+Rule of Thumb: If you want to use a trait, try to think how to solve the
+problem with aggregation.
+
+If you want to read more about problems with traits,
+`Anthony <http://blog.ircmaxell.com/2011/07/are-traits-new-eval.html>`_ wrote
+about them quite a while ago.
 
 .. author:: default
 .. categories:: PHP
