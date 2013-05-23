@@ -84,6 +84,76 @@
         <div class="timestamp postmeta">
             <span>January 11, 2009</span> 
         </div>
+        <div class="section" id="howto-file-a-good-bug-report-suggestions-for-framework-users">
+<h1><a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html">Howto file a good bug report: Suggestions for framework users</a></h1>
+<p>I have fixed quite a number of bugs for the ZF lately, which lead me to
+this post about how to file a good bug report. There are many annoying
+bug reports out there, where the reporter of the bug withholds important
+information to the bugfixer unintended. This advice applies bug reports
+in general of course.</p>
+<p>What are the benefits of a good bug report? The bug generally gets fixed
+faster, when the developer has more information at hand. Additionally
+other developers might come to rescue since they can understand the
+issue faster. These benefits are good for both parties. If you take no
+time for a good bug report, your issue might risk to end up getting old
+or closed unfixed.</p>
+<ul class="simple">
+<li><strong>Post the whole Exception Stack Trace</strong>: If the library throws an
+Exception into your application that is unexpected and may indicate
+an bug: Do not post the Message or Exception name only. The exception
+may be thrown in many different places or due to different reasons.
+The PHP exception class offers the method <strong>getTraceAsString()</strong>,
+which offers many information to the developer what the cause of the
+exception might be. Please use it!</li>
+<li><strong>Post codefixes in a patch format</strong>: When you find a bug in the
+framework, it is quite possible that you can offer a fix directly.
+Writing “Replace x in line y with z” does not help very often. The
+component might be in flux and the line positions change more often
+than you think. Please create a diff file of this changes that
+indicate the precise position of the change. This diff also includes
+2 lines above and below the patched code for direction of the
+developer. SVN Diffs are even more useful since they include the
+revision where you fixed the bug in.</li>
+<li><strong>Post reproducible cases as PHPUnit Test</strong>: If you find a bug and
+can show how to reproduce it: Write a unittest to prove it. It is ZF
+policy to create a unittest for each bugfix showing that the bug was
+indeed fixed and previous functionality remains the same, so this
+unit-test has to be written anyways. Many show-offs rely on massive
+<strong>echo</strong> statements or <strong>var_dump</strong>, which render them almost
+useless for the developer.</li>
+<li><strong>Attach a unit-test to a submitted patch</strong>: This is related to the
+previous point. If you add a unit test your patch will get more
+attention. It will prove that you have thought about the patch, its
+consequences and that you might have checked it does not break
+backwards compatibility. This is worth a lot.</li>
+<li><strong>Run the test suite with your patch</strong>: If you want to provide a
+patch. Run the testsuite of the Zend Framework. It might break
+expected behaviour. When you post a patch that will break BC, it will
+be recognized. Your bug report might be closed, which helps nobody.</li>
+</ul>
+<p>When you find a bug you have probably thought about it and how to fix
+it. This is valuable information. Disregarding one of this points will
+lead to missing information on part of the developer that he has to
+“learn” again. This takes time, which may make your bug last longer than
+it should.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html#disqus_thread" data-disqus-identifier="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>January 11, 2009</span> 
+        </div>
         <div class="section" id="what-will-be-new-in-zf-1-8">
 <h1><a href="2009/01/11/what-will-be-new-in-zf-1-8.html">What will be new in ZF 1.8</a></h1>
 <p>In February or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
@@ -775,68 +845,6 @@ PHP tools and enhance Code Sniffer support.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/07/30/php-codesniffer-support-for-netbeans.html#disqus_thread" data-disqus-identifier="2009/07/30/php-codesniffer-support-for-netbeans">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>July 04, 2009</span> 
-        </div>
-        <div class="section" id="using-symfony-dependency-injection-with-zend-application">
-<h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
-<p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
-post</a> on Dependency
-Injection containers and Zend_Application I was eager to find out if
-its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
-Container</a>
-into the Zend Framework. To my surprise it’s possible without having to
-make any changes to one of the two components. An example use-case would
-look like:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$container = new sfServiceContainerBuilder();
-
-$loader = new sfServiceContainerLoaderFileXml($container);
-$loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
-
-$application = new Zend_Application(
-    APPLICATION_ENV,
-    APPLICATION_PATH . '/config/application.xml'
-);
-$application-&gt;getBootstrap()-&gt;setContainer($container);
-$application-&gt;bootstrap()
-            -&gt;run();</pre>
-</div>
-</div></blockquote>
-<p>Resources instantiated by Zend_Application are then injected into the
-container by the name of the resource and are given the resource
-instance. Any object from the Symfony container can then use these
-dependencies in their object setup. The only drawback of the integration
-is the fact that the Symfony Container is case-sensitive in regards to
-the service names but Zend_Application lower-cases all service before
-injecting them into the container. The following code is a restatement
-of my previous example of a <strong>MyModel</strong> class which requires a
-<strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$container-&gt;register('myModel', 'MyModel')
-          -&gt;addArgument(new sfServiceReference('db'))
-          -&gt;addArgument(new sfServiceReference('cache'));</pre>
-</div>
-</div></blockquote>
-<p>Access to a MyModel instance with its dependencies is then granted
-through the call <strong>$container-&gt;myModel</strong> throughout the application.
-Make sure to call this after running Zend_Application::bootstrap, so
-that the Resource dependencies are injected first.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/07/04/using-symfony-dependency-injection-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/07/04/using-symfony-dependency-injection-with-zend-application">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -883,6 +891,9 @@ that the Resource dependencies are injected first.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
         </li>
         <li class="recent_post">
@@ -908,9 +919,6 @@ that the Resource dependencies are injected first.</p>
         </li>
         <li class="recent_post">
             <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
         </li>
     </ul>
 </div>

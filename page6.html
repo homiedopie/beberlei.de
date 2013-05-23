@@ -82,6 +82,88 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>June 22, 2008</span> 
+        </div>
+        <div class="section" id="zf-caching-pages-via-front-controller-plugin">
+<h1><a href="2008/06/22/zf-caching-pages-via-front-controller-plugin.html">ZF: Caching Pages via Front Controller Plugin</a></h1>
+<p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
+Matthews post on Zend Devzone</a>)
+into the Whitewashing blog software via Zend_Cache and the Filesystem
+Backend. I ran some superficial Apache Benchmark tests to have a look
+at the gain change in performance.</p>
+<p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
+Devzone</a> and a missing function
+getCache() in the code fragment:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>public function getCache()
+{
+    if( ($response = $this-&gt;cache-&gt;load($this-&gt;key)) != false) {
+        return $response;
+    }
+    return false;
+}</pre>
+</div>
+</div></blockquote>
+<p>I loaded the Plugin into the front controller and initialized it with a
+Zend_Config_Ini object. This all works very smoothly and caching is
+ready to begin.</p>
+<p>Testing came to the result that with 1000 requests, 10 of them concurrent
+(ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
+this blog, the request time dropped by half, from six to three seconds
+(still lot of time, but this isn’t the best webserver).</p>
+<div class="section" id="results-without-caching">
+<h2>Results without caching</h2>
+<div class="highlight-python"><pre>Requests per second:    1.49 [#/sec] (mean)
+Time per request:       6695.213 [ms] (mean)
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       26   30   4.0     30      43
+Processing:  1556 6452 3372.1   5511   14768
+Waiting:     1436 6129 3174.1   5145   14595
+Total:       1583 6483 3373.2   5538   14810</pre>
+</div>
+</div>
+<div class="section" id="results-with-caching">
+<h2>Results with caching</h2>
+<div class="highlight-python"><pre>Requests per second:    3.03 [#/sec] (mean)
+Time per request:       3304.534 [ms] (mean)
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       26   31   6.3     30      73
+Processing:   781 3214 1757.7   3103    7445
+Waiting:      650 3055 1731.4   2928    7190
+Total:        809 3245 1757.8   3135    7475</pre>
+</div>
+<p>As said before this testing is superficial, but its gives a broad sense
+of what performance gain is possible with just some lines of code and a
+temporary directory. Using memcache will probably speed up the process
+another good amount.</p>
+<p>Later I realized that complete page caching (rather than block element
+caching) sucks when you inject admin area links into the navigation,
+which would allow non-logged in users to see parts of the admin area so
+I had to disable caching totally. You never know in the first place (you
+should though). I have to rework my admin area or extend my
+authentication or the caching plugin somehow. This will probably be the
+topic another time.</p>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/06/22/zf-caching-pages-via-front-controller-plugin.html#disqus_thread" data-disqus-identifier="2008/06/22/zf-caching-pages-via-front-controller-plugin">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>June 21, 2008</span> 
         </div>
         <div class="section" id="on-frameworks-and-javascript-coupling">
@@ -646,55 +728,6 @@ macStyle = false and you have your menubars back.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars.html#disqus_thread" data-disqus-identifier="2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>August 02, 2008</span> 
-        </div>
-        <div class="section" id="dojox-django-template-language-example-with-data-from-php-json">
-<h1><a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html">DojoX Django Template Language Example with Data from PHP/JSON</a></h1>
-<p>This is a simple example how you would use DojoX Django Template
-Language component filled with data from a JSON GET Response:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>&lt;script type=&quot;text/javascript&quot; src=&quot;/development/dojo-release-1.1.1/dojo/dojo.js&quot; djConfig=&quot;parseOnLoad:true, isDebug:true&quot;&gt;&lt;/script&gt;
-
-&lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;&lt;!--
-dojo.require(&quot;dojox.dtl&quot;);
-dojo.require(&quot;dojox.dtl.Context&quot;);
-dojo.require(&quot;dojox.dtl.ext-dojo.NodeList&quot;);
-dojo.addOnLoad(
-    dojo.xhrGet({url: &quot;dojotest.php&quot;, handleAs: &quot;json&quot;, handle: function(data,ioArgs){
-        if(typeof data == &quot;error&quot;){
-            console.log(&quot;error?&quot;,data);
-        } else {
-            dojo.query(&quot;#test&quot;).dtl(&quot;I am eating {{food.fruit}} and {{food.meat}}&quot;, data);
-        }
-    }
-}));
---&gt;&lt;/script&gt;
-
-::
-
-    &lt;?php
-    header('Content-type: text/json');
-    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
-    echo json_encode($food);
-    ?&gt;</pre>
-</div>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html#disqus_thread" data-disqus-identifier="2008/08/02/dojox-django-template-language-example-with-data-from-php-json">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -741,6 +774,9 @@ dojo.addOnLoad(
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
         </li>
         <li class="recent_post">
@@ -766,9 +802,6 @@ dojo.addOnLoad(
         </li>
         <li class="recent_post">
             <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
         </li>
     </ul>
 </div>

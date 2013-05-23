@@ -84,6 +84,55 @@
         <div class="timestamp postmeta">
             <span>August 02, 2008</span> 
         </div>
+        <div class="section" id="dojox-django-template-language-example-with-data-from-php-json">
+<h1><a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html">DojoX Django Template Language Example with Data from PHP/JSON</a></h1>
+<p>This is a simple example how you would use DojoX Django Template
+Language component filled with data from a JSON GET Response:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>&lt;script type=&quot;text/javascript&quot; src=&quot;/development/dojo-release-1.1.1/dojo/dojo.js&quot; djConfig=&quot;parseOnLoad:true, isDebug:true&quot;&gt;&lt;/script&gt;
+
+&lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;&lt;!--
+dojo.require(&quot;dojox.dtl&quot;);
+dojo.require(&quot;dojox.dtl.Context&quot;);
+dojo.require(&quot;dojox.dtl.ext-dojo.NodeList&quot;);
+dojo.addOnLoad(
+    dojo.xhrGet({url: &quot;dojotest.php&quot;, handleAs: &quot;json&quot;, handle: function(data,ioArgs){
+        if(typeof data == &quot;error&quot;){
+            console.log(&quot;error?&quot;,data);
+        } else {
+            dojo.query(&quot;#test&quot;).dtl(&quot;I am eating {{food.fruit}} and {{food.meat}}&quot;, data);
+        }
+    }
+}));
+--&gt;&lt;/script&gt;
+
+::
+
+    &lt;?php
+    header('Content-type: text/json');
+    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
+    echo json_encode($food);
+    ?&gt;</pre>
+</div>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html#disqus_thread" data-disqus-identifier="2008/08/02/dojox-django-template-language-example-with-data-from-php-json">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>August 02, 2008</span> 
+        </div>
         <div class="section" id="wrestling-with-dojo">
 <h1><a href="2008/08/02/wrestling-with-dojo.html">Wrestling with Dojo</a></h1>
 <p>I have to complain about the <a class="reference external" href="http://www.dojotoolkit.org">Dojo
@@ -578,58 +627,6 @@ old ways”.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/23/constructions.html#disqus_thread" data-disqus-identifier="2008/01/23/constructions">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 14, 2008</span> 
-        </div>
-        <div class="section" id="helpers-in-zend-view-class-prefix">
-<h1><a href="2008/01/14/helpers-in-zend-view-class-prefix.html">Helpers in Zend_View: Class Prefix</a></h1>
-<p>I have to say, the Zend Framework documentation is a bit imprecise
-sometimes. Regarding custom Helpers in Zend_View it states:</p>
-<blockquote>
-<div>The class name must, at the very minimum, end with the helper name
-itself, using CamelCaps. E.g., if you were writing a helper called
-“specialPurpose”, the class name would minimally need to be
-“SpecialPurpose”. You may, and should, give the class name a prefix,
-and it is recommended that you use ‘View_Helper’ as part of that
-prefix: “My_View_Helper_SpecialPurpose”. (You will need to pass
-in the prefix, with or without the trailing underscore, to
-addHelperPath() or setHelperPath()).</div></blockquote>
-<p>What does that mean regarding how your Helper has to be called? The
-default prefix for a Helper function that should be called foobar() is
-actually:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class Zend_View_Helper_Foobar()</span>
-<span class="x">{</span>
-<span class="x">    function foobar() { }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>It took me some time to realize that. Why doesn’t Zend just give an
-example like that? To change the prefix in a context of the
-Zend_Controller_Action you have to do something like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeController extends Zend_Controller_Action</span>
-<span class="x">{</span>
-<span class="x">    function init() {</span>
-<span class="x">        $this-&gt;initView();</span>
-<span class="x">        $this-&gt;view-&gt;addHelperPath(&quot;pathtohelpers&quot;, &quot;ClassPrefix&quot;);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/14/helpers-in-zend-view-class-prefix.html#disqus_thread" data-disqus-identifier="2008/01/14/helpers-in-zend-view-class-prefix">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -676,6 +673,9 @@ Zend_Controller_Action you have to do something like this:</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
         </li>
         <li class="recent_post">
@@ -701,9 +701,6 @@ Zend_Controller_Action you have to do something like this:</p>
         </li>
         <li class="recent_post">
             <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
         </li>
     </ul>
 </div>

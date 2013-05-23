@@ -80,6 +80,174 @@
         <div class="timestamp postmeta">
             <span>December 03, 2008</span> 
         </div>
+        <div class="section" id="ezcomponents-view-handler-for-zend-pdf">
+<h1><a href="2008/12/03/ezcomponents-view-handler-for-zend-pdf.html">ezComponents View Handler for Zend_Pdf</a></h1>
+<p><a class="reference external" href="http://www.whitewashing.de/blog/article/93">My previous posting</a>
+discussed different view handlers based on routing information. One
+example was the PDF View which was implemented rather hackish through
+overwriting the <strong>createResponseBody()</strong> function of <strong>ezcMvcView</strong>.
+<a class="reference external" href="http://www.derickrethans.nl/">Derick</a> told me the way to go would be
+writing my own PDF view handler. Since this is a rather lengthy topic I
+created this new post that only discusses using
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.pdf.html">Zend_Pdf</a> as a
+View Handler in the new <a class="reference external" href="http://www.ezcomponents.org">ezComponents
+MvcTools</a>.</p>
+<p>The code for the View Handler would look like the following:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>abstract class myPdfViewHandler implements ezcMvcViewHandler
+{
+    /**
+     * Contains the zone name
+     *
+     * @var string
+     */
+    protected $zoneName;
+
+    /**
+     * Contains the variables that will be available in the template.
+     *
+     * @var array(mixed)
+     */
+    protected $variables = array();
+
+    /**
+     * Pdf object to be rendered.
+     *
+     * @var Zend_Pdf
+     */
+    protected $pdf;
+
+    /**
+     * Creates a new view handler, where $zoneName is the name of the block and
+     * $templateLocation the location of a view template.
+     *
+     * @var string $zoneName
+     * @var string $templateLocation
+     */
+    public function __construct( $zoneName, $templateLocation = null )
+    {
+        $this-&gt;zoneName = $zoneName;
+    }
+
+    /**
+     * Adds a variable to the template, which can then be used for rendering
+     * the view.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function send( $name, $value )
+    {
+        $this-&gt;variables[$name] = $value;
+    }
+
+    /**
+     * Processes the template with the variables added by the send() method.
+     * The result of this action should be retrievable through the getResult() method.
+     */
+    public function process( $last )
+    {
+        // template method
+    }
+
+    /**
+     * Returns the value of the property $name.
+     *
+     * @throws ezcBasePropertyNotFoundException if the property does not exist.
+     * @param string $name
+     * @ignore
+     */
+    public function __get( $name )
+    {
+        return $this-&gt;variables[$name];
+    }
+
+    /**
+     * Returns true if the property $name is set, otherwise false.
+     *
+     * @param string $name
+     * @return bool
+     * @ignore
+     */
+    public function __isset( $name )
+    {
+        return array_key_exists( $name, $this-&gt;variables );
+    }
+
+    /**
+     * Returns the name of the template, as set in the constructor.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this-&gt;zoneName;
+    }
+
+    /**
+     * Returns the result of the process() method.
+     *
+     * @return mixed
+     */
+    public function getResult()
+    {
+        if($this-&gt;pdf instanceof Zend_Pdf) {
+            return $this-&gt;pdf-&gt;render();
+        } else {
+            throw new Exception(&quot;Could not render PDF.&quot;);
+        }
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Now you would implement a concrete PDF view handler by extending
+myPdfViewHandler.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myConcretePdfViewHandler extends myPdfViewHandler {
+    public function process( $last )
+    {
+        $pdf = new Zend_Pdf();
+        // do concrete PDF drawing stuff here
+
+        // save PDF here, will be rendered in getResult()
+        $this-&gt;pdf = $pdf;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>And your <strong>ezcMvcView</strong> implementation will make of <strong>createZones()</strong>
+and look like the following:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myPdfView extends ezcMvcView {
+    function createZones( $layout )
+    {
+        $zones = array();
+        // A decision which concrete Pdf Handler should be used would be decided on here.
+        $zones[] = new myConcretePdfViewHandler( 'concreteA' );
+        return $zones;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>There you go!</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/03/ezcomponents-view-handler-for-zend-pdf.html#disqus_thread" data-disqus-identifier="2008/12/03/ezcomponents-view-handler-for-zend-pdf">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
+            <span>December 03, 2008</span> 
+        </div>
         <div class="section" id="ezcomponents-2008-2-beta-mvc-separation-for-win">
 <h1><a href="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html">ezComponents 2008.2 Beta - Mvc separation for win</a></h1>
 <p><a class="reference external" href="http://www.whitewashing.de/blog/articles/88">I have written</a> on the
@@ -559,6 +727,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
         </li>
         <li class="recent_post">
@@ -584,9 +755,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
         </li>
         <li class="recent_post">
             <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a>
         </li>
     </ul>
 </div>
