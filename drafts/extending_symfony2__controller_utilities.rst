@@ -87,6 +87,10 @@ Then you can simplify the controller as a service:
         }
     }
 
+You don't have to stop here. You can introduce lots of helper objects
+and inject them into your controller, depending on your use-cases.
+Generic handling of file uploads comes to mind for example.
+
 .. author:: default
 .. categories:: none
 .. tags:: none
