@@ -51,16 +51,100 @@ Controller that solves the problem:
     <?php
     abstract class CRUDController extends Controller
     {
-        protected function removeEntity($class, $id)
-        {
-            $entityManager = $this->get('doctrine.orm.default_entity_manager');
-            $user = $entityManager->find($class, $id);
+        abstract public function getEntityClass();
 
-            $entityManager->remove($user);
+        abstract public function getEntityListRouteName();
+
+        public function removeAction(Request $request)
+        {
+            $id = $request->attributes->get('id');
+            $entityManager = $this->get('doctrine.orm.default_entity_manager');
+            $entity = $entityManager->find($this->getEntityClass(), $id);
+
+            $entityManager->remove($entity);
             $entityManager->flush();
+
+            return $this->redirect($this->generateUrl($this->getEntityListRouteName()));
         }
     }
 
+And you can implement this base controller to solve the User example from
+above:
+
+.. code-block:: php
+
+    <?php
+    class UserController extends CRUDController
+    {
+        public function getEntityClass()
+        {
+            return 'Acme\UserBundle\Entity\User';
+        }
+
+        public function getEntityListRouteName()
+        {
+            return 'user_list';
+        }
+    }
+
+The clean solution: Controller Helper
+-------------------------------------
+
+The problem with the quick and dirty solution is its violation of the single
+responsibility and the interface seggregatoin principle.  The
+``CRUDController`` class will become huge once you start adding all the
+different actions, for example batch operations on the list and so on.
+Additionally not all the Doctrine entities will require ALL the actions,
+but some only need a subset.
+
+Instead of cramping all the stuff into one big class, lets introduce
+helper classes for each operation:
+
+.. code-block:: php
+
+    <?php
+    namespace Acme\UserBundle\Controller\Helper;
+
+    class DeleteEntity
+    {
+        private $entityManager;
+
+        public function __construct(EntityManager $entityManager)
+        {
+            $this->entityManager = $entityManager;
+        }
+
+        public function remove($class, $id, $redirectUri, array $redirectParams = array())
+        {
+            $entity = $this->entityManager->find($class, $id);
+
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+
+            return $this->redirect($this->generateUrl($redirectRoute, $redirectParams));
+        }
+    }
+
+And after registering this helper in the DIC, for example as ``acme_demo.controller_helper.delete_entity``,
+you can use it in every controller as you wish:
+
+.. code-block:: php
+
+    <?php
+    namespace Acme\UserBundle\Controller;
+
+    class UserController extends CRUDController
+    {
+        public function removeAction(Request $request)
+        {
+            return $this->get('acme_demo.controller_helper.delete_entity')
+                ->remove(
+                    'Acme\UserBundle\Entity\User',
+                    $request->attributes->get('id'),
+                    'user_list'
+                );
+        }
+    }
 
 .. author:: default
 .. categories:: none
