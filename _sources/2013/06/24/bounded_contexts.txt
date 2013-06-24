@@ -9,7 +9,7 @@ mistake.
 It is propably a human trait trying to find the one line that connects
 every dot. However in software design there is a case to be made for the
 separation of contexts to tackle complexity. Eric Evans described this in detail with the
-`"Bounded Context" <http://domaindrivendesign.org/node/91/>`_ pattern in his
+`"Bounded Context" <http://dddcommunity.org/uncategorized/bounded-context/>`_ pattern in his
 "Domain-Driven Design" book. According to an interview with Evans I read
 somewhere, he considers it one of the most important patterns in the whole book.
 
