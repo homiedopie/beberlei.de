@@ -82,6 +82,47 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 14, 2009</span> 
+        </div>
+        <div class="section" id="finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">
+<h1><a href="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html">Finally: Zend_Mail charset and/or long lines header encoding bug fixed</a></h1>
+<p>There was this <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">lurking bug in
+Zend_Mail</a> which
+destroyed every Mail-Header (and corresponding Mail) with non US-ASCII
+Chars and more than an encoded length of 74 chars. This is quite a huge
+subset of mails, but it seems a nice solution was not so easy, at least
+nobody tried to fixed it for quite some time.</p>
+<p>Where many hackish solutions we’re offered, Ota Mares aka Littlex spent
+incredible time to hunt the original problem down and with his help I
+tag-teamed the bug to death today. Saturo Yoshida of Zend Fame added
+some further spice regarding an alternative solution with Base64
+Encoding instead of Quoted Printable Mime Header encoding.</p>
+<p>In the end the solution we chose was, not to re-use the Mime encoding
+function that is specific to MIME bodies according to
+<a class="reference external" href="http://tools.ietf.org/html/rfc2045">RFC2045</a>, but to write a
+completely new algorithm for Mime Headers, whose rules are specified in
+<a class="reference external" href="http://tools.ietf.org/html/rfc2047">RFC2047</a>. This is now done and
+unit-tests prove its working according to standard.</p>
+<p>What is missing now is people trying that fix on as many Mail platforms
+as possible and <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">giving feedback in the
+issue</a> if a lengthy
+subject with non-ASCII chars is displayed correctly.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html#disqus_thread" data-disqus-identifier="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 11, 2009</span> 
         </div>
         <div class="section" id="howto-file-a-good-bug-report-suggestions-for-framework-users">
@@ -804,47 +845,6 @@ you could make use of symlinks.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html#disqus_thread" data-disqus-identifier="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>July 30, 2009</span> 
-        </div>
-        <div class="section" id="php-codesniffer-support-for-netbeans">
-<h1><a href="2009/07/30/php-codesniffer-support-for-netbeans.html">PHP CodeSniffer Support for Netbeans</a></h1>
-<p>I dived into the code of my new favorite IDE
-<a class="reference external" href="http://www.netbeans.org">Netbeans</a> these last days and came up with
-an <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/tree/master">extension
-module</a>,
-which adds PHP CodeSniffer Support on a per file basis to make my life
-much easier. It shows warnings and errors as annotations to the Editor
-and marks the affected lines in yellow and red.</p>
-<p><a class="reference external" href="http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/netbeans_cs_support.png">|image0|</a></p>
-<p>[STRIKEOUT:My Java skills being very bad, it will only work on Linux
-currently, since the PHP Code Sniffer “binary” is hardcoded into the
-Java Source code. You have to create a “/usr/bin/phpcs2” executable,
-which is a wrapper that looks like:]</p>
-<p>With Manuals extensions (see the comments) the module now works without
-the wrapper script. It might even work under Windows now. Yet now the
-Zend Coding standard is enforced though. I am working on making that one
-configurable next.</p>
-<p>You can install the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">NBM module install
-file</a>
-from the GitHub repository into Netbeans and it “should” work then.</p>
-<p>I hope to get more familiar with Netbeans in the future to add some more
-PHP tools and enhance Code Sniffer support.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/07/30/php-codesniffer-support-for-netbeans.html#disqus_thread" data-disqus-identifier="2009/07/30/php-codesniffer-support-for-netbeans">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -891,6 +891,9 @@ PHP tools and enhance Code Sniffer support.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/06/24/bounded_contexts.html">Bounded Contexts</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
         </li>
         <li class="recent_post">
@@ -916,9 +919,6 @@ PHP tools and enhance Code Sniffer support.</p>
         </li>
         <li class="recent_post">
             <a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a>
         </li>
     </ul>
 </div>

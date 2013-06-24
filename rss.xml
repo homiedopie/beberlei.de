@@ -5,7 +5,81 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Thu, 23 May 2013 00:00:00 +0200</pubDate>
+        <pubDate>Mon, 24 Jun 2013 00:00:00 +0200</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/06/24/bounded_contexts.html</link>
+            <guid>http://www.whitewashing.de/2013/06/24/bounded_contexts.html</guid>
+            <title><![CDATA[Bounded Contexts]]></title>
+            <description><![CDATA[<div class="section" id="bounded-contexts">
+<h1>Bounded Contexts</h1>
+<p>I regularly fall into the same trap when building applications: Trying to find
+the one model that unifies all the use-cases and allows to solve every problem.
+From discussions with other developers I know not to be the only one making this
+mistake.</p>
+<p>It is propably a human trait trying to find the one line that connects
+every dot. However in software design there is a case to be made for the
+separation of contexts to tackle complexity. Eric Evans described this in detail in his
+<a class="reference external" href="http://domaindrivendesign.org/node/91/">“Bounded Context”</a> pattern in the
+“Domain-Driven Design” book. According to an interview with Evans I read
+somewhere, he considers it one of the most important patterns in the whole book.</p>
+<p>The essence of this strategic pattern is to embrance the separation of
+different parts of an application and develop different models as different
+domain contexts. Consistency and constraints are enforced within one context,
+but don’t necessarily hold in another context.</p>
+<p>The goal is simplication and freeing us from the burden of finding that one
+model that fits all use cases. It is much less awkward to have some parts of
+the model reimplemented for different purposes than creating God objects that
+try to unify everything, and failing at this task.</p>
+<p>Evans evens goes further and introduces a significant amount of patterns
+that describe the relationship between different bounded contexts.</p>
+<div class="section" id="an-experiment">
+<h2>An Experiment</h2>
+<p>At the <a class="reference external" href="http://www.socrates-conference.de/">SoCraTes conference</a> in August
+last year, I participated in a DDD architecture game by <a class="reference external" href="https://twitter.com/cyriux">Cyrille Martraire</a> that focused on distilling bounded contexts. We
+were given a very simple domain concept “Customer” and assigned different roles
+in the business.</p>
+<p>Everyone described their perfect customer very differently, imagining the
+Customer object that fits all these requirements was quite an eye opener. Even
+if there is no such single software that operates a business, going to the
+extreme and defining 10 different angles for a single concept made me clear,
+that sometimes different overlapping implementations are not such a bad thing.</p>
+</div>
+<div class="section" id="problems-and-solutions">
+<h2>Problems and Solutions</h2>
+<p>One problem when applying bounded contexts is data synchronization.
+Synchronization between contexts can be reached in many different ways,
+three of which are:</p>
+<ol class="arabic simple">
+<li>The <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">Domain Event</a> pattern that integrates
+nicelly into Domain-Driven Design and simplifies the synchronization with
+other parts of an application.</li>
+<li>Correlation Ids of the same entity into the different contexts and a clean
+seperation of the data (no shared data necessary).</li>
+<li>Another way are immutable read models (value objects) of the data managed in
+another context (entity).</li>
+</ol>
+<p>In any way relying on <a class="reference external" href="http://en.wikipedia.org/wiki/Eventual_consistency">Eventual
+Consistency</a> helps
+solving the synchronization problem.</p>
+<p>Depending on how your bounded contexts seperate from each other, duplication of
+classes is necessary as well. This is something that has to be accounted for
+and you should make sure that only one context is responsible for changing the
+same data. Different contexts can have different behaviors on the same data.
+This is actually a point where Domain-Driven Design and <a class="reference external" href="http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context and
+Interaction (DCI)</a>
+intersect.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Applying bounded contexts to an application or a cluster of applications helps
+developers and domain experts to focus on problems in their specific context.
+Sometimes each context even has its own domain-expert. The benefit for
+developers is a simplified abstraction of different parts of the modelled
+problem.</p>
+</div>
+</div>]]></description>
+            <pubDate>Mon, 24 Jun 2013 00:00:00 +0200</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</link>
             <guid>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</guid>
