@@ -8,8 +8,8 @@ mistake.
 
 It is propably a human trait trying to find the one line that connects
 every dot. However in software design there is a case to be made for the
-separation of contexts to tackle complexity. Eric Evans described this in detail in his
-`"Bounded Context" <http://domaindrivendesign.org/node/91/>`_ pattern in the
+separation of contexts to tackle complexity. Eric Evans described this in detail with the
+`"Bounded Context" <http://domaindrivendesign.org/node/91/>`_ pattern in his
 "Domain-Driven Design" book. According to an interview with Evans I read
 somewhere, he considers it one of the most important patterns in the whole book.
 
@@ -23,7 +23,7 @@ model that fits all use cases. It is much less awkward to have some parts of
 the model reimplemented for different purposes than creating God objects that
 try to unify everything, and failing at this task.
 
-Evans evens goes further and introduces a significant amount of patterns
+Evans goes even further and introduces a significant amount of patterns
 that describe the relationship between different bounded contexts.
 
 An Experiment
