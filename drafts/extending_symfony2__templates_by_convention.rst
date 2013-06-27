@@ -1,10 +1,9 @@
 Extending Symfony2: Templates by Convention
 ===========================================
 
-In a Symfony2 application you are usally rendering templates
-for controllers explicitly. Based on usual Framework conventions
-however, the template names could easily be automatically
-detected based on Controller + Action name.
+In a Symfony2 application you are usally rendering templates for controllers
+explicitly. Based on usual Framework conventions however, the template names
+could easily be automatically detected based on Controller + Action name.
 
 The problem: Rendering Templates by name epxlicitly
 ---------------------------------------------------
@@ -79,8 +78,8 @@ A cleaner solution allows us to return an array only, and doing all the
 template resolving magic automatically during the ``kernel.view`` event.
 
 SensioFrameworkExtraBundle does this out of the box with the ``@Template``
-annotation, however we wan't to do better and skip even this annotation all
-together.
+annotation, however we wan't to do better and make this work without
+annotations all together.
 
 The first step is extracting the code for bundle and controller name
 detection into a service class, we call it ``SymfonyClassUtils``.
@@ -148,7 +147,7 @@ controller returned an array only, and if so uses the class utils.
             $templating = $this->container->get('templating');
             list($controller, $action) = $event->getRequest()->attributes->get('_controller');
 
-            $bundle = $this->classUtils->getBundle($controller);
+            $bundle = $this->classUtils->getBundleForClass($controller);
             $controller = $this->classUtils->getControllerShortName($controller);
             $template = sprintf('%s.%s.%s.twig.html', $bundle, $controller, $action);
 

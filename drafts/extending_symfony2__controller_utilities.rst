@@ -38,8 +38,8 @@ There are some problems here:
 - The constructor is MUCH too big, this doesn't even include your own
   application, database or mailer services.
 
-The hack: Injecting the Container
----------------------------------
+The quick and dirty solution
+----------------------------
 
 You could as a first solution, inject the container into your controller.
 But this is actually the same as just using the base controller from Symfony
@@ -49,7 +49,7 @@ The solution: Introduce a Utilities Service
 -------------------------------------------
 
 To avoid the mentioned problems with controller as a service, introduce a
-controller utilities service:
+controller utilities service and register it as ``controller_utils`` service:
 
 .. code-block:: php
 
@@ -97,6 +97,10 @@ Then you can simplify the controller as a service:
 You don't have to stop here. You can introduce lots of helper objects
 and inject them into your controller, depending on your use-cases.
 Generic handling of file uploads comes to mind for example.
+
+From medium to large applications this can lead to much smaller
+controllers, because they can much more easily reuse code between
+each other than in the case of inheritance.
 
 .. author:: default
 .. categories:: none
