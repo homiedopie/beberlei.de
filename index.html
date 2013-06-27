@@ -78,6 +78,124 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>June 27, 2013</span> 
+        </div>
+        <div class="section" id="extending-symfony2-controller-utilities">
+<h1><a href="2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a></h1>
+<p>Controllers as a service are a heated topic in the Symfony world. Developers
+mainly choose to extend the base class, because its much simpler to use and
+less to write. But less to write is not necessarily true.</p>
+<div class="section" id="the-problem-injecting-tons-of-services">
+<h2>The problem: Injecting tons of services</h2>
+<p>The Symfony controller base class uses quite a lot of services, if
+you need them in your controller as a service, you have to inject them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
+        <span class="nx">RouterInterface</span> <span class="nv">$router</span><span class="p">,</span>
+        <span class="nx">EngineInterface</span> <span class="nv">$engine</span><span class="p">,</span>
+        <span class="nx">HttpKernel</span> <span class="nv">$kernel</span><span class="p">,</span>
+        <span class="nx">FormFactoryInterface</span> <span class="nv">$formFactory</span><span class="p">,</span>
+        <span class="nx">SecurityContextInterface</span> <span class="nv">$security</span>
+    <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">router</span> <span class="o">=</span> <span class="nv">$router</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">engine</span> <span class="o">=</span> <span class="nv">$engine</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFactory</span> <span class="o">=</span> <span class="nv">$formFactory</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">security</span> <span class="o">=</span> <span class="nv">$security</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are some problems here:</p>
+<ul class="simple">
+<li>The services are not loaded lazily, we probably end up with a resource overuse here.</li>
+<li>The constructor is MUCH too big, this doesn’t even include your own
+application, database or mailer services.</li>
+</ul>
+</div>
+<div class="section" id="the-quick-and-dirty-solution">
+<h2>The quick and dirty solution</h2>
+<p>You could as a first solution, inject the container into your controller.
+But this is actually the same as just using the base controller from Symfony
+or just use the <tt class="docutils literal"><span class="pre">ContainerAware</span></tt> interface in a controller of your own.</p>
+</div>
+<div class="section" id="the-solution-introduce-a-utilities-service">
+<h2>The solution: Introduce a Utilities Service</h2>
+<p>To avoid the mentioned problems with controller as a service, introduce a
+controller utilities service and register it as <tt class="docutils literal"><span class="pre">controller_utils</span></tt> service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">ControllerUtils</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">createForm</span><span class="p">(</span><span class="nv">$type</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$template</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can implement this by just copying the over from
+<tt class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></tt> all the methods you
+need.</p>
+<p>Then you can simplify the controller as a service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class UserController</span>
+<span class="x">{</span>
+<span class="x">    private $utils;</span>
+
+<span class="x">    public function _construct(ControllerUtils $utils)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;utils = $utils;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>You don’t have to stop here. You can introduce lots of helper objects
+and inject them into your controller, depending on your use-cases.
+Generic handling of file uploads comes to mind for example.</p>
+<p>From medium to large applications this can lead to much smaller
+controllers, because they can much more easily reuse code between
+each other than in the case of inheritance.</p>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                
+                    <a href="tags/symfony.html">Symfony</a>
+                
+            </span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html#disqus_thread" data-disqus-identifier="2013/06/27/extending_symfony2__controller_utilities">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>June 24, 2013</span> 
         </div>
         <div class="section" id="bounded-contexts">
@@ -1570,50 +1688,6 @@ You can of course execute additional steps in the <tt class="docutils literal"><
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html#disqus_thread" data-disqus-identifier="2012/11/19/composer_and_azure_websites_git_deployment">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>October 27, 2012</span> 
-        </div>
-        <div class="section" id="babysteps-with-fortrabbit-php-cloud">
-<h1><a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a></h1>
-<p>I wanted to host a simple application to play around with the <a class="reference external" href="https://tent.io">Tent Protocol</a> (see <a class="reference external" href="http://whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html">my last blogpost</a>), so
-I checked through some of the PHP Cloud providers again for the fun of it. One
-requirement was to deploy from Git and update dependencies from Composer. I
-found a new provider that i haven’t heard of before, <a class="reference external" href="http://www.fortrabbit.com/">Fortrabbit</a> that supports this so I had to check it out.
-It has some more features that I really dig:</p>
-<p>Fortrabbit provides you with a Git url where you can push your repository.
-It is directly deployed during the push operation. You can trigger composer
-updates by having a special syntax in the commit message. The push
-output informs you about all the steps performed during deployment.</p>
-<p>Additionally you can configure environment variables in the web-administration
-interface that are available in the application through <tt class="docutils literal"><span class="pre">$_SERVER</span></tt>. You
-can easily use them to configure your application, if its hosted in a public
-repository. Great to share sample applications on Github and host them from
-there.</p>
-<p>You get SSH access to the machines, where you can take a look at the apache
-and php error log files. You have vim available. Quite cool and very helpful
-for any kind of debugging necessary. Deployments overwrite every change you
-make, so its still a save environment.</p>
-<p>The composer support allows for post install scripts, which is cool to perform
-all sorts of cache warmup and other deployment tasks.</p>
-<p>You can host one application for free, however they shutdown after 48 hours if
-you don’t regularly click on a reset button. Its definitely enough to get small
-prototypes up and running. From there you can upgrade in many small steps from
-small plans (10€/month) to bigger ones (80€/month).</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/10/27/babysteps_with_fortrabbit_php_cloud.html#disqus_thread" data-disqus-identifier="2012/10/27/babysteps_with_fortrabbit_php_cloud">Leave a comment</a>
         </div>
     </div>
     

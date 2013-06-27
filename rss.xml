@@ -5,7 +5,106 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Mon, 24 Jun 2013 00:00:00 +0200</pubDate>
+        <pubDate>Thu, 27 Jun 2013 00:00:00 +0200</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html</link>
+            <guid>http://www.whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html</guid>
+            <title><![CDATA[Extending Symfony2: Controller Utilities]]></title>
+            <description><![CDATA[<div class="section" id="extending-symfony2-controller-utilities">
+<h1>Extending Symfony2: Controller Utilities</h1>
+<p>Controllers as a service are a heated topic in the Symfony world. Developers
+mainly choose to extend the base class, because its much simpler to use and
+less to write. But less to write is not necessarily true.</p>
+<div class="section" id="the-problem-injecting-tons-of-services">
+<h2>The problem: Injecting tons of services</h2>
+<p>The Symfony controller base class uses quite a lot of services, if
+you need them in your controller as a service, you have to inject them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
+        <span class="nx">RouterInterface</span> <span class="nv">$router</span><span class="p">,</span>
+        <span class="nx">EngineInterface</span> <span class="nv">$engine</span><span class="p">,</span>
+        <span class="nx">HttpKernel</span> <span class="nv">$kernel</span><span class="p">,</span>
+        <span class="nx">FormFactoryInterface</span> <span class="nv">$formFactory</span><span class="p">,</span>
+        <span class="nx">SecurityContextInterface</span> <span class="nv">$security</span>
+    <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">router</span> <span class="o">=</span> <span class="nv">$router</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">engine</span> <span class="o">=</span> <span class="nv">$engine</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFactory</span> <span class="o">=</span> <span class="nv">$formFactory</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">security</span> <span class="o">=</span> <span class="nv">$security</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are some problems here:</p>
+<ul class="simple">
+<li>The services are not loaded lazily, we probably end up with a resource overuse here.</li>
+<li>The constructor is MUCH too big, this doesn’t even include your own
+application, database or mailer services.</li>
+</ul>
+</div>
+<div class="section" id="the-quick-and-dirty-solution">
+<h2>The quick and dirty solution</h2>
+<p>You could as a first solution, inject the container into your controller.
+But this is actually the same as just using the base controller from Symfony
+or just use the <tt class="docutils literal"><span class="pre">ContainerAware</span></tt> interface in a controller of your own.</p>
+</div>
+<div class="section" id="the-solution-introduce-a-utilities-service">
+<h2>The solution: Introduce a Utilities Service</h2>
+<p>To avoid the mentioned problems with controller as a service, introduce a
+controller utilities service and register it as <tt class="docutils literal"><span class="pre">controller_utils</span></tt> service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">ControllerUtils</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">createForm</span><span class="p">(</span><span class="nv">$type</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$template</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can implement this by just copying the over from
+<tt class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></tt> all the methods you
+need.</p>
+<p>Then you can simplify the controller as a service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class UserController</span>
+<span class="x">{</span>
+<span class="x">    private $utils;</span>
+
+<span class="x">    public function _construct(ControllerUtils $utils)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;utils = $utils;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>You don’t have to stop here. You can introduce lots of helper objects
+and inject them into your controller, depending on your use-cases.
+Generic handling of file uploads comes to mind for example.</p>
+<p>From medium to large applications this can lead to much smaller
+controllers, because they can much more easily reuse code between
+each other than in the case of inheritance.</p>
+</div>
+</div>]]></description>
+            <pubDate>Thu, 27 Jun 2013 00:00:00 +0200</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/06/24/bounded_contexts.html</link>
             <guid>http://www.whitewashing.de/2013/06/24/bounded_contexts.html</guid>

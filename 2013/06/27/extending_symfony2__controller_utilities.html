@@ -1,0 +1,279 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Extending Symfony2: Controller Utilities &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Bounded Contexts" href="../24/bounded_contexts.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2013-06-27-extending_symfony2__controller_utilities">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../24/bounded_contexts.html">Bounded Contexts</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>June 27, 2013</span> 
+        </div>
+    <div class="section" id="extending-symfony2-controller-utilities">
+<h1>Extending Symfony2: Controller Utilities</h1>
+<p>Controllers as a service are a heated topic in the Symfony world. Developers
+mainly choose to extend the base class, because its much simpler to use and
+less to write. But less to write is not necessarily true.</p>
+<div class="section" id="the-problem-injecting-tons-of-services">
+<h2>The problem: Injecting tons of services</h2>
+<p>The Symfony controller base class uses quite a lot of services, if
+you need them in your controller as a service, you have to inject them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
+        <span class="nx">RouterInterface</span> <span class="nv">$router</span><span class="p">,</span>
+        <span class="nx">EngineInterface</span> <span class="nv">$engine</span><span class="p">,</span>
+        <span class="nx">HttpKernel</span> <span class="nv">$kernel</span><span class="p">,</span>
+        <span class="nx">FormFactoryInterface</span> <span class="nv">$formFactory</span><span class="p">,</span>
+        <span class="nx">SecurityContextInterface</span> <span class="nv">$security</span>
+    <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">router</span> <span class="o">=</span> <span class="nv">$router</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">engine</span> <span class="o">=</span> <span class="nv">$engine</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFactory</span> <span class="o">=</span> <span class="nv">$formFactory</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">security</span> <span class="o">=</span> <span class="nv">$security</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are some problems here:</p>
+<ul class="simple">
+<li>The services are not loaded lazily, we probably end up with a resource overuse here.</li>
+<li>The constructor is MUCH too big, this doesn&#8217;t even include your own
+application, database or mailer services.</li>
+</ul>
+</div>
+<div class="section" id="the-quick-and-dirty-solution">
+<h2>The quick and dirty solution</h2>
+<p>You could as a first solution, inject the container into your controller.
+But this is actually the same as just using the base controller from Symfony
+or just use the <tt class="docutils literal"><span class="pre">ContainerAware</span></tt> interface in a controller of your own.</p>
+</div>
+<div class="section" id="the-solution-introduce-a-utilities-service">
+<h2>The solution: Introduce a Utilities Service</h2>
+<p>To avoid the mentioned problems with controller as a service, introduce a
+controller utilities service and register it as <tt class="docutils literal"><span class="pre">controller_utils</span></tt> service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">ControllerUtils</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">createForm</span><span class="p">(</span><span class="nv">$type</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$template</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can implement this by just copying the over from
+<tt class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></tt> all the methods you
+need.</p>
+<p>Then you can simplify the controller as a service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class UserController</span>
+<span class="x">{</span>
+<span class="x">    private $utils;</span>
+
+<span class="x">    public function _construct(ControllerUtils $utils)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;utils = $utils;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>You don&#8217;t have to stop here. You can introduce lots of helper objects
+and inject them into your controller, depending on your use-cases.
+Generic handling of file uploads comes to mind for example.</p>
+<p>From medium to large applications this can lead to much smaller
+controllers, because they can much more easily reuse code between
+each other than in the case of inheritance.</p>
+</div>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                
+                    <a href="../../../tags/symfony.html">Symfony</a>
+                
+            </span>
+        </div>
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/06/27/extending_symfony2__controller_utilities";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Extending Symfony2: Controller Utilities</a>
+        </li>
+        <li class="recent_post">
+            <a href="../24/bounded_contexts.html">Bounded Contexts</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../04/12/traits_are_static_access.html">Traits are Static Access</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

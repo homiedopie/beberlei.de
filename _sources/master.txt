@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/06/27/extending_symfony2__controller_utilities
    2013/06/24/bounded_contexts
    2013/05/23/symfony2_on_windows_azure_websites
    2013/04/12/traits_are_static_access
