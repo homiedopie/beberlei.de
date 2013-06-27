@@ -84,15 +84,17 @@ controller utilities service and register it as <tt class="docutils literal"><sp
 <tt class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></tt> all the methods you
 need.</p>
 <p>Then you can simplify the controller as a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class UserController</span>
-<span class="x">{</span>
-<span class="x">    private $utils;</span>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="x">    public function _construct(ControllerUtils $utils)</span>
-<span class="x">    {</span>
-<span class="x">        $this-&gt;utils = $utils;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$utils</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span><span class="nx">ControllerUtils</span> <span class="nv">$utils</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">utils</span> <span class="o">=</span> <span class="nv">$utils</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>You don’t have to stop here. You can introduce lots of helper objects

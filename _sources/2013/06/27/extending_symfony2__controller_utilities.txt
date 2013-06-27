@@ -84,6 +84,8 @@ Then you can simplify the controller as a service:
 
 .. code-block:: php
 
+    <?php
+
     class UserController
     {
         private $utils;
