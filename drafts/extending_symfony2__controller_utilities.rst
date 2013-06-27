@@ -1,9 +1,9 @@
 Extending Symfony2: Controller Utilities
 ========================================
 
-Controllers as a service a heated topic in the Symfony world. Developers
+Controllers as a service are a heated topic in the Symfony world. Developers
 mainly choose to extend the base class, because its much simpler to use and
-less to write. But this doesn't have to be the case.
+less to write. But less to write is not necessarily true.
 
 The problem: Injecting tons of services
 ---------------------------------------
@@ -37,6 +37,13 @@ There are some problems here:
 - The services are not loaded lazily, we probably end up with a resource overuse here.
 - The constructor is MUCH too big, this doesn't even include your own
   application, database or mailer services.
+
+The hack: Injecting the Container
+---------------------------------
+
+You could as a first solution, inject the container into your controller.
+But this is actually the same as just using the base controller from Symfony
+or just use the ``ContainerAware`` interface in a controller of your own.
 
 The solution: Introduce a Utilities Service
 -------------------------------------------
@@ -93,5 +100,5 @@ Generic handling of file uploads comes to mind for example.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony
 .. comments::
