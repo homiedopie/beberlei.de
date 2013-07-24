@@ -82,6 +82,110 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 31, 2009</span> 
+        </div>
+        <div class="section" id="enums-in-php">
+<h1><a href="2009/08/31/enums-in-php.html">Enums in PHP</a></h1>
+<p><a class="reference external" href="http://blog.tobias-olry.de">A colleague of mine</a> complained about the
+missing support for Enums in PHP and how one often wants to have a
+variable that is constant and has one of several specific values. We
+came up with an elegant solution that we want to share, maybe its even
+helpful to you.
+If you want to implement Enum behaviour with a simple string or int
+value you end up with having to validate the values at several different
+locations in the code rather than being able to strictly enforce the
+Enum structure by using typehints.</p>
+<p>We discussed several approaches to this problem that all seemed a bit
+ugly in one or another way. For example the <strong>SplEnum</strong> class is a step
+in the right direction, however you can only use a type hint for
+“SplEnum” or add another inheritance layer. Also you have to implement
+different classes for each enum type, which requires you to implement a
+factory method for your enum to help with creation of the different
+types.</p>
+<p>We came up with a very simple Enum concept. It uses reflection in the
+constructor to check if the given value is a valid Enum value by
+checking it against all the defined constants of the implementing class
+and throws an Exception if it is not. The __toString() magic method is
+implemented to allow for simple checks of the enums value. Strict
+type-checks are not possible with this construct, however in our opinion
+it is a very elegant solution to enforce a limited set of specific
+values throughout your code-base.</p>
+<p>Here is the code plus a small example:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>abstract class MyEnum
+{
+    final public function __construct($value)
+    {
+        $c = new ReflectionClass($this);
+        if(!in_array($value, $c-&gt;getConstants())) {
+            throw IllegalArgumentException();
+        }
+        $this-&gt;value = $value;
+    }
+
+    final public function __toString()
+    {
+        return $this-&gt;value;
+    }
+}
+
+class Foo extends MyEnum
+{
+    const FOO = &quot;foo&quot;;
+    const BAR = &quot;bar&quot;;
+}
+
+$a = new Foo(Foo::FOO);
+$b = new Foo(Foo::BAR);
+$c = new Foo(Foo::BAR);
+
+if($a == Foo::FOO) {
+    echo &quot;My value is Foo::FOO\n&quot;;
+} else {
+    echo &quot;I dont match!\n&quot;;
+}
+
+if($a == $b) {
+    echo &quot;a value equals b value!\n&quot;;
+}
+if($b == $c) {
+    echo &quot;b value equals c value!\n&quot;;
+}</pre>
+</div>
+</div></blockquote>
+<p>Now you could nice things such as:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>function doStuff(Foo $foo) {
+    switch($foo) {
+        case Foo::FOO:
+            echo &quot;do more here!\n&quot;;
+            break;
+        case Foo::BAR;
+            echo &quot;evil stop!\n&quot;;
+            break;
+    }
+}
+
+doStuff($a);</pre>
+</div>
+</div></blockquote>
+<p>What are your thoughts?</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/08/31/enums-in-php.html#disqus_thread" data-disqus-identifier="2009/08/31/enums-in-php">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 23, 2009</span> 
         </div>
         <div class="section" id="zend-form-and-the-model-yet-another-perspective-using-a-mediator">
@@ -768,52 +872,6 @@ looking forward to see you at IPC.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09.html#disqus_thread" data-disqus-identifier="2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>October 05, 2009</span> 
-        </div>
-        <div class="section" id="php-codesniffer-for-netbeans-v0-2">
-<h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
-<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/">PHP CodeSniffer for
-Netbeans
-plugin</a>.
-Previously the plugin used an unnecessary API which restricted the use
-to Netbeans 6.7.0 only. This API was removed so that the plugin should
-now work with all Netbeans Versions &gt;= 6.7.0.</p>
-<p>Additionally when working the previous version would scan every PHP
-script on a file per file basis when the all projects or main projects
-filters were activated. This rendered made the plugin almost useless. In
-the current version scans of filters that contain more than one file are
-blocked. That means you will only see Coding Violations when you enable
-the “Current File” filter. Using any other filter will just do nothing
-and won’t put your Netbeans in permanent hibernation mode (aka useless
-mode).</p>
-<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
-<strong>`NbPreferences
-API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
-which allows to configure the coding standard. [STRIKEOUT:However this
-feature was contributed by <a class="reference external" href="http://manuel-pichler.de/">Manuel
-Piechler</a> and I don’t yet understand how I
-can manipulate it. Maybe someone knows how (*Looking in Mapis general
-direction*)?] By default the Zend Coding Standard is used.</p>
-<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
-file .netbeans/6.7/config/Preferences.properties setting
-“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
-inline highlighting that did not refresh when lines in the file changed.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/10/05/php-codesniffer-for-netbeans-v0-2.html#disqus_thread" data-disqus-identifier="2009/10/05/php-codesniffer-for-netbeans-v0-2">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -860,6 +918,9 @@ inline highlighting that did not refresh when lines in the file changed.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
         </li>
         <li class="recent_post">
@@ -885,9 +946,6 @@ inline highlighting that did not refresh when lines in the file changed.</p>
         </li>
         <li class="recent_post">
             <a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a>
-        </li>
-        <li class="recent_post">
-            <a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a>
         </li>
     </ul>
 </div>

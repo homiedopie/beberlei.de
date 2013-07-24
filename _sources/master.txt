@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/07/24/doctrine_and_domainevents
    2013/06/27/extending_symfony2__controller_utilities
    2013/06/24/bounded_contexts
    2013/05/23/symfony2_on_windows_azure_websites
