@@ -19,7 +19,7 @@ approaches:
 - No need to use unexplicit Doctrine Lifecycle events that are triggered on all
   update operations.
 
-This block post will introduce a very simple implementation for Domain Events
+This blog post will introduce a very simple implementation for Domain Events
 with Doctrine2. You should be able to easily extend it to be more flexible,
 reliable or optionally even asynchronuous. I skip some of the glue code in this blog post,
 but you can try the full code by checking out `this Gist
