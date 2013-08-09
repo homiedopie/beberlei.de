@@ -1,5 +1,5 @@
-Your Service Layer benefits from Central Dispatching
-====================================================
+Your Service Layer benefits from a Dispatcher
+=============================================
 
 One benefit of recent applications over old 90s, early 2000 style PHP is
 central dispatching of requests through one ``Application`` or ``Dispatcher``
