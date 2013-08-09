@@ -1,0 +1,414 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Your Service Layer benefits from a Dispatcher &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Doctrine and Domain Events" href="../../07/24/doctrine_and_domainevents.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2013-08-09-your_service_layer_benefits_from_a_dispatcher">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>August 09, 2013</span> 
+        </div>
+    <div class="section" id="your-service-layer-benefits-from-a-dispatcher">
+<h1>Your Service Layer benefits from a Dispatcher</h1>
+<p>One benefit of recent applications over old 90s, early 2000 style PHP is
+central dispatching of requests through one <tt class="docutils literal"><span class="pre">Application</span></tt> or <tt class="docutils literal"><span class="pre">Dispatcher</span></tt>
+object. This is true for dispatching objects such as PHPs <tt class="docutils literal"><span class="pre">SoapServer</span></tt> or
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> as well. Old style applications use the
+webserver (Apache, Nginx) for the dispatching of routes to executed PHP
+scripts.</p>
+<p>Central dispatching allows developers to hook into central events during the
+request processing to implement security, routing, caching, debugging, logging,
+localization and many things more transparently.</p>
+<p>If you check this list of features, these are all cross-cutting concerns to
+the real purpose of your application and nicely abstracted from the core
+of your application using central dispatching.</p>
+<p>When building a future proof system focussing on the domain and starting
+test-driven without dependency on a framework and UI, we often use the <a class="reference external" href="http://martinfowler.com/eaaCatalog/serviceLayer.html">Service
+Layer Pattern</a> to
+decouple our business logic from technical implementation details. The service
+layer however is affected by cross-cutting concerns again and this blog-post
+is about finding a maintainable solution to handle them.</p>
+<div class="section" id="service-layer-without-dispatching">
+<h2>Service Layer without Dispatching</h2>
+<p>As a practical example I will pick the classical user registration example,
+starting with a service-layer that implements the cross-cutting
+concerns inside the service method:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">create</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nv">$password</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">security</span><span class="o">-&gt;</span><span class="na">assertNotLoggedInAlready</span><span class="p">();</span>
+
+        <span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+        <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">setEmail</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
+        <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">encodePassword</span><span class="p">(</span><span class="nv">$password</span><span class="p">);</span>
+
+        <span class="nv">$violations</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">validator</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$violations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\IllegalArgumentException</span><span class="p">(((</span><span class="nx">string</span><span class="p">)</span><span class="nv">$violations</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
+
+        <span class="nv">$message</span> <span class="o">=</span> <span class="s2">&quot;Thanks for registering! Please click here: ...&quot;</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">mailer</span><span class="o">-&gt;</span><span class="na">sendMessage</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nv">$message</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">logger</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s2">&quot;New user registration: &quot;</span> <span class="o">.</span> <span class="nv">$email</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is quickly getting out of hands with the number of services needed and you
+will not have fun testing this for example. This approach violates the
+Single-Responsibility-Princple (SRP) doing way too much non-related operations.
+Think about having to do this in every method of your service layer and you
+can already see this leads to lots of spagetti-code.</p>
+</div>
+<div class="section" id="using-the-decorator-pattern">
+<h2>Using the Decorator Pattern</h2>
+<p>We could use the decorator pattern to extract some of the cross-cutting concerns
+into their own services. This requires to introduce an interface for <tt class="docutils literal"><span class="pre">UserService</span></tt>
+and then building decorators for the different concerns. Then the service
+can be built as a decorator chain:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$userService</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nx">LogUserService</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">SecurityUserService</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">DoctrineTransactionUserService</span><span class="p">(</span>
+                <span class="k">new</span> <span class="nx">UserService</span><span class="p">(),</span> <span class="o">...</span>
+            <span class="p">),</span> <span class="o">...</span>
+        <span class="p">),</span> <span class="o">...</span>
+    <span class="p">);</span>
+</pre></div>
+</div>
+<p>The real <tt class="docutils literal"><span class="pre">UserService</span></tt> will slimmer and more closely handling just the
+business logic related information. Using decorators requires us to write the
+same delegation code <strong>for every</strong> method on every service, introducing many
+decorators and interfaces that duplicate lots of code.  Something we want to
+avoid to keep our own sanity.</p>
+</div>
+<div class="section" id="introducing-a-dispatcher">
+<h2>Introducing a Dispatcher</h2>
+<p>Lets refactor from decorator towards a dispatching approach instead, to
+keep more reusable. The <tt class="docutils literal"><span class="pre">CommandDispatcher</span></tt> object accepts a service name
+and method and calls it. We can wrap every call with cross-cutting
+concerns.</p>
+<p>Starting with a very simple dispatcher possible that just delegates the calls
+to registered services, we add all the cross-cutting concerns our application
+needs. Note: This is <strong>deliberatly written without further abstraction</strong>, just
+to show the concept. The real thing would propably seperate the
+responsibilities from each other.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">CommandDispatcher</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$services</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerService</span><span class="p">(</span><span class="nv">$serviceName</span><span class="p">,</span> <span class="nv">$service</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="nv">$serviceName</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$service</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">$serviceName</span><span class="p">,</span> <span class="nv">$method</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$params</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$service</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="nv">$serviceName</span><span class="p">];</span> <span class="c1">// make lazy</span>
+        <span class="nv">$callback</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$service</span><span class="p">,</span> <span class="nv">$method</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$serviceName</span> <span class="o">===</span> <span class="s2">&quot;user&quot;</span> <span class="o">&amp;&amp;</span> <span class="nv">$method</span> <span class="o">===</span> <span class="s2">&quot;create&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNotLoggedInAlready</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$callback</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">mailer</span><span class="o">-&gt;</span><span class="na">sendQueuedMails</span><span class="p">();</span> <span class="c1">// &quot;deferred commit&quot; of mails</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">logger</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s2">&quot;Called </span><span class="si">$serviceName</span><span class="s2">.</span><span class="si">$method</span><span class="s2">&quot;</span><span class="p">);</span>
+
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span><span class="o">-&gt;</span><span class="na">rollBack</span><span class="p">();</span>
+            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The dispatcher handles transactions around all the commands and also makes sure
+that when they send emails, those only get send when the transaction was
+successful. It checks if the user has the correct access
+controls/authentication and performs some generic logging.</p>
+<p>And using the dispatcher in your code looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
+
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nv">$password</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Like the front controller in MVC or PHPs <tt class="docutils literal"><span class="pre">SOAPServer</span></tt> you register
+services/functions with the dispatcher. Registration of services can be done by
+convention, via some DependencyInjection Container Service name or any other
+way you prefer. The dispatcher then handles ALL commands by wrapping them
+inside some generic logic.</p>
+<p>Compared to the Decorator approach, you can now easily reuse this code with
+many commands. Except registering new services, no new code is necessary when
+adding a new method or service.</p>
+</div>
+<div class="section" id="a-better-api-for-the-dispatcher">
+<h2>A better API for the Dispatcher</h2>
+<p>So far the API of the dispatcher is tedious, so lets work a little bit on how
+you actually call methods on the service-layer.</p>
+<p>There are two ways to make this call nicer. The first is use magic <tt class="docutils literal"><span class="pre">__call</span></tt> and some
+clever duck-typing to create an API similar to this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
+
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">user</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nv">$password</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The second approach does not require magic <tt class="docutils literal"><span class="pre">__call</span></tt>, but requires you to write a class for each
+command. We map the command class name to a callback:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$userService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">();</span>
+
+<span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerCommand</span><span class="p">(</span><span class="s1">&#39;CreateUserCommand&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$userService</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">));</span>
+
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">CreateUserCommand</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nv">$password</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>The naming is very techincal here, but since the dispatcher also acts as a
+facade to the application, we could give it better names like
+<tt class="docutils literal"><span class="pre">PayrollApplication</span></tt>, <tt class="docutils literal"><span class="pre">Shop</span></tt>, <tt class="docutils literal"><span class="pre">TrackingSystem</span></tt>, any name the application
+has inside your organization.</p>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion</h2>
+<p>Now that I have shown the implementation of a dispatcher a small discussion
+is necessary to evaluate it. The cross-cutting concerns could be nicely
+wrapped in the dispatcher, so we achieved a considerable improvement
+over the first example with all the concerns nicely seperated from each other.</p>
+<p>The benefits are:</p>
+<ul class="simple">
+<li>Services themself don&#8217;t need access to the cross-cutting concerns anymore,
+reducing the number of dependencies and increasing maintainability and
+testability.</li>
+<li>Handling cross-cutting concerns, that can make the service layer code very
+complex otherwise, in a clean way</li>
+<li>All the concerns are easily composable and the result is a SOLID approach towards them.</li>
+<li>The dispatcher also allows us to add or remove concerns later at one central
+location without having to change all the service layer code.</li>
+<li>The framework we use can be very simple as long it fullfils the major
+requirement to be easily compatible to the dispatcher approach.</li>
+<li>Compared to an MVC frameworks dispatcher, our service dispatcher can tailored
+to the application itself and end up being very small and easily
+understandable.</li>
+</ul>
+<p>How do we use this dispatcher in our MVC framework though? Instead of using
+controllers/actions a REST or SOAP API could just use the dispatching and
+services directly and map the HTTP request to it based on convention. This
+would be a real win and simplify the framework-glue code considerably.</p>
+<p>In a web-application however this is not so simple. We need to send redirects,
+manage session state and handle request and response data, which often requires one
+specific controller-action for each command. With some experimentation
+it might be possible to achieve a much higher re-use here, but it might fail as
+well.</p>
+<p>That brings us to the downside of the dispatcher approach:</p>
+<ul class="simple">
+<li>We need some additional code and extra classes, which might be too much for
+small applications and the indirection of handling cross-cutting concerns
+might confuse teammates.</li>
+<li>Having the dispatcher object inside controllers feels strange from the MVC
+point of view, it doesn&#8217;t really fit. It also still may require implementing
+one action for every command, not simplifying this part of the development.</li>
+<li>While other languages don&#8217;t need this because of their support for AOP and
+annotations (Spring for Java for example) this is necessary in PHP only,
+because we don&#8217;t have this features.</li>
+<li>Unless we use the explicit command object approach, there is no
+auto-completion for commands on the dispatcher in the IDEs.</li>
+</ul>
+<p>My conclusion from working with both kind of service layers: If you decided for
+such a service layer, then my experience shows it is a mistake not to use a
+dispatcher, because the benefits outweigh the downsides.</p>
+</div>
+</div>
+
+    
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+    </div>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/08/09/your_service_layer_benefits_from_a_dispatcher";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2013/08/09/your_service_layer_benefits_from_a_dispatcher.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Your Service Layer benefits from a Dispatcher</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../06/24/bounded_contexts.html">Bounded Contexts</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../04/12/traits_are_static_access.html">Traits are Static Access</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
