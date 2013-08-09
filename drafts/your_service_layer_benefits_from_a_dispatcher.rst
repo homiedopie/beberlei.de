@@ -101,10 +101,11 @@ keep more reusable. The ``CommandDispatcher`` object accepts a service name
 and method and calls it. We can wrap every call with cross-cutting
 concerns.
 
-Starting with the most simple dispatcher possible, by just delegating the calls,
-we add all the cross-cutting concerns. Note: This is **deliberatly written
-without further abstraction**, just to show the concept. The real thing would
-propably seperate the responsibilities from each other.
+Starting with a very simple dispatcher possible that just delegates the calls
+to registered services, we add all the cross-cutting concerns our application
+needs. Note: This is **deliberatly written without further abstraction**, just
+to show the concept. The real thing would propably seperate the
+responsibilities from each other.
 
 .. code-block:: php
 
@@ -232,6 +233,10 @@ The benefits are:
 
 - The framework we use can be very simple as long it fullfils the major
   requirement to be easily compatible to the dispatcher approach.
+
+- Compared to an MVC frameworks dispatcher, our service dispatcher can tailored
+  to the application itself and end up being very small and easily
+  understandable.
 
 How do we use this dispatcher in our MVC framework though? Instead of using
 controllers/actions a REST or SOAP API could just use the dispatching and
