@@ -130,9 +130,9 @@ responsibilities from each other.
             }
 
             $this->entityManager->beginTransaction();
-            try {
 
-                $result =  call_user_func_array($callback, $params);
+            try {
+                $result = call_user_func_array($callback, $params);
                 $this->entityManager->commit();
 
                 $this->mailer->sendQueuedMails(); // "deferred commit" of mails
