@@ -88,10 +88,10 @@ can be built as a decorator chain:
         );
 
 The real ``UserService`` will slimmer and more closely handling just the
-business logic related information. But this solution with decorators, requires
-us to write the same delegation code **for every** method on every service,
-introducing many decorators and interfaces that duplicate lots of code.
-Something we want to avoid to keep our own sanity.
+business logic related information. Using decorators requires us to write the
+same delegation code **for every** method on every service, introducing many
+decorators and interfaces that duplicate lots of code.  Something we want to
+avoid to keep our own sanity.
 
 Introducing a Dispatcher
 ------------------------
