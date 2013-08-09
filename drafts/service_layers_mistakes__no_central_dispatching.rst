@@ -1,10 +1,10 @@
-Service Layers Mistakes: No central dispatching
-===============================================
+Your Service Layer benefits from Central Dispatching
+====================================================
 
 One benefit of recent applications over old 90s, early 2000 style PHP is
-central dispatching of requests through one `Application` or `Dispatcher`
-object. This is true for dispatching objects such as PHPs `SoapServer` or
-`Zend\XmlRpc\Server` as well. Old style applications use the
+central dispatching of requests through one ``Application`` or ``Dispatcher``
+object. This is true for dispatching objects such as PHPs ``SoapServer`` or
+``Zend\XmlRpc\Server`` as well. Old style applications use the
 webserver (Apache, Nginx) for the dispatching of routes to executed PHP
 scripts.
 
@@ -17,14 +17,11 @@ the real purpose of your application and nicely abstracted from the core
 of your application using central dispatching.
 
 When building a future proof system focussing on the domain and starting
-test-driven without a UI, it makes sense to use `Service Layer Pattern
-<http://martinfowler.com/eaaCatalog/serviceLayer.html>`_ to decouple our
-business logic from nasty technical decisions such as what framework to use, if
-the application is served via REST API or directly renders to HTML, maybe even
-works over different protocols. The service layer however is affected by the
-same cross cutting concerns again. A language with support for
-Aspect-Oriented-Programming could handle those concerns nicely, but PHP is not
-such a language.
+test-driven without dependency on a framework and UI, we often use the `Service
+Layer Pattern <http://martinfowler.com/eaaCatalog/serviceLayer.html>`_ to
+decouple our business logic from technical implementation details. The service
+layer however is affected by cross-cutting concerns again and this blog-post
+is about finding a maintainable solution to handle them.
 
 Service Layer without Dispatching
 ---------------------------------
@@ -63,10 +60,11 @@ concerns inside the service method:
         }
     }
 
-This is quickly getting out of hands with the number of services needed
-and you will not have fun testing this for example. This approach
-violates the Single-Responsibility-Princple (SRP) doing way too much
-non-related operations.
+This is quickly getting out of hands with the number of services needed and you
+will not have fun testing this for example. This approach violates the
+Single-Responsibility-Princple (SRP) doing way too much non-related operations.
+Think about having to do this in every method of your service layer and you
+can already see this leads to lots of spagetti-code.
 
 Using the Decorator Pattern
 ---------------------------
