@@ -48,7 +48,7 @@ considerable performance boost on a Vagrant box:
 
         public function getCacheDir()
         {
-            if (in_array($this->environment, array('dev, 'test'))) {
+            if (in_array($this->environment, array('dev', 'test'))) {
                 return sys_get_temp_dir() . '/appname/cache/' .  $this->environment;
             }
 
@@ -57,7 +57,7 @@ considerable performance boost on a Vagrant box:
 
         public function getLogDir()
         {
-            if (in_array($this->environment, array('dev, 'test'))) {
+            if (in_array($this->environment, array('dev', 'test'))) {
                 return sys_get_temp_dir() . '/appname/logs';
             }
 
