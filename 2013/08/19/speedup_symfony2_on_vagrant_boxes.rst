@@ -45,9 +45,9 @@ finally doing some benchmarking with `XHProf
 
 The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
 To fix this just change the cache **AND** the log directory to
-``sys_get_temp_dir()`` instead of writing to the NFS share. I actually tried
-this before, but since I forgot the log directory, this felt equally slow
-and I reverted the change.
+``sys_get_temp_dir()`` or shared memory (/dev/shm) instead of writing to the
+NFS share. I actually tried this before, but since I forgot the log directory,
+this felt equally slow and I reverted the change.
 
 Here is the code you should add to your ``AppKernel`` to give you a
 considerable performance boost on a Vagrant box:
@@ -63,7 +63,7 @@ considerable performance boost on a Vagrant box:
         public function getCacheDir()
         {
             if (in_array($this->environment, array('dev', 'test'))) {
-                return sys_get_temp_dir() . '/appname/cache/' .  $this->environment;
+                return '/dev/shm/appname/cache/' .  $this->environment;
             }
 
             return parent::getCacheDir();
@@ -72,7 +72,7 @@ considerable performance boost on a Vagrant box:
         public function getLogDir()
         {
             if (in_array($this->environment, array('dev', 'test'))) {
-                return sys_get_temp_dir() . '/appname/logs';
+                return '/dev/shm/appname/logs';
             }
 
             return parent::getLogDir();
