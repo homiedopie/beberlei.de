@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/08/19/speedup_symfony2_on_vagrant_boxes
    2013/08/09/your_service_layer_benefits_from_a_dispatcher
    2013/07/24/doctrine_and_domainevents
    2013/06/27/extending_symfony2__controller_utilities
