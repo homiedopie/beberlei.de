@@ -51,16 +51,16 @@ considerable performance boost on a Vagrant box:</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev, '</span><span class="nx">test</span><span class="s1">'))) {</span>
-<span class="s1">            return sys_get_temp_dir() . '</span><span class="o">/</span><span class="nx">appname</span><span class="o">/</span><span class="nx">cache</span><span class="o">/</span><span class="s1">' .  $this-&gt;environment;</span>
-<span class="s1">        }</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">sys_get_temp_dir</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'/appname/cache/'</span> <span class="o">.</span>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">;</span>
+        <span class="p">}</span>
 
-<span class="s1">        return parent::getCacheDir();</span>
-<span class="s1">    }</span>
+        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getCacheDir</span><span class="p">();</span>
+    <span class="p">}</span>
 
-<span class="s1">    public function getLogDir()</span>
-<span class="s1">    {</span>
-<span class="s1">        if (in_array($this-&gt;environment, array('</span><span class="nx">dev</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLogDir</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
             <span class="k">return</span> <span class="nb">sys_get_temp_dir</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'/appname/logs'</span><span class="p">;</span>
         <span class="p">}</span>
 
