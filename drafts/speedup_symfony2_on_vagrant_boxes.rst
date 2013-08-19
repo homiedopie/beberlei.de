@@ -14,7 +14,7 @@ configuration files have changed.
 
 This is just a small part, there are other bottlenecks that I have found after
 finally doing some benchmarking with `XHProf
-<https://github.com/facebook/xhprof>`_, leading to a truely simple fix:
+<https://github.com/facebook/xhprof>`_, leading to a simple fix:
 
 1. Monolog logs to the NFS share and the huge number ``fwrite`` take their toll.
 2. Writing compiled Twig templates to the NFS share using ``file_put_contents``.
@@ -30,7 +30,7 @@ finally doing some benchmarking with `XHProf
    inside the pass over 100.000 times.
 
 The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
-The fix is simple, change the cache **AND** the log directory to
+To fix this just change the cache **AND** the log directory to
 ``sys_get_temp_dir()`` instead of writing to the NFS share. I actually tried
 this before, but since I forgot the log directory, this felt equally slow
 and I reverted the change.
