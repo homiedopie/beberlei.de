@@ -1,11 +1,25 @@
 Speedup Symfony2 on Vagrant boxes
 =================================
 
+**Update:** Added requirements to configure Vagrant and Virtualbox before
+trying my change.
+
 Using Symfony2 inside a Vagrant box is considered to be very slow (`here
 <http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host>`_,
 `here <https://twitter.com/spicy_sake/status/183135528567320576>`_), even when
 using NFS. I can confirm the experience and know many others that reported the
 same.
+
+Before doing this changes make sure:
+
+- You are using Vagrant 1.2 (not sure that makes a difference though)
+- You are using NFS with Vagrant (`More
+  <http://docs.vagrantup.com/v2/synced-folders/nfs.html>`_). If you are on
+  Windows then this can already be the problem (Virtualbox FS is slow with
+  Symfony, because of the large number of files.)
+- You have the Vbox Guest Additions on the guest that match your system (`More <https://gist.github.com/fernandoaleman/5083680>`_)
+- You have an opcode cache installed, either `apc` or `opcache`.
+- You disable `xdebug` or `xhprof`.
 
 Without looking at an actual benchmark (mistake!) I always considered the problem to be
 related to the huge number of files that a Symfony project normally ships with
