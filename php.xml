@@ -50,9 +50,9 @@ inside the pass over 100.000 times.</li>
 </ol>
 <p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
 To fix this just change the cache <strong>AND</strong> the log directory to
-<tt class="docutils literal"><span class="pre">sys_get_temp_dir()</span></tt> instead of writing to the NFS share. I actually tried
-this before, but since I forgot the log directory, this felt equally slow
-and I reverted the change.</p>
+<tt class="docutils literal"><span class="pre">sys_get_temp_dir()</span></tt> or shared memory (/dev/shm) instead of writing to the
+NFS share. I actually tried this before, but since I forgot the log directory,
+this felt equally slow and I reverted the change.</p>
 <p>Here is the code you should add to your <tt class="docutils literal"><span class="pre">AppKernel</span></tt> to give you a
 considerable performance boost on a Vagrant box:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -64,7 +64,7 @@ considerable performance boost on a Vagrant box:</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nb">sys_get_temp_dir</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'/appname/cache/'</span> <span class="o">.</span>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">;</span>
+            <span class="k">return</span> <span class="s1">'/dev/shm/appname/cache/'</span> <span class="o">.</span>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">;</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getCacheDir</span><span class="p">();</span>
@@ -73,7 +73,7 @@ considerable performance boost on a Vagrant box:</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">getLogDir</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nb">sys_get_temp_dir</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'/appname/logs'</span><span class="p">;</span>
+            <span class="k">return</span> <span class="s1">'/dev/shm/appname/logs'</span><span class="p">;</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getLogDir</span><span class="p">();</span>
