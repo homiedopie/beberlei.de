@@ -78,6 +78,108 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 19, 2013</span> 
+        </div>
+        <div class="section" id="speedup-symfony2-on-vagrant-boxes">
+<h1><a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a></h1>
+<p>Using Symfony2 inside a Vagrant box is considered to be very slow (<a class="reference external" href="http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host">here</a>,
+<a class="reference external" href="https://twitter.com/spicy_sake/status/183135528567320576">here</a>), even when
+using NFS. I can confirm the experience and know many others that reported the
+same.</p>
+<p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
+related to the huge number of files that a Symfony project normally ships with
+and the I/O that is generated from <tt class="docutils literal"><span class="pre">filemtime</span></tt> calls to check if the
+configuration files have changed.</p>
+<p>This is just a small part, there are other bottlenecks that I have found after
+finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
+<ol class="arabic simple">
+<li>Monolog logs to the NFS share and the huge number <tt class="docutils literal"><span class="pre">fwrite</span></tt> take their toll.</li>
+<li>Writing compiled Twig templates to the NFS share using <tt class="docutils literal"><span class="pre">file_put_contents</span></tt>.</li>
+<li>Assetic: Scanning for stylesheets and javascripts within templates is very
+slow, causing lots of I/O on the NFS share and CPU and changing it to using
+explicit bundling in the <tt class="docutils literal"><span class="pre">app/config/config.yml</span></tt> helps alot. You can use a
+cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
+a <cite>–watch</cite> flag in the background.</li>
+<li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
+<li><tt class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></tt> in Symfony DIC uses a set of
+recursive algorithms to replace aliases with the real services. That takes a
+huge amount of time in bigger applications including amounting calls to methods
+inside the pass over 100.000 times.</li>
+</ol>
+<p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
+To fix this just change the cache <strong>AND</strong> the log directory to
+<tt class="docutils literal"><span class="pre">sys_get_temp_dir()</span></tt> instead of writing to the NFS share. I actually tried
+this before, but since I forgot the log directory, this felt equally slow
+and I reverted the change.</p>
+<p>Here is the code you should add to your <tt class="docutils literal"><span class="pre">AppKernel</span></tt> to give you a
+considerable performance boost on a Vagrant box:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev, '</span><span class="nx">test</span><span class="s1">'))) {</span>
+<span class="s1">            return sys_get_temp_dir() . '</span><span class="o">/</span><span class="nx">appname</span><span class="o">/</span><span class="nx">cache</span><span class="o">/</span><span class="s1">' .  $this-&gt;environment;</span>
+<span class="s1">        }</span>
+
+<span class="s1">        return parent::getCacheDir();</span>
+<span class="s1">    }</span>
+
+<span class="s1">    public function getLogDir()</span>
+<span class="s1">    {</span>
+<span class="s1">        if (in_array($this-&gt;environment, array('</span><span class="nx">dev</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">sys_get_temp_dir</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'/appname/logs'</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getLogDir</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This brings the page rendering speeds down to between 1.5 and 3 seconds, which
+is quite normal for the development environment even outside a virtual machine.</p>
+<p>This tip obviously works for any kind of application that has a I/O intensive
+development environment: Don’t perform this operations on the NFS share unless
+you wan’t to suffer.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="categories">
+            <span>
+                Filed under:
+                
+                    <a href="categories/php.html">PHP</a>,
+                
+                    <a href="categories/symfony.html">Symfony</a>
+                
+            </span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                
+                    <a href="tags/php.html">PHP</a>,
+                
+                    <a href="tags/symfony.html">Symfony</a>
+                
+            </span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html#disqus_thread" data-disqus-identifier="2013/08/19/speedup_symfony2_on_vagrant_boxes">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>August 09, 2013</span> 
         </div>
         <div class="section" id="your-service-layer-benefits-from-a-dispatcher">
@@ -1710,205 +1812,6 @@ tests.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/03/04/doctrine_repositories.html#disqus_thread" data-disqus-identifier="2013/03/04/doctrine_repositories">Leave a comment</a>
-        </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>February 19, 2013</span> 
-        </div>
-        <div class="section" id="extending-symfony2-paramconverter">
-<h1><a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a></h1>
-<p>Symfony2 is an extremely extendable framework, everything is extendable or
-overwritable through the Dependency Injection Container. The problem developers
-face is knowing about the extension points and when to use them.  If you don’t
-know the extension points, your Symfony application will end up with code
-duplication, too much inheritance and very little unit-testable code.</p>
-<p>This blog post will be the first in a series, describing Symfony2 extension
-points that help you achieve clean and duplicateless code. In my experience,
-using Symfony extension points to avoid code duplication helps you avoid
-writing thousands of lines of code in your controllers.</p>
-<div class="section" id="the-problem-duplicate-finder-logic">
-<h2>The problem: Duplicate finder logic</h2>
-<p>Inside controllers you can easily end with lots of duplication using the same
-general finder logic again in several actions. Take this following example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1&quot;</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>If we need this block of code in several actions of different controllers, we
-will end up with duplication that has to be eliminated.</p>
-</div>
-<div class="section" id="the-quick-and-dirty-solution">
-<h2>The Quick and Dirty Solution</h2>
-<p>One way of resolving the duplication appearing in this case, is moving the
-finder + not found logic into a common controller base class or into a trait.
-But this leaves us with a helper method buried in the code and a static
-dependency to a base class or a trait that we want to avoid.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">AbstractController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">findUser</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1&quot;</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nv">$user</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>There are two problems with this sort of refactoring:</p>
-<ol class="arabic simple">
-<li>We are using inheritance for code-reuse.</li>
-<li>We hide the <tt class="docutils literal"><span class="pre">findUser</span></tt> behavior in an abstract class and make it hard to test.</li>
-</ol>
-</div>
-<div class="section" id="the-preferred-solution">
-<h2>The Preferred Solution</h2>
-<p>The <a class="reference external" href="http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html">SensioFrameworkExtraBundle</a>
-offers an extension hook called <strong>Parameter Converters</strong> to transform Request
-attributes to objects directly for controller method arguments. They hook into
-the <tt class="docutils literal"><span class="pre">kernel.controller</span></tt> event that you can use yourself to achieve the same
-goal.</p>
-<p>Lets see how the action will look like after our refactoring:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">User</span> <span class="nv">$user</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Very concise and easy to read. The param converter doing the heavy lifting
-looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Request\ParamConverter</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Exception\NotFoundHttpException</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">UserParamConverter</span> <span class="k">implements</span> <span class="nx">ParamConverterInterface</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$entityManager</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">EntityManager</span> <span class="nv">$entityManager</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">apply</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$id</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
-
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1&quot;</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="nv">$param</span> <span class="o">=</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
-        <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="p">(</span><span class="nv">$param</span><span class="p">,</span> <span class="nv">$user</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">supports</span><span class="p">(</span><span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="s2">&quot;MyProject\Entity\User&quot;</span> <span class="o">===</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getClass</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Now we only need to register this class in the dependency injection container:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">&quot;my_project.user_param_converter&quot;</span>
-      <span class="na">class=</span><span class="s">&quot;MyProject\Request\ParamConverter\UserParamConverter&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">&quot;service&quot;</span> <span class="na">id=</span><span class="s">&quot;doctrine.orm.default_entity_manager&quot;</span> <span class="nt">/&gt;</span>
-
-    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">&quot;request.param_converter&quot;</span> <span class="na">converter=</span><span class="s">&quot;user&quot;</span> <span class="na">priority=</span><span class="s">&quot;10&quot;</span> <span class="nt">/&gt;</span>
-<span class="nt">&lt;/service&gt;</span>
-</pre></div>
-</div>
-<p>With the priority configuration the <tt class="docutils literal"><span class="pre">User</span></tt> entity is now always handled
-by our custom param converter and not by the default Doctrine converter.</p>
-<p>In a next step, we should extract the query logic from the ParamConverter
-into a custom Doctrine entity repository. But that is a task for another blog
-post in this series.</p>
-</div>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="categories">
-            <span>
-                Filed under:
-                
-                    <a href="categories/symfony2.html">Symfony2</a>
-                
-            </span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                
-                    <a href="tags/symfony2_extendingsymfony2.html">Symfony2 ExtendingSymfony2</a>
-                
-            </span>
-        </div>
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html#disqus_thread" data-disqus-identifier="2013/02/19/extending_symfony2__paramconverter">Leave a comment</a>
         </div>
     </div>
     

@@ -82,6 +82,220 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 18, 2012</span> 
+        </div>
+        <div class="section" id="oop-business-applications-command-query-responsibility-segregation-cqrs">
+<h1><a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a></h1>
+<p>Other posts in this series about OOP Business Applications:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">Trying to escape the
+mess</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">Entity, Boundary, Interactor</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
+</ul>
+<p>The last pattern for designing your business logic is called
+“Command-Query-Responsibility-Segregation” or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
+put forward by Bertrand Meyer.</p>
+<p>Wikipedia has a very good summary about what this principle is about:</p>
+<div class="highlight-python"><pre>Command-Query-Separation states that every method should either be a
+command that performs an action, or a query that returns data to the
+caller, but not both. In other words, asking a question should not change
+the answer. More formally, methods should return a value only if they are
+referentially transparent and hence possess no side effects.</pre>
+</div>
+<p>CQRS is an OOP architecture design pattern building on that imperative
+principle.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are many different variations of the CQRS pattern that
+all have their place. This post describes a simple variant that does
+<strong>not</strong>
+use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
+with CQRS.</p>
+</div>
+<p>At its heart is the separation of Read and Write methods. This can be easily
+achieved by just having two different service layer classes instead of one.
+This insight alone is not really helpful, its just moving methods around.
+Coupled to this change however is the notion, that read and write models don’t
+necessarily have to be the same:</p>
+<ul class="simple">
+<li>Getter/Setters: We don’t need setters in the write model, instead we use
+explicit methods for each write operation. Entities are also much simpler
+without bi-directional relationships that read/write models often need.
+Read-only models (ViewModel) don’t need getters/setters. They could just use
+public properties or even be arrays.</li>
+<li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
+mostly need queries by primary key, changing only some objects. In
+read scenarios we need complex queries, joins and aggregations. A separation
+prevents both from affecting each other negatively.</li>
+<li>Mapping Data-Transfer objects becomes simple. Instead of sending the whole
+model back and forth, for the write scenario you define use-case specific
+tasks and updates. This is much simpler than generic mapping of Data Transfer
+objects to complex object graphs.</li>
+<li>Transforming SQL directly to a view model in a highly optimized way.
+Simple concept, but it has huge implications: A pure read-only model is simple to
+maintain and refactor for any performance requirements that come up.</li>
+</ul>
+<p>Furthermore with CQRS our write service methods are not allowed to return data
+anymore (With the exceptions to the rule of course). This may increase the
+complexity at first, but it has benefits for scalability and decoupling.
+Following this principle allows us to turn every command from synchronous to
+asynchronous processing later without much problems. Services are allowed to
+throw exceptions and refuse the execution. Proper validation of input data
+should happen before executing write operations though.</p>
+<p>One drawback of CQRS: A naive implementation doubles the amount of classes and
+services to write. But there are simple shortcuts to avoid having to write a
+full blown read-model if you don’t apply CQRS religiously:</p>
+<ul class="simple">
+<li>Don’t use different data-stores for both models.</li>
+<li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
+very simple. You can easily generalize this to a simple object that gives
+efficient access to all your data.</li>
+<li>Share parts of the write and read models if you don’t have to compromise
+much.</li>
+</ul>
+<p>The important thing to take away from this separation is, that the read part of
+your application is seldom the part where business value lies in. Moving this
+code into a different part of your applications allows you to work with the
+underlying data-source much more directly, without need for much abstractions.</p>
+<p>One thing that CQRS puts forward is the concept of Commands, Command Handlers
+and Command Bus and how they interact. Commands are simple objects that
+contain all the data necessary to execute an operation. Each command is
+processed by exactly one command handler. The Command Bus is responsible to
+route a command to its appropriate command handler.</p>
+<div class="section" id="example">
+<h2>Example</h2>
+<p>Here is the most simple implementation of the Command Bus, just holds a hash map
+mapping command class names to command handlers:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">Handler</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">CommandBus</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$handlers</span><span class="p">;</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">(</span><span class="nv">$commandClassName</span><span class="p">,</span> <span class="nx">Handler</span> <span class="nv">$handler</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handlers</span><span class="p">[</span><span class="nv">$commandClassName</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$handler</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handlers</span><span class="p">[</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$command</span><span class="p">)]</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In your code you would always pass Commands to the bus. That way the command
+bus is a central entry point to any write operation. With this we can rewrite the
+TransferMoney service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">TransferMoneyCommand</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$money</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MoneyTransfer</span> <span class="k">implements</span> <span class="nx">Handler</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
+
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There is also a benefit from the mental model of commands compared to the
+“generic” term of model requests in EBI. Your write model gets task
+oriented.</p>
+<p>Routing everything through the command bus has several benefits as well:</p>
+<ul class="simple">
+<li>Nesting handlers that take care of transactions, logging, 2 phase commits</li>
+<li>Order nested command calls sequentially instead of deep into each other.</li>
+<li>Asynchronous processing with message queue become an option</li>
+</ul>
+<p>The command bus acts as the application boundary as described in the
+Entity-Boundary-Interactor pattern, usage is simple:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$commandBus</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'command_bus'</span><span class="p">);</span>
+        <span class="nv">$commandBus</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TransferMoneyCommand</span><span class="p">(</span>
+            <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'sourceId'</span><span class="p">),</span>
+            <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'destinationId'</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'amount'</span><span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pros-and-cons">
+<h2>Pros and Cons</h2>
+<p>I really like CQRS for multiple reasons. It offers explicit guidance how solve
+tasks by making use of a range of different design patterns. This is very
+helpful, because the code-base is based on conventions that are simple to
+understand by everyone on the team. This structure liberates you from the curse
+of choice and gives you a cookbook of best-practices how to solve problems.
+You want this structure for all your applications, regardless of what
+architectural pattern you have chosen.</p>
+<p>Embracing the difference between read and write models is another plus of CQRS.
+It is very helpful, not to try fitting both read and write into one model.  You
+also don’t run into so many read-related problems with an ORM any more. You
+design the entities to be optimized for the write model only, loose the
+bidirectional associations and avoid all the optimizations here and there for
+read performance.</p>
+<p>Compared to EBI, where we had to maintain a mapping between DTOs and entities,
+CQRS explicitly uses the command based approach to avoid the complexity of
+these mappings. You will still have to map between command and entity, however
+doing so in the context of a use-case simplifies the code considerably compared
+to a generic mapping solution.</p>
+<p>One negative point: Its difficult to work with commands not returning any data
+in some cases. You need to find simple ways to return messages to the
+user. For that you also need to validate commands on the “client” or
+controller side, using the read model, so that you can prevent invalid/illegal
+commands from being sent as often as possible.</p>
+<p>Without return values from your models, you are left to using mocks as means of
+testing. This might be more difficult for developers to use and understand.
+This problem goes away however, if you combine CQRS with Event Sourcing. A
+topic that I will discuss in the next blog post.</p>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="categories">
+            <span>
+                Filed under:
+                
+                    <a href="categories/php.html">PHP</a>
+                
+            </span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html#disqus_thread" data-disqus-identifier="2012/08/18/oop_business_applications__command_query_responsibility_seggregation">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>August 16, 2012</span> 
         </div>
         <div class="section" id="oop-business-applications-data-context-interaction">
@@ -1429,156 +1643,6 @@ test and get a green bar for a working lock support.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/05/02/testing-database-locks-with-phpunit-and-gearman.html#disqus_thread" data-disqus-identifier="2010/05/02/testing-database-locks-with-phpunit-and-gearman">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 08, 2010</span> 
-        </div>
-        <div class="section" id="immutable-datetime-objects">
-<h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
-<p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
-extension</a> is the mutability of its
-instances. It can lead to serious bugs if a DateTime instance is passed
-between different functions and is modified at unexpected places.
-Additionally this possibly rules out several optimizations for scripts
-that make very heavy use of dates and could share references to equal
-timestamps.</p>
-<p><strong>Warning:</strong> All the code assumes that you work with one timezone only!</p>
-<p>The following code is an immutable version of PHP’s DateTime. All setter
-methods throw an exception and add(),sub() and modify() clone the
-current instance, apply the operation and return the new instance.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">Whitewashing\DateTime</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">DateTime</span> <span class="k">extends</span> <span class="nx">\DateTime</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * To prevent infinite recursions</span>
-<span class="sd">     *</span>
-<span class="sd">     * @var bool</span>
-<span class="sd">     */</span>
-    <span class="k">private</span> <span class="k">static</span> <span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$month</span><span class="p">,</span> <span class="nv">$day</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setISODate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$week</span><span class="p">,</span> <span class="nv">$day</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTime</span><span class="p">(</span><span class="nv">$hour</span><span class="p">,</span> <span class="nv">$minute</span><span class="p">,</span> <span class="nv">$second</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimestamp</span><span class="p">(</span><span class="nv">$timestamp</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimezone</span><span class="p">(</span><span class="nv">$timezone</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-<span class="k">class</span> <span class="nc">ImmutableException</span> <span class="k">extends</span> <span class="nx">\Exception</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">&quot;Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!&quot;</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Its not the prettiest code, but it works.</p>
-<p>A next optimization would be a <strong>DateFactory</strong> that manages DateTime
-instances by returning already existing instances for specific dates.
-This is not a perfect solution, since you won’t be able to enforce a
-single instance when you are using the relative descriptive dates or
-when calculating with dates using add(), sub() and modify(), however for
-lots of dates created from a database or other external source it might
-be quite a powerful optimization depending on your use-case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">namespace Whitewashing\DateTime;</span>
-
-<span class="x">class DateFactory</span>
-<span class="x">{</span>
-<span class="x">    static private $_dates = array();</span>
-
-<span class="x">    static public function create($hour, $minute, $second, $month, $day, $year)</span>
-<span class="x">    {</span>
-<span class="x">        $ts = mktime($hour, $minute, $second, $month, $day, $year);</span>
-<span class="x">        if (!isset(self::$_dates[$ts])) {</span>
-<span class="x">            self::$_dates[$ts] = new DateTime('@'.$ts);</span>
-<span class="x">        }</span>
-<span class="x">        return self::$_dates[$ts];</span>
-<span class="x">    }</span>
-
-<span class="x">    static public function createFromMysqlDate($mysqlDate)</span>
-<span class="x">    {</span>
-<span class="x">        list($date, $time) = explode(&quot; &quot;, $mysqlDate);</span>
-<span class="x">        if($time == null) {</span>
-<span class="x">            $hour = $minute = $second = 0;</span>
-<span class="x">        } else {</span>
-<span class="x">            list($hour, $minute, $second) = explode(&quot;:&quot;, $time);</span>
-<span class="x">        }</span>
-<span class="x">        list($year, $month, $day) = explode(&quot;-&quot;, $mysqlDate);</span>
-<span class="x">        return self::create($hour, $minute, $second, $month, $day, $year);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>This includes some date time calculations and date creation with
-mktime() and DateTimes unix timestamp capabilities to be able to work.
-Otherwise the sharing of instances could not be implemented. If you need
-to create shareable instances from other formats you could just create
-another creation method for it and convert the format for create() to be
-used.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/01/08/immutable-datetime-objects.html#disqus_thread" data-disqus-identifier="2010/01/08/immutable-datetime-objects">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -1625,6 +1689,9 @@ used.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
         </li>
         <li class="recent_post">
@@ -1650,9 +1717,6 @@ used.</p>
         </li>
         <li class="recent_post">
             <a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
         </li>
     </ul>
 </div>

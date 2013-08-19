@@ -82,6 +82,156 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 08, 2010</span> 
+        </div>
+        <div class="section" id="immutable-datetime-objects">
+<h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
+<p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
+extension</a> is the mutability of its
+instances. It can lead to serious bugs if a DateTime instance is passed
+between different functions and is modified at unexpected places.
+Additionally this possibly rules out several optimizations for scripts
+that make very heavy use of dates and could share references to equal
+timestamps.</p>
+<p><strong>Warning:</strong> All the code assumes that you work with one timezone only!</p>
+<p>The following code is an immutable version of PHP’s DateTime. All setter
+methods throw an exception and add(),sub() and modify() clone the
+current instance, apply the operation and return the new instance.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Whitewashing\DateTime</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">DateTime</span> <span class="k">extends</span> <span class="nx">\DateTime</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * To prevent infinite recursions</span>
+<span class="sd">     *</span>
+<span class="sd">     * @var bool</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$month</span><span class="p">,</span> <span class="nv">$day</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setISODate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$week</span><span class="p">,</span> <span class="nv">$day</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTime</span><span class="p">(</span><span class="nv">$hour</span><span class="p">,</span> <span class="nv">$minute</span><span class="p">,</span> <span class="nv">$second</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimestamp</span><span class="p">(</span><span class="nv">$timestamp</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimezone</span><span class="p">(</span><span class="nv">$timezone</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">ImmutableException</span> <span class="k">extends</span> <span class="nx">\Exception</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">&quot;Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Its not the prettiest code, but it works.</p>
+<p>A next optimization would be a <strong>DateFactory</strong> that manages DateTime
+instances by returning already existing instances for specific dates.
+This is not a perfect solution, since you won’t be able to enforce a
+single instance when you are using the relative descriptive dates or
+when calculating with dates using add(), sub() and modify(), however for
+lots of dates created from a database or other external source it might
+be quite a powerful optimization depending on your use-case:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">namespace Whitewashing\DateTime;</span>
+
+<span class="x">class DateFactory</span>
+<span class="x">{</span>
+<span class="x">    static private $_dates = array();</span>
+
+<span class="x">    static public function create($hour, $minute, $second, $month, $day, $year)</span>
+<span class="x">    {</span>
+<span class="x">        $ts = mktime($hour, $minute, $second, $month, $day, $year);</span>
+<span class="x">        if (!isset(self::$_dates[$ts])) {</span>
+<span class="x">            self::$_dates[$ts] = new DateTime('@'.$ts);</span>
+<span class="x">        }</span>
+<span class="x">        return self::$_dates[$ts];</span>
+<span class="x">    }</span>
+
+<span class="x">    static public function createFromMysqlDate($mysqlDate)</span>
+<span class="x">    {</span>
+<span class="x">        list($date, $time) = explode(&quot; &quot;, $mysqlDate);</span>
+<span class="x">        if($time == null) {</span>
+<span class="x">            $hour = $minute = $second = 0;</span>
+<span class="x">        } else {</span>
+<span class="x">            list($hour, $minute, $second) = explode(&quot;:&quot;, $time);</span>
+<span class="x">        }</span>
+<span class="x">        list($year, $month, $day) = explode(&quot;-&quot;, $mysqlDate);</span>
+<span class="x">        return self::create($hour, $minute, $second, $month, $day, $year);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>This includes some date time calculations and date creation with
+mktime() and DateTimes unix timestamp capabilities to be able to work.
+Otherwise the sharing of instances could not be implemented. If you need
+to create shareable instances from other formats you could just create
+another creation method for it and convert the format for create() to be
+used.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/01/08/immutable-datetime-objects.html#disqus_thread" data-disqus-identifier="2010/01/08/immutable-datetime-objects">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>January 10, 2010</span> 
         </div>
         <div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
@@ -857,138 +1007,6 @@ friendly.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html#disqus_thread" data-disqus-identifier="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>June 16, 2009</span> 
-        </div>
-        <div class="section" id="using-a-dependency-injection-container-with-zend-application">
-<h1><a href="2009/06/16/using-a-dependency-injection-container-with-zend-application.html">Using a Dependency Injection Container with Zend_Application</a></h1>
-<p>Much has been written on Dependency Injection lately, mostly by Padraic
-Brady
-(<a class="reference external" href="http://blog.astrumfutura.com/archives/394-The-Case-For-Dependency-Injection-Part-1.html">1</a>,
-<a class="reference external" href="http://blog.astrumfutura.com/archives/395-The-Case-For-Dependency-Injection-Part-2.html">2</a>)
-and Fabien Potencier
-(<a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">1</a>,
-<a class="reference external" href="http://fabien.potencier.org/article/12/do-you-need-a-dependency-injection-container">2</a>,
-<a class="reference external" href="http://fabien.potencier.org/article/13/introduction-to-the-symfony-service-container">3</a>,
-<a class="reference external" href="http://fabien.potencier.org/article/14/symfony-service-container-using-a-builder-to-create-services">4</a>,
-<a class="reference external" href="http://github.com/fabpot/Pimple/tree/master">5</a>). My subjective
-feeling tells me there are now more PHP DI containers out there than CMS
-or ORMs implemented in PHP, including two written by myself (an
-<a class="reference external" href="http://www.beberlei.de/sphicy/">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
-one</a>). Its an awesome
-pattern if used on a larger scale and can (re-) wire a complex business
-application according to a clients needs without having to change much
-of the domain code. It aims at a complete separation of object
-instantiation and dependency tracking from the business logic.</p>
-<p>Beginning with version 1.8 Zend Framework is able to integrate any of
-these DI containers into its <strong>Zend_Application</strong> component easily. The
-Application component initializes a set of common resources and pushes
-them into the MVC stack as additional Front Controller parameters.
-Technically a <strong>Zend_Registry</strong> instance holds all these resources with
-their respective resource names as keys. The resources are accessible
-inside the Front Controller and the Action Controller classes. Assume
-the resource ‘Db’ is initialized in your application, you can access it
-with:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$front = Zend_Controller_Front::getInstance();
-$container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
-$db = $container-&gt;db;
-
-// or:
-class FooController extends Zend_Controller_Action {
-    public function barAction()
-    {
-        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
-        $db = $container-&gt;db;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>This is pretty much dependency injection already, but the default
-registry approach suffers from two serious problem: New instances can
-only be added to the Container by implementing new Zend_Application
-resources and these instances cannot be lazy loaded. All resources used
-by Zend_Application are always loaded on every request. But the
-application container implementation was developed with Dependency
-Injection in mind and is not tied to the use of Zend_Registry. Only
-three magic methods are required by any container that wants to be
-Zend_Application compliant: __get(), __set() and __isset(). Each
-instantiated resource is pushed via __set() into the container. If
-required by another resource, __isset() is used to check whether a
-resource with the given name exists inside the container and __get()
-is used to retrieve the instances from the container.</p>
-<p>Some month ago I extended
-<a class="reference external" href="http://github.com/beberlei/yadif/tree/master">Yadif</a>, a lightweight
-PicoContainer-like DI container for PHP written by Thomas McKelvey, with
-several features that make it a very powerful DI container in my
-opinion. It has a detailed documentation and examples on the GitHub Page
-if you want to check it out. I extended Yadif to be Zend_Application
-compliant in a way that the application-wide Zend_Application resources
-can be used as dependencies for objects that are lazy-loaded from the
-container. Skipping the tech-talk, here is an example. First we have to
-replace the default Container with Yadif:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH.&quot;/config/objects.xml&quot;);
-$container = new Yadif_Container($objects);
-
-$application = new Zend_Application(
-    APPLICATION_ENV,
-    APPLICATION_PATH . '/config/application.xml'
-);
-// Set Yadif as Container
-$application-&gt;getBootstrap()-&gt;setContainer($container);
-$application-&gt;bootstrap()
-            -&gt;run();</pre>
-</div>
-</div></blockquote>
-<p>Assume you run Zend_Application with a “Db” and a “Cache” resource.
-These resources are loaded on every request. The objects configured in
-Yadif however are not instantiated until they are requested for the
-first time from the container. We can merge these two worlds and make
-use of the Application resources inside the Yadif Configuration
-“objects.xml”, which looks like:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;objects&gt;
-    &lt;myModel&gt;
-        &lt;class&gt;MyModel&lt;/class&gt;
-        &lt;arguments arg1=&quot;db&quot; arg2=&quot;cache&quot; /&gt;
-    &lt;/myModel&gt;
-&lt;/objects&gt;</pre>
-</div>
-<p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
-the the Database and Cache resources as constructor arguments:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class FooController extends Zend_Controller_Action {
-    public function barAction()
-    {
-        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
-        $myModel = $container-&gt;myModel;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Given the possibilites by the Yadif_Container you are now empowered
-to use Dependency Injection for all your application objects and
-make use of Zend_Applications resource system. Furthermore any
-other dependency injection container, simple or complex, can also be
-integrated easily.</p>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/06/16/using-a-dependency-injection-container-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/06/16/using-a-dependency-injection-container-with-zend-application">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -1035,6 +1053,9 @@ integrated easily.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
         </li>
         <li class="recent_post">
@@ -1060,9 +1081,6 @@ integrated easily.</p>
         </li>
         <li class="recent_post">
             <a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
         </li>
     </ul>
 </div>

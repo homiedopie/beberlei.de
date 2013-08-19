@@ -78,6 +78,56 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>July 22, 2008</span> 
+        </div>
+        <div class="section" id="multidimensional-array-via-spl">
+<h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
+<p>Per default any implementation of ArrayObject does not allow to use the
+object as multidimensional array. This snippet here implements the
+support:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class ArrayMultiObject extends ArrayObject</span>
+<span class="x">{</span>
+<span class="x">    function __construct($array, $flags = 0, $iterator_class = &quot;ArrayIterator&quot;)</span>
+<span class="x">    {</span>
+<span class="x">        $objects = array();</span>
+<span class="x">        foreach($array AS $key =&gt; $value) {</span>
+<span class="x">            if(is_array($value)) {</span>
+<span class="x">                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);</span>
+<span class="x">            } else {</span>
+<span class="x">                $objects[$key] = $value;</span>
+<span class="x">            }</span>
+<span class="x">        }</span>
+
+<span class="x">        parent::__construct($objects, $flags, $iterator_class);</span>
+<span class="x">    }</span>
+
+<span class="x">    public function offsetSet($name, $value)</span>
+<span class="x">    {</span>
+<span class="x">        if(is_array($value)) {</span>
+<span class="x">            $value = new ArrayMultiObject($value);</span>
+<span class="x">        }</span>
+
+<span class="x">        return parent::offsetSet($name, $value);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/07/22/multidimensional-array-via-spl.html#disqus_thread" data-disqus-identifier="2008/07/22/multidimensional-array-via-spl">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>July 17, 2008</span> 
         </div>
         <div class="section" id="zf-jquery-helper-first-prototype-ready">
@@ -307,6 +357,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
         </li>
         <li class="recent_post">
@@ -332,9 +385,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
         </li>
         <li class="recent_post">
             <a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a>
         </li>
     </ul>
 </div>

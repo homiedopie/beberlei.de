@@ -5,7 +5,80 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Wed, 24 Jul 2013 00:00:00 +0200</pubDate>
+        <pubDate>Mon, 19 Aug 2013 00:00:00 +0200</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</link>
+            <guid>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</guid>
+            <title><![CDATA[Speedup Symfony2 on Vagrant boxes]]></title>
+            <description><![CDATA[<div class="section" id="speedup-symfony2-on-vagrant-boxes">
+<h1>Speedup Symfony2 on Vagrant boxes</h1>
+<p>Using Symfony2 inside a Vagrant box is considered to be very slow (<a class="reference external" href="http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host">here</a>,
+<a class="reference external" href="https://twitter.com/spicy_sake/status/183135528567320576">here</a>), even when
+using NFS. I can confirm the experience and know many others that reported the
+same.</p>
+<p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
+related to the huge number of files that a Symfony project normally ships with
+and the I/O that is generated from <tt class="docutils literal"><span class="pre">filemtime</span></tt> calls to check if the
+configuration files have changed.</p>
+<p>This is just a small part, there are other bottlenecks that I have found after
+finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
+<ol class="arabic simple">
+<li>Monolog logs to the NFS share and the huge number <tt class="docutils literal"><span class="pre">fwrite</span></tt> take their toll.</li>
+<li>Writing compiled Twig templates to the NFS share using <tt class="docutils literal"><span class="pre">file_put_contents</span></tt>.</li>
+<li>Assetic: Scanning for stylesheets and javascripts within templates is very
+slow, causing lots of I/O on the NFS share and CPU and changing it to using
+explicit bundling in the <tt class="docutils literal"><span class="pre">app/config/config.yml</span></tt> helps alot. You can use a
+cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
+a <cite>–watch</cite> flag in the background.</li>
+<li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
+<li><tt class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></tt> in Symfony DIC uses a set of
+recursive algorithms to replace aliases with the real services. That takes a
+huge amount of time in bigger applications including amounting calls to methods
+inside the pass over 100.000 times.</li>
+</ol>
+<p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
+To fix this just change the cache <strong>AND</strong> the log directory to
+<tt class="docutils literal"><span class="pre">sys_get_temp_dir()</span></tt> instead of writing to the NFS share. I actually tried
+this before, but since I forgot the log directory, this felt equally slow
+and I reverted the change.</p>
+<p>Here is the code you should add to your <tt class="docutils literal"><span class="pre">AppKernel</span></tt> to give you a
+considerable performance boost on a Vagrant box:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev, '</span><span class="nx">test</span><span class="s1">'))) {</span>
+<span class="s1">            return sys_get_temp_dir() . '</span><span class="o">/</span><span class="nx">appname</span><span class="o">/</span><span class="nx">cache</span><span class="o">/</span><span class="s1">' .  $this-&gt;environment;</span>
+<span class="s1">        }</span>
+
+<span class="s1">        return parent::getCacheDir();</span>
+<span class="s1">    }</span>
+
+<span class="s1">    public function getLogDir()</span>
+<span class="s1">    {</span>
+<span class="s1">        if (in_array($this-&gt;environment, array('</span><span class="nx">dev</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">sys_get_temp_dir</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'/appname/logs'</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getLogDir</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This brings the page rendering speeds down to between 1.5 and 3 seconds, which
+is quite normal for the development environment even outside a virtual machine.</p>
+<p>This tip obviously works for any kind of application that has a I/O intensive
+development environment: Don’t perform this operations on the NFS share unless
+you wan’t to suffer.</p>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+            <category><![CDATA[ Symfony ]]></category>
+            <pubDate>Mon, 19 Aug 2013 00:00:00 +0200</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</link>
             <guid>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</guid>
