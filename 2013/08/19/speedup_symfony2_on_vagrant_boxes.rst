@@ -79,7 +79,7 @@ considerable performance boost on a Vagrant box:
         }
     }
 
-This brings the page rendering speeds down to between 1.5 and 3 seconds, which
+This brings the page rendering speeds down to between 0.5 and 1.5 seconds, which
 is quite normal for the development environment even outside a virtual machine.
 
 This tip obviously works for any kind of application that has a I/O intensive
