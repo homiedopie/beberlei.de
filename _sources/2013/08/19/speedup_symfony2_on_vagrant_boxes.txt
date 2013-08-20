@@ -1,9 +1,9 @@
 Speedup Symfony2 on Vagrant boxes
 =================================
 
-**Update:** Added requirements to configure Vagrant and Virtualbox before
+- **Update:** Added requirements to configure Vagrant and Virtualbox before
 trying my change.
-**Update 2:** Added link to Virtualbox Guest Additions plugin for Vagrant,
+- **Update 2:** Added link to Virtualbox Guest Additions plugin for Vagrant,
 thanks Peter Kruithof for the hint.
 
 Using Symfony2 inside a Vagrant box is considered to be very slow (`here
