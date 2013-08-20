@@ -81,7 +81,9 @@
     <div class="section" id="speedup-symfony2-on-vagrant-boxes">
 <h1>Speedup Symfony2 on Vagrant boxes</h1>
 <p><strong>Update:</strong> Added requirements to configure Vagrant and Virtualbox before
-trying my change.</p>
+trying my change.
+<strong>Update 2:</strong> Added link to Virtualbox Guest Additions plugin for Vagrant,
+thanks Peter Kruithof for the hint.</p>
 <p>Using Symfony2 inside a Vagrant box is considered to be very slow (<a class="reference external" href="http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host">here</a>,
 <a class="reference external" href="https://twitter.com/spicy_sake/status/183135528567320576">here</a>), even when
 using NFS. I can confirm the experience and know many others that reported the
@@ -92,7 +94,7 @@ same.</p>
 <li>You are using NFS with Vagrant (<a class="reference external" href="http://docs.vagrantup.com/v2/synced-folders/nfs.html">More</a>). If you are on
 Windows then this can already be the problem (Virtualbox FS is slow with
 Symfony, because of the large number of files.)</li>
-<li>You have the Vbox Guest Additions on the guest that match your system (<a class="reference external" href="https://gist.github.com/fernandoaleman/5083680">More</a>)</li>
+<li>You have the Vbox Guest Additions on the guest that match your system (<a class="reference external" href="https://github.com/dotless-de/vagrant-vbguest">Vagrant Plugin</a>, <a class="reference external" href="https://gist.github.com/fernandoaleman/5083680">Manual Update</a>)</li>
 <li>You have an opcode cache installed, either <cite>apc</cite> or <cite>opcache</cite>.</li>
 <li>You disable <cite>xdebug</cite> or <cite>xhprof</cite>.</li>
 </ul>
