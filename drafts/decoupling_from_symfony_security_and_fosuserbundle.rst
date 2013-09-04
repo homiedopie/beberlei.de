@@ -106,10 +106,11 @@ correlation ID in the ``Customer`` object.
     }
 
 Now you need to extend the application to synchronize all changes from the
-``User`` entity to the ``Customer`` entity. From my experience this can be
-achieved relatively easy by overwriting the ``ModelManager`` or when finally
+``User`` entity to the ``Customer`` entity. You can 
+achieve this relatively easy by overwriting the ``ModelManager`` or when finally
 supported by *FOSUserBundle* listening to events.  Your own code can
-exclusively work with ``Customer`` objects.
+exclusively work with ``Customer`` objects now, void of any reference to
+the Symfony Security component or the huge FOSUserBundle dependency.
 
 .. author:: default
 .. categories:: PHP, Symfony2
