@@ -25,8 +25,8 @@ and on `Decoupling Forms from Entities
 User management breaks the isolation of your business model open,
 by introducing the ``UserInterface`` from the Security component into your
 code base. In combination with the *FOSUserBundle* this can cause a dependency
-on quite a bit of code already because the ``FOS\UserBundle\Model\User`` object
-cannot be called leightweight. However this and other FriendsOfSymfony bundles
+on quite a bit of code already because I wouldn't call the ``FOS\UserBundle\Model\User`` object
+leightweight. However this and other FriendsOfSymfony bundles
 are very helpful to get annoying features of your application done in a matter
 of hours.
 
