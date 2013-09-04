@@ -82,6 +82,119 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>November 05, 2008</span> 
+        </div>
+        <div class="section" id="overwrite-ezcmvccontroller-a-bit-more-rapid">
+<h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
+<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
+with the alpha version, since I am currently searching for a good
+framework for a high performance application. My first benchmarks on
+ezcMvc just say: wh000pie! A lot faster as compared to the Zend
+Framework.
+Still ezcMvc is VERY loosely coupled and you have to write lots of lines
+to get where ZF gets you with less (more magic involved). As you can see
+from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
+component</a>
+it is currently a bit unwieldily to work with ezcMvcController since you
+have to create and return result objects everywhere. This is very nice
+since it abstracts from the actual response type (could be www, mail,
+cli, anything).
+I have created a very little extension of the ezcMvcController class
+that hopefully serves you quite some time. You can append variables to
+the ezcMvcResult object by calling the magic __get and __set on the
+controller. Plus it offers a method to use the ezcMvcInternalRedirect
+instead of the result. See for yourself:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myController extends ezcMvcController
+{
+    protected $result;
+
+    public function createResult()
+    {
+        $actionMethod = $this-&gt;createActionMethodName();
+
+        if ( method_exists( $this, $actionMethod ) ) {
+            $status = $this-&gt;$actionMethod();
+            if($status != 0) {
+                $this-&gt;getResult()-&gt;status = $status;
+            }
+            return $this-&gt;getResult();
+        } else {
+            throw new ezcMvcActionNotFoundException( $this-&gt;action );
+        }
+    }
+
+    protected function _redirect($uri)
+    {
+        $request = clone $this-&gt;request;
+        $request-&gt;uri = $uri;
+        $this-&gt;result = new ezcMvcInternalRedirect($request);
+    }
+
+    public function __get($name)
+    {
+        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
+            return $this-&gt;getResult()-&gt;variables[$name];
+        }
+        return null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this-&gt;getResult()-&gt;variables[$name] = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this-&gt;getResult()-&gt;variables[$name]);
+    }
+
+    protected function getResult()
+    {
+        if($this-&gt;result === null) {
+            $this-&gt;result = new ezcMvcResult();
+        }
+        return $this-&gt;result;
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You can now use a controller in the following way:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class dashboardController extends myController
+{
+    public function doIndex()
+    {
+        $this-&gt;cookie = &quot;Cookie!&quot;; // Proxy to $ezcMvcResult-&gt;variables['cookie']
+    }
+
+    public function doRedirect()
+    {
+        $this-&gt;_redirect(&quot;/&quot;);
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>Very nice! The next thing I have to extend in ezcMvc is automagical
+matching of controller and action names to view output names with a
+special View Handler that takes care of this. This saves another bunch
+of work you have to cope with in the current standard setup.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html#disqus_thread" data-disqus-identifier="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>November 25, 2008</span> 
         </div>
         <div class="section" id="next-zf-mini-release-1-7-1">
@@ -466,146 +579,6 @@ check them if you want.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/08/22/zend-helper-for-jquery-ui-widgets-demo.html#disqus_thread" data-disqus-identifier="2008/08/22/zend-helper-for-jquery-ui-widgets-demo">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>August 28, 2008</span> 
-        </div>
-        <div class="section" id="benchmark-and-optimize-zend-framework-performance">
-<h1><a href="2008/08/28/benchmark-and-optimize-zend-framework-performance.html">Benchmark and Optimize Zend Framework Performance</a></h1>
-<p>In the fall of <a class="reference external" href="http://talks.php.net/show/froscon08">Rasmus presentation (Simple is
-Hard)</a> on
-<a class="reference external" href="http://www.froscon.org">FrOSCon</a> I tried to optimize <a class="reference external" href="http://framework.zend.com">Zend
-Frameworks</a> performance a little bit. There
-has also been a little discussion on the Zend Framework Mailing List on
-this topic.</p>
-<p>I haven’t changed great parts of the code or anything, I just
-benchmarked how different global include strategies affect the overall
-performance of my blog software written with help of the ZF. The
-following include strategies were tested (I’ve used the Zend Framework
-1.6 RC2 package for all of them):</p>
-<ol class="arabic simple">
-<li>Zend_Loader Autoload, Default PHP Include Path</li>
-<li>Zend_Loader Autoload, Swapped Include Path</li>
-<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies,
-Zend_Loader Autoload, Swapped Include Path</li>
-<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies, no
-autoload, used <a class="reference external" href="http://pecl.php.net/package/inclued">inclued</a> to
-find file dependencies and require (not _once) them all on startup.</li>
-</ol>
-<p>To strip all the require_once from the Zend Framework source code, i
-built a little script to do that for me. For the last test I wrote a
-little script that used the <strong>inclued_get_data()</strong> function to built a
-correct dependency tree for all includes. I have put each configuration
-of my Zend Framework install 30 seconds under siege with 5 concurrent
-requests. I have rerun all tests with APC and without APC.</p>
-<div class="section" id="results-without-apc">
-<h2>Results without APC</h2>
-<table border="1" class="docutils">
-<colgroup>
-<col width="42%"/>
-<col width="21%"/>
-<col width="16%"/>
-<col width="21%"/>
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>Include Strategy</td>
-<td>Response time</td>
-<td>Trans/sec</td>
-<td>Performance %</td>
-</tr>
-<tr class="row-even"><td>Autoload, default include path</td>
-<td>0.20</td>
-<td>24.65</td>
-<td>100%</td>
-</tr>
-<tr class="row-odd"><td>Autoload, swapped include path</td>
-<td>0.19</td>
-<td>26.83</td>
-<td>95%</td>
-</tr>
-<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
-<td>0.17</td>
-<td>29.27</td>
-<td>85%</td>
-</tr>
-<tr class="row-odd"><td>No-Autoload, require up front</td>
-<td>0.16</td>
-<td>31.82</td>
-<td>80%</td>
-</tr>
-</tbody>
-</table>
-<p>You can see that each step makes a ZF application run faster and that
-the full optimization with requiring all scripts up front is about 20%
-faster than the default configuration.</p>
-</div>
-<div class="section" id="results-with-apc">
-<h2>Results with APC</h2>
-<table border="1" class="docutils">
-<colgroup>
-<col width="42%"/>
-<col width="21%"/>
-<col width="16%"/>
-<col width="21%"/>
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>Include Strategy</td>
-<td>Response time</td>
-<td>Trans/sec</td>
-<td>Performance %</td>
-</tr>
-<tr class="row-even"><td>Autoload, default include path</td>
-<td>0.11</td>
-<td>45.76</td>
-<td>100%</td>
-</tr>
-<tr class="row-odd"><td>Autoload, swapped include path</td>
-<td>0.09</td>
-<td>53.05</td>
-<td>81,81%</td>
-</tr>
-<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
-<td>0.08</td>
-<td>60.90</td>
-<td>72,72%</td>
-</tr>
-<tr class="row-odd"><td>No-Autoload, require up front</td>
-<td>0.07</td>
-<td>73.99</td>
-<td>63,63%</td>
-</tr>
-</tbody>
-</table>
-<p>Turning APC on gives a boost of about 50% to your application no matter
-what include strategy you are following (so there is excuse not using
-APC). But switching between different include strategies still makes a
-huge difference in performance. Percentage-wise this is a larger
-difference than without APC. Requiring all dependent scripts up front
-takes only about 63% of the default configuration time, which can make a
-major difference on any production server.</p>
-<p>In an application knowing which includes of the Zend Framework will be
-needed on each request is difficult, since different helpers and classes
-might be needed based on which url is requested. It maybe a good
-practice to just include all the classes that might be needed. If this
-is a job to hard to do you can still get lots of performance gain out of
-your application by fixing the include path, using Zend Loaders Autoload
-and stripping all require_once calls from all of the Zend Framework
-files.</p>
-</div>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/28/benchmark-and-optimize-zend-framework-performance.html#disqus_thread" data-disqus-identifier="2008/08/28/benchmark-and-optimize-zend-framework-performance">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -652,6 +625,9 @@ files.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
         </li>
         <li class="recent_post">
@@ -677,9 +653,6 @@ files.</p>
         </li>
         <li class="recent_post">
             <a href="2013/03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a>
         </li>
     </ul>
 </div>
