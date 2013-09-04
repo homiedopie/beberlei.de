@@ -1,20 +1,22 @@
-Symfony2 applications decoupled from Security & FOSUserBundle
-=============================================================
+Decoupling from Symfony Security and FOSUserBundle
+==================================================
 
 In this blog post I will show how to decouple your core application
 from the Symfony Security component and User bundles such as the FOSUserBundle.
 
 In my opinion a framework has to be evaluated by how much it allows you to hide
-it from your actual application. This blog post will add another perspective on how
-to achieve this decoupling from Symfony with a very simple approach. With this
-puzzle piece and others I wrote about before (`Controllers as Service
+it from your actual application. This blog post will add another perspective on
+how to achieve decoupling from Symfony user and security with a very simple
+approach. With this puzzle piece and others I wrote about before (`Controllers
+as Service
 <http://whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html>`_,
 `Param Converters
 <http://whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html>`_)
-and I still need to write about, Symfony2 can be considered a good framework.
+and other pieces I still need to write about, I would classify Symfony2 as a
+good framework.
 
 A number of other authors have written blog posts on decoupling Symfony and your model
-code, such as William Durand `on project structure
+code as well, such as William Durand `on project structure
 <http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first/>`_
 , Matthias Verraes `on project structure as well <http://verraes.net/2011/10/code-folder-structure/>`_
 and on `Decoupling Forms from Entities
