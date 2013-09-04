@@ -95,7 +95,7 @@ correlation ID in the ``Customer`` object.
         /**
          * @ORM\Id
          * @ORM\Column(type="integer")
-         * @ORM\GeneratedValue(strategy="AUTO")
+         * @ORM\GeneratedValue(strategy="NONE")
          */
         protected $id;
 
