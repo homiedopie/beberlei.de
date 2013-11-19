@@ -82,6 +82,80 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>April 27, 2008</span> 
+        </div>
+        <div class="section" id="ox-cross-correlation-coefficients-with-lags">
+<h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
+<p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
+class</a> I
+realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
+calculate correlation coefficients like Mathlab has.</p>
+<p>Our assignment was to replicate the Dynamic Correlations graph in
+<a class="reference external" href="http://www.amazon.de/gp/redirect.html?ie=UTF8&amp;location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&amp;s=books-intl-de&amp;qid=1209289935&amp;sr=8-1&amp;site-redirect=de&amp;tag=economystuden-21&amp;linkCode=ur2&amp;camp=1638&amp;creative=6742">Walshs’ Monetary Theory and
+Policy</a>
+for European Data, which shows the cross-correlation of different
+monetary aggregates (M0,M1,M2) with GDP over lagging periods of -8 to +8
+quarters.</p>
+<p>What was missing for me to do that assignment in Ox was a function to
+calculate cross-correlation coefficients for two vectors for a specified
+lag length:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>#include &lt;oxfloat.h&gt;
+
+/**
+ * Computes the cross-correlation coefficient for two vector series allowing
+ * to optionally specify the number of positive and negative lags the ccc
+ * should be calculated for.
+ *
+ * @author Benjamin Eberlei (kontakt at beberlei dot de)
+ * @param vVarY Tx1 vector of variable related to
+ * @param vVarX Tx1 vector of variable which is tested in different lags
+ * @param lags Integer indicating the number of negative and positive lags.
+ * @returns (1+lags*2)*1 vector of correlations from -lags to lags
+ **/
+ccf(const vVarY, const vVarX, const lags)
+{
+    // Generate positive and negative lags of given length and fill with NaN, so
+    // that rows with not available numbers can be dropped from calculating the CCF later on.
+    decl mXLag = lag0(vVarX, range(lags, -lags), M_NAN);
+
+    decl mCorr, sCov;
+
+    // initialize result vector holding one crosscorrelation per lag
+    decl vCorrLags = zeros(1+lags*2, 1);
+
+    // sadly there are no matrix operations to ease this computation, loop over all lags
+    for(decl i = 0; i &lt; 1+lags*2; i++) {
+        mCorr = deleter(vVarY ~ mXLag[][i]); // stick y and current lagged x together and delete NaN rows
+
+        // calculate covariance of both time series
+        sCov = 1/(rows(mCorr)-1) * sumc( (mCorr[][0]-meanc(mCorr[][0]))' * (mCorr[][1]-meanc(mCorr[][1])) );
+
+        // calculate correlation coefficient
+        vCorrLags[i][0] = sCov / ( sqrt(varc(mCorr[][0])) * sqrt(varc(mCorr[][1])) );
+    }
+
+    return vCorrLags;
+}</pre>
+</div>
+</div></blockquote>
+<p>It may prove useful to someone.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/04/27/ox-cross-correlation-coefficients-with-lags.html#disqus_thread" data-disqus-identifier="2008/04/27/ox-cross-correlation-coefficients-with-lags">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>September 05, 2008</span> 
         </div>
         <div class="section" id="jquery-component-approved-for-extras-library">
@@ -842,39 +916,6 @@ user example, you would use the new router in the following way:</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html#disqus_thread" data-disqus-identifier="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 12, 2008</span> 
-        </div>
-        <div class="section" id="bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">
-<h1><a href="2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete.html">Bad news: jQuery UI 1.6 ships without Spinner and AutoComplete</a></h1>
-<p>The jQuery UI team <a class="reference external" href="http://blog.jquery.com/2008/12/11/whats-up-with-jquery-ui/">announced yesterday on its
-blog</a> that
-<a class="reference external" href="http://ui.jquery.com">jQuery UI 1.6</a> will not be shipped with
-AutoComplete and Spinner Plugin support. No further delay, for the
-original august 2008 estimated release, is wanted.</p>
-<p>This brings about a problem on
-<a class="reference external" href="http://framework.zend.com/manual/en/zendx.jquery.html">ZendX_JQuery</a>.
-All view helpers and decorators that depend on AutoComplete and Spinner
-Plugins can only be run with SVN trunk or 1.6 release candidates, which
-have known bugs and problems.</p>
-<p>I am adding a compatibility table to the ZendX jQuery manual today that
-will make its way to the manual of the 1.7.2 release. This will
-hopefully help and guide everyone to the correct dependencies.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete.html#disqus_thread" data-disqus-identifier="2008/12/12/bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -921,6 +962,9 @@ hopefully help and guide everyone to the correct dependencies.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
         </li>
         <li class="recent_post">
@@ -946,9 +990,6 @@ hopefully help and guide everyone to the correct dependencies.</p>
         </li>
         <li class="recent_post">
             <a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/03/12/code_coffee_bonn.html">Code & Coffee Bonn</a>
         </li>
     </ul>
 </div>
