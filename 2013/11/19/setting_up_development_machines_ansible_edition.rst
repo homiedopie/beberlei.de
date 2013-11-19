@@ -51,7 +51,7 @@ compared to Puppet modules + DSL.
 
 For demonstration I have converted the puppet examples from my blog post on
 Puppet to Ansible.  To start we have to create a folder and create a new file
-`inventory` in it containing our local machine:
+`inventory` in it containing our local machine: ::
 
     localhost   ansible_connection=local
 
@@ -59,7 +59,7 @@ This is necessary to convince the remote task execution part of Ansible that
 localhost exists and there is no SSH necessary to get into that machine.
 
 Now I can create playbooks for the different tools I might want to install and
-setup, such as Vim in a `vim.yml`:
+setup, such as Vim in a `vim.yml`: ::
 
     ---
     - hosts: localhost
@@ -88,7 +88,7 @@ puppet you try to make those tasks idempotent through flags such as `creates`,
 signaling when a task needs to be or was already executed. I can optionally
 use sudo to run commands such as installing packages.
 
-To execute the playbook I call:
+To execute the playbook I call: ::
 
     $> ansible-playbook -K -i inventory vim.yml
 
