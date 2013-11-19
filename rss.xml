@@ -52,59 +52,41 @@ compared to Puppet modules + DSL.</p>
 <p>For demonstration I have converted the puppet examples from my blog post on
 Puppet to Ansible.  To start we have to create a folder and create a new file
 <cite>inventory</cite> in it containing our local machine:</p>
-<blockquote>
-<div>localhost   ansible_connection=local</div></blockquote>
+<div class="highlight-python"><pre>localhost   ansible_connection=local</pre>
+</div>
 <p>This is necessary to convince the remote task execution part of Ansible that
 localhost exists and there is no SSH necessary to get into that machine.</p>
 <p>Now I can create playbooks for the different tools I might want to install and
 setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<blockquote>
-<div><p>—
-- hosts: localhost</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>tasks:</dt>
-<dd><ul class="first last">
-<li><p class="first">name: Install VIM
-apt: pkg=vim state=present
-sudo: yes</p>
-</li>
-<li><p class="first">name: Install Dotfiles
-git: &gt;</p>
-<blockquote>
-<div><p><a class="reference external" href="mailto:repo=git%40github.com/beberlei/vim-dotfiles.git">repo=git<span>@</span>github<span>.</span>com/beberlei/vim-dotfiles<span>.</span>git</a>
-dest=/home/${ansible_user_id}/.vim</p>
-</div></blockquote>
-</li>
-<li><p class="first">name: Create .vimrc Symlink
-file: &gt;</p>
-<blockquote>
-<div><p>src=/home/${ansible_user_id}/.vim/vimrc
-dest=/home/${ansible_user_id}/.vimrc
-state=symlink</p>
-</div></blockquote>
-</li>
-<li><p class="first">name: Compile and Install Command-T plugin
-command: &gt;</p>
-<blockquote>
-<div><p>rake make
-chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
-creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe</p>
-</div></blockquote>
-</li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-python"><pre>---
+- hosts: localhost
+  tasks:
+    - name: Install VIM
+      apt: pkg=vim state=present
+      sudo: yes
+    - name: Install Dotfiles
+      git: &gt;
+        repo=git@github.com/beberlei/vim-dotfiles.git
+        dest=/home/${ansible_user_id}/.vim
+    - name: Create .vimrc Symlink
+      file: &gt;
+        src=/home/${ansible_user_id}/.vim/vimrc
+        dest=/home/${ansible_user_id}/.vimrc
+        state=symlink
+    - name: Compile and Install Command-T plugin
+      command: &gt;
+        rake make
+        chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
+        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe</pre>
+</div>
 <p>You can see here, tasks are a list of commands to execute. They are always
 executed in order and stop when the first task in the chain fails. Like in
 puppet you try to make those tasks idempotent through flags such as <cite>creates</cite>,
 signaling when a task needs to be or was already executed. I can optionally
 use sudo to run commands such as installing packages.</p>
 <p>To execute the playbook I call:</p>
-<blockquote>
-<div>$&gt; ansible-playbook -K -i inventory vim.yml</div></blockquote>
+<div class="highlight-python"><pre>$&gt; ansible-playbook -K -i inventory vim.yml</pre>
+</div>
 <p>With the <tt class="docutils literal"><span class="pre">-i</span></tt> flag I define the pool of hosts to run on, in our case the
 local machine and the playbook applies the <cite>hosts</cite> filter to that inventory.
 The <cite>-K</cite> parameter prompts me to enter the sudo password for my Ubuntu machine,
