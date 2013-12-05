@@ -82,6 +82,117 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>August 08, 2008</span> 
+        </div>
+        <div class="section" id="first-impressions-on-zend-soap-and-a-basic-implementation">
+<h1><a href="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html">First impressions on Zend_Soap and a basic implementation</a></h1>
+<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> release candidate for
+version 1.6 includes a new component for SOAP operations.
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.html">Zend_Soap_Server/Client</a>
+extend the PHP functionality of the SOAPClient and SOAPServer objects,
+which by itself is trivial. The more important functionality it ads to
+the package is the <a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.autodiscovery.introduction.html">AutoDiscovery
+Component</a>.</p>
+<p>Generally you can use <a class="reference external" href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> in the
+so called “non-wsdl” mode, that is if you specify the correct options
+like the soap service location and uri, you don’t need any description
+of the service for the clients. This is only useful if you’re using the
+SOAP Service internally since you then know about all the available
+functions and methods. If you want to offer the Service for external
+users you want to use the WSDL-mode: Generate a
+<a class="reference external" href="http://en.wikipedia.org/wiki/Web_Services_Description_Language">WSDL</a>
+that describes the services available methods, their parameters and
+return types is an important task.</p>
+<p>Using Zend_Soap_AutoDiscover you can generate your WSDL file
+automatically by reflecting on the given Service Class methods. This
+works as follows. We setup a simple service:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class HelloWorldService
+{
+    /**
+     * @return string
+     */
+    public function helloWorld()
+    {
+        return &quot;Hello World!&quot;;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFruits()
+    {
+        return array('apple', 'orange', 'banana');
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>It is important that you specify the Doc Comments @param and @return
+otherwise the AutoDiscovery of the correct parameter and return types
+cannot be resolved. We will now setup a simple SOAP Server access point,
+that will also generate our WSDL file for description of this HelloWorld
+service:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>require_once &quot;HelloWorldService.php&quot;;
+require_once &quot;Zend/Soap/Server.php&quot;;
+require_once &quot;Zend/Soap/AutoDiscover.php&quot;;
+
+if(isset($_GET['wsdl'])) {
+    $autodiscover = new Zend_Soap_AutoDiscover();
+    $autodiscover-&gt;setClass('HelloWorldService');
+    $autodiscover-&gt;handle();
+} else {
+
+    $soap = new Zend_Soap_Server(&quot;http://localhost/soapserver.php?wsdl&quot;); // this current file here
+    $soap-&gt;setClass('HelloWorldService');
+    $soap-&gt;handle();
+}</pre>
+</div>
+</div></blockquote>
+<p>Now we have our SOAP Service up and running and any client can access
+the HelloWorldService class from a remote or local location with just
+this simple lines:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>require_once &quot;Zend/Exception.php&quot;;
+require_once &quot;Zend/Soap/Client.php&quot;;
+
+try {
+    $client = new Zend_Soap_Client(&quot;http://localhost/soapserver.php?wsdl&quot;); // Servers WSDL Location
+    $string =  $client-&gt;helloWorld();
+    $fruits = $client-&gt;getFruits();
+
+    var_dump($string);
+    var_dump($fruits);
+} catch(Zend_Exception $e) {
+    echo $e-&gt;getMessage();
+}</pre>
+</div>
+<p>This is easy. Additionally Zend_Soap offers a WSDL class to
+generate your own WSDL file based on your special preferences, which
+is a nice feature. I guess only some people can write a correct WSDL
+XML specification file on their own from scratch, so using a
+powerful helper is reasonable.</p>
+<p>The usage of Zend_Soap is quite simple and straightforward as is
+PHP5’s internal SOAP Service and might therefore gain widespread
+use. I have never tested PEAR’s WSDL Autodiscovery, so i cannot draw
+comparisons.</p>
+</div></blockquote>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html#disqus_thread" data-disqus-identifier="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>August 22, 2008</span> 
         </div>
         <div class="section" id="zend-helper-for-jquery-ui-widgets-demo">
@@ -518,33 +629,6 @@ problem set.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/22/a-knight-s-tour-solver-in-pascal.html#disqus_thread" data-disqus-identifier="2008/01/22/a-knight-s-tour-solver-in-pascal">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>January 22, 2008</span> 
-        </div>
-        <div class="section" id="knights-tour-using-warndorff-s-rule">
-<h1><a href="2008/01/22/knights-tour-using-warndorff-s-rule.html">Knights Tour using Warndorff’s rule</a></h1>
-<p>When using <a class="reference external" href="http://web.telia.com/~u85905224/knight/eWarnsd.htm">Warndorff’s
-rule</a> for solving
-the Knights Tour problem, the solution is found within a second. It took
-some time for me to realize it in PASCAL though using a <strong>RECORD</strong> type
-to match the jumps to the number of free fields and then sort them. You
-can view my source code
-<a class="reference external" href="http://www.beberlei.de/sources/knightstour.txt">here</a>.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/22/knights-tour-using-warndorff-s-rule.html#disqus_thread" data-disqus-identifier="2008/01/22/knights-tour-using-warndorff-s-rule">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -591,6 +675,9 @@ can view my source code
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li>
         <li class="recent_post">
@@ -616,9 +703,6 @@ can view my source code
         </li>
         <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
         </li>
     </ul>
 </div>

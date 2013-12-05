@@ -78,6 +78,68 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>December 04, 2008</span> 
+        </div>
+        <div class="section" id="rest-and-ajax-aware-controllers-in-ezcmvctools">
+<h1><a href="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html">REST and Ajax Aware controllers in ezcMvcTools</a></h1>
+<p>There are essentially two major different ways to implement a restful
+application using a web framework. You either implement a router that
+routes to different controller actions based on the HTTP method used on
+a requested resource. This is the fancy way, which sadly is not always
+so practical because many browsers do not support sending more than GET
+and POST requests. The other way would be to define suburls of a
+resource such as <strong>/user/1/delete</strong> for the resource <strong>/user/1</strong> and
+take GET a a request for deleting and POST for the confirmation of the
+delete.</p>
+<p>ezcMvcTools HTTP Request Parser and routing mechanisms currently offer
+no real help to decide on this issues, but its easy to extend this
+missing functionality. What we first add are simple checks of the
+current http request method. We extend <strong>ezcMvcHttpRequestParser</strong> which
+will return a derived <strong>ezcMvcRequest</strong> object that implements 7 new
+methods: isPost(), isGet(), isDelete(), isPut(), isXmlHttpRequest(),
+isMethod() and getMethod(). These methods can now be easily used on the
+request object to determine which action will be undertaken:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myMvcRequest extends ezcMvcRequest{  public function isPost()  {    return $this-&gt;isMethod(&quot;POST&quot;);  }  public function isGet()  {    return $this-&gt;isMethod(&quot;GET&quot;);  }  public function isPut()  {    return $this-&gt;isMethod(&quot;PUT&quot;);  }  public function isDelete()  {    return $this-&gt;isMethod(&quot;DELETE&quot;);  }  public function isXmlHttpRequest()  {    if(isset($this-&gt;raw['HTTP_X_REQUESTED_WITH'])      &amp;&amp; strtolower($this-&gt;raw['HTTP_X_REQUESTED_WITH']) == &quot;xmlhttprequest&quot;) {      return true;    }    return false;  }    public function getMethod()  {    if(isset($this-&gt;raw['REQUEST_METHOD']))      return strtolower($this-&gt;raw['REQUEST_METHOD']);    }    return false;  }  public function isMethod($method)  {    if(isset($this-&gt;raw['REQUEST_METHOD']) &amp;&amp;       $this-&gt;getMethod() == strtolower($method)) {      return true;    }    return false;  }}class myMvcHttpRequestParser extends ezcMvcHttpRequestParser{  /**   * Uses the data from the superglobals.   *   * @return ezcMvcRequest   */  public function createRequest()  {    $this-&gt;request = new myMvcRequest;    $this-&gt;processStandardHeaders();    $this-&gt;processAcceptHeaders();    $this-&gt;processUserAgentHeaders();    $this-&gt;processFiles();    $this-&gt;processAuthVars();    $this-&gt;request-&gt;raw = &amp;$_SERVER;    return $this-&gt;request;  }}</pre>
+</div>
+</div></blockquote>
+<p>This helps us to implement simple decision mechanisms in a single
+controller action that takes both POST and GET requests. From the point
+separation of concerns this is not a good design decision. We need
+routes that can point to different controller actions based on their
+request method, so that two requests <strong>GET /user/1/delete</strong> and <strong>POST
+/user/1/delete</strong> lead to different methods, for example
+<strong>userController::doDeleteDialog</strong> and <strong>userController::doDelete</strong>. We
+will simply extend the <strong>ezcMvcRailsRoute</strong> to support decision based on
+http request methods:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myMvcRestRoute extends ezcMvcRailsRoute{  protected $method;  public function __construct( $method, $pattern, $controllerClassName, $action = null, array $defaultValues = array() )  {    $this-&gt;method = $method;    parent::__construct($pattern, $controllerClassName, $action, $defaultValues);  }  public function matches( ezcMvcRequest $request )  {    if(strtolower($this-&gt;method) == strtolower($request-&gt;raw['REQUEST_METHOD'])) {      return parent::matches($request);    }    return null;  }}</pre>
+</div>
+</div></blockquote>
+<p>This very simple extension is independent of the advanced request parser
+given above, so you could use it separately. In the light of our delete
+user example, you would use the new router in the following way:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myRouter extends ezcMvcRouter{  public function createRoutes()  {    return array(      new myMvcRestRoute( 'GET', '/users/:id/delete', 'UserController', 'deleteDialog' ),      new myMvcRestRoute( 'POST', '/users/:id/delete', 'UserController', 'delete' ),    );  }}</pre>
+</div>
+</div></blockquote>
+<p>We have now simple rest route support in our ezcMvcTools application.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html#disqus_thread" data-disqus-identifier="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>December 12, 2008</span> 
         </div>
         <div class="section" id="bad-news-jquery-ui-1-6-ships-without-spinner-and-autocomplete">
@@ -435,6 +497,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li>
         <li class="recent_post">
@@ -460,9 +525,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
         </li>
         <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
         </li>
     </ul>
 </div>

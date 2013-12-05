@@ -5,7 +5,67 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Tue, 19 Nov 2013 00:00:00 +0100</pubDate>
+        <pubDate>Thu, 05 Dec 2013 00:00:00 +0100</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</link>
+            <guid>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</guid>
+            <title><![CDATA[Feature Flags and Doctrine Entities]]></title>
+            <description><![CDATA[<div class="section" id="feature-flags-and-doctrine-entities">
+<h1>Feature Flags and Doctrine Entities</h1>
+<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
+Doctrine Entities, Metadata Mapping and their database.</p>
+<p>The problem of feature flags with Doctrine is easily explained: If you add
+properties for a new feature that is disabled in the Doctrine metadata, then you
+need to upgrade the database before deployment, even when the feature is not
+being rolled out for some days/weeks. Doctrine requires the database to look
+exactly like the metadata specifies it.</p>
+<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
+easily:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User&quot;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                    <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
+                    <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
+                <span class="p">));</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something&quot;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// more mapping</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
+<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
+<p>Then if the feature is enabled fore some time and accepted into the pool of
+permanent features, you can remove the listener and move the mapping onto the
+Entities metadata.</p>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+            <pubDate>Thu, 05 Dec 2013 00:00:00 +0100</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/11/19/setting_up_development_machines_ansible_edition.html</link>
             <guid>http://www.whitewashing.de/2013/11/19/setting_up_development_machines_ansible_edition.html</guid>

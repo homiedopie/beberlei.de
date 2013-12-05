@@ -82,6 +82,108 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>May 25, 2008</span> 
+        </div>
+        <div class="section" id="introducing-zend-controller-scaffolding">
+<h1><a href="2008/05/25/introducing-zend-controller-scaffolding.html">Introducing: Zend Controller Scaffolding</a></h1>
+<p>In the last couple of weeks I <a class="reference external" href="http://codecaine.co.za/posts/form-generation-with-zend-form-part-2/">came across the
+idea</a>
+of building a little component for scaffolding in Zend Framework. After
+playing around with this idea a little I came up with an
+Zend_Controller_Scaffolding object, which extends the
+Zend_Controller_Action object.</p>
+<p>It takes any Zend_Db_Table_Abstract object and generates create and
+update forms using Zend_Form and displays them in the Controller. The
+component is very easy to use, as this example shows:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}</pre>
+</div>
+</div></blockquote>
+<p>You now have access to the following actions of the controller:
+some/create some/edit some/delete and some/index (some/list). They
+handle all your model editing dreams.</p>
+<p>All you have to own is the WW_Controller_Scaffolding Library Class and
+a folder of scaffolding view templates both of which are <a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">bundled in an
+archive you can
+download</a>.</p>
+<p><strong>Download</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">Download Version
+0.5.5</a></li>
+</ul>
+<p><strong>Changes</strong></p>
+<ul class="simple">
+<li>0.5.5: Put Component into own Namespace (WW = Whitewashing). Make it
+possible to hide fields in the list via the options. Allow to specify
+scaffolding view scripts folder via options.</li>
+</ul>
+<p><strong>Install &amp; Usage</strong></p>
+<blockquote>
+<div><div class="highlight-python"><pre>Untar the two folders include/ and views/ into your
+Zend Framework project application directory.
+
+Make sure the include folder is in your Zend_Loader
+include path or move the Scaffolding.php so that it
+is placed in your library include path.
+
+Define each Controller that should be a Scaffolding Interface
+as:
+
+class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}
+
+Where $options is an array or Zend_Config object with any of the following keys:
+
+  'allow_edit_primary_key' True/false - Whether the form allows you to set the
+                          Primary Key fields or not
+
+ 'field_names' an Array of the Database Tables field names mapped to Label Names
+
+ 'hide_list_fields' Array of database table field names that should not be displayed in the list overview.
+
+ 'checkbox' an Array of Database Table field names that should be represented
+            as Checkbox. Useful for TINYINT(1) fields that represent boolean decisions.
+
+ 'view_folder' Sometimes you want to use different views for scaffolding in one project. Use
+               this variable and copy the scaffolding folder for each component you want to
+               change the view basics for.</pre>
+</div>
+</div></blockquote>
+<p><strong>Todos &amp; Problems:</strong></p>
+<ul class="simple">
+<li>Many To Many Relationships are not implemented yet (Using
+MultiSelec).</li>
+<li>Compound Keys are probably not working correctly</li>
+<li>Relationships on non-primary key fields probably don’t work as
+expected</li>
+<li>Relationships with lots of data are not scaled down for easy
+administration.</li>
+</ul>
+<p>Please report any bugs and feature requests or recommendations to
+<strong>kontakt at beberlei dot de</strong>.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/05/25/introducing-zend-controller-scaffolding.html#disqus_thread" data-disqus-identifier="2008/05/25/introducing-zend-controller-scaffolding">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>May 18, 2008</span> 
         </div>
         <div class="section" id="my-2-cents-on-zend-search-lucene-update-problems">
@@ -582,66 +684,6 @@ that save time on integration after the first initial setup.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/06/21/on-frameworks-and-javascript-coupling.html#disqus_thread" data-disqus-identifier="2008/06/21/on-frameworks-and-javascript-coupling">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>June 21, 2008</span> 
-        </div>
-        <div class="section" id="simplifying-zf-scope-of-variables-in-view-and-controller">
-<h1><a href="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html">Simplifying ZF: Scope of Variables in View and Controller</a></h1>
-<p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
-Ass!</a>
-article referenced earlier I came up with some simplifications of the Zend
-View and Controller variable coupling.</p>
-<p>Using some code in the article I created a new Zend_View_Extended
-class which offers the possibility to circumvent the access of variables
-via $this and directly registers each variable key of the Zend_View
-object as an own variable in the script template:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class Zend_View_Extended extends Zend_View_Abstract
-{
-    protected function _run()
-    {
-        while( list( $k, $v ) = each( $this ) ) ${$k} = $v;
-
-        include func_get_arg(0);
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Now rather than calling $this-&gt;data you can call $data in a script
-template. Of course this comes with additional overhead of each variable
-being registered twice. I don’t know how this handles performance wise,
-but maybe unsetting $this variables after copying solves this. Also you
-have to overwrite the initView() method of your base Controller Action
-class.</p>
-<p>Another simplification would be to allow for the following direct
-variable settings in any Controller Action, which would shorten the
-$this-&gt;view-&gt;variable call, to derive the same functionality via
-$this-&gt;variable. I haven’t tested this though.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class Zend_Controller_SimpleAction extends Zend_Controller_Action
-{
-    function __set($name, $value)
-    {
-        $this-&gt;view-&gt;{$name} = $value;
-    }
-}</pre>
-</div>
-</div></blockquote>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html#disqus_thread" data-disqus-identifier="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -688,6 +730,9 @@ $this-&gt;variable. I haven’t tested this though.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li>
         <li class="recent_post">
@@ -713,9 +758,6 @@ $this-&gt;variable. I haven’t tested this though.</p>
         </li>
         <li class="recent_post">
             <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a>
         </li>
     </ul>
 </div>

@@ -10,7 +10,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Symfony2 on Windows Azure Websites &mdash; Whitewashing</title>
+    <title>Feature Flags and Doctrine Entities &mdash; Whitewashing</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -32,8 +32,7 @@
     <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
     
     <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Traits are Static Access" href="../../04/12/traits_are_static_access.html" />
-    <link rel="prev" title="Bounded Contexts" href="../../06/24/bounded_contexts.html" />
+    <link rel="next" title="Setting up development machines: Ansible edition" href="../../11/19/setting_up_development_machines_ansible_edition.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
   </head>
   <body>
@@ -64,69 +63,73 @@
     <div class="span-24 content">
       <div>
         <div>
-          <div id="2013-05-23-symfony2_on_windows_azure_websites">
+          <div id="2013-12-05-feature_flags_and_doctrine_entities">
             
             
     
     <div class="related">
         <ul>
-            <li>
-                 &laquo; <a href="../../06/24/bounded_contexts.html">Bounded Contexts</a>
-            </li>
             <li class="right">
-                <a href="../../04/12/traits_are_static_access.html">Traits are Static Access</a> &raquo; 
+                <a href="../../11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a> &raquo; 
             </li>
         </ul>
     </div>
     
         <div class="timestamp postmeta">
-            <span>May 23, 2013</span> 
+            <span>December 05, 2013</span> 
         </div>
-    <div class="section" id="symfony2-on-windows-azure-websites">
-<h1>Symfony2 on Windows Azure Websites</h1>
-<p>With the Windows Azure Websites platform-as-a-service (PaaS), which was
-released as a preview to a general audiance in June last year, PHP applications
-can be deployed to Azure with as much as a Git push to a remote repository. At
-the same time Microsoft released a new and much improved <a class="reference external" href="https://github.com/WindowsAzure/azure-sdk-for-php">PHP SDK</a>, which
-integrates with all the Azure webservices.</p>
-<p>I blogged about deployment with Composer on Azure Websites last November and
-since then I have been working with Microsoft to improve Symfony2 support on
-Windows Azure by developing and releasing the <a class="reference external" href="https://github.com/beberlei/AzureDistributionBundle">AzureDistributionBundle</a>. This is a new version
-of the bundle and contains the following improvements:</p>
-<ul class="simple">
-<li>Full support for the PHP SDK through the DependencyInjection container</li>
-<li>Installation of project dependendencies using Composer during deployment.
-I will blog about the Composer support in much more detail in the next
-days, because this information is not only valuable for Symfony2 projects.</li>
-<li>a <a class="reference external" href="https://github.com/beberlei/symfony-azure-edition">full demo application</a> (derived from
-symfony-standard) to show PHP, Symfony &amp; Azure integration</li>
-<li>documentation of the Windows Azure Websites deployment process and
-possiblities for PHP configuration</li>
-<li>a Stream Wrapper for Azure Blob Storage, currently being reviewed for
-inclusion into the Azure PHP SDK itself.</li>
-</ul>
-<p>You can install both the Bundle or the Demo application via Composer.
-For the Demo application call:</p>
-<div class="highlight-python"><pre>$ php composer.phar create-project beberlei/symfony-azure-edition</pre>
-</div>
-<p>The README includes more information about how to deploy the demo
-to your Azure websites account.</p>
-<p>The bundle can be installed using the following <tt class="docutils literal"><span class="pre">composer.json</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;beberlei/azure-distribution-bundle&quot;</span><span class="p">:</span> <span class="s">&quot;*&quot;</span>
-    <span class="p">},</span>
-    <span class="s">&quot;repositories&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;pear&quot;</span><span class="p">,</span>
-            <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://pear.php.net&quot;</span>
+    <div class="section" id="feature-flags-and-doctrine-entities">
+<h1>Feature Flags and Doctrine Entities</h1>
+<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
+Doctrine Entities, Metadata Mapping and their database.</p>
+<p>The problem of feature flags with Doctrine is easily explained: If you add
+properties for a new feature that is disabled in the Doctrine metadata, then you
+need to upgrade the database before deployment, even when the feature is not
+being rolled out for some days/weeks. Doctrine requires the database to look
+exactly like the metadata specifies it.</p>
+<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
+easily:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">&#39;super_feature2&#39;</span><span class="p">))</span> <span class="p">{</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User&quot;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;fieldName&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;superFeatureProperty&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;string&#39;</span>
+                <span class="p">));</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something&quot;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// more mapping</span>
+            <span class="p">}</span>
         <span class="p">}</span>
-    <span class="p">],</span>
+    <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Registering PEAR is necessary, because the Azure PHP SDK depends on some PEAR
-components.</p>
+<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
+<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
+<p>Then if the feature is enabled fore some time and accepted into the pool of
+permanent features, you can remove the listener and move the mapping onto the
+Entities metadata.</p>
 </div>
 
     
@@ -149,19 +152,21 @@ components.</p>
             <span>
                 Tags:
                 
-                    <a href="../../../tags/azure.html">Azure</a>
+                    <a href="../../../tags/php.html">PHP</a>,
+                
+                    <a href="../../../tags/doctrine.html">Doctrine</a>
                 
             </span>
         </div>
         
     </div>
-    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/05/23/symfony2_on_windows_azure_websites";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/12/05/feature_flags_and_doctrine_entities";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
 
             <div id="disqus_thread"></div>
             <script type="text/javascript">
                 var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html';
+                var disqus_url = 'http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html';
                 (function() {
                     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
@@ -187,7 +192,7 @@ components.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
-            <a href="../../12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+            <a href="#">Feature Flags and Doctrine Entities</a>
         </li>
         <li class="recent_post">
             <a href="../../11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
@@ -211,7 +216,7 @@ components.</p>
             <a href="../../06/24/bounded_contexts.html">Bounded Contexts</a>
         </li>
         <li class="recent_post">
-            <a href="#">Symfony2 on Windows Azure Websites</a>
+            <a href="../../05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
         </li>
         <li class="recent_post">
             <a href="../../04/12/traits_are_static_access.html">Traits are Static Access</a>
