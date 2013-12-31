@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2013/12/31/2013_and_2014
    2013/12/05/feature_flags_and_doctrine_entities
    2013/11/19/setting_up_development_machines_ansible_edition
    2013/09/04/decoupling_from_symfony_security_and_fosuserbundle
