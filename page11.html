@@ -2,8 +2,6 @@
 
 
 
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -44,7 +42,7 @@
     </div>
     <div class="span-11" id="about">
         <p>
-            Whitewashing is the blog of Benjamin Eberlei and covers topics in software-development and object-oriented-design. Benjamin works
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
             for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
         </p>
     </div>
@@ -76,6 +74,68 @@
             </li>
         </ul>
     </div>
+        
+        <div class="timestamp postmeta">
+            <span>December 03, 2008</span> 
+        </div>
+        <div class="section" id="ezcomponents-2008-2-beta-mvc-separation-for-win">
+<h1><a href="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html">ezComponents 2008.2 Beta - Mvc separation for win</a></h1>
+<p><a class="reference external" href="http://www.whitewashing.de/blog/articles/88">I have written</a> on the
+<a class="reference external" href="http://ezcomponents.org">new ezComponents MvcTools</a> component before
+already. Just yesterday the beta of this component was released with the
+<a class="reference external" href="http://ezcomponents.org/resources/news/news-2008-12-01">general beta of the 2008.2
+version</a> of
+ezComponents. Several bugfixes and enhancements were included into the
+MvcTools which make it a perfect component for any Mvc based
+application.</p>
+<p>I reviewed lots of the code myself and can only say i love the beauty of
+the code. Its very simple but by default the most powerful mvc solution
+in the PHP market. People working with unittests will like it very much,
+since all the parts are perfectly separated from each other allowing to
+test controllers, views, routers and filters in complete separation.</p>
+<p>To show one very simple example howto benefit of the separation of view
+and controllers. If we need a view in both html and pdf, this should
+generally make no difference for the controller. We add two routes, one
+for the pdf one for the html view that execute the same controller and
+action:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myRouter extends ezcMvcRouter{ public function createRoutes() {  return array(   new ezcMvcRailsRoute( '/pdf', 'SomeController', 'index'),   new ezcMvcRailsRoute( '/', 'SomeController', index' ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables['items'] = Model::retrieveLotsOfItems();  return $result; }}</pre>
+</div>
+</div></blockquote>
+<p>Now howto decide between PDF and Html view? We use the createView method
+of our dispatcher configuration, but we still only need the http
+response writer, nothing more.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, &quot;/pdf&quot;)) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}</pre>
+</div>
+</div></blockquote>
+<p>Now both <strong>myHtmlView</strong> and <strong>myPdfView</strong> can create their
+ezcMvcResponse objects that fill the response body depending on their
+type. Please note that overwriting createResponseBody() in myPdfView is
+a shortcut that circumvents me having to write a new PDF View Handler
+(which would be the way to go).</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = &quot;application/pdf&quot;;   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}</pre>
+</div>
+</div></blockquote>
+<p>Now all the the logic that is potentially in the controller is completely
+separated from the view handling that may depend on the routing
+information not on the controller. And views can be tested separately
+from the controller result. Testability is very high.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html#disqus_thread" data-disqus-identifier="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
         
         <div class="timestamp postmeta">
             <span>December 04, 2008</span> 
@@ -497,6 +557,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li>
         <li class="recent_post">
@@ -522,9 +585,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
         </li>
         <li class="recent_post">
             <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a>
         </li>
     </ul>
 </div>
