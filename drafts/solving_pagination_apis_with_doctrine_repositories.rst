@@ -1,10 +1,13 @@
 Solving Pagination APIs with Doctrine Repositories
 ==================================================
 
-For quite some time now it bugs me that existing pagination APIs are
-violating decoupling in MVC. One example where this is clearly happening is
-when you are using KnpLabs Pager in combination with Solarium. In that
-case the ``Paginator#paginate()`` method requires an array of ``$select`` and
+For quite some time now it bugs me that existing pagination APIs for Symfony are
+violating decoupling in MVC. And this problem exists in other frameworks and
+libraries as well.
+
+One obvious example where this is clearly happening is when you are using
+KnpLabs Pager in combination with Solarium. In that case the
+``Paginator#paginate()`` method requires an array of ``$select`` and
 ``$solrClient``. Integrations for the Doctrine ORM require to pass Query or
 QueryBuilder objects for both Pagerfanta and KnpLabs Pager.
 
@@ -120,6 +123,6 @@ Please post feedback and issues in the comments or into the `Github issue
 tracker <https://github.com/beberlei/porpaginas/issues>`_.
 
 .. author:: default
-.. categories:: PHP
-.. tags:: PHP, Porpaginas
+.. categories:: Symfony
+.. tags:: Symfony, Porpaginas
 .. comments::
