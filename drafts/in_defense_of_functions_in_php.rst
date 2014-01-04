@@ -17,10 +17,10 @@ increase with Drupal8 now moving towards OOP as well. The only major PHP
 software projects I know that are still based largely on functions are
 Wordpress and phpBB (maybe Mediawiki?).
 
-Why are objects favored over functions? In general, because we learned that
-they allow better code-reuse, decoupling, testability, runtime binding of
-dependencies and avoid global state. The fundamental principles behind these
-claims are the `SOLID principles
+Why do PHP programmers favor objects over functions? In general, because we
+learned that they allow better code-reuse, decoupling, testability, runtime
+binding of dependencies and avoid global state. The fundamental principles
+behind these claims are the `SOLID principles
 <http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)>`_.
 
 Systems based on functions try to emulate some properties of OOP with two
@@ -31,14 +31,6 @@ But you can follow the SOLID principles as easily with functions and get rid of
 global state without resorting to magic. To achieve this you should move from
 the imperative/procedural paradigm towards more functional instead of the
 object-oriented paradigm.
-
-What are the differences between those paradigms? In object-oriented paradigm
-we have mutable state and we couple data+behavior. In the functional paradigm
-we seperate data and behavior and focus on immutable state. Immutable state
-means no modifications are possible after creation, instead only new values are
-created. See `Anthony's video
-<http://blog.ircmaxell.com/2012/11/programming-with-anthony-paradigm-soup.html>`_
-for more details on different programming paradigms.
 
 Example
 -------
@@ -112,13 +104,11 @@ call.
         // much more context details here
     }
 
-We could introduce an array as context ``$wordpressContext = array('blog_id' =>
-4);`` to avoid using a class, but passing around huge arrays of data hurts
-readability of code very much. Introducing an object here allows us to be
-typesafe and help developers read the code. Take note that this does not mean
-that we are now using object-oriented paradigm, since we are still seperating
-data and behavior and we might design ``WordpressContext`` to be immutable in
-the future.
+Why start with an object? We could introduce an array as context
+``$wordpressContext = array('blog_id' => 4);`` to avoid using a class, but
+passing around huge arrays of data hurts readability of code very much.
+Introducing an object here allows us to be typesafe and help developers read
+the code.
 
 Now assume that every hook function always gets this context passed as first
 argument, with the help of some code inside ``do_action_ref_array``:
@@ -166,6 +156,9 @@ in order:
 
     <?php
     add_action('send_headers', 'add_header_xua', array('get_option'));
+
+There are other ways to solve this, but this is a greater topic that needs its
+own blog post.
 
 Step 3: Remove side-effects
 ---------------------------
@@ -277,6 +270,10 @@ areas:
   immutable in our PHP code. We also have to force ourselves to avoid
   mutating data and make functions pure instead.
 
+- I only took a look at my own function, however the ``WP#send_headers`` and
+  ``do_action_ref_array`` functions require refactoring towards this approach
+  as well.
+
 I will discuss approaches to fix these problems in future blog posts.
 
 Conclusion
@@ -300,9 +297,10 @@ as they does not really apply here.
 The resulting code is very simple to read and write and does not contain global
 state anymore. 
 
-This blog post doesn't show a full-fledged solution to the problem and there
-are some issues that need to be tackled, however it is a good proof of concept
-to show the basics of using functional approaches 
+This blog post doesn't show a full-fledged solution to the problem and I cannot
+claim that it will work on a larger scale, because of the mentoined issues that
+should be tackled. However it is a good proof of concept to show the basics of
+using functional approaches to SOLID.
 
 .. author:: default
 .. categories:: PHP
