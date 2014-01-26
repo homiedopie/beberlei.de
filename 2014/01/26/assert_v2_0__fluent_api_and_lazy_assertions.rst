@@ -103,6 +103,6 @@ You can find more information in the `README of Assert
 <https://github.com/beberlei/assert#assert>`_.
 
 .. author:: default
-.. categories:: none
-.. tags:: none
+.. categories:: PHP
+.. tags:: PHP
 .. comments::
