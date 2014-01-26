@@ -1,0 +1,254 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Assert v2.0: Fluent API and Lazy Assertions &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="2013 and 2014" href="../../../2013/12/31/2013_and_2014.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2014-01-26-assert_v2_0__fluent_api_and_lazy_assertions">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>2014-01-26 00:00:00</span> 
+        </div>
+    <div class="section" id="assert-v2-0-fluent-api-and-lazy-assertions">
+<h1>Assert v2.0: Fluent API and Lazy Assertions</h1>
+<p>Almost two years ago I started developing a small library <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> (<a class="reference external" href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html">blog post</a>)
+which contained a set of assertion methods to use in production code. With
+18.000 installations from Packagist this is my most successful piece of open
+source software outside of the Doctrine universe. There is a fair number
+of contributors and I know several companies using the library in production.</p>
+<p>The API however didn&#8217;t make me too happy, using the static method calls
+made it impossible to collect multiple errors and also made the code
+more verbose than necessary when validating the same value with multiple
+assertions.</p>
+<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
+these problems. The last two days I had some time to implement those new
+functionalities and I am releasing a new version 2.0 of Assert today.</p>
+<div class="section" id="fluent-api">
+<h2>Fluent API</h2>
+<p>Instead of having to use the static assertion methods, there is now
+a new fluent API, invoked by calling the function <tt class="docutils literal"><span class="pre">Assert\that($value)</span></tt>
+and then all the assertions you want to call on that value.</p>
+<p>Here are some examples:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">null</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullOr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">boolean</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This new API allows for much shorter and compact assertions.</p>
+</div>
+<div class="section" id="lazy-assertions">
+<h2>Lazy Assertions</h2>
+<p>Using Assert with webforms was never possible unless you wanted to show
+the user only exactly one error message. Because every assertion fails
+with an Exception, there was no way to execute multiple assertions and
+collect the errors. This has changed with the new lazy assertion API,
+that is similar to the Fluent API:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">\Assert\lazy</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">verifyNow</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The method <tt class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></tt> requires a property path (name), so
+that you know how to differentiate the errors afterwards.</p>
+<p>On failure <tt class="docutils literal"><span class="pre">verifyNow()</span></tt> will throw an exception
+<tt class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></tt> (this does not extend
+<tt class="docutils literal"><span class="pre">AssertionFailedException</span></tt>) with a combined message:</p>
+<div class="highlight-python"><pre>The following 3 assertions failed:
+1) foo: Value "10" expected to be string, type integer given.
+2) bar: Value "&lt;NULL&gt;" is empty, but non empty value was expected.
+3) baz: Value "string" is not an array.</pre>
+</div>
+<p>You can also call the method <tt class="docutils literal"><span class="pre">getErrorExceptions()</span></tt> to retrieve all the
+underyling <tt class="docutils literal"><span class="pre">AssertionFailedException</span></tt> objects and convert them something
+useable for the frontend.</p>
+</div>
+<div class="section" id="error-messages-values-and-constraints">
+<h2>Error Messages, Values and Constraints</h2>
+<p>In version 1.0 Assert did not have default error messages when failures
+occured. This has changed and now every assertion has a default failure
+message, as well as access to the value and constraints of an exception:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">AssertionFailedException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value &quot;10&quot; is not between 100 and 1000.</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span> <span class="c1">// 10</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getConstraints</span><span class="p">();</span> <span class="c1">// array(&#39;min&#39; =&gt; 100, &#39;max&#39; =&gt; 1000)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This helps during development when the assertion exceptions occur and also
+allows to provide error messages to the user, by using the exception code and
+the value and constraint data for translating into human readable messages.</p>
+<p>You can find more information in the <a class="reference external" href="https://github.com/beberlei/assert#assert">README of Assert</a>.</p>
+</div>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/06/24/bounded_contexts.html">Bounded Contexts</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

@@ -80,6 +80,57 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>January 24, 2008</span> 
+        </div>
+        <div class="section" id="how-my-zend-db-table-models-look-like">
+<h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
+<p>I am not too happy with the ZF Frameworks Table access solution. Not
+that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
+pattern</a>,
+but in most web applications you almost always have to join data some
+way or another. Even this rather simple application, a blog, needs joins
+for displaying articles so that category, comment count and tags can be
+displayed. Therefore I use an instance of Zend_Db_Table_Abstract only
+for the simplest purposes and pimp it by using lots of public methods
+and
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.db.select.html">Zend_Db_Select</a>.
+An example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeModel extends Zend_Db_Table_Abstract</span>
+<span class="x">{</span>
+<span class="x">  $_name = &quot;someTable&quot;;</span>
+<span class="x">  $_primary = &quot;id&quot;;</span>
+
+<span class="x">  public function getSomethingByJoin($param1, $param2)</span>
+<span class="x">  {</span>
+<span class="x">     $db = $this-&gt;getAdapter();</span>
+<span class="x">     $select = $db-&gt;select();</span>
+<span class="x">     ...[build select]</span>
+<span class="x">     $result = $db-&gt;query($select);</span>
+
+<span class="x">     return $result;</span>
+<span class="x">  }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>That way you still follow the MVC pattern and don’t have to take one
+compromise after another for getting the Table Gateway to reproduce a
+result that looks like a join.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/24/how-my-zend-db-table-models-look-like.html#disqus_thread" data-disqus-identifier="2008/01/24/how-my-zend-db-table-models-look-like">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>October 30, 2008</span> 
         </div>
         <div class="section" id="php-conference-recap-netbeans-ezcomponents-mapreduce">
@@ -750,174 +801,6 @@ useful documentation for it to be of use to anyone.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/12/18/dependecy-injection-the-juicy-way.html#disqus_thread" data-disqus-identifier="2008/12/18/dependecy-injection-the-juicy-way">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>December 03, 2008</span> 
-        </div>
-        <div class="section" id="ezcomponents-view-handler-for-zend-pdf">
-<h1><a href="2008/12/03/ezcomponents-view-handler-for-zend-pdf.html">ezComponents View Handler for Zend_Pdf</a></h1>
-<p><a class="reference external" href="http://www.whitewashing.de/blog/article/93">My previous posting</a>
-discussed different view handlers based on routing information. One
-example was the PDF View which was implemented rather hackish through
-overwriting the <strong>createResponseBody()</strong> function of <strong>ezcMvcView</strong>.
-<a class="reference external" href="http://www.derickrethans.nl/">Derick</a> told me the way to go would be
-writing my own PDF view handler. Since this is a rather lengthy topic I
-created this new post that only discusses using
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.pdf.html">Zend_Pdf</a> as a
-View Handler in the new <a class="reference external" href="http://www.ezcomponents.org">ezComponents
-MvcTools</a>.</p>
-<p>The code for the View Handler would look like the following:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>abstract class myPdfViewHandler implements ezcMvcViewHandler
-{
-    /**
-     * Contains the zone name
-     *
-     * @var string
-     */
-    protected $zoneName;
-
-    /**
-     * Contains the variables that will be available in the template.
-     *
-     * @var array(mixed)
-     */
-    protected $variables = array();
-
-    /**
-     * Pdf object to be rendered.
-     *
-     * @var Zend_Pdf
-     */
-    protected $pdf;
-
-    /**
-     * Creates a new view handler, where $zoneName is the name of the block and
-     * $templateLocation the location of a view template.
-     *
-     * @var string $zoneName
-     * @var string $templateLocation
-     */
-    public function __construct( $zoneName, $templateLocation = null )
-    {
-        $this-&gt;zoneName = $zoneName;
-    }
-
-    /**
-     * Adds a variable to the template, which can then be used for rendering
-     * the view.
-     *
-     * @param string $name
-     * @param mixed $value
-     */
-    public function send( $name, $value )
-    {
-        $this-&gt;variables[$name] = $value;
-    }
-
-    /**
-     * Processes the template with the variables added by the send() method.
-     * The result of this action should be retrievable through the getResult() method.
-     */
-    public function process( $last )
-    {
-        // template method
-    }
-
-    /**
-     * Returns the value of the property $name.
-     *
-     * @throws ezcBasePropertyNotFoundException if the property does not exist.
-     * @param string $name
-     * @ignore
-     */
-    public function __get( $name )
-    {
-        return $this-&gt;variables[$name];
-    }
-
-    /**
-     * Returns true if the property $name is set, otherwise false.
-     *
-     * @param string $name
-     * @return bool
-     * @ignore
-     */
-    public function __isset( $name )
-    {
-        return array_key_exists( $name, $this-&gt;variables );
-    }
-
-    /**
-     * Returns the name of the template, as set in the constructor.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this-&gt;zoneName;
-    }
-
-    /**
-     * Returns the result of the process() method.
-     *
-     * @return mixed
-     */
-    public function getResult()
-    {
-        if($this-&gt;pdf instanceof Zend_Pdf) {
-            return $this-&gt;pdf-&gt;render();
-        } else {
-            throw new Exception(&quot;Could not render PDF.&quot;);
-        }
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>Now you would implement a concrete PDF view handler by extending
-myPdfViewHandler.</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myConcretePdfViewHandler extends myPdfViewHandler {
-    public function process( $last )
-    {
-        $pdf = new Zend_Pdf();
-        // do concrete PDF drawing stuff here
-
-        // save PDF here, will be rendered in getResult()
-        $this-&gt;pdf = $pdf;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>And your <strong>ezcMvcView</strong> implementation will make of <strong>createZones()</strong>
-and look like the following:</p>
-<blockquote>
-<div><div class="highlight-python"><pre>class myPdfView extends ezcMvcView {
-    function createZones( $layout )
-    {
-        $zones = array();
-        // A decision which concrete Pdf Handler should be used would be decided on here.
-        $zones[] = new myConcretePdfViewHandler( 'concreteA' );
-        return $zones;
-    }
-}</pre>
-</div>
-</div></blockquote>
-<p>There you go!</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/03/ezcomponents-view-handler-for-zend-pdf.html#disqus_thread" data-disqus-identifier="2008/12/03/ezcomponents-view-handler-for-zend-pdf">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -964,6 +847,9 @@ and look like the following:</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li>
+        <li class="recent_post">
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
         </li>
         <li class="recent_post">
@@ -989,9 +875,6 @@ and look like the following:</p>
         </li>
         <li class="recent_post">
             <a href="2013/06/24/bounded_contexts.html">Bounded Contexts</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
         </li>
     </ul>
 </div>

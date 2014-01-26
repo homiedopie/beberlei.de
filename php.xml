@@ -5,7 +5,96 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Thu, 05 Dec 2013 00:00:00 +0100</pubDate>
+        <pubDate>Sun, 26 Jan 2014 00:00:00 +0100</pubDate>
+        <item>
+            <link>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</link>
+            <guid>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</guid>
+            <title><![CDATA[Assert v2.0: Fluent API and Lazy Assertions]]></title>
+            <description><![CDATA[<div class="section" id="assert-v2-0-fluent-api-and-lazy-assertions">
+<h1>Assert v2.0: Fluent API and Lazy Assertions</h1>
+<p>Almost two years ago I started developing a small library <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> (<a class="reference external" href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html">blog post</a>)
+which contained a set of assertion methods to use in production code. With
+18.000 installations from Packagist this is my most successful piece of open
+source software outside of the Doctrine universe. There is a fair number
+of contributors and I know several companies using the library in production.</p>
+<p>The API however didn’t make me too happy, using the static method calls
+made it impossible to collect multiple errors and also made the code
+more verbose than necessary when validating the same value with multiple
+assertions.</p>
+<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
+these problems. The last two days I had some time to implement those new
+functionalities and I am releasing a new version 2.0 of Assert today.</p>
+<div class="section" id="fluent-api">
+<h2>Fluent API</h2>
+<p>Instead of having to use the static assertion methods, there is now
+a new fluent API, invoked by calling the function <tt class="docutils literal"><span class="pre">Assert\that($value)</span></tt>
+and then all the assertions you want to call on that value.</p>
+<p>Here are some examples:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">null</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullOr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">boolean</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This new API allows for much shorter and compact assertions.</p>
+</div>
+<div class="section" id="lazy-assertions">
+<h2>Lazy Assertions</h2>
+<p>Using Assert with webforms was never possible unless you wanted to show
+the user only exactly one error message. Because every assertion fails
+with an Exception, there was no way to execute multiple assertions and
+collect the errors. This has changed with the new lazy assertion API,
+that is similar to the Fluent API:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">\Assert\lazy</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="s1">'string'</span><span class="p">,</span> <span class="s1">'baz'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">verifyNow</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The method <tt class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></tt> requires a property path (name), so
+that you know how to differentiate the errors afterwards.</p>
+<p>On failure <tt class="docutils literal"><span class="pre">verifyNow()</span></tt> will throw an exception
+<tt class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></tt> (this does not extend
+<tt class="docutils literal"><span class="pre">AssertionFailedException</span></tt>) with a combined message:</p>
+<div class="highlight-python"><pre>The following 3 assertions failed:
+1) foo: Value &quot;10&quot; expected to be string, type integer given.
+2) bar: Value &quot;&lt;NULL&gt;&quot; is empty, but non empty value was expected.
+3) baz: Value &quot;string&quot; is not an array.</pre>
+</div>
+<p>You can also call the method <tt class="docutils literal"><span class="pre">getErrorExceptions()</span></tt> to retrieve all the
+underyling <tt class="docutils literal"><span class="pre">AssertionFailedException</span></tt> objects and convert them something
+useable for the frontend.</p>
+</div>
+<div class="section" id="error-messages-values-and-constraints">
+<h2>Error Messages, Values and Constraints</h2>
+<p>In version 1.0 Assert did not have default error messages when failures
+occured. This has changed and now every assertion has a default failure
+message, as well as access to the value and constraints of an exception:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">AssertionFailedException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value &quot;10&quot; is not between 100 and 1000.</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span> <span class="c1">// 10</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getConstraints</span><span class="p">();</span> <span class="c1">// array('min' =&gt; 100, 'max' =&gt; 1000)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This helps during development when the assertion exceptions occur and also
+allows to provide error messages to the user, by using the exception code and
+the value and constraint data for translating into human readable messages.</p>
+<p>You can find more information in the <a class="reference external" href="https://github.com/beberlei/assert#assert">README of Assert</a>.</p>
+</div>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+            <pubDate>Sun, 26 Jan 2014 00:00:00 +0100</pubDate>
+        </item>
         <item>
             <link>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</link>
             <guid>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</guid>
