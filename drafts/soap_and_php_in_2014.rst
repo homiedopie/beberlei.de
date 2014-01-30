@@ -104,7 +104,7 @@ these problems. In general there are several mechanisms to debug SOAP in PHP:
 
 1. Enable ``'trace' => true`` option on the SOAPClient. This allows you
    to call the methods ``$client->__getLastResponse()`` and
-   ``$client->__getLastResponse()`` to take a look at the interaction between
+   ``$client->__getLastRequest()`` to take a look at the interaction between
    server and client.
 
 2. When failures happen, ``SOAPClient`` throws a ``SOAPFault`` exception.
@@ -172,7 +172,7 @@ from code.
 
 There are several reasons to introduce WSDLs for your SOAP service:
 
-- Your clients are not written in PHP, making use of non-WSDL mode impossible.
+- Your SOAP clients will not be written in PHP, which prevents use of the non-WSDL mode.
 - Clients of the service are used and  written by other teams or companies.
 - You want to use the WSDL as a validation mechanism for input from clients.
 
@@ -390,7 +390,7 @@ need to implement different PHP service classes to allow for versioned APIs.
 Conclusion
 ----------
 
-While the full extend of SOAP and WSDL can be scary, they allow you to write
+While the full extent of SOAP and WSDL can be scary, they allow you to write
 servers and clients for RPC communication between servers and languages very
 easily. If you don't need to expose your API to the webbrowser via REST/JSON,
 then using SOAP is a very good alternative to most of the handcrafting that is
