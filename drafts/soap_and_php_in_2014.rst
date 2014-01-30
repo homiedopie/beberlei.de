@@ -51,7 +51,7 @@ from the server and use a non-wsdl client to talk to it. The PHP ``SOAPClient``
 and ``SOAPServer`` have a common exchange format that is used in this case
 and replaces WSDL entirely.
 
-.. code-block::
+.. code-block:: php
 
     <?php
     // server.php
@@ -322,6 +322,8 @@ on Zend Autodiscovery:
                  ->setOperationStyle(array('use' => 'literal'));
 
 Then use the wrapper like such:
+
+.. code-block:: php
 
     <?php
 
