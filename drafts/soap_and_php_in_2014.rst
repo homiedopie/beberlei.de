@@ -390,10 +390,11 @@ need to implement different PHP service classes to allow for versioned APIs.
 Conclusion
 ----------
 
-While SOAP and WSDL are scary, they allow you to write servers and clients for
-RPC communication between servers and languages very easily. If you don't need
-to expose your API to the webbrowser via REST/JSON, then using SOAP is a very
-good alternative to most of the handcrafting that is necessary for REST APIs.
+While the full extend of SOAP and WSDL can be scary, they allow you to write
+servers and clients for RPC communication between servers and languages very
+easily. If you don't need to expose your API to the webbrowser via REST/JSON,
+then using SOAP is a very good alternative to most of the handcrafting that is
+necessary for REST APIs.
 
 .. author:: default
 .. categories:: PHP
