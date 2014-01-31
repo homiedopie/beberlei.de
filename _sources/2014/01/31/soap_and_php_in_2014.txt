@@ -4,8 +4,10 @@ SOAP and PHP in 2014
     "The SOAP stack is generally regarded as an embarrassing failure these days."
     -- Tim Bray
 
-While the quote by Tim Bray is still true, the toolstack and possiblities behind 
-SOAP are still superior to REST, which requires alot of handcrafting.
+While the quote by Tim Bray is still true to some degree, the toolstack and
+possiblities behind SOAP are still superior to REST in my opinion. REST still
+requires alot of manual coding, where RPC with SOAP allows much automation with
+tools.
 
 These last years REST has gotten all the buzz, everybody seems to be using it
 and there are lots of talks about REST on conferences. SOAP used to be big for
