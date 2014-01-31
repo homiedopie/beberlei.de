@@ -80,6 +80,79 @@
     </div>
         
         <div class="timestamp postmeta">
+            <span>October 22, 2012</span> 
+        </div>
+        <div class="section" id="a-tent-io-app-zelten-bookmarks">
+<h1><a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a></h1>
+<p>Over the weekend I built a <a class="reference external" href="http://zelten.eu1.frbit.net">very simple bookmarking application</a> for <a class="reference external" href="http://tent.io">tent.io</a>. I wanted to try the tent functionality to create
+arbitrary entities of data using something as simple as a “Bookmark”.</p>
+<p>The application retrieves and stores bookmarks on your own tent-server, nothing
+is kept on the applications server and as a user you keep full control over
+your content (bookmarks).</p>
+<p>The <a class="reference external" href="https://github.com/beberlei/zelten-bookmarks">code for the application</a>
+is on Github, as well as the <a class="reference external" href="https://github.com/beberlei/TentPHP">TentPHP library</a> I have written to support the protocol.
+The application is using PHP, the Silex microframework and MySQL.</p>
+<div class="section" id="so-what-is-tent-and-why-bother">
+<h2>So what is Tent and why bother?</h2>
+<p>About two month ago a new distributed social networking protocol was launched called
+<a class="reference external" href="http://tent.io">Tent.io</a>. It works over HTTP using JSON and distributes data
+using webhooks. This happened in the shadow of <a class="reference external" href="http://www.app.net">app.net</a>
+funding, just two weeks after they collected over 500k USD. Tent.io got lots of
+attention but not as much as app.net sadly. Its distributed nature however is
+much more suited to achieving true independence of large companies and true privacy
+for the users though. Compared to Diaspora it has the benefit of being a protocol, not
+an application first.</p>
+<p>Now two month later, there are <a class="reference external" href="https://github.com/tent">reference implementations</a>
+for Server, Client and a Twitter like Status application. You can use <a class="reference external" href="http://tent.is">Tent.is</a> to create a free or payed tent account including access to
+the status application or setup your own tentd server on Heroku.</p>
+<p>As a user I can connect any application to the tent server I have registered
+with and control the visibility and sharing policies. Content can be private,
+public or visible to certain groups only. A Tent server then makes sure to
+distribute content to the appropriate subscribers.</p>
+<p>In this early state of the protocol it makes sense to register on the central
+tent.is service, however when the server gets more stable or alternative
+server implementations popup its easy to move all your data off tent.is to your
+own server. One feature that will hit tent.is soonish is registration of domain
+records. That will be the first step to your own tent server, I am eagerly
+waiting to host all my content at <a class="reference external" href="https://tent.beberlei.de">https://tent.beberlei.de</a> at some day.</p>
+</div>
+<div class="section" id="tent-io-sounds-awesome-how-can-i-help">
+<h2>Tent.io sounds awesome, how can I help?</h2>
+<p>Right at the moment the tent software stack is developed by the team that also
+hosts <a class="reference external" href="https://tent.is">Tent.is</a>. If all you can provide is money, then
+signing up for the 12 USD per month is the way to go.</p>
+<p>If you are a developer, then take a look at the <a class="reference external" href="https://github.com/tent/tent.io/wiki/Related-projects">Wiki</a> where related
+projects are listed. You will find a bunch of client libraries for major
+languages already, helping you to get started.</p>
+<p>I suppose the major work lies in implementing Status-Post clients for all
+major smartphone platforms and desktops. As well as the host of applications
+that Facebook and other social networks provides:</p>
+<ul class="simple">
+<li>Manage and share Photo albums</li>
+<li>Plan and share events</li>
+<li>Managing contact data/address book</li>
+<li>Resume details (Linkedin/Xing)</li>
+<li>Track User Events (Timeline)</li>
+<li>Sharing Music and Videos (Myspace)</li>
+<li>Importing all sorts of existing content (RSS,..)</li>
+</ul>
+</div>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html#disqus_thread" data-disqus-identifier="2012/10/22/a_tent_io_app__zelten_bookmarks">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
+        
+        <div class="timestamp postmeta">
             <span>September 04, 2012</span> 
         </div>
         <div class="section" id="using-assertions-for-validation">
@@ -1549,145 +1622,6 @@ Conference</a> in Sankt Augustin Germany on
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html#disqus_thread" data-disqus-identifier="2012/08/11/oop_business_applications__trying_to_escape_the_mess">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>June 03, 2012</span> 
-        </div>
-        <div class="section" id="setting-up-development-machines-with-puppet">
-<h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
-<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
-mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
-dive into Puppet in combination with Vagrant I want to share my general
-experiences with Puppet (beginners level, I just played with this today).</p>
-<p>Puppet is a configuration management tool. It uses a declarative language to
-describe how a system should look like. Upon invocation of puppet it attempts
-to get the system from its current state into the desired state by installing
-packages, executing programs/scripts and creating files/directories.</p>
-<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
-run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
-I really like the Unity desktop and wanted to get away from the Gnome that is
-in 10.04.</p>
-<p>After a backup and fresh installation of Ubuntu I realized how many things I
-have to install to get this machine productive:</p>
-<ul class="simple">
-<li>LAMP stack + a bunch of other databases and services</li>
-<li>Git, Svn, Hg, ..</li>
-<li>Virtualbox + Vagrant</li>
-<li>Vim with my Dot-Files, including Command-T which requires compilation,
-and a bunch of development tools such as tree, ack-grep.</li>
-<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
-<li>Git with Author Information and global ignore file</li>
-<li>A bunch of .bashrc initializations</li>
-<li>Some open source projects I always have around (Doctrine, ...)</li>
-<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
-<li>and I probably forgot a bunch of tools just thinking about this today.</li>
-</ul>
-<p>I realized not only virtual machines, but also their hosts (my development
-machines) could be automatically setup with Puppet.</p>
-<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
-them using Puppet. In Puppet you define Resources of several types, for example
-Files, Packages or shell commands. You group these resources together in a
-<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
-via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
-<p>The idea is to define Puppet resources in a way that they are performed once and
-then the system has this resource. This means you can run puppet as often as
-you want and it will only activate the missing resources.</p>
-<p>I separate the installation process into two puppet files, one that has to be
-run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
-my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
-<p>Because every dev-machine setup is unique, I will just show some
-examples of my puppet file to get the message across:</p>
-<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
-
-# VIM Dot Files
-vcsrepo { 'vim-dotfiles':
-    path     =&gt; &quot;/home/$id/.vim&quot;,
-    ensure   =&gt; present,
-    provider =&gt; git,
-    source   =&gt; 'https://...'
-}
-
-file { 'vim-dotfiles-symlink':
-    path   =&gt; &quot;/home/$id/.vimrc&quot;,
-    ensure =&gt; link,
-    target =&gt; '.vim/vimrc',
-    require =&gt; Vcsrepo['vim-dotfiles']
-}
-
-exec { 'vim-make-command-t':
-    command =&gt; 'rake make',
-    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
-    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
-    require =&gt; Vcsrepo['vim-dotfiles']
-}</pre>
-</div>
-<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
-define what functionality should be executed by puppet. Vcsrepo is a custom
-type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
-<ul class="simple">
-<li>The first block uses Git to make sure that in my home directory the
-<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
-<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
-using a symlink.</li>
-<li>The third block compiles the Command-T VIM plugin. Inside the
-exec block you can see the unless condition. This is necessary to prevent the
-command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
-puppet. The require makes sure this resource is only activated after the dotfiles
-were installed.</li>
-</ul>
-<p>Another nice example is the configuration of Git:</p>
-<div class="highlight-python"><pre># Configure Git
-exec { &quot;git-author-name&quot;:
-    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
-    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
-}
-
-exec { &quot;git-author-email&quot;:
-    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
-    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
-}
-
-exec { &quot;git-global-ignore&quot;:
-    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
-    unless  =&gt; 'git config -l --global|grep excludesfile'
-}
-
-file { &quot;git-global-ignorefile&quot;:
-    path =&gt; &quot;/home/$id/.gitignore&quot;,
-    ensure =&gt; present,
-    content =&gt; &quot;*.swo\n*.swp\n&quot;
-}</pre>
-</div>
-<p>Here A bunch of commands is executed unless some option is already set. At last
-the global .gitingore is filled with the patterns of Vim temporary files.</p>
-<p>I also automated all the other steps listed above, but will spare you the
-details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
-set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
-folder and they are then available in any of your puppet files.</p>
-<p>I can now reuse this on the different machines: desktop at home and at work and
-my laptop. Whenever I install a new tool or change some configuration of my
-system I can directly put this into puppet and keep the setup synchronized on
-all the machines I work with.</p>
-<p>You can find more detailed resources on the PuppetLabs website:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
-<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
-<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
-</ul>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html#disqus_thread" data-disqus-identifier="2012/06/03/setting_up_development_machines_with_puppet">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
@@ -1734,6 +1668,9 @@ all the machines I work with.</p>
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
+        </li>
+        <li class="recent_post">
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
         </li>
         <li class="recent_post">
@@ -1759,9 +1696,6 @@ all the machines I work with.</p>
         </li>
         <li class="recent_post">
             <a href="2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/06/24/bounded_contexts.html">Bounded Contexts</a>
         </li>
     </ul>
 </div>

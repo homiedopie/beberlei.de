@@ -32,6 +32,7 @@
     <link rel="shortcut icon" href="_static/tinkerer.ico"/>
     
     <link rel="top" title="Whitewashing" href="index.html" />
+    <link rel="next" title="Older" href="page12.html" />
     <link rel="prev" title="Newer" href="page10.html" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /> 
   </head>
@@ -72,8 +73,90 @@
             <li>
                  &laquo; <a href="page10.html">Newer</a>
             </li>
+            <li class="right">
+                <a href="page12.html">Older</a> &raquo; 
+            </li>
         </ul>
     </div>
+        
+        <div class="timestamp postmeta">
+            <span>December 18, 2008</span> 
+        </div>
+        <div class="section" id="dependency-injection-the-juicy-way">
+<h1><a href="2008/12/18/dependecy-injection-the-juicy-way.html">Dependency Injection the juicy way</a></h1>
+<p>I have written on dependency injection before and <a class="reference external" href="http://www.whitewashing.de/blog/articles/83">came up with a
+solution for PHP via interface
+injection</a>. Thinking
+about it twice I didn’t like it very much. Its too much overkill that
+you have to implement all setter methods again and again.</p>
+<p>Still dependency injection is the way to write good, testable and easily
+exchanged and re-wired object graphs. I tried to do lots of dependency
+injection via constructor lately and realized that it pollutes my
+constructors when my object graph is too deep.</p>
+<p>An example: When I setup my database connection in the bootstrap file
+and encapsulate it in my model creation factory object, i have to insert
+the model factory through the configuration into the dispatcher into the
+different controllers and views to be accessible in the MVC pattern. The
+model factory has to walk 3 nodes in the object graph without being used
+at all in the “higher” steps. This creates very unnecessary
+dependencies.</p>
+<p>I came across <a class="reference external" href="http://misko.hevery.com/">Misko Hevery</a>‘s Blog, which
+rocks. There are also some <a class="reference external" href="http://www.youtube.com/results?search_query=misko+hevery&amp;search_type=&amp;aq=f">great Google Tech Talks by
+him</a>,
+where he argues in favour of dependency injection and debunks singletons
+as being evil (he does that on his blog too). From there I learnt about
+<a class="reference external" href="http://code.google.com/p/google-guice/">Guice</a>, a dependency
+injection framework for Java by Google.</p>
+<p>What I like about Guice: Its easy to use and its immediately obvious to
+someone without experience, why it works so good and you don’t have to
+hand down objects deep down the object graph. I cloned the basic
+functionality for PHP and an example would work as follows.</p>
+<p>We first have to implement a <strong>module</strong>, which defines which concrete
+implementation should be injected as a placeholder for which interface.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind(&quot;Service&quot;)-&gt;to(&quot;ConcreteService&quot;);  $b-&gt;bind(&quot;Add&quot;)-&gt;to(&quot;ConcreteAdd&quot;);  $b-&gt;bind(&quot;Sub&quot;)-&gt;to(&quot;ConcreteSub&quot;); }}</pre>
+</div>
+</div></blockquote>
+<p>We can now use this module to instantiate an injector object:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance(&quot;Service&quot;);</pre>
+</div>
+</div></blockquote>
+<p>Given that the constructor of <strong>ConcreteService</strong> would expect an Add
+and a Sub object, the Injector would realize this and instantiate the
+concrete implementations <strong>ConcreteAdd</strong> and <strong>ConcreteSub</strong> and inject
+them into the constructor.</p>
+<p>What makes this dependency injection so simple and great to use? You can
+instantiate an injector everywhere in your code and just have to
+configure it using the additional module implementation. This way you
+don’t have to make sure that you pass down the dependency injection
+container from the bootstrap into all nodes of the application. You can
+also easily work with many frameworks and still be able to use
+dependency injection without having to hack the whole core of the
+framework.</p>
+<p>My guice clone does more. It allows to pass down additional non-object
+arguments into constructors, even for object dependencies. It offers a
+<strong>Provider</strong> interface to be able to wrap adapters around your already
+existing ServiceLocator or Registry objects. But its reflection
+capabilities have to be extended to docblock comments, so that better
+dependency detection is possible.</p>
+<p>Because using dependency injection with only this little example I will
+refrain from releasing the source code yet. I have to provide some
+useful documentation for it to be of use to anyone.</p>
+</div>
+        
+    <div class="postmeta">
+        
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/18/dependecy-injection-the-juicy-way.html#disqus_thread" data-disqus-identifier="2008/12/18/dependecy-injection-the-juicy-way">Leave a comment</a>
+        </div>
+    </div><div class="separator post_separator"></div>
         
         <div class="timestamp postmeta">
             <span>December 03, 2008</span> 
@@ -656,38 +739,15 @@ issue in the near future.</p>
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/07/12/discussing-a-jquery-helper-for-zend-framework.html#disqus_thread" data-disqus-identifier="2008/07/12/discussing-a-jquery-helper-for-zend-framework">Leave a comment</a>
         </div>
-    </div><div class="separator post_separator"></div>
-        
-        <div class="timestamp postmeta">
-            <span>July 24, 2008</span> 
-        </div>
-        <div class="section" id="finished-first-django-template-language-port-to-php-zf">
-<h1><a href="2008/07/24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a></h1>
-<p>Today I finished the first almost complete <a class="reference external" href="http://www.djangoproject.com">Django Template
-Language</a> Clone for PHP implementing the
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a> View Interface. <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Dtl+-+Benjamin+Eberlei">My
-proposal</a>
-is up and running on the ZF Wiki. The source code can be downloaded from
-my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repository</a>.</p>
-</div>
-        
-    <div class="postmeta">
-        
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/24/finished-first-django-template-language-port-to-php-zf.html#disqus_thread" data-disqus-identifier="2008/07/24/finished-first-django-template-language-port-to-php-zf">Leave a comment</a>
-        </div>
     </div>
     
     <div class="related">
         <ul>
             <li>
                  &laquo; <a href="page10.html">Newer</a>
+            </li>
+            <li class="right">
+                <a href="page12.html">Older</a> &raquo; 
             </li>
         </ul>
     </div>
@@ -725,6 +785,9 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <h3>Recent Posts</h3>
     <ul>
         <li class="recent_post">
+            <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
+        </li>
+        <li class="recent_post">
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
         </li>
         <li class="recent_post">
@@ -750,9 +813,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
         </li>
         <li class="recent_post">
             <a href="2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-        <li class="recent_post">
-            <a href="2013/06/24/bounded_contexts.html">Bounded Contexts</a>
         </li>
     </ul>
 </div>

@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2014/01/31/soap_and_php_in_2014
    2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions
    2013/12/31/2013_and_2014
    2013/12/05/feature_flags_and_doctrine_entities

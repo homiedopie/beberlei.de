@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SOAP and PHP in 2014 &mdash; Whitewashing</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/disqus.js"></script>
+    <script type="text/javascript" src="../../../_static/ga.js"></script>
+    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
+    
+    <link rel="top" title="Whitewashing" href="../../../index.html" />
+    <link rel="next" title="Assert v2.0: Fluent API and Lazy Assertions" href="../26/assert_v2_0__fluent_api_and_lazy_assertions.html" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
+  </head>
+  <body>
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+
+
+    <div class="document">
+<div class="container">
+    
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2014-01-31-soap_and_php_in_2014">
+            
+            
+    
+    <div class="related">
+        <ul>
+            <li class="right">
+                <a href="../26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a> &raquo; 
+            </li>
+        </ul>
+    </div>
+    
+        <div class="timestamp postmeta">
+            <span>2014-01-31 00:00:00</span> 
+        </div>
+    <div class="section" id="soap-and-php-in-2014">
+<h1>SOAP and PHP in 2014</h1>
+<blockquote>
+<div>&#8220;The SOAP stack is generally regarded as an embarrassing failure these days.&#8221;
+&#8211; Tim Bray</div></blockquote>
+<p>While the quote by Tim Bray is still true, the toolstack and possiblities behind
+SOAP are still superior to REST, which requires alot of handcrafting.</p>
+<p>These last years REST has gotten all the buzz, everybody seems to be using it
+and there are lots of talks about REST on conferences. SOAP used to be big for
+building APIs, but everybody seems to hate it for various reasons. I have used
+SOAP in several projects over the last 10 years and this blog post is a random
+collection of information about the state of SOAP in PHP 2014, as a reminder
+to myself and to others as well.</p>
+<p>Why care about SOAP in 2014? For server to server (RPC) communication it still
+has massive time to market and stability benefits over REST. The REST toolchain
+is just not well developed enough, it lacks:</p>
+<ul class="simple">
+<li>a standard to describe the input/output formats of endpoints</li>
+<li>a way to &#8220;just do it&#8221;</li>
+<li>ways to automatically generate clients in any language</li>
+</ul>
+<p>While solutions exist for these problems in the REST space, they are often not
+standardized and don&#8217;t serve the full stack and different languages.</p>
+<p>WSDLs for SOAP however allow you to generate servers and clients from
+datastructures by the click of a button or execution of a script. I can get two
+servers communicating over SOAP, exposing all service methods in literally
+minutes.</p>
+<div class="section" id="basics">
+<h2>Basics</h2>
+<p>SOAP is a protocol for Remote-Procedure Calls. HTTP is used as mechanism
+to talk between client and servers by sending POST requests with XML request
+and response bodies.</p>
+<p>In PHP you can expose functions, classes or objects as server by invoking
+<tt class="docutils literal"><span class="pre">SOAPServer#addFunction</span></tt>, <tt class="docutils literal"><span class="pre">SOAPServer#setClass</span></tt> or
+<tt class="docutils literal"><span class="pre">SOAPServer#setObject()</span></tt>.</p>
+</div>
+<div class="section" id="phps-non-wsdl-mode">
+<h2>PHPs Non-WSDL mode</h2>
+<p>One argument against SOAP is the requirement to define WSDL documents for
+both server and client to allow communication. This is not true for Clients and
+Servers both written in PHP. You can use the non-WSDL mode to expose an object
+from the server and use a non-wsdl client to talk to it. The PHP <tt class="docutils literal"><span class="pre">SOAPClient</span></tt>
+and <tt class="docutils literal"><span class="pre">SOAPServer</span></tt> have a common exchange format that is used in this case
+and replaces WSDL entirely.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// server.php</span>
+<span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$x</span> <span class="o">+</span> <span class="nv">$y</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://server/namespace&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;location&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://server/location&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">());</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The client is as simple as the following lines of code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// client.php</span>
+<span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://server/namespace&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;location&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://server/location&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This kind of services work with flawlessly all datatypes except with objects,
+which get converted to <tt class="docutils literal"><span class="pre">stdClass</span></tt> with public properties on the Client.</p>
+<p>If you are developing internal APIs between components in your own system,
+then using SOAP in non-WSDL mode is a massive time saver. You can expose
+remote services for Remote procedure calls this way very easily.</p>
+<p>The only downside is that you have no documentation what methods exist on the
+client and <strong>ALL</strong> public methods of the server object can be called, so make sure
+they only have those methods you want to be called remotely.</p>
+</div>
+<div class="section" id="debugging-soap">
+<h2>Debugging SOAP</h2>
+<p>When something goes wrong in either the client or server, it sucks to debug
+these problems. In general there are several mechanisms to debug SOAP in PHP:</p>
+<ol class="arabic simple">
+<li>Enable <tt class="docutils literal"><span class="pre">'trace'</span> <span class="pre">=&gt;</span> <span class="pre">true</span></tt> option on the SOAPClient. This allows you
+to call the methods <tt class="docutils literal"><span class="pre">$client-&gt;__getLastResponse()</span></tt> and
+<tt class="docutils literal"><span class="pre">$client-&gt;__getLastRequest()</span></tt> to take a look at the interaction between
+server and client.</li>
+<li>When failures happen, <tt class="docutils literal"><span class="pre">SOAPClient</span></tt> throws a <tt class="docutils literal"><span class="pre">SOAPFault</span></tt> exception.
+You can even throw this exception yourself from the SOAPServer code,
+and the client can then read this failure. However you must know
+that the <tt class="docutils literal"><span class="pre">$faultcode</span></tt> variable in the constructor of <tt class="docutils literal"><span class="pre">new</span>
+<span class="pre">SOAPFault($faultcode,</span> <span class="pre">$faultmsg)</span></tt> is <strong>NOT</strong> an integer error code
+like in normal Exceptions. Instead its either a value <tt class="docutils literal"><span class="pre">SERVER</span></tt> or <tt class="docutils literal"><span class="pre">CLIENT</span></tt>,
+with the component of the interaction that failed.</li>
+<li>If you throw non <tt class="docutils literal"><span class="pre">SOAPFault</span></tt> exceptions from the server, then you
+need to catch them and recast them to <tt class="docutils literal"><span class="pre">SOAPFault</span></tt>, otherwise
+the client only sees &#8220;Internal Server Error&#8221; messages.</li>
+</ol>
+<p>You can easily solve the <tt class="docutils literal"><span class="pre">SOAPFault</span></tt> problem by decorating your service with an exception handler,
+and also logging the errors yourself.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">SoapExceptionHandler</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$exposeExceptionMessages</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;MyProject\DomainException&#39;</span><span class="p">,</span>
+    <span class="p">);</span>
+
+    <span class="k">private</span> <span class="nv">$service</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span> <span class="o">=</span> <span class="nv">$service</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="p">,</span> <span class="nv">$method</span><span class="p">),</span>
+                <span class="nv">$args</span>
+            <span class="p">);</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// log errors here as well!</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="p">),</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">exposeExceptionMessages</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nx">SOAPFAult</span><span class="p">(</span><span class="s1">&#39;SERVER&#39;</span><span class="p">,</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">());</span>
+            <span class="p">}</span>
+
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">SOAPFault</span><span class="p">(</span><span class="s1">&#39;SERVER&#39;</span><span class="p">,</span> <span class="s1">&#39;Application Error&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">SoapExceptionHandler</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">()));</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="generating-wsdls">
+<h2>Generating WSDLs</h2>
+<p>SOAP uses a service description format called WSDL to describe the input and
+output of the server and what methods exist. WSDL are formatted with XML
+and use XMLSchema to describe the input/output messages. The format is very
+complex, however tools for any languages allow you to autogenerate WSDLs
+from code.</p>
+<p>There are several reasons to introduce WSDLs for your SOAP service:</p>
+<ul class="simple">
+<li>Your SOAP clients will not be written in PHP, which prevents use of the non-WSDL mode.</li>
+<li>Clients of the service are used and  written by other teams or companies.</li>
+<li>You want to use the WSDL as a validation mechanism for input from clients.</li>
+</ul>
+<p>While you should have some understanding of how a WSDL looks like,
+you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
+By default it uses the docblocks <tt class="docutils literal"><span class="pre">&#64;param</span></tt> and <tt class="docutils literal"><span class="pre">&#64;return</span></tt> to generate
+the correct WSDL for a service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;MyService&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://server/namespace&#39;</span><span class="p">)</span> <span class="c1">// same as server &#39;uri&#39;</span>
+             <span class="o">-&gt;</span><span class="na">setLocation</span><span class="p">(</span><span class="s1">&#39;http://server/soap.php&#39;</span><span class="p">)</span> <span class="c1">// same as server &#39;location&#39;</span>
+             <span class="o">-&gt;</span><span class="na">setServiceName</span><span class="p">(</span><span class="s1">&#39;MyService&#39;</span><span class="p">);</span>
+<span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
+<span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">dump</span><span class="p">(</span><span class="s2">&quot;/path/to/file.wsdl&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can now place that WSDL file in any public location and then point both
+<tt class="docutils literal"><span class="pre">SOAPServer</span></tt> and <tt class="docutils literal"><span class="pre">SOAPClient</span></tt> at the file using the first constructor
+argument:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">&#39;http://server/path/wsdl&#39;</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="s1">&#39;http://server/path/wsdl&#39;</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>To make the WSDL generation work with objects and object graphs, you have
+to use objects in your service API that have only public properties. If
+you dont do it this way, you will need to convert the objects in a seperate
+step, something to avoid.</p>
+<p>Sometimes you want to use other metadata than docblocks. When using
+tools like Doctrine you already now much better what datatypes an object has.
+You can write your own <cite>ComplexTypeStrategy</cite> to generate the metadata
+for your WSDL files. This is more advanced topic, but can be understood and
+automated in a reasonable amount of time.</p>
+</div>
+<div class="section" id="generating-objects-from-wsdl">
+<h2>Generating Objects from WSDL</h2>
+<p>If you implement a client, you want to generate objects for the datastructures
+of a WSDL file. You can use those objects instead of the <tt class="docutils literal"><span class="pre">stdClass</span></tt> objects
+which are used by default.</p>
+<p>For this task I use the <a class="reference external" href="https://github.com/moyarada/XSD-to-PHP">XSD-TO-PHP library</a>.  I normally hack around in the code
+a little to adjust for correct namespace generation and code-style adjustments,
+but it works quite well by default. Here is an example of a generated class
+for the DHL Intraship SOAP API:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">DHL\Intraship</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ComplexType</span>
+<span class="p">{</span>
+  <span class="sd">/**</span>
+<span class="sd">   *</span>
+<span class="sd">   * @var salutation $salutation</span>
+<span class="sd">   * @access public</span>
+<span class="sd">   */</span>
+  <span class="k">public</span> <span class="nv">$salutation</span><span class="p">;</span>
+
+  <span class="sd">/**</span>
+<span class="sd">   *</span>
+<span class="sd">   * @var title $title</span>
+<span class="sd">   * @access public</span>
+<span class="sd">   */</span>
+  <span class="k">public</span> <span class="nv">$title</span><span class="p">;</span>
+
+  <span class="sd">/**</span>
+<span class="sd">   *</span>
+<span class="sd">   * @var firstname $firstname</span>
+<span class="sd">   * @access public</span>
+<span class="sd">   */</span>
+  <span class="k">public</span> <span class="nv">$firstname</span><span class="p">;</span>
+
+  <span class="sd">/**</span>
+<span class="sd">   *</span>
+<span class="sd">   * @var middlename $middlename</span>
+<span class="sd">   * @access public</span>
+<span class="sd">   */</span>
+  <span class="k">public</span> <span class="nv">$middlename</span><span class="p">;</span>
+
+  <span class="sd">/**</span>
+<span class="sd">   *</span>
+<span class="sd">   * @var lastname $lastname</span>
+<span class="sd">   * @access public</span>
+<span class="sd">   */</span>
+  <span class="k">public</span> <span class="nv">$lastname</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The next thing you can generate is a classmap, that maps every WSDL Type to
+your newly generated code, in the above example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;classmap&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Person&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;DHL\Intraship\Person&#39;</span><span class="p">,</span>
+        <span class="c1">// all the other types</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="soap-with-different-languages">
+<h2>SOAP with different Languages</h2>
+<p>As long as you stay within the PHP world, SOAP is rather easy with both WSDL
+and non-WSDL modes. Once you want to talk to Java or C# you need solve some
+more problems.</p>
+<p>The first thing to understand is that SOAP can actually talk in 4 different
+modes. You can use &#8216;document&#8217; or &#8216;rpc&#8217; style, &#8216;literal&#8217; or &#8216;encoded&#8217;  use.
+This post on the <a class="reference external" href="http://www.ibm.com/developerworks/library/ws-whichwsdl/">IBM website</a> describes all the
+different modes in much detail and I recommend everybody having to work with
+SOAP to read it.</p>
+<p>The essence from that article is, that you will always want to use
+<cite>document/literal</cite> for your SOAP services, to be compliant with all languages,
+wrapping each method call and response in its own Message Document.</p>
+<p>However using this style is rather complicated in PHP itself, because
+for every input and output message you need to create a wrapper object (or
+array) with a specific structure.</p>
+<p>You can fix this problem on the Server by using this <a class="reference external" href="https://github.com/zendframework/zf2/blob/master/library/Zend/Soap/Server/DocumentLiteralWrapper.php">DocumentLiteralWrapper</a>
+class in Zend Framework 2. It has no external dependencies, so you can just
+copy it into your project if you want.</p>
+<p>To generate a WSDL for document/literal mode, use the following methods
+on Zend Autodiscovery:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;style&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;document&#39;</span><span class="p">))</span>
+             <span class="o">-&gt;</span><span class="na">setOperationStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;use&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;literal&#39;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Then use the wrapper like such:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">\Zend\Soap\Server\DocumentLiteralWrapper</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">SoapExceptionHandler</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">MyService</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>SOAP Servers generated this way can be converted into a C# SOAP Client with a
+bunch of button clicks from Visual Studio. It will generate both the Client
+object and all the data transfer objects for you. Truely amazing.</p>
+</div>
+<div class="section" id="testing-soap-interaction">
+<h2>Testing SOAP Interaction</h2>
+<p>Because SOAP is very painful about the exact format of messages and rejects
+invalid messages in the client already when they do not match the WSDL you
+certainly want to Integration test your clients and servers.</p>
+<p>You can do that in PHPUnit by using a client, that wraps a Server directly
+and doesn&#8217;t require a Webserver. Zend Framework 2 already has such an object,
+named <cite>ZendSoapClientLocal</cite>. Its usage is simple:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">\Zend\Soap\Server\DocumentLiteralWrapper</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">SoapExceptionHandler</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">MyService</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\Soap\Client\Local</span><span class="p">(</span><span class="nv">$server</span><span class="p">,</span> <span class="nv">$wsdl</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This will pass through the complete SOAP marshalling and unmarshalling
+process and allow you test SOAP interaction.</p>
+<p>If you want to take a look at the code of the Local client, <a class="reference external" href="https://github.com/zendframework/zf2/blob/master/library/Zend/Soap/Client/Local.php">its very easy to
+achieve this</a>.</p>
+</div>
+<div class="section" id="versioning-with-soap-wsdl">
+<h2>Versioning with SOAP/WSDL</h2>
+<p>If you want to version your SOAP Service, you will need to provide versioned
+WSDL files on different URLs. You should never change the WSDL at a location,
+because languages like C# statically create clients from the WSDL, never
+talking to the WSDL again.</p>
+<p>If you take care of your Service objects, then you can design them in a way
+that you can use the same PHP service object for many different versions of the
+WSDL file in a backwards compatible way. If your API changes alot, you might
+need to implement different PHP service classes to allow for versioned APIs.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>While the full extent of SOAP and WSDL can be scary, they allow you to write
+servers and clients for RPC communication between servers and languages very
+easily. If you don&#8217;t need to expose your API to the webbrowser via REST/JSON,
+then using SOAP is a very good alternative to most of the handcrafting that is
+necessary for REST APIs.</p>
+</div>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2014/01/31/soap_and_php_in_2014";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last">
+        
+          
+            <div class="yui-b" id="sidebar">
+              
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+
+<div class="widget">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li class="recent_post">
+            <a href="#">SOAP and PHP in 2014</a>
+        </li>
+        <li class="recent_post">
+            <a href="../26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
+        </li>
+        <li class="recent_post">
+            <a href="../../../2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+      </div>
+            </div> 
+          
+        
+    </div>
+</div>
+
+      <div class="clearer"></div>
+    </div>
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
