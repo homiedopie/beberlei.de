@@ -112,9 +112,16 @@ minutes.</p>
 <p>SOAP is a protocol for Remote-Procedure Calls. HTTP is used as mechanism
 to talk between client and servers by sending POST requests with XML request
 and response bodies.</p>
-<p>In PHP you can expose functions, classes or objects as server by invoking
+<p>The <tt class="docutils literal"><span class="pre">SOAPServer</span></tt> and <tt class="docutils literal"><span class="pre">SOAPClient</span></tt> objects ship with PHP core by default.</p>
+<p>You can expose functions, classes or objects as server by registering
+service callbacks with
 <tt class="docutils literal"><span class="pre">SOAPServer#addFunction</span></tt>, <tt class="docutils literal"><span class="pre">SOAPServer#setClass</span></tt> or
-<tt class="docutils literal"><span class="pre">SOAPServer#setObject()</span></tt>.</p>
+<tt class="docutils literal"><span class="pre">SOAPServer#setObject</span></tt> and then calling the <tt class="docutils literal"><span class="pre">handle()</span></tt> method, which
+handles request and response generation and sending in one step. You can
+normally exit the request directly after handle.</p>
+<p>The client is even simpler, it overwrites the <tt class="docutils literal"><span class="pre">__call</span></tt> magic method.
+Any call to the client therefore looks exactly like the same call
+on the server in your code.</p>
 </div>
 <div class="section" id="phps-non-wsdl-mode">
 <h2>PHPs Non-WSDL mode</h2>
