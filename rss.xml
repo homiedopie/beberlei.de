@@ -120,6 +120,12 @@ technically not necessary by using the <span class="docutils literal"><span clas
 component has no such closure loader, so its not possible to avoid
 YAML in the first minutes of Symfony2 exposure and we reference
 the <cite>app/config/routing.yml</cite>:</p>
+<div class="highlight-yaml"><div class="highlight"><pre>hello:
+  pattern: /
+  defaults:
+    _controller: &quot;Acme\TrainingBundle\Controller\HelloController::helloAction&quot;
+</pre></div>
+</div>
 <p>Did you know that you can specify controllers in Symfony by using the static callback
 syntax? It has disadvantages when considering bundle inheritance, but why
 bother a beginner with this feature and confuse him with the convention of
