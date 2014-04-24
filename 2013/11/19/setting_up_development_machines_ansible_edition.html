@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Setting up development machines: Ansible edition &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Setting up development machines: Ansible edition &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" /><link rel="prev" title="Feature Flags and Doctrine Entities" href="../../12/05/feature_flags_and_doctrine_entities.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" />
-    <link rel="prev" title="Feature Flags and Doctrine Entities" href="../../12/05/feature_flags_and_doctrine_entities.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,32 +62,18 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2013-11-19-setting_up_development_machines_ansible_edition">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../../12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-            </li>
-            <li class="right">
-                <a href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2013-11-19 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>November 19, 2013</span>
         </div>
+
     <div class="section" id="setting-up-development-machines-ansible-edition">
 <h1>Setting up development machines: Ansible edition</h1>
 <p>A little over a year ago I posted on using <a class="reference external" href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html">Puppet for setting up development
@@ -122,13 +116,14 @@ compared to Puppet modules + DSL.</p>
 <p>For demonstration I have converted the puppet examples from my blog post on
 Puppet to Ansible.  To start we have to create a folder and create a new file
 <cite>inventory</cite> in it containing our local machine:</p>
-<div class="highlight-python"><pre>localhost   ansible_connection=local</pre>
+<div class="highlight-python"><div class="highlight"><pre>localhost   ansible_connection=local
+</pre></div>
 </div>
 <p>This is necessary to convince the remote task execution part of Ansible that
 localhost exists and there is no SSH necessary to get into that machine.</p>
 <p>Now I can create playbooks for the different tools I might want to install and
 setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<div class="highlight-python"><pre>---
+<div class="highlight-python"><div class="highlight"><pre>---
 - hosts: localhost
   tasks:
     - name: Install VIM
@@ -147,7 +142,8 @@ setup, such as Vim in a <cite>vim.yml</cite>:</p>
       command: &gt;
         rake make
         chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
-        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe</pre>
+        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe
+</pre></div>
 </div>
 <p>You can see here, tasks are a list of commands to execute. They are always
 executed in order and stop when the first task in the chain fails. Like in
@@ -155,9 +151,10 @@ puppet you try to make those tasks idempotent through flags such as <cite>create
 signaling when a task needs to be or was already executed. I can optionally
 use sudo to run commands such as installing packages.</p>
 <p>To execute the playbook I call:</p>
-<div class="highlight-python"><pre>$&gt; ansible-playbook -K -i inventory vim.yml</pre>
+<div class="highlight-python"><div class="highlight"><pre>$&gt; ansible-playbook -K -i inventory vim.yml
+</pre></div>
 </div>
-<p>With the <tt class="docutils literal"><span class="pre">-i</span></tt> flag I define the pool of hosts to run on, in our case the
+<p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the
 local machine and the playbook applies the <cite>hosts</cite> filter to that inventory.
 The <cite>-K</cite> parameter prompts me to enter the sudo password for my Ubuntu machine,
 otherwise the tasks will fail.</p>
@@ -200,60 +197,36 @@ the future.</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="#">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -264,6 +237,11 @@ the future.</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>

@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Setting up Development Machines with Puppet &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Setting up Development Machines with Puppet &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" /><link rel="prev" title="OOP Business Applications: Trying to escape the mess" href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" />
-    <link rel="prev" title="OOP Business Applications: Trying to escape the mess" href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,32 +62,18 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2012-06-03-setting_up_development_machines_with_puppet">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a>
-            </li>
-            <li class="right">
-                <a href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2012-06-03 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>June 03, 2012</span>
         </div>
+
     <div class="section" id="setting-up-development-machines-with-puppet">
 <h1>Setting up Development Machines with Puppet</h1>
 <p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
@@ -111,85 +105,87 @@ and a bunch of development tools such as tree, ack-grep.</li>
 </ul>
 <p>I realized not only virtual machines, but also their hosts (my development
 machines) could be automatically setup with Puppet.</p>
-<p>So instead of saving my <tt class="docutils literal"><span class="pre">.bash_history</span></tt> to remember the steps I automated
+<p>So instead of saving my <span class="docutils literal"><span class="pre">.bash_history</span></span> to remember the steps I automated
 them using Puppet. In Puppet you define Resources of several types, for example
 Files, Packages or shell commands. You group these resources together in a
-<tt class="docutils literal"><span class="pre">.pp</span></tt> file and then invoke <tt class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></tt>. You can install Puppet
-via <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></tt> on Ubuntu.</p>
+<span class="docutils literal"><span class="pre">.pp</span></span> file and then invoke <span class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></span>. You can install Puppet
+via <span class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></span> on Ubuntu.</p>
 <p>The idea is to define Puppet resources in a way that they are performed once and
 then the system has this resource. This means you can run puppet as often as
 you want and it will only activate the missing resources.</p>
 <p>I separate the installation process into two puppet files, one that has to be
-run with root <tt class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></tt> and another one that has to be run with
-my own user <tt class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></tt>.</p>
+run with root <span class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></span> and another one that has to be run with
+my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:</p>
-<div class="highlight-python"><pre># /home/benny/.puppet/devmachine.pp
+<div class="highlight-python"><div class="highlight"><pre># /home/benny/.puppet/devmachine.pp
 
 # VIM Dot Files
-vcsrepo { 'vim-dotfiles':
-    path     =&gt; "/home/$id/.vim",
+vcsrepo { &#39;vim-dotfiles&#39;:
+    path     =&gt; &quot;/home/$id/.vim&quot;,
     ensure   =&gt; present,
     provider =&gt; git,
-    source   =&gt; 'https://...'
+    source   =&gt; &#39;https://...&#39;
 }
 
-file { 'vim-dotfiles-symlink':
-    path   =&gt; "/home/$id/.vimrc",
+file { &#39;vim-dotfiles-symlink&#39;:
+    path   =&gt; &quot;/home/$id/.vimrc&quot;,
     ensure =&gt; link,
-    target =&gt; '.vim/vimrc',
-    require =&gt; Vcsrepo['vim-dotfiles']
+    target =&gt; &#39;.vim/vimrc&#39;,
+    require =&gt; Vcsrepo[&#39;vim-dotfiles&#39;]
 }
 
-exec { 'vim-make-command-t':
-    command =&gt; 'rake make',
-    cwd     =&gt; "/home/$id/.vim/bundle/Command-T",
-    unless  =&gt; "ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'",
-    require =&gt; Vcsrepo['vim-dotfiles']
-}</pre>
+exec { &#39;vim-make-command-t&#39;:
+    command =&gt; &#39;rake make&#39;,
+    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
+    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep &#39;command-t.recipe&#39;&quot;,
+    require =&gt; Vcsrepo[&#39;vim-dotfiles&#39;]
+}
+</pre></div>
 </div>
-<p>The three keywords <tt class="docutils literal"><span class="pre">vcsrepo</span></tt>, <tt class="docutils literal"><span class="pre">file</span></tt> and <tt class="docutils literal"><span class="pre">exec</span></tt> are called types. They
+<p>The three keywords <span class="docutils literal"><span class="pre">vcsrepo</span></span>, <span class="docutils literal"><span class="pre">file</span></span> and <span class="docutils literal"><span class="pre">exec</span></span> are called types. They
 define what functionality should be executed by puppet. Vcsrepo is a custom
 type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
 <ul class="simple">
 <li>The first block uses Git to make sure that in my home directory the
-<tt class="docutils literal"><span class="pre">~/.vim</span></tt> directory is a checkout of a given remote git repository.</li>
-<li>The second file block makes sure that <tt class="docutils literal"><span class="pre">~/.vimrc</span></tt> points to <tt class="docutils literal"><span class="pre">~/.vim/vimrc</span></tt>
+<span class="docutils literal"><span class="pre">~/.vim</span></span> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <span class="docutils literal"><span class="pre">~/.vimrc</span></span> points to <span class="docutils literal"><span class="pre">~/.vim/vimrc</span></span>
 using a symlink.</li>
 <li>The third block compiles the Command-T VIM plugin. Inside the
 exec block you can see the unless condition. This is necessary to prevent the
-command from being executed whenever <tt class="docutils literal"><span class="pre">devmachine.pp</span></tt> is executed with
+command from being executed whenever <span class="docutils literal"><span class="pre">devmachine.pp</span></span> is executed with
 puppet. The require makes sure this resource is only activated after the dotfiles
 were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
-<div class="highlight-python"><pre># Configure Git
-exec { "git-author-name":
-    command =&gt; 'git config --global user.name "Benjamin Eberlei"',
-    unless =&gt; "git config --global --get user.name|grep 'Benjamin Eberlei'"
+<div class="highlight-python"><div class="highlight"><pre># Configure Git
+exec { &quot;git-author-name&quot;:
+    command =&gt; &#39;git config --global user.name &quot;Benjamin Eberlei&quot;&#39;,
+    unless =&gt; &quot;git config --global --get user.name|grep &#39;Benjamin Eberlei&#39;&quot;
 }
 
-exec { "git-author-email":
-    command =&gt; 'git config --global user.email "kontakt@beberlei.de"',
-    unless =&gt; "git config --global --get user.email|grep 'kontakt@beberlei.de'"
+exec { &quot;git-author-email&quot;:
+    command =&gt; &#39;git config --global user.email &quot;kontakt@beberlei.de&quot;&#39;,
+    unless =&gt; &quot;git config --global --get user.email|grep &#39;kontakt@beberlei.de&#39;&quot;
 }
 
-exec { "git-global-ignore":
-    command =&gt; "git config --global core.excludesfile /home/$id/.gitignore",
-    unless  =&gt; 'git config -l --global|grep excludesfile'
+exec { &quot;git-global-ignore&quot;:
+    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
+    unless  =&gt; &#39;git config -l --global|grep excludesfile&#39;
 }
 
-file { "git-global-ignorefile":
-    path =&gt; "/home/$id/.gitignore",
+file { &quot;git-global-ignorefile&quot;:
+    path =&gt; &quot;/home/$id/.gitignore&quot;,
     ensure =&gt; present,
-    content =&gt; "*.swo\n*.swp\n"
-}</pre>
+    content =&gt; &quot;*.swo\n*.swp\n&quot;
+}
+</pre></div>
 </div>
 <p>Here A bunch of commands is executed unless some option is already set. At last
 the global .gitingore is filled with the patterns of Vim temporary files.</p>
 <p>I also automated all the other steps listed above, but will spare you the
 details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
-set of Puppet Modules. You can just put them into your <tt class="docutils literal"><span class="pre">~/.puppet/modules</span></tt>
+set of Puppet Modules. You can just put them into your <span class="docutils literal"><span class="pre">~/.puppet/modules</span></span>
 folder and they are then available in any of your puppet files.</p>
 <p>I can now reuse this on the different machines: desktop at home and at work and
 my laptop. Whenever I install a new tool or change some configuration of my
@@ -229,60 +225,36 @@ all the machines I work with.</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -293,6 +265,11 @@ all the machines I work with.</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>

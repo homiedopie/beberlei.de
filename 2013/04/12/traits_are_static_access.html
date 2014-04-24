@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Traits are Static Access &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Traits are Static Access &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Lessons learned: A failed side project" href="../06/a_failed_side_project.html" /><link rel="prev" title="Symfony2 on Windows Azure Websites" href="../../05/23/symfony2_on_windows_azure_websites.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Lessons learned: A failed side project" href="../06/a_failed_side_project.html" />
-    <link rel="prev" title="Symfony2 on Windows Azure Websites" href="../../05/23/symfony2_on_windows_azure_websites.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,32 +62,18 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2013-04-12-traits_are_static_access">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../../05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a>
-            </li>
-            <li class="right">
-                <a href="../06/a_failed_side_project.html">Lessons learned: A failed side project</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2013-04-12 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>April 12, 2013</span>
         </div>
+
     <div class="section" id="traits-are-static-access">
 <h1>Traits are Static Access</h1>
 <p>In a Twitter discussion yesterday I formulated my negative opinion
@@ -126,7 +120,7 @@ controller code through traits:</p>
     <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="nx">trait</span> <span class="nx">Redirector</span>
+<span class="k">trait</span> <span class="nx">Redirector</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
     <span class="p">{</span>
@@ -147,15 +141,15 @@ controller code through traits:</p>
 </div>
 <p>Lets spot the problems:</p>
 <ol class="arabic">
-<li><p class="first"><tt class="docutils literal"><span class="pre">Redirector</span></tt> is tightly coupled to <tt class="docutils literal"><span class="pre">MyController</span></tt>. There is no way to
+<li><p class="first"><span class="docutils literal"><span class="pre">Redirector</span></span> is tightly coupled to <span class="docutils literal"><span class="pre">MyController</span></span>. There is no way to
 change this during runtime, by using a different type of redirector, it has
 to be exactly the trait used at compile time. This is exactly what static
 access enforces as well.</p>
 </li>
-<li><p class="first">The trait accesses <tt class="docutils literal"><span class="pre">$this-&gt;container</span></tt> without defining it and couples itself against
+<li><p class="first">The trait accesses <span class="docutils literal"><span class="pre">$this-&gt;container</span></span> without defining it and couples itself against
 the implementing classes. We can actually refactor this to include an
-abstract method <tt class="docutils literal"><span class="pre">getContainer()</span></tt> in the trait. But if we have multiple
-traits now, all having a <tt class="docutils literal"><span class="pre">getContainer()</span></tt> method then we run into method
+abstract method <span class="docutils literal"><span class="pre">getContainer()</span></span> in the trait. But if we have multiple
+traits now, all having a <span class="docutils literal"><span class="pre">getContainer()</span></span> method then we run into method
 class problems that cannot be solved. We could pass the container as an
 argument to the method, but that actually defeats the purpose of the
 abstraction here.</p>
@@ -165,21 +159,21 @@ software design.</p>
 </li>
 <li><p class="first">No way to overwrite subset of functionality. If I want to use only one
 method of a trait and a second one slighty different, then I cannot
-overwrite this function of <tt class="docutils literal"><span class="pre">Redirector</span></tt> for example in <tt class="docutils literal"><span class="pre">MyController</span></tt>.</p>
+overwrite this function of <span class="docutils literal"><span class="pre">Redirector</span></span> for example in <span class="docutils literal"><span class="pre">MyController</span></span>.</p>
 </li>
 <li><p class="first">I cannot mock the traits functionality, therefore I cannot test
-<tt class="docutils literal"><span class="pre">MyController</span></tt> as a unit only in combination with a trait.</p>
+<span class="docutils literal"><span class="pre">MyController</span></span> as a unit only in combination with a trait.</p>
 </li>
 <li><p class="first">I cannot test the trait as a unit, I always have to create a class
 that uses the trait to be able to write a test for it.
 This prevents me from testing traits in isolation.</p>
 </li>
-<li><p class="first">Once you start using <tt class="docutils literal"><span class="pre">Redirector</span></tt> in many controllers, its impact
+<li><p class="first">Once you start using <span class="docutils literal"><span class="pre">Redirector</span></span> in many controllers, its impact
 on your code base (see <a class="reference external" href="http://pdepend.org/documentation/software-metrics/index.html">Code Rank</a>) increases
 a lot. Traits are concrete implementations and therefore violate the
 Dependency Inversion SOLID principle: Changes in the trait require adoptions
 in all the implementing classes.</p>
-<p>With aggregation you could depend on an abstraction <tt class="docutils literal"><span class="pre">Redirector</span></tt> or
+<p>With aggregation you could depend on an abstraction <span class="docutils literal"><span class="pre">Redirector</span></span> or
 turn it into an abstraction in the moment that you need different
 functionality.</p>
 </li>
@@ -224,7 +218,7 @@ into &#8220;pseudo&#8221; static code:</p>
 </pre></div>
 </div>
 <p>Calling dynamic methods statically actually works right now (and access to
-<tt class="docutils literal"><span class="pre">$this</span></tt> of the parent class will luckily be removed in PHP 5.5). Let&#8217;s
+<span class="docutils literal"><span class="pre">$this</span></span> of the parent class will luckily be removed in PHP 5.5). Let&#8217;s
 reformulate it into something that is actually using static methods and
 will work on 5.5, requires changes to the visibility of properties though:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -299,60 +293,36 @@ about them quite a while ago.</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -363,6 +333,11 @@ about them quite a while ago.</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>

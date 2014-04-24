@@ -6,6 +6,7 @@
         <description></description>
         <language>en-us</language>
         <pubDate>Fri, 31 Jan 2014 00:00:00 +0100</pubDate>
+        
         <item>
             <link>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</link>
             <guid>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</guid>
@@ -44,14 +45,14 @@ minutes.</p>
 <p>SOAP is a protocol for Remote-Procedure Calls. HTTP is used as mechanism
 to talk between client and servers by sending POST requests with XML request
 and response bodies.</p>
-<p>The <tt class="docutils literal"><span class="pre">SOAPServer</span></tt> and <tt class="docutils literal"><span class="pre">SOAPClient</span></tt> objects ship with PHP core by default.</p>
+<p>The <span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> objects ship with PHP core by default.</p>
 <p>You can expose functions, classes or objects as server by registering
 service callbacks with
-<tt class="docutils literal"><span class="pre">SOAPServer#addFunction</span></tt>, <tt class="docutils literal"><span class="pre">SOAPServer#setClass</span></tt> or
-<tt class="docutils literal"><span class="pre">SOAPServer#setObject</span></tt> and then calling the <tt class="docutils literal"><span class="pre">handle()</span></tt> method, which
+<span class="docutils literal"><span class="pre">SOAPServer#addFunction</span></span>, <span class="docutils literal"><span class="pre">SOAPServer#setClass</span></span> or
+<span class="docutils literal"><span class="pre">SOAPServer#setObject</span></span> and then calling the <span class="docutils literal"><span class="pre">handle()</span></span> method, which
 handles request and response generation and sending in one step. You can
 normally exit the request directly after handle.</p>
-<p>The client is even simpler, it overwrites the <tt class="docutils literal"><span class="pre">__call</span></tt> magic method.
+<p>The client is even simpler, it overwrites the <span class="docutils literal"><span class="pre">__call</span></span> magic method.
 Any call to the client therefore looks exactly like the same call
 on the server in your code.</p>
 </div>
@@ -60,8 +61,8 @@ on the server in your code.</p>
 <p>One argument against SOAP is the requirement to define WSDL documents for
 both server and client to allow communication. This is not true for Clients and
 Servers both written in PHP. You can use the non-WSDL mode to expose an object
-from the server and use a non-wsdl client to talk to it. The PHP <tt class="docutils literal"><span class="pre">SOAPClient</span></tt>
-and <tt class="docutils literal"><span class="pre">SOAPServer</span></tt> have a common exchange format that is used in this case
+from the server and use a non-wsdl client to talk to it. The PHP <span class="docutils literal"><span class="pre">SOAPClient</span></span>
+and <span class="docutils literal"><span class="pre">SOAPServer</span></span> have a common exchange format that is used in this case
 and replaces WSDL entirely.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="c1">// server.php</span>
@@ -95,7 +96,7 @@ and replaces WSDL entirely.</p>
 </pre></div>
 </div>
 <p>This kind of services work with flawlessly all datatypes except with objects,
-which get converted to <tt class="docutils literal"><span class="pre">stdClass</span></tt> with public properties on the Client.</p>
+which get converted to <span class="docutils literal"><span class="pre">stdClass</span></span> with public properties on the Client.</p>
 <p>If you are developing internal APIs between components in your own system,
 then using SOAP in non-WSDL mode is a massive time saver. You can expose
 remote services for Remote procedure calls this way very easily.</p>
@@ -108,22 +109,22 @@ they only have those methods you want to be called remotely.</p>
 <p>When something goes wrong in either the client or server, it sucks to debug
 these problems. In general there are several mechanisms to debug SOAP in PHP:</p>
 <ol class="arabic simple">
-<li>Enable <tt class="docutils literal"><span class="pre">'trace'</span> <span class="pre">=&gt;</span> <span class="pre">true</span></tt> option on the SOAPClient. This allows you
-to call the methods <tt class="docutils literal"><span class="pre">$client-&gt;__getLastResponse()</span></tt> and
-<tt class="docutils literal"><span class="pre">$client-&gt;__getLastRequest()</span></tt> to take a look at the interaction between
+<li>Enable <span class="docutils literal"><span class="pre">'trace'</span> <span class="pre">=&gt;</span> <span class="pre">true</span></span> option on the SOAPClient. This allows you
+to call the methods <span class="docutils literal"><span class="pre">$client-&gt;__getLastResponse()</span></span> and
+<span class="docutils literal"><span class="pre">$client-&gt;__getLastRequest()</span></span> to take a look at the interaction between
 server and client.</li>
-<li>When failures happen, <tt class="docutils literal"><span class="pre">SOAPClient</span></tt> throws a <tt class="docutils literal"><span class="pre">SOAPFault</span></tt> exception.
+<li>When failures happen, <span class="docutils literal"><span class="pre">SOAPClient</span></span> throws a <span class="docutils literal"><span class="pre">SOAPFault</span></span> exception.
 You can even throw this exception yourself from the SOAPServer code,
 and the client can then read this failure. However you must know
-that the <tt class="docutils literal"><span class="pre">$faultcode</span></tt> variable in the constructor of <tt class="docutils literal"><span class="pre">new</span>
-<span class="pre">SOAPFault($faultcode,</span> <span class="pre">$faultmsg)</span></tt> is <strong>NOT</strong> an integer error code
-like in normal Exceptions. Instead its either a value <tt class="docutils literal"><span class="pre">SERVER</span></tt> or <tt class="docutils literal"><span class="pre">CLIENT</span></tt>,
+that the <span class="docutils literal"><span class="pre">$faultcode</span></span> variable in the constructor of <span class="docutils literal"><span class="pre">new</span>
+<span class="pre">SOAPFault($faultcode,</span> <span class="pre">$faultmsg)</span></span> is <strong>NOT</strong> an integer error code
+like in normal Exceptions. Instead its either a value <span class="docutils literal"><span class="pre">SERVER</span></span> or <span class="docutils literal"><span class="pre">CLIENT</span></span>,
 with the component of the interaction that failed.</li>
-<li>If you throw non <tt class="docutils literal"><span class="pre">SOAPFault</span></tt> exceptions from the server, then you
-need to catch them and recast them to <tt class="docutils literal"><span class="pre">SOAPFault</span></tt>, otherwise
+<li>If you throw non <span class="docutils literal"><span class="pre">SOAPFault</span></span> exceptions from the server, then you
+need to catch them and recast them to <span class="docutils literal"><span class="pre">SOAPFault</span></span>, otherwise
 the client only sees “Internal Server Error” messages.</li>
 </ol>
-<p>You can easily solve the <tt class="docutils literal"><span class="pre">SOAPFault</span></tt> problem by decorating your service with an exception handler,
+<p>You can easily solve the <span class="docutils literal"><span class="pre">SOAPFault</span></span> problem by decorating your service with an exception handler,
 and also logging the errors yourself.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
@@ -179,7 +180,7 @@ from code.</p>
 </ul>
 <p>While you should have some understanding of how a WSDL looks like,
 you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
-By default it uses the docblocks <tt class="docutils literal"><span class="pre">@param</span></tt> and <tt class="docutils literal"><span class="pre">@return</span></tt> to generate
+By default it uses the docblocks <span class="docutils literal"><span class="pre">@param</span></span> and <span class="docutils literal"><span class="pre">@return</span></span> to generate
 the correct WSDL for a service:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
@@ -192,7 +193,7 @@ the correct WSDL for a service:</p>
 </pre></div>
 </div>
 <p>You can now place that WSDL file in any public location and then point both
-<tt class="docutils literal"><span class="pre">SOAPServer</span></tt> and <tt class="docutils literal"><span class="pre">SOAPClient</span></tt> at the file using the first constructor
+<span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> at the file using the first constructor
 argument:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
@@ -212,7 +213,7 @@ automated in a reasonable amount of time.</p>
 <div class="section" id="generating-objects-from-wsdl">
 <h2>Generating Objects from WSDL</h2>
 <p>If you implement a client, you want to generate objects for the datastructures
-of a WSDL file. You can use those objects instead of the <tt class="docutils literal"><span class="pre">stdClass</span></tt> objects
+of a WSDL file. You can use those objects instead of the <span class="docutils literal"><span class="pre">stdClass</span></span> objects
 which are used by default.</p>
 <p>For this task I use the <a class="reference external" href="https://github.com/moyarada/XSD-to-PHP">XSD-TO-PHP library</a>.  I normally hack around in the code
 a little to adjust for correct namespace generation and code-style adjustments,
@@ -280,7 +281,7 @@ and non-WSDL modes. Once you want to talk to Java or C# you need solve some
 more problems.</p>
 <p>The first thing to understand is that SOAP can actually talk in 4 different
 modes. You can use ‘document’ or ‘rpc’ style, ‘literal’ or ‘encoded’  use.
-This post on the <a class="reference external" href="http://www.ibm.com/developerworks/library/ws-whichwsdl/">IBM website</a> describes all the
+This post on the <a class="reference external" href="http://www.ibm.com/developerworks/library/ws-whichwsdl">IBM website</a> describes all the
 different modes in much detail and I recommend everybody having to work with
 SOAP to read it.</p>
 <p>The essence from that article is, that you will always want to use
@@ -366,8 +367,9 @@ necessary for REST APIs.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Fri, 31 Jan 2014 00:00:00 +0100</pubDate>
+             <pubDate>Fri, 31 Jan 2014 00:00:00 +0100</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</link>
             <guid>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</guid>
@@ -383,13 +385,13 @@ of contributors and I know several companies using the library in production.</p
 made it impossible to collect multiple errors and also made the code
 more verbose than necessary when validating the same value with multiple
 assertions.</p>
-<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
+<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj">AssertJ</a> that gave me the idea how to fix
 these problems. The last two days I had some time to implement those new
 functionalities and I am releasing a new version 2.0 of Assert today.</p>
 <div class="section" id="fluent-api">
 <h2>Fluent API</h2>
 <p>Instead of having to use the static assertion methods, there is now
-a new fluent API, invoked by calling the function <tt class="docutils literal"><span class="pre">Assert\that($value)</span></tt>
+a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
 and then all the assertions you want to call on that value.</p>
 <p>Here are some examples:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -416,18 +418,19 @@ that is similar to the Fluent API:</p>
     <span class="o">-&gt;</span><span class="na">verifyNow</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>The method <tt class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></tt> requires a property path (name), so
+<p>The method <span class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></span> requires a property path (name), so
 that you know how to differentiate the errors afterwards.</p>
-<p>On failure <tt class="docutils literal"><span class="pre">verifyNow()</span></tt> will throw an exception
-<tt class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></tt> (this does not extend
-<tt class="docutils literal"><span class="pre">AssertionFailedException</span></tt>) with a combined message:</p>
-<div class="highlight-python"><pre>The following 3 assertions failed:
+<p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
+<span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
+<span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
+<div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
 1) foo: Value &quot;10&quot; expected to be string, type integer given.
 2) bar: Value &quot;&lt;NULL&gt;&quot; is empty, but non empty value was expected.
-3) baz: Value &quot;string&quot; is not an array.</pre>
+3) baz: Value &quot;string&quot; is not an array.
+</pre></div>
 </div>
-<p>You can also call the method <tt class="docutils literal"><span class="pre">getErrorExceptions()</span></tt> to retrieve all the
-underyling <tt class="docutils literal"><span class="pre">AssertionFailedException</span></tt> objects and convert them something
+<p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
+underyling <span class="docutils literal"><span class="pre">AssertionFailedException</span></span> objects and convert them something
 useable for the frontend.</p>
 </div>
 <div class="section" id="error-messages-values-and-constraints">
@@ -455,15 +458,16 @@ the value and constraint data for translating into human readable messages.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Sun, 26 Jan 2014 00:00:00 +0100</pubDate>
+             <pubDate>Sun, 26 Jan 2014 00:00:00 +0100</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</link>
             <guid>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</guid>
             <title><![CDATA[Feature Flags and Doctrine Entities]]></title>
             <description><![CDATA[<div class="section" id="feature-flags-and-doctrine-entities">
 <h1>Feature Flags and Doctrine Entities</h1>
-<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
+<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com">EasyBib developers</a> this week about how to use feature flags with
 Doctrine Entities, Metadata Mapping and their database.</p>
 <p>The problem of feature flags with Doctrine is easily explained: If you add
 properties for a new feature that is disabled in the Doctrine metadata, then you
@@ -515,8 +519,9 @@ permanent features, you can remove the listener and move the mapping onto the
 Entities metadata.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Thu, 05 Dec 2013 00:00:00 +0100</pubDate>
+             <pubDate>Thu, 05 Dec 2013 00:00:00 +0100</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</link>
             <guid>http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</guid>
@@ -534,30 +539,30 @@ as Service</a>,
 and other pieces I still need to write about, I would classify Symfony2 as a
 good framework.</p>
 <p>A number of other authors have written blog posts on decoupling Symfony and your model
-code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first/">on project structure</a>
-, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure/">on project structure as well</a>
-and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities/">Decoupling Forms from Entities</a>.</p>
+code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first">on project structure</a>
+, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure">on project structure as well</a>
+and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities">Decoupling Forms from Entities</a>.</p>
 <p>User management breaks the isolation of your business model open,
-by introducing the <tt class="docutils literal"><span class="pre">UserInterface</span></tt> from the Security component into your
+by introducing the <span class="docutils literal"><span class="pre">UserInterface</span></span> from the Security component into your
 code base. In combination with the <em>FOSUserBundle</em> this can cause a dependency
-on quite a bit of code already because I wouldn’t call the <tt class="docutils literal"><span class="pre">FOS\UserBundle\Model\User</span></tt> object
+on quite a bit of code already because I wouldn’t call the <span class="docutils literal"><span class="pre">FOS\UserBundle\Model\User</span></span> object
 leightweight. However this and other FriendsOfSymfony bundles
 are very helpful to get annoying features of your application done in a matter
 of hours.</p>
 <p>You can decouple the <em>FOSUserBundle</em> from our own entities and code by
 introducing a second object that representes the user concept in our model.
-The <tt class="docutils literal"><span class="pre">UserInterface</span></tt> entities need fields for username, password, enabled and
+The <span class="docutils literal"><span class="pre">UserInterface</span></span> entities need fields for username, password, enabled and
 some more. Except the username and email, the business model rarely needs other
 properties.</p>
 <p>Take an ecommerce system as example, where customers can register as users.
-In this example we could create two entities <tt class="docutils literal"><span class="pre">MyProject\UserBundle\Entity\User</span></tt> and
-<tt class="docutils literal"><span class="pre">MyProject\ShopBundle\Entity\Customer</span></tt>. Two strategies exist now:</p>
+In this example we could create two entities <span class="docutils literal"><span class="pre">MyProject\UserBundle\Entity\User</span></span> and
+<span class="docutils literal"><span class="pre">MyProject\ShopBundle\Entity\Customer</span></span>. Two strategies exist now:</p>
 <ol class="arabic simple">
 <li>Use the same table for both entities with some shared and other exclusive columns</li>
 <li>Use different tables in the database</li>
 </ol>
 <p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
-<p>For case two, the <tt class="docutils literal"><span class="pre">User</span></tt> entity looks like this:</p>
+<p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
 
@@ -581,10 +586,10 @@ In this example we could create two entities <tt class="docutils literal"><span 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">Customer</span></tt> entity is a completly new object, not depending
-on the <tt class="docutils literal"><span class="pre">UserInterface</span></tt> and containing some duplicated properties.</p>
-<p>You can either use exactly the same ID or plant the <tt class="docutils literal"><span class="pre">$userId</span></tt> as
-correlation ID in the <tt class="docutils literal"><span class="pre">Customer</span></tt> object.</p>
+<p>The <span class="docutils literal"><span class="pre">Customer</span></span> entity is a completly new object, not depending
+on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
+<p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
+correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
 
@@ -613,16 +618,17 @@ correlation ID in the <tt class="docutils literal"><span class="pre">Customer</s
 </pre></div>
 </div>
 <p>Now you need to extend the application to synchronize all changes from the
-<tt class="docutils literal"><span class="pre">User</span></tt> entity to the <tt class="docutils literal"><span class="pre">Customer</span></tt> entity. You can
-achieve this relatively easy by overwriting the <tt class="docutils literal"><span class="pre">ModelManager</span></tt> or when finally
+<span class="docutils literal"><span class="pre">User</span></span> entity to the <span class="docutils literal"><span class="pre">Customer</span></span> entity. You can
+achieve this relatively easy by overwriting the <span class="docutils literal"><span class="pre">ModelManager</span></span> or when finally
 supported by <em>FOSUserBundle</em> listening to events.  Your own code can
-exclusively work with <tt class="docutils literal"><span class="pre">Customer</span></tt> objects now, void of any reference to
+exclusively work with <span class="docutils literal"><span class="pre">Customer</span></span> objects now, void of any reference to
 the Symfony Security component or the huge FOSUserBundle dependency.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
             <category><![CDATA[ Symfony2 ]]></category>
-            <pubDate>Wed, 04 Sep 2013 00:00:00 +0200</pubDate>
+             <pubDate>Wed, 04 Sep 2013 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</link>
             <guid>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</guid>
@@ -651,30 +657,30 @@ Symfony, because of the large number of files.)</li>
 </ul>
 <p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
 related to the huge number of files that a Symfony project normally ships with
-and the I/O that is generated from <tt class="docutils literal"><span class="pre">filemtime</span></tt> calls to check if the
+and the I/O that is generated from <span class="docutils literal"><span class="pre">filemtime</span></span> calls to check if the
 configuration files have changed.</p>
 <p>This is just a small part, there are other bottlenecks that I have found after
 finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
 <ol class="arabic simple">
-<li>Monolog logs to the NFS share and the huge number <tt class="docutils literal"><span class="pre">fwrite</span></tt> take their toll.</li>
-<li>Writing compiled Twig templates to the NFS share using <tt class="docutils literal"><span class="pre">file_put_contents</span></tt>.</li>
+<li>Monolog logs to the NFS share and the huge number <span class="docutils literal"><span class="pre">fwrite</span></span> take their toll.</li>
+<li>Writing compiled Twig templates to the NFS share using <span class="docutils literal"><span class="pre">file_put_contents</span></span>.</li>
 <li>Assetic: Scanning for stylesheets and javascripts within templates is very
 slow, causing lots of I/O on the NFS share and CPU and changing it to using
-explicit bundling in the <tt class="docutils literal"><span class="pre">app/config/config.yml</span></tt> helps alot. You can use a
+explicit bundling in the <span class="docutils literal"><span class="pre">app/config/config.yml</span></span> helps alot. You can use a
 cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
 a <cite>–watch</cite> flag in the background.</li>
 <li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
-<li><tt class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></tt> in Symfony DIC uses a set of
+<li><span class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></span> in Symfony DIC uses a set of
 recursive algorithms to replace aliases with the real services. That takes a
 huge amount of time in bigger applications including amounting calls to methods
 inside the pass over 100.000 times.</li>
 </ol>
 <p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
 To fix this just change the cache <strong>AND</strong> the log directory to
-<tt class="docutils literal"><span class="pre">sys_get_temp_dir()</span></tt> or shared memory (/dev/shm) instead of writing to the
+<span class="docutils literal"><span class="pre">sys_get_temp_dir()</span></span> or shared memory (/dev/shm) instead of writing to the
 NFS share. I actually tried this before, but since I forgot the log directory,
 this felt equally slow and I reverted the change.</p>
-<p>Here is the code you should add to your <tt class="docutils literal"><span class="pre">AppKernel</span></tt> to give you a
+<p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
 considerable performance boost on a Vagrant box:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
@@ -710,8 +716,9 @@ you wan’t to suffer.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
             <category><![CDATA[ Symfony ]]></category>
-            <pubDate>Mon, 19 Aug 2013 00:00:00 +0200</pubDate>
+             <pubDate>Mon, 19 Aug 2013 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</link>
             <guid>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</guid>
@@ -738,8 +745,8 @@ update operations.</li>
 with Doctrine2. You should be able to easily extend it to be more flexible,
 reliable or optionally even asynchronuous. I skip some of the glue code in this blog post,
 but you can try the full code by checking out <a class="reference external" href="https://gist.github.com/beberlei/53cd6580d87b1f5cd9ca">this Gist</a> and running
-<tt class="docutils literal"><span class="pre">composer</span> <span class="pre">install</span></tt> and then <tt class="docutils literal"><span class="pre">php</span> <span class="pre">domain_events.php</span></tt>.</p>
-<p>Lets look at the following entity, an <tt class="docutils literal"><span class="pre">InventoryItem</span></tt> tracking the number
+<span class="docutils literal"><span class="pre">composer</span> <span class="pre">install</span></span> and then <span class="docutils literal"><span class="pre">php</span> <span class="pre">domain_events.php</span></span>.</p>
+<p>Lets look at the following entity, an <span class="docutils literal"><span class="pre">InventoryItem</span></span> tracking the number
 we have this item in stock:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Domain</span><span class="p">;</span>
@@ -779,8 +786,8 @@ we have this item in stock:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>We want this entity to raise two domain events using the <tt class="docutils literal"><span class="pre">raise($eventName,</span>
-<span class="pre">array</span> <span class="pre">$properties)</span></tt> method.  Our preferred use case for this code looks like this:</p>
+<p>We want this entity to raise two domain events using the <span class="docutils literal"><span class="pre">raise($eventName,</span>
+<span class="pre">array</span> <span class="pre">$properties)</span></span> method.  Our preferred use case for this code looks like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nv">$item</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InventoryItem</span><span class="p">(</span><span class="s1">'Cookies'</span><span class="p">);</span>
 <span class="nv">$item</span><span class="o">-&gt;</span><span class="na">checkIn</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
@@ -806,7 +813,7 @@ we have this item in stock:</p>
 </pre></div>
 </div>
 <p>As the first building block, we need a <a class="reference external" href="http://martinfowler.com/eaaCatalog/layerSupertype.html">Layer Supertype</a> for our entities,
-called <tt class="docutils literal"><span class="pre">AggregateRoot</span></tt> adding the event raising capabilities to all entities that need it:</p>
+called <span class="docutils literal"><span class="pre">AggregateRoot</span></span> adding the event raising capabilities to all entities that need it:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainSuperTypes</span><span class="p">;</span>
 
@@ -829,15 +836,15 @@ called <tt class="docutils literal"><span class="pre">AggregateRoot</span></tt> 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This class allows us to add events to an entity using <tt class="docutils literal"><span class="pre">raise()</span></tt> as we have
-seen in the <tt class="docutils literal"><span class="pre">InventoryItem</span></tt> entity before.</p>
-<p>Now we need Doctrine to process the events during a transaction (<tt class="docutils literal"><span class="pre">flush()</span></tt>).
+<p>This class allows us to add events to an entity using <span class="docutils literal"><span class="pre">raise()</span></span> as we have
+seen in the <span class="docutils literal"><span class="pre">InventoryItem</span></span> entity before.</p>
+<p>Now we need Doctrine to process the events during a transaction (<span class="docutils literal"><span class="pre">flush()</span></span>).
 We do this by keeping all entities with domain events, and then triggering
 the domain events after the transaction has completed. This is a vital part
 of the domain events pattern, because it guarantees every listener that the
 state leading to the event is already in the database.</p>
 <p>Technically we implement this with a Doctrine EventListener that listeners for
-the <tt class="docutils literal"><span class="pre">postFlush</span></tt>, <tt class="docutils literal"><span class="pre">postPersist</span></tt>, <tt class="docutils literal"><span class="pre">postUpdate</span></tt> and <tt class="docutils literal"><span class="pre">postRemove</span></tt> events:</p>
+the <span class="docutils literal"><span class="pre">postFlush</span></span>, <span class="docutils literal"><span class="pre">postPersist</span></span>, <span class="docutils literal"><span class="pre">postUpdate</span></span> and <span class="docutils literal"><span class="pre">postRemove</span></span> events:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainEvents</span><span class="p">;</span>
 
@@ -909,13 +916,13 @@ the <tt class="docutils literal"><span class="pre">postFlush</span></tt>, <tt cl
 </pre></div>
 </div>
 <p>Now the example from above, creating and checking in inventory items
-will trigger the <tt class="docutils literal"><span class="pre">EchoInventoryListener</span></tt> and print the data to the screen.</p>
+will trigger the <span class="docutils literal"><span class="pre">EchoInventoryListener</span></span> and print the data to the screen.</p>
 <p>This example is very simple but shows how you can incorporate Domain Events into
 your Doctrine projects. The following improvements can be made if necessary:</p>
 <ul class="simple">
 <li>Use a base EventSubscriber for the Domain Listeners, that automatically
 registers all the domain event listener methods. This way you don’t have
-to manually list them when calling <tt class="docutils literal"><span class="pre">$evm-&gt;addListener()</span></tt>.</li>
+to manually list them when calling <span class="docutils literal"><span class="pre">$evm-&gt;addListener()</span></span>.</li>
 <li>Implement one class for every domain event, allowing to typehint the events
 in listeners, with much more helpful information about the contained data.</li>
 <li>If you prefer asynchroneous processing, serialize the events into a
@@ -927,8 +934,9 @@ in the background.</li>
 Doctrine. Again, <a class="reference external" href="https://gist.github.com/beberlei/53cd6580d87b1f5cd9ca">see the code on this Gist</a> for a working example.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Wed, 24 Jul 2013 00:00:00 +0200</pubDate>
+             <pubDate>Wed, 24 Jul 2013 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</link>
             <guid>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</guid>
@@ -958,11 +966,12 @@ inclusion into the Azure PHP SDK itself.</li>
 </ul>
 <p>You can install both the Bundle or the Demo application via Composer.
 For the Demo application call:</p>
-<div class="highlight-python"><pre>$ php composer.phar create-project beberlei/symfony-azure-edition</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ php composer.phar create-project beberlei/symfony-azure-edition
+</pre></div>
 </div>
 <p>The README includes more information about how to deploy the demo
 to your Azure websites account.</p>
-<p>The bundle can be installed using the following <tt class="docutils literal"><span class="pre">composer.json</span></tt>:</p>
+<p>The bundle can be installed using the following <span class="docutils literal"><span class="pre">composer.json</span></span>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&quot;beberlei/azure-distribution-bundle&quot;</span><span class="p">:</span> <span class="s">&quot;*&quot;</span>
@@ -980,8 +989,9 @@ to your Azure websites account.</p>
 components.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Thu, 23 May 2013 00:00:00 +0200</pubDate>
+             <pubDate>Thu, 23 May 2013 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</link>
             <guid>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</guid>
@@ -1032,7 +1042,7 @@ controller code through traits:</p>
     <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="nx">trait</span> <span class="nx">Redirector</span>
+<span class="k">trait</span> <span class="nx">Redirector</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
     <span class="p">{</span>
@@ -1053,15 +1063,15 @@ controller code through traits:</p>
 </div>
 <p>Lets spot the problems:</p>
 <ol class="arabic">
-<li><p class="first"><tt class="docutils literal"><span class="pre">Redirector</span></tt> is tightly coupled to <tt class="docutils literal"><span class="pre">MyController</span></tt>. There is no way to
+<li><p class="first"><span class="docutils literal"><span class="pre">Redirector</span></span> is tightly coupled to <span class="docutils literal"><span class="pre">MyController</span></span>. There is no way to
 change this during runtime, by using a different type of redirector, it has
 to be exactly the trait used at compile time. This is exactly what static
 access enforces as well.</p>
 </li>
-<li><p class="first">The trait accesses <tt class="docutils literal"><span class="pre">$this-&gt;container</span></tt> without defining it and couples itself against
+<li><p class="first">The trait accesses <span class="docutils literal"><span class="pre">$this-&gt;container</span></span> without defining it and couples itself against
 the implementing classes. We can actually refactor this to include an
-abstract method <tt class="docutils literal"><span class="pre">getContainer()</span></tt> in the trait. But if we have multiple
-traits now, all having a <tt class="docutils literal"><span class="pre">getContainer()</span></tt> method then we run into method
+abstract method <span class="docutils literal"><span class="pre">getContainer()</span></span> in the trait. But if we have multiple
+traits now, all having a <span class="docutils literal"><span class="pre">getContainer()</span></span> method then we run into method
 class problems that cannot be solved. We could pass the container as an
 argument to the method, but that actually defeats the purpose of the
 abstraction here.</p>
@@ -1071,21 +1081,21 @@ software design.</p>
 </li>
 <li><p class="first">No way to overwrite subset of functionality. If I want to use only one
 method of a trait and a second one slighty different, then I cannot
-overwrite this function of <tt class="docutils literal"><span class="pre">Redirector</span></tt> for example in <tt class="docutils literal"><span class="pre">MyController</span></tt>.</p>
+overwrite this function of <span class="docutils literal"><span class="pre">Redirector</span></span> for example in <span class="docutils literal"><span class="pre">MyController</span></span>.</p>
 </li>
 <li><p class="first">I cannot mock the traits functionality, therefore I cannot test
-<tt class="docutils literal"><span class="pre">MyController</span></tt> as a unit only in combination with a trait.</p>
+<span class="docutils literal"><span class="pre">MyController</span></span> as a unit only in combination with a trait.</p>
 </li>
 <li><p class="first">I cannot test the trait as a unit, I always have to create a class
 that uses the trait to be able to write a test for it.
 This prevents me from testing traits in isolation.</p>
 </li>
-<li><p class="first">Once you start using <tt class="docutils literal"><span class="pre">Redirector</span></tt> in many controllers, its impact
+<li><p class="first">Once you start using <span class="docutils literal"><span class="pre">Redirector</span></span> in many controllers, its impact
 on your code base (see <a class="reference external" href="http://pdepend.org/documentation/software-metrics/index.html">Code Rank</a>) increases
 a lot. Traits are concrete implementations and therefore violate the
 Dependency Inversion SOLID principle: Changes in the trait require adoptions
 in all the implementing classes.</p>
-<p>With aggregation you could depend on an abstraction <tt class="docutils literal"><span class="pre">Redirector</span></tt> or
+<p>With aggregation you could depend on an abstraction <span class="docutils literal"><span class="pre">Redirector</span></span> or
 turn it into an abstraction in the moment that you need different
 functionality.</p>
 </li>
@@ -1130,7 +1140,7 @@ into “pseudo” static code:</p>
 </pre></div>
 </div>
 <p>Calling dynamic methods statically actually works right now (and access to
-<tt class="docutils literal"><span class="pre">$this</span></tt> of the parent class will luckily be removed in PHP 5.5). Let’s
+<span class="docutils literal"><span class="pre">$this</span></span> of the parent class will luckily be removed in PHP 5.5). Let’s
 reformulate it into something that is actually using static methods and
 will work on 5.5, requires changes to the visibility of properties though:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -1179,8 +1189,9 @@ problem with aggregation.</p>
 about them quite a while ago.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Fri, 12 Apr 2013 00:00:00 +0200</pubDate>
+             <pubDate>Fri, 12 Apr 2013 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</link>
             <guid>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</guid>
@@ -1198,13 +1209,13 @@ times in different projects by different teams and think it can be approved upon
 the QueryBuilder API is returned to the client code. This might seen
 like nitpicking, however it leads to bloated client code doing the
 query builder work over and over again. For example the
-<tt class="docutils literal"><span class="pre">-&gt;getQuery()-&gt;getSingleResult(AbstractQuery::HYDRATE_ARRAY)</span></tt> call.</p>
+<span class="docutils literal"><span class="pre">-&gt;getQuery()-&gt;getSingleResult(AbstractQuery::HYDRATE_ARRAY)</span></span> call.</p>
 </li>
 <li><p class="first">Different parts of the QueryBuilder filtering cannot be composed together,
 because of the way the API is created. Assume we have the
-<tt class="docutils literal"><span class="pre">filterGroupsForApi()</span></tt> call, there is no way to combine it with another
-call <tt class="docutils literal"><span class="pre">filterGroupsForPermissions()</span></tt>.  Instead reusing this code will lead
-to a third method <tt class="docutils literal"><span class="pre">filterGroupsForApiAndPermissions()</span></tt>.</p>
+<span class="docutils literal"><span class="pre">filterGroupsForApi()</span></span> call, there is no way to combine it with another
+call <span class="docutils literal"><span class="pre">filterGroupsForPermissions()</span></span>.  Instead reusing this code will lead
+to a third method <span class="docutils literal"><span class="pre">filterGroupsForApiAndPermissions()</span></span>.</p>
 <p>This can lead to combinatorial explosion of methods that the developer using
 the repository needs to know.  And wading through a list of 100 methods to
 find the right one is never fun, most importantly when the naming of methods
@@ -1217,8 +1228,8 @@ approach also clearly demonstrates a bad abstraction. In OOP the primary goal is
 changes to affect the whole system.</p>
 <div class="section" id="introduce-criteria-objects">
 <h2>Introduce Criteria Objects</h2>
-<p>Instead of using the <tt class="docutils literal"><span class="pre">QueryBuilder</span></tt> outside of the Repository, lets start with an
-alternative refactoring. I will introduce a <tt class="docutils literal"><span class="pre">Criteria</span></tt> class for the <tt class="docutils literal"><span class="pre">User</span></tt>:</p>
+<p>Instead of using the <span class="docutils literal"><span class="pre">QueryBuilder</span></span> outside of the Repository, lets start with an
+alternative refactoring. I will introduce a <span class="docutils literal"><span class="pre">Criteria</span></span> class for the <span class="docutils literal"><span class="pre">User</span></span>:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserCriteria</span>
 <span class="p">{</span>
@@ -1230,7 +1241,7 @@ alternative refactoring. I will introduce a <tt class="docutils literal"><span c
 <p>It is important not to introduce a constructor here, because when we add
 more and more criterions, the constructor will get bloated. Static
 factory methods that create a criteria do make sense however.</p>
-<p>Now we can introduce a <tt class="docutils literal"><span class="pre">match</span></tt> method on the <tt class="docutils literal"><span class="pre">UserRepository</span></tt>. Lets see
+<p>Now we can introduce a <span class="docutils literal"><span class="pre">match</span></span> method on the <span class="docutils literal"><span class="pre">UserRepository</span></span>. Lets see
 that on an interface level first, to see how simple usage is for the client
 side of the repository:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -1244,7 +1255,7 @@ side of the repository:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Put in a <tt class="docutils literal"><span class="pre">$criteria</span></tt> get back users or array data. Very nice and simple!
+<p>Put in a <span class="docutils literal"><span class="pre">$criteria</span></span> get back users or array data. Very nice and simple!
 The implementation would look like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="sd">/**</span>
@@ -1269,8 +1280,8 @@ The implementation would look like this:</p>
 </pre></div>
 </div>
 <p>The benefit here is, that we can add additional conditions and processing
-by only adding a new property on the <tt class="docutils literal"><span class="pre">UserCriteria</span></tt> and then handling
-this inside <tt class="docutils literal"><span class="pre">UserRepository#match()</span></tt>. Additionally you can save the <tt class="docutils literal"><span class="pre">UserCriteria</span></tt>
+by only adding a new property on the <span class="docutils literal"><span class="pre">UserCriteria</span></span> and then handling
+this inside <span class="docutils literal"><span class="pre">UserRepository#match()</span></span>. Additionally you can save the <span class="docutils literal"><span class="pre">UserCriteria</span></span>
 in the session, or even in the database to that users can “save filter” or return
 to a search overview, with the previous criteria still known.</p>
 <p>The client code now looks like:</p>
@@ -1314,7 +1325,7 @@ that should be implementation detail of the repository.</p>
 </pre></div>
 </div>
 <p>Simple enough, now we can use it everywhere we want by adding
-for example <tt class="docutils literal"><span class="pre">$criteria-&gt;permissions</span> <span class="pre">=</span> <span class="pre">UserCriteria::PERMISSION_WRITE</span></tt>
+for example <span class="docutils literal"><span class="pre">$criteria-&gt;permissions</span> <span class="pre">=</span> <span class="pre">UserCriteria::PERMISSION_WRITE</span></span>
 in our client code.</p>
 </div>
 <div class="section" id="specification-pattern">
@@ -1323,7 +1334,7 @@ in our client code.</p>
 behind a very simple API, but it fails short when:</p>
 <ul class="simple">
 <li>Composing Conditions using combinations of Not/And/Or is not possible
-without a tree structure, however <tt class="docutils literal"><span class="pre">Criteria</span></tt> is just a single object.</li>
+without a tree structure, however <span class="docutils literal"><span class="pre">Criteria</span></span> is just a single object.</li>
 <li>Removing duplication of code between different repositories. If you
 have similar conditions, limit or ordering requirements then you can
 only solve this by having all repositories extend a base repository.
@@ -1333,7 +1344,7 @@ But <a class="reference external" href="http://c2.com/cgi/wiki?ImplementationInh
 this issue. There are several ways to implement it, in the spirit of refactoring I will
 approach it from our existing Criteria.</p>
 <p>Lets move the QueryBuilder code from the repository, into the Criteria object and
-rename it <tt class="docutils literal"><span class="pre">UserSpecification</span></tt>. Its important here to change the query builder
+rename it <span class="docutils literal"><span class="pre">UserSpecification</span></span>. Its important here to change the query builder
 code to use expressions that can be composed.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserSpecification</span>
@@ -1377,7 +1388,7 @@ code to use expressions that can be composed.</p>
 </pre></div>
 </div>
 <p>The repository is then delegating the expression generation
-and puts the result into the <tt class="docutils literal"><span class="pre">where()</span></tt> method of the builder</p>
+and puts the result into the <span class="docutils literal"><span class="pre">where()</span></span> method of the builder</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserRepository</span>
 <span class="p">{</span>
@@ -1395,9 +1406,9 @@ and puts the result into the <tt class="docutils literal"><span class="pre">wher
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Strictly speaking, the <tt class="docutils literal"><span class="pre">UserSpecification</span></tt> violates the single responsibility
+<p>Strictly speaking, the <span class="docutils literal"><span class="pre">UserSpecification</span></span> violates the single responsibility
 principle, which prevents the composability of specifications and reuse in
-different repositories. This is apparent by the <tt class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">&quot;1=1&quot;;</span></tt> line that is
+different repositories. This is apparent by the <span class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">&quot;1=1&quot;;</span></span> line that is
 required to make the combination of conditions possible.
 Lets factor away the violation of the single
 responsibility principle by introducing three specifications:</p>
@@ -1508,7 +1519,7 @@ of this object, the usage is simple and obvious.</p>
 </pre></div>
 </div>
 <p>Assuming we import all specifications
-from a common namespace <tt class="docutils literal"><span class="pre">Spec</span></tt>, our client code will look
+from a common namespace <span class="docutils literal"><span class="pre">Spec</span></span>, our client code will look
 like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nv">$specification</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spec\AsArray</span><span class="p">(</span><span class="k">new</span> <span class="nx">Spec\AndX</span><span class="p">(</span>
@@ -1566,7 +1577,7 @@ specification in its match method:</p>
 </pre></div>
 </div>
 <p>Now we can introduce very generic specifications, such as <cite>OnlyPage($page, Specification $spec)`</cite>
-for limit queries, or <tt class="docutils literal"><span class="pre">Equals($field,</span> <span class="pre">$value)</span></tt>. For more readable code, you can then create
+for limit queries, or <span class="docutils literal"><span class="pre">Equals($field,</span> <span class="pre">$value)</span></span>. For more readable code, you can then create
 a domain language for your specifications that is composed of more simple specifications:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">PowerUsers</span> <span class="k">implements</span> <span class="nx">Specification</span>
@@ -1640,8 +1651,9 @@ tests.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Mon, 04 Mar 2013 00:00:00 +0100</pubDate>
+             <pubDate>Mon, 04 Mar 2013 00:00:00 +0100</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</link>
             <guid>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</guid>
@@ -1705,7 +1717,7 @@ the solution for this is using traits. <a class="reference external" href="http:
 traits create a hard dependency. Even if we accept the static dependency,
 traits are not perfect even for this very simple example, because its very
 likely that you cannot override the constructor of every entity.</p>
-<p>The solution is to extract a value object <tt class="docutils literal"><span class="pre">Timestamped</span></tt> that contains
+<p>The solution is to extract a value object <span class="docutils literal"><span class="pre">Timestamped</span></span> that contains
 all the logic:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Timestamped</span>
@@ -1736,23 +1748,23 @@ all the logic:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>See how all the code could be moved into <tt class="docutils literal"><span class="pre">Timestamped</span></tt> and is now reusable
+<p>See how all the code could be moved into <span class="docutils literal"><span class="pre">Timestamped</span></span> and is now reusable
 in other entities.</p>
 <p>Doctrine has no support for embedded objects, which is very sad. I am working
 very hard to get this feature into Doctrine as soon as possible. You can use
-the “object” type as a workaround and <tt class="docutils literal"><span class="pre">serialize()</span></tt> the value object into
+the “object” type as a workaround and <span class="docutils literal"><span class="pre">serialize()</span></span> the value object into
 the database. However this is beyond ugly in my opinion.</p>
 </div>
 <div class="section" id="extract-method-objects-maximizing-clarity">
 <h2>Extract Method Objects: Maximizing clarity</h2>
 <p>Once you have identified groups of fields that are modified, then the
 complexity of the state transformations can attract lots of code.</p>
-<p>Take an <tt class="docutils literal"><span class="pre">Order</span></tt> object that has a method for calculating the shipping costs,
+<p>Take an <span class="docutils literal"><span class="pre">Order</span></span> object that has a method for calculating the shipping costs,
 depending all the order items and products.
 To separate calculations from state transformations you can extract
-method objects instead of inlining the code into the <tt class="docutils literal"><span class="pre">Order</span></tt> object.</p>
-<p>For this kind of extraction I create a folder <tt class="docutils literal"><span class="pre">Order</span></tt> and put all
-the extracted method objects in the <tt class="docutils literal"><span class="pre">Order</span></tt> subnamespace.</p>
+method objects instead of inlining the code into the <span class="docutils literal"><span class="pre">Order</span></span> object.</p>
+<p>For this kind of extraction I create a folder <span class="docutils literal"><span class="pre">Order</span></span> and put all
+the extracted method objects in the <span class="docutils literal"><span class="pre">Order</span></span> subnamespace.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
 
@@ -1805,22 +1817,23 @@ Doctrine to make this possible.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Mon, 04 Feb 2013 00:00:00 +0100</pubDate>
+             <pubDate>Mon, 04 Feb 2013 00:00:00 +0100</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</link>
             <guid>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</guid>
             <title><![CDATA[Composer and Azure Websites Git Deployment]]></title>
             <description><![CDATA[<div class="section" id="composer-and-azure-websites-git-deployment">
 <h1>Composer and Azure Websites Git Deployment</h1>
-<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
+<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
 console.</p>
-<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites/">Azure Websites</a> in June this
+<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites">Azure Websites</a> in June this
 year.  It is a platform as a service solution where you can deploy your
 websites via FTP or Git. With Azure Websites you can avoid having to deal with
-the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services/">Azure Hosted Cloud
+the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services">Azure Hosted Cloud
 Services</a>.
 As long as your website only requires an SQLServer, MySQL or external APIs you
 can actually achieve quite a lot already.</p>
@@ -1838,14 +1851,14 @@ to the document root.</p>
 <p>If Composer fails during this step, the website will still be served from the
 currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
-work. Create a <tt class="docutils literal"><span class="pre">.deployment</span></tt> file in your project root folder:</p>
+work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
 <span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
 name to “v5.4”, but I haven’t tested this.</p>
-<p>Then you need to create the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt> file that is referenced in the
+<p>Then you need to create the <span class="docutils literal"><span class="pre">build_azure.php</span></span> file that is referenced in the
 deployment command. The actual implementation is up to you, my version is
 the most simple one:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -1865,14 +1878,15 @@ the most simple one:</p>
 <p class="last">This currently only works with a Composer version, where
 <a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
 You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
-<tt class="docutils literal"><span class="pre">./bin/compile</span></tt> to generate a composer.phar that works.</p>
+<span class="docutils literal"><span class="pre">./bin/compile</span></span> to generate a composer.phar that works.</p>
 </div>
-<p>Instead of using this approach, you could ship <tt class="docutils literal"><span class="pre">composer.phar</span></tt> with your repository for example.
-You can of course execute additional steps in the <tt class="docutils literal"><span class="pre">build_azure.php</span></tt>, for example warmup caches.</p>
+<p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
+You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Mon, 19 Nov 2012 00:00:00 +0100</pubDate>
+             <pubDate>Mon, 19 Nov 2012 00:00:00 +0100</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</link>
             <guid>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</guid>
@@ -1917,7 +1931,7 @@ very complete validation of the input data, however its not very readable.
 Instead you have 6 if branches, which increase the complexity of the method
 and almost take up half the screen without even getting to the actual code.</p>
 <p>The assertion pattern is really helpful here to reduce the complexity of this
-code and hide the <tt class="docutils literal"><span class="pre">if/throw</span></tt> conditions into little helper methods. Have a
+code and hide the <span class="docutils literal"><span class="pre">if/throw</span></span> conditions into little helper methods. Have a
 look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
@@ -1939,7 +1953,7 @@ assertions.</p>
 library/namespace. Especially when you start using this pattern on a large
 scale, you have to make sure this assertions are <strong>VERY</strong> stable and
 unit-tested.</p>
-<p>That is why you should extend from <tt class="docutils literal"><span class="pre">Assertion</span></tt> and use your own class when
+<p>That is why you should extend from <span class="docutils literal"><span class="pre">Assertion</span></span> and use your own class when
 using the Assert library. This returns some control in your hands and even
 allows you to overwrite the exception class:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -1955,8 +1969,9 @@ allows you to overwrite the exception class:</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Tue, 04 Sep 2012 00:00:00 +0200</pubDate>
+             <pubDate>Tue, 04 Sep 2012 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</link>
             <guid>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</guid>
@@ -1967,7 +1982,7 @@ allows you to overwrite the exception class:</p>
 abstraction technology that converts rows to objects, then you will probably
 use getter/setter methods or properties (C#) to encapsulate object properties.</p>
 <p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
-at the default <tt class="docutils literal"><span class="pre">User</span></tt> entity from the Symfony2 FOSUserBundle plugin for
+at the default <span class="docutils literal"><span class="pre">User</span></span> entity from the Symfony2 FOSUserBundle plugin for
 example: A colossus of getter/setter methods with nearly no real business
 logic. This is how most of our persistence related objects look like in PHP.
 A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
@@ -1994,7 +2009,7 @@ actual storage. Something that object-orientation was suppose to avoid.</p>
 <p>One way to avoid writing setters is a task based approach to the model. Think
 of every task that is performed in an application and add a method that
 changes all the affected fields at once, to perform this task. In the famous
-blog example the <tt class="docutils literal"><span class="pre">Post</span></tt> object may look like:</p>
+blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
@@ -2017,7 +2032,7 @@ blog example the <tt class="docutils literal"><span class="pre">Post</span></tt>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">Post</span></tt> class is now much more protected from the outside and
+<p>The <span class="docutils literal"><span class="pre">Post</span></span> class is now much more protected from the outside and
 is actually much better to read and understand. You can clearly see
 the behaviors that exist on this object. In the future you might even
 be able to change the state of this object without breaking client code.</p>
@@ -2056,7 +2071,7 @@ model, using the visitor pattern in combination with view models:</p>
 </div>
 <p>There are drawbacks with this approach though:</p>
 <ul class="simple">
-<li>Why use the Post model in memory, when you are only passing <tt class="docutils literal"><span class="pre">PostView</span></tt>
+<li>Why use the Post model in memory, when you are only passing <span class="docutils literal"><span class="pre">PostView</span></span>
 instances to the controllers and views only anyways? Its much more efficient
 to have the database map to the view objects directly. This is what CQRS
 postulates as separation of read- and write model.</li>
@@ -2075,7 +2090,7 @@ Framework 2</a> ones map forms directly to objects
 and back. Without getters/setters this is obviously not possible anymore.
 However if you are decoupling the model from the framework, then using this
 kind of form framework on entities is a huge no go anyways.</p>
-<p>Think back to the tasks we are performing on our <tt class="docutils literal"><span class="pre">Post</span></tt> entity:</p>
+<p>Think back to the tasks we are performing on our <span class="docutils literal"><span class="pre">Post</span></span> entity:</p>
 <ul class="simple">
 <li>Edit (title, body, tags)</li>
 <li>Publish (publishDate)</li>
@@ -2167,8 +2182,9 @@ please leave comments when leaving this website :-)</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Wed, 22 Aug 2012 00:00:00 +0200</pubDate>
+             <pubDate>Wed, 22 Aug 2012 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</link>
             <guid>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</guid>
@@ -2187,11 +2203,12 @@ mess</a></li>
 the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-python"><pre>Command-Query-Separation states that every method should either be a
+<div class="highlight-python"><div class="highlight"><pre>Command-Query-Separation states that every method should either be a
 command that performs an action, or a query that returns data to the
 caller, but not both. In other words, asking a question should not change
 the answer. More formally, methods should return a value only if they are
-referentially transparent and hence possess no side effects.</pre>
+referentially transparent and hence possess no side effects.
+</pre></div>
 </div>
 <p>CQRS is an OOP architecture design pattern building on that imperative
 principle.</p>
@@ -2363,8 +2380,9 @@ topic that I will discuss in the next blog post.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Sat, 18 Aug 2012 00:00:00 +0200</pubDate>
+             <pubDate>Sat, 18 Aug 2012 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</link>
             <guid>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</guid>
@@ -2414,13 +2432,13 @@ transferring money that would be:</p>
 <li>TransferMoneySink (Destination)</li>
 </ul>
 <p>We can do this by either introducing two interfaces and two concrete
-implementations that accept the <tt class="docutils literal"><span class="pre">BankAccount</span></tt> as object to work on
+implementations that accept the <span class="docutils literal"><span class="pre">BankAccount</span></span> as object to work on
 or by building two traits. I will go down the route with traits, to show
 one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">trait</span> <span class="nx">TransferMoneySource</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySource</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
     <span class="p">{</span>
@@ -2428,7 +2446,7 @@ objects using them in the tests for this use-case.</p>
     <span class="p">}</span>
     <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
 <span class="p">}</span>
-<span class="nx">trait</span> <span class="nx">TransferMoneySink</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySink</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
     <span class="p">{</span>
@@ -2440,7 +2458,7 @@ objects using them in the tests for this use-case.</p>
 </pre></div>
 </div>
 <p>Any checks for balances, credit limits or other things would also happen
-here. The <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>  on the data objects should be as
+here. The <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>  on the data objects should be as
 dumb as possible, so that their implementation does not cause any side-effects
 on the execution of this use-case.</p>
 <p>The bank account would then be modified to look:</p>
@@ -2469,7 +2487,7 @@ on the execution of this use-case.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The use-case <tt class="docutils literal"><span class="pre">TransferMoney</span></tt> would then be modified to create Roles instead
+<p>The use-case <span class="docutils literal"><span class="pre">TransferMoney</span></span> would then be modified to create Roles instead
 of Data objects from the DAO. This can be a bit tricky when you have multiple
 data objects implementing the same role and you have no way of knowing which
 underlying data object to pick. The binding of data objects to roles happens
@@ -2533,7 +2551,7 @@ traits.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">ObjectStorage</span></tt> here is a service (repository) that can find any
+<p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
 persistent data object by a global ID. This is necessary, because it
 doesn’t actually matter what data object uses the necessary traits
 for this use-case.</p>
@@ -2571,8 +2589,9 @@ parts of the system.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Thu, 16 Aug 2012 00:00:00 +0200</pubDate>
+             <pubDate>Thu, 16 Aug 2012 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</link>
             <guid>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</guid>
@@ -2586,7 +2605,7 @@ mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
 an architectural design pattern. I first heard about it in a keynote video of
-<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc/">Uncle Bob</a> on Ruby
+<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc">Uncle Bob</a> on Ruby
 Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
 This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
 by Alistair Cockburn.</p>
@@ -2614,7 +2633,7 @@ and lower levels, for example to manage database transactions.</p>
 throughout all blog posts, the usual Bank Account/Money Transfer. The use case
 is the money transfer from one bank account (source) to another one
 (destination).</p>
-<p>We start by implementing the entity <tt class="docutils literal"><span class="pre">BankAccount</span></tt>:</p>
+<p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
@@ -2637,7 +2656,7 @@ is the money transfer from one bank account (source) to another one
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>It is straightforward to implement the <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>
+<p>It is straightforward to implement the <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>
 functionality. The Money object implementation is omitted here.</p>
 <p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
@@ -2670,7 +2689,7 @@ source to the destination account:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">MoneyTransferRequest</span></tt> and <tt class="docutils literal"><span class="pre">MoneyTransferResponse</span></tt> objects are dumb
+<p>The <span class="docutils literal"><span class="pre">MoneyTransferRequest</span></span> and <span class="docutils literal"><span class="pre">MoneyTransferResponse</span></span> objects are dumb
 php objects (so called data-transfer objects, DTO).</p>
 <p>You can see in the example that we use a Data Access object to retrieve the
 source and destination account entities from some storage subsystem. To follow the EBI
@@ -2725,7 +2744,7 @@ generic approach to getting this job done.</p>
 (Reason below).  It allows you to wrap calls to the model by some sort of proxy
 that transforms the request and response and also handles transactions and
 such. Loosely spoken this was actually some kind of AOP library, using the
-limited ways that PHP provides to implement AOP (magic <tt class="docutils literal"><span class="pre">__call</span></tt> proxies).</p>
+limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
 <p>With context you would do something like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
@@ -2837,8 +2856,9 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Mon, 13 Aug 2012 00:00:00 +0200</pubDate>
+             <pubDate>Mon, 13 Aug 2012 00:00:00 +0200</pubDate>
         </item>
+    
         <item>
             <link>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</link>
             <guid>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</guid>
@@ -2952,7 +2972,7 @@ architecture or “Ports and adapters”. Gained popularity after <a class="refe
 at Ruby Midwest</a>
 last year.</li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
-<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
 day video class</a> by Greg Young.</li>
 </ul>
 <p>They are not new and have all been around for several years already. I would
@@ -2965,14 +2985,15 @@ different ways.</p>
 some examples and then wrap up my thoughts about all of them.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home">Free and Open Source
 Conference</a> in Sankt Augustin Germany on
 25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
 </div>
 </div>
 </div>]]></description>
             <category><![CDATA[ PHP ]]></category>
-            <pubDate>Sat, 11 Aug 2012 00:00:00 +0200</pubDate>
+             <pubDate>Sat, 11 Aug 2012 00:00:00 +0200</pubDate>
         </item>
+    
     </channel>
 </rss>

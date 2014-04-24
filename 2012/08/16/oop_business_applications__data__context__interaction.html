@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>OOP Business Applications: Data, Context, Interaction &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>OOP Business Applications: Data, Context, Interaction &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="OOP Business Applications: Entity, Boundary, Interactor" href="../13/oop_business_applications_entity_boundary_interactor.html" /><link rel="prev" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="OOP Business Applications: Entity, Boundary, Interactor" href="../13/oop_business_applications_entity_boundary_interactor.html" />
-    <link rel="prev" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,32 +62,18 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2012-08-16-oop_business_applications__data__context__interaction">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a>
-            </li>
-            <li class="right">
-                <a href="../13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2012-08-16 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>August 16, 2012</span>
         </div>
+
     <div class="section" id="oop-business-applications-data-context-interaction">
 <h1>OOP Business Applications: Data, Context, Interaction</h1>
 <p>Other posts in this series:</p>
@@ -125,13 +119,13 @@ transferring money that would be:</p>
 <li>TransferMoneySink (Destination)</li>
 </ul>
 <p>We can do this by either introducing two interfaces and two concrete
-implementations that accept the <tt class="docutils literal"><span class="pre">BankAccount</span></tt> as object to work on
+implementations that accept the <span class="docutils literal"><span class="pre">BankAccount</span></span> as object to work on
 or by building two traits. I will go down the route with traits, to show
 one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">trait</span> <span class="nx">TransferMoneySource</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySource</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
     <span class="p">{</span>
@@ -139,7 +133,7 @@ objects using them in the tests for this use-case.</p>
     <span class="p">}</span>
     <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
 <span class="p">}</span>
-<span class="nx">trait</span> <span class="nx">TransferMoneySink</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySink</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
     <span class="p">{</span>
@@ -151,7 +145,7 @@ objects using them in the tests for this use-case.</p>
 </pre></div>
 </div>
 <p>Any checks for balances, credit limits or other things would also happen
-here. The <tt class="docutils literal"><span class="pre">withdraw</span></tt> and <tt class="docutils literal"><span class="pre">deposit</span></tt>  on the data objects should be as
+here. The <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>  on the data objects should be as
 dumb as possible, so that their implementation does not cause any side-effects
 on the execution of this use-case.</p>
 <p>The bank account would then be modified to look:</p>
@@ -180,7 +174,7 @@ on the execution of this use-case.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The use-case <tt class="docutils literal"><span class="pre">TransferMoney</span></tt> would then be modified to create Roles instead
+<p>The use-case <span class="docutils literal"><span class="pre">TransferMoney</span></span> would then be modified to create Roles instead
 of Data objects from the DAO. This can be a bit tricky when you have multiple
 data objects implementing the same role and you have no way of knowing which
 underlying data object to pick. The binding of data objects to roles happens
@@ -244,7 +238,7 @@ traits.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">ObjectStorage</span></tt> here is a service (repository) that can find any
+<p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
 persistent data object by a global ID. This is necessary, because it
 doesn&#8217;t actually matter what data object uses the necessary traits
 for this use-case.</p>
@@ -308,60 +302,36 @@ parts of the system.</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -372,6 +342,11 @@ parts of the system.</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>

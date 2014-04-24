@@ -1,0 +1,211 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 13 &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/default.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="prev" title="Newer" href="page12.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="page13">
+            
+            <div class="timestamp postmeta">
+            <span>July 12, 2008</span>
+        </div>
+        <div class="section" id="discussing-a-jquery-helper-for-zend-framework">
+<h1><a href="2008/07/12/discussing-a-jquery-helper-for-zend-framework.html">Discussing a jQuery Helper for Zend Framework</a></h1>
+<p>Yesterday I had some time to test Matthews <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Helper_Dojo">Dojo View
+Helper</a>
+and the Zend_Dojo_Form component. At a first glance the implementation
+looks great and can almost instantly generate you a very nice form with
+all the possible Dijit form extensions that
+<a class="reference external" href="http://dojotoolkit.org">Dojo</a> has to offer.</p>
+<p>If one were to refactor the Dojo Component to allow for
+<a class="reference external" href="http://www.jquery.com">jQuery</a> elements one bigger problem appears.
+Dojo has a CDN (Content Distribution Network) for all its components,
+that is, the Zend Dojo components can load all javascript and css files
+from a distant server. JQuery can only offer its main library to be
+loaded from a CDN. All additional components, for example the jQuery
+DatePicker, have to be installed locally. This significantly reduces the
+possibility for rapid development of Javascript/Ajax/Form components
+with jQuery and Zend Framework.</p>
+<p>One could offer a complete dependency downloadable archive with all the
+CSS, Javascript and Images inside, but this would be very complex to
+maintain. Looking at the future Zend Tool capabilities one possibility
+would be to offer a download client for all the relevant jQuery plugins,
+but there would have to be a man-middle-server that maintains the most
+up to date locations of all the plugins, which also has to be
+maintained. Does anybody have a better solution to solve this problem?
+Perhaps the jQuery Team needs to be made aware that they need a CDN for
+their most stable plugins.</p>
+<p>Abstracting from the CDN problem, I implemented a simple jQuery View
+Helper (mostly copy paste and simple rewrites from Matthews Dojo
+component) and a HtmlElement Form Helper which constructs a Date-Picker
+from within the template. This is very easy to use and looks great. In
+the next days I will add further helpers for the jQuery plugins I use in
+my day to day work live and hope to present a demo. I might even opting
+for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
+<p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
+list</a>
+stating that a CDN is planned for the jQuery UI library. Sadly this does
+not include plugins for which one might desperately need a View Helper
+except for maybe the Date Picker. I will post further comments on this
+issue in the near future.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/07/12/discussing-a-jquery-helper-for-zend-framework.html#disqus_thread" data-disqus-identifier="2008/07/12/discussing-a-jquery-helper-for-zend-framework">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>July 24, 2008</span>
+        </div>
+        <div class="section" id="finished-first-django-template-language-port-to-php-zf">
+<h1><a href="2008/07/24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a></h1>
+<p>Today I finished the first almost complete <a class="reference external" href="http://www.djangoproject.com">Django Template
+Language</a> Clone for PHP implementing the
+<a class="reference external" href="http://framework.zend.com">Zend Framework</a> View Interface. <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Dtl+-+Benjamin+Eberlei">My
+proposal</a>
+is up and running on the ZF Wiki. The source code can be downloaded from
+my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repository</a>.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/07/24/finished-first-django-template-language-port-to-php-zf.html#disqus_thread" data-disqus-identifier="2008/07/24/finished-first-django-template-language-port-to-php-zf">Leave a comment</a>
+        </div></div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/page13.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h3>Recent Posts</h3>
+    <ul><li>
+            <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
+            <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
+        </li><li>
+            <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li><li>
+            <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li><li>
+            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li><li>
+            <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li><li>
+            <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li><li>
+            <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li><li>
+            <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
+        </li><li>
+            <a href="2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

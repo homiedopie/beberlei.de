@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Building an Object Model: No setters allowed &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Building an Object Model: No setters allowed &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="prev" title="Decoupling applications with Domains Events" href="../25/decoupling_applications_with_domain_events.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" />
-    <link rel="prev" title="Decoupling applications with Domains Events" href="../25/decoupling_applications_with_domain_events.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,39 +62,25 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2012-08-22-building_an_object_model__no_setters_allowed">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a>
-            </li>
-            <li class="right">
-                <a href="../18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2012-08-22 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>August 22, 2012</span>
         </div>
+
     <div class="section" id="building-an-object-model-no-setters-allowed">
 <h1>Building an Object Model: No setters allowed</h1>
 <p>If you are using an object relational mapper or any other database
 abstraction technology that converts rows to objects, then you will probably
 use getter/setter methods or properties (C#) to encapsulate object properties.</p>
 <p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
-at the default <tt class="docutils literal"><span class="pre">User</span></tt> entity from the Symfony2 FOSUserBundle plugin for
+at the default <span class="docutils literal"><span class="pre">User</span></span> entity from the Symfony2 FOSUserBundle plugin for
 example: A colossus of getter/setter methods with nearly no real business
 logic. This is how most of our persistence related objects look like in PHP.
 A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines &#8220;Issue&#8221;</a> avoids
@@ -113,7 +107,7 @@ actual storage. Something that object-orientation was suppose to avoid.</p>
 <p>One way to avoid writing setters is a task based approach to the model. Think
 of every task that is performed in an application and add a method that
 changes all the affected fields at once, to perform this task. In the famous
-blog example the <tt class="docutils literal"><span class="pre">Post</span></tt> object may look like:</p>
+blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
@@ -136,7 +130,7 @@ blog example the <tt class="docutils literal"><span class="pre">Post</span></tt>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">Post</span></tt> class is now much more protected from the outside and
+<p>The <span class="docutils literal"><span class="pre">Post</span></span> class is now much more protected from the outside and
 is actually much better to read and understand. You can clearly see
 the behaviors that exist on this object. In the future you might even
 be able to change the state of this object without breaking client code.</p>
@@ -175,7 +169,7 @@ model, using the visitor pattern in combination with view models:</p>
 </div>
 <p>There are drawbacks with this approach though:</p>
 <ul class="simple">
-<li>Why use the Post model in memory, when you are only passing <tt class="docutils literal"><span class="pre">PostView</span></tt>
+<li>Why use the Post model in memory, when you are only passing <span class="docutils literal"><span class="pre">PostView</span></span>
 instances to the controllers and views only anyways? Its much more efficient
 to have the database map to the view objects directly. This is what CQRS
 postulates as separation of read- and write model.</li>
@@ -194,7 +188,7 @@ Framework 2</a> ones map forms directly to objects
 and back. Without getters/setters this is obviously not possible anymore.
 However if you are decoupling the model from the framework, then using this
 kind of form framework on entities is a huge no go anyways.</p>
-<p>Think back to the tasks we are performing on our <tt class="docutils literal"><span class="pre">Post</span></tt> entity:</p>
+<p>Think back to the tasks we are performing on our <span class="docutils literal"><span class="pre">Post</span></span> entity:</p>
 <ul class="simple">
 <li>Edit (title, body, tags)</li>
 <li>Publish (publishDate)</li>
@@ -312,60 +306,36 @@ please leave comments when leaving this website :-)</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -376,6 +346,11 @@ please leave comments when leaving this website :-)</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>

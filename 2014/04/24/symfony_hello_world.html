@@ -1,0 +1,305 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Symfony2: A Simple Hello World &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="SOAP and PHP in 2014" href="../../01/31/soap_and_php_in_2014.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2014-04-24-symfony_hello_world">
+            
+            
+    <div class="timestamp postmeta">
+            <span>April 24, 2014</span>
+        </div>
+
+    <div class="section" id="symfony2-a-simple-hello-world">
+<h1>Symfony2: A Simple Hello World</h1>
+<p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
+I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
+to start with a very simple &#8220;Hello World&#8221; example.</p>
+<p>The Symfony2 Standard Edition already contains a huge burden of concepts,
+assumptions and conventions that can be confusing for a beginner.</p>
+<ul class="simple">
+<li>YAML</li>
+<li>Twig</li>
+<li>Environments and Dependency Injection Container</li>
+<li>Various weird and magic syntaxes for bundles, <span class="docutils literal"><span class="pre">_controller</span></span> and template names</li>
+<li>Various files to open and poke around in</li>
+<li>Composer</li>
+<li>Maybe even Doctrine</li>
+</ul>
+<p>As a trainer it is very hard to explain all this at the same time.
+It makes a lot of sense to avoid as many of them as possible.</p>
+<p>That is why the Standard Edition is not the best way to start teaching Symfony,
+but one should actually consider a much lighter version of the framework and
+then gradually add more and more features until you end up with the standard
+edition.</p>
+<p>Fabien discussed the simplification of the Symfony Standard Edition from
+another angle before, considering the minimum necessary code to use when
+reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">&#8220;Packing a Symfony Full-Stack Application in
+one file&#8221;</a>.</p>
+<p>This blog post is about a truely minimal Symfony edition to start learning
+about the framework.  The first thing I like to show is a really simple Hello
+World controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Response</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What is the necessary framework glue code to support this Hello World? Lets start
+from the index file <cite>web/index.php</cite>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../vendor/autoload.php&quot;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../app/AppKernel.php&quot;</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
+<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="s1">&#39;dev&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
+at them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">{</span>
+<span class="x">    &quot;require&quot;: {</span>
+<span class="x">        &quot;symfony/symfony&quot;: &quot;@stable&quot;</span>
+<span class="x">    },</span>
+<span class="x">    &quot;autoload&quot;: {</span>
+<span class="x">        &quot;psr-0&quot;: { &quot;Acme&quot;: &quot;src/&quot; }</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The <cite>composer.json</cite> file installs the latest stable Symfony release and
+adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
+<p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
+and the minimal version of this looks like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">&#39;framework&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;secret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;some secret here&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;router&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;%kernel.root_dir%/config/routing.yml&#39;</span>
+                <span class="p">),</span>
+                <span class="s1">&#39;templating&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;engines&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;twig&#39;</span><span class="p">))</span>
+            <span class="p">));</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In trainings we are starting with a single <span class="docutils literal"><span class="pre">config.yml</span></span> file but that is
+technically not necessary by using the <span class="docutils literal"><span class="pre">ClosureLoader</span></span>. The routing
+component has no such closure loader, so its not possible to avoid
+YAML in the first minutes of Symfony2 exposure and we reference
+the <cite>app/config/routing.yml</cite>:</p>
+<p>Did you know that you can specify controllers in Symfony by using the static callback
+syntax? It has disadvantages when considering bundle inheritance, but why
+bother a beginner with this feature and confuse him with the convention of
+<span class="docutils literal"><span class="pre">&quot;AcmeTrainingBundle:Hello:hello&quot;</span></span>.</p>
+<p>There are still lots of trip wires to stumble upon in this simple piece of <span class="docutils literal"><span class="pre">routing.yml</span></span>:</p>
+<ul class="simple">
+<li>Tabs are not allowed in YAML, in every training at least one person gets
+bitten by that.</li>
+<li>2 vs 4 spaces ambiguity.</li>
+<li>What is this magic <span class="docutils literal"><span class="pre">_controller</span></span> key?</li>
+<li>I carefully avoid the <span class="docutils literal"><span class="pre">{}</span></span> inline syntax of YAML here as well as it
+introduces yet another ambiguity.</li>
+</ul>
+<p>Run this application with the build in webserver:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 web/index.php
+</pre></div>
+</div>
+<p>Hello World!</p>
+<p>The next step for a beginner is his first twig template to print the Hello
+World. To avoid another confusing convention at the beginning, the <span class="docutils literal"><span class="pre">&quot;AcmeTrainingBundle:Hello:hello.html.twig&quot;</span></span>
+template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
+that is automatically registered in the Twig Bundle. Just create
+a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;hello.html.twig&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The total number of files is 5 (6 with template) for this example. Note that we
+haven&#8217;t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
+the static syntax we don&#8217;t need it.</p>
+<p>This is a very good starting point to start exploring more features of Symfony
+and gradually add the required configuration and files for this.</p>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2014/04/24/symfony_hello_world.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h3>Recent Posts</h3>
+    <ul><li>
+            <a href="#">Symfony2: A Simple Hello World</a>
+        </li><li>
+            <a href="../../01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
+        </li><li>
+            <a href="../../01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li><li>
+            <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li><li>
+            <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li><li>
+            <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li><li>
+            <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li><li>
+            <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li><li>
+            <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
+        </li><li>
+            <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

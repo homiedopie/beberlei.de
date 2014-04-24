@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Trying a Two Step PEAR/PHAR approach to develop and deploy &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Trying a Two Step PEAR/PHAR approach to develop and deploy &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="PHP CodeSniffer Support for Netbeans" href="../../07/30/php-codesniffer-support-for-netbeans.html" /><link rel="prev" title="PHP CodeSniffer for Netbeans v0.2" href="../../10/05/php-codesniffer-for-netbeans-v0-2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="PHP CodeSniffer Support for Netbeans" href="../../07/30/php-codesniffer-support-for-netbeans.html" />
-    <link rel="prev" title="PHP CodeSniffer for Netbeans v0.2" href="../../10/05/php-codesniffer-for-netbeans-v0-2.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,32 +62,18 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2009-12-19-trying-a-two-step-pear-phar-approach-to-develop-and-deploy">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../../10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a>
-            </li>
-            <li class="right">
-                <a href="../../07/30/php-codesniffer-support-for-netbeans.html">PHP CodeSniffer Support for Netbeans</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2009-12-19 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>December 19, 2009</span>
         </div>
+
     <div class="section" id="trying-a-two-step-pear-phar-approach-to-develop-and-deploy">
 <h1>Trying a Two Step PEAR/PHAR approach to develop and deploy</h1>
 <p>With PHP 5.3 the PHAR extension is a pretty powerful concept for all
@@ -96,9 +90,10 @@ scenario, so please bear with me and add all the feedback and comments
 you can come up with. I tested this with the ongoing rewrite of my blog
 software.</p>
 <p>First we&#8217;ll add a new user that we develop our application with:</p>
-<div class="highlight-python"><pre>sudo useradd -m -g www-data whitewashing
+<div class="highlight-python"><div class="highlight"><pre>sudo useradd -m -g www-data whitewashing
 sudo passwd whitewashing
-su - whitewashing</pre>
+su - whitewashing
+</pre></div>
 </div>
 <p>Now there is the possibility that with this user PHP and PEAR is not in
 your $PATH environment, so you might have to add it. In my case on Ubuntu
@@ -110,10 +105,11 @@ directory into the main folder.</p>
 <p>But first we create a folder for our application, and create a Zend
 Framework project in the subfolder &#8220;trunk&#8221;, which will be the focus of
 our development.</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ mkdir whitewashing
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ mkdir whitewashing
 whitewashing@desktop:~$ zf create project whitewashing/trunk
 Creating project at /home/whitewashing/whitewashing/trunk
-whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor</pre>
+whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor
+</pre></div>
 </div>
 <p>Now we can configure an Apache virtual host to point to our
 /home/whitewashing/whitewashing/public directory, i call this
@@ -121,9 +117,10 @@ whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor</pre>
 project page.</p>
 <p>We then configure our PEAR installation for the specific application
 user and re-configure the bin and php library paths:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
 whitewashing@desktop:~$ pear config-set php_dir /home/whitewashing/whitewashing/trunk/vendor
-whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/trunk/bin</pre>
+whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/trunk/bin
+</pre></div>
 </div>
 <p>This configuration assumes that we will install all our stuff into our
 development trunk. From there also the PEAR installed libraries might be
@@ -132,16 +129,17 @@ web-files will still be put by default under $HOME/pear/*. We don&#8217;t
 need them for our applications.</p>
 <p>Now we install all the dependencies our project needs, in this case Zend
 Framework, Doctrine 2, HTML Purifier:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
 whitewashing@desktop:~$ pear install zfcampus/zf-alpha
 whitewashing@desktop:~$ pear channel-discover htmlpurifier.org
 whitewashing@desktop:~$ pear install hp/HTMLPurifier
 whitewashing@desktop:~$ pear channel-discover pear.phpdoctrine.org
-whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0</pre>
+whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0
+</pre></div>
 </div>
 <p>Now we have all three of the packages installed in our project folder
 <cite>whitewashing/trunk/vendor</cite>, see:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
 total 680
 drwxr-xr-x  7 whitewashing www-data   4096 2009-12-13 14:45 ./
 drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:36 ../
@@ -161,17 +159,19 @@ drwxr-xr-x 20 whitewashing www-data   4096 2009-12-13 14:39 HTMLPurifier/
 -rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .lock
 drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:43 .registry/
 drwxr-xr-x 59 whitewashing www-data   4096 2009-12-13 14:36 Zend/
--rw-r--r--  1 whitewashing www-data  19537 2009-12-13 14:36 zf.php</pre>
+-rw-r--r--  1 whitewashing www-data  19537 2009-12-13 14:36 zf.php
+</pre></div>
 </div>
 <p>And both Doctrine and ZF registered their binary CLi tools inside the
 <cite>whitewashing/trunk/bin/</cite> folder:</p>
-<div class="highlight-python"><pre>whitewashing@desktop:~$ ls -aFl bin/
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ ls -aFl bin/
 total 20
 drwxr-xr-x 2 whitewashing www-data 4096 2009-12-13 14:45 ./
 drwxr-xr-x 8 whitewashing www-data 4096 2009-12-13 14:36 ../
 -rwxr-xr-x 1 whitewashing www-data   50 2009-12-13 14:45 doctrine*
 -rwxr-xr-x 1 whitewashing www-data  169 2009-12-13 14:45 doctrine.php*
--rwxr-xr-x 1 whitewashing www-data 1511 2009-12-13 14:36 zf*</pre>
+-rwxr-xr-x 1 whitewashing www-data 1511 2009-12-13 14:36 zf*
+</pre></div>
 </div>
 <p>We now have the full control over the versions of our dependencies, we
 can call &#8220;pear upgrade &#8221; whenever we want to update one of the ZF,
@@ -206,7 +206,7 @@ outside into the PHAR context. This is a powerful feature that is
 required to distribute configurable applications like our blog.</p>
 <p>This screenshot shows how the application is currently structured in
 development mode. In production its structure should look like:</p>
-<div class="highlight-python"><pre>whitewashing
+<div class="highlight-python"><div class="highlight"><pre>whitewashing
 |--application
 |  |--configs
 |     |-- my application config files are all here...
@@ -215,15 +215,17 @@ development mode. In production its structure should look like:</p>
 |--public
 |  |--index.php
 |  |--.htaccess
-|--whitewashing.phar</pre>
+|--whitewashing.phar
+</pre></div>
 </div>
 <p>The whitewashing.php and index.php files are the application entry
 points that only include the phar file and trigger the application
 bootstrapping that will be included in the Stub file. They both look
 like:</p>
-<div class="highlight-python"><pre>&lt;?php
-define('EXTERNAL_APPLICATION_ROOT', __DIR__."/../");
-include EXTERNAL_APPLICATION_ROOT."/whitewashing.phar";</pre>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+define(&#39;EXTERNAL_APPLICATION_ROOT&#39;, __DIR__.&quot;/../&quot;);
+include EXTERNAL_APPLICATION_ROOT.&quot;/whitewashing.phar&quot;;
+</pre></div>
 </div>
 <p>Including a PHAR file essentially has two consequences:</p>
 <ul class="simple">
@@ -231,26 +233,27 @@ include EXTERNAL_APPLICATION_ROOT."/whitewashing.phar";</pre>
 <li>The stub file will be executed.</li>
 </ul>
 <p>Our application stub looks like this:</p>
-<div class="highlight-python"><pre>&lt;?php
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
 
-if(defined('EXTERNAL_APPLICATION_ROOT')) {
+if(defined(&#39;EXTERNAL_APPLICATION_ROOT&#39;)) {
     // Mount the external application/configs directory as config if it exists.
-    if (file_exists(EXTERNAL_APPLICATION_ROOT."/application/configs")) {
-        Phar::mount("application/configs", EXTERNAL_APPLICATION_ROOT."/application/configs");
+    if (file_exists(EXTERNAL_APPLICATION_ROOT.&quot;/application/configs&quot;)) {
+        Phar::mount(&quot;application/configs&quot;, EXTERNAL_APPLICATION_ROOT.&quot;/application/configs&quot;);
     }
 }
 
 /** Zend_Loader_Autoloader */
-require_once 'Zend/Loader/Autoloader.php';
+require_once &#39;Zend/Loader/Autoloader.php&#39;;
 $autoloader = Zend_Loader_Autoloader::getInstance();
 
-if (php_sapi_name() == "cli") {
-    require_once 'bin/whitewashing.php';
+if (php_sapi_name() == &quot;cli&quot;) {
+    require_once &#39;bin/whitewashing.php&#39;;
 } else {
-    require_once 'public/index.php';
+    require_once &#39;public/index.php&#39;;
 }
 
-__HALT_COMPILER();</pre>
+__HALT_COMPILER();
+</pre></div>
 </div>
 <p>The first bit of the stub mounts the external application configs
 directory into the stub and hides possible directories that are present
@@ -260,7 +263,7 @@ the configuration files to fit the application to his need.</p>
 <p>The second bit loads Zend Framework Autoloader that is required by the
 bootstrapping mechanism. The third bit decides whether this request is
 executed from the CLI- or the Web-Entry point of the application. The
-fourth bit, <tt class="docutils literal"><span class="pre">__HALT_COMPILER();</span></tt> is a technically required call inside
+fourth bit, <span class="docutils literal"><span class="pre">__HALT_COMPILER();</span></span> is a technically required call inside
 your stub-file.</p>
 <p>Now that we have a stub-file for our application, we can package it and
 distribute it. I am using a modified version of Cal Evans example for
@@ -310,60 +313,36 @@ you could make use of symlinks.</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../../2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -374,6 +353,11 @@ you could make use of symlinks.</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>

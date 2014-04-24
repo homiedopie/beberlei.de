@@ -1,40 +1,48 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Speedup Symfony2 on Vagrant boxes &mdash; Whitewashing</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Speedup Symfony2 on Vagrant boxes &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Your Service Layer benefits from a Dispatcher" href="../09/your_service_layer_benefits_from_a_dispatcher.html" /><link rel="prev" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.2',
+        VERSION:     '1.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/disqus.js"></script>
-    <script type="text/javascript" src="../../../_static/ga.js"></script>
-    <link rel="shortcut icon" href="../../../_static/tinkerer.ico"/>
-    
-    <link rel="top" title="Whitewashing" href="../../../index.html" />
-    <link rel="next" title="Your Service Layer benefits from a Dispatcher" href="../09/your_service_layer_benefits_from_a_dispatcher.html" />
-    <link rel="prev" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /> 
-  </head>
-  <body>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
 <div class="container">
     <div id="header" class="span-8">
         <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
@@ -54,32 +62,18 @@
     </div>
 </div>
 
-
-
-    <div class="document">
+<div class="main-container">
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
           <div id="2013-08-19-speedup_symfony2_on_vagrant_boxes">
             
             
-    
-    <div class="related">
-        <ul>
-            <li>
-                 &laquo; <a href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-            </li>
-            <li class="right">
-                <a href="../09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a> &raquo; 
-            </li>
-        </ul>
-    </div>
-    
-        <div class="timestamp postmeta">
-            <span>2013-08-19 00:00:00</span> 
+    <div class="timestamp postmeta">
+            <span>August 19, 2013</span>
         </div>
+
     <div class="section" id="speedup-symfony2-on-vagrant-boxes">
 <h1>Speedup Symfony2 on Vagrant boxes</h1>
 <ul class="simple">
@@ -104,30 +98,30 @@ Symfony, because of the large number of files.)</li>
 </ul>
 <p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
 related to the huge number of files that a Symfony project normally ships with
-and the I/O that is generated from <tt class="docutils literal"><span class="pre">filemtime</span></tt> calls to check if the
+and the I/O that is generated from <span class="docutils literal"><span class="pre">filemtime</span></span> calls to check if the
 configuration files have changed.</p>
 <p>This is just a small part, there are other bottlenecks that I have found after
 finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
 <ol class="arabic simple">
-<li>Monolog logs to the NFS share and the huge number <tt class="docutils literal"><span class="pre">fwrite</span></tt> take their toll.</li>
-<li>Writing compiled Twig templates to the NFS share using <tt class="docutils literal"><span class="pre">file_put_contents</span></tt>.</li>
+<li>Monolog logs to the NFS share and the huge number <span class="docutils literal"><span class="pre">fwrite</span></span> take their toll.</li>
+<li>Writing compiled Twig templates to the NFS share using <span class="docutils literal"><span class="pre">file_put_contents</span></span>.</li>
 <li>Assetic: Scanning for stylesheets and javascripts within templates is very
 slow, causing lots of I/O on the NFS share and CPU and changing it to using
-explicit bundling in the <tt class="docutils literal"><span class="pre">app/config/config.yml</span></tt> helps alot. You can use a
+explicit bundling in the <span class="docutils literal"><span class="pre">app/config/config.yml</span></span> helps alot. You can use a
 cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
 a <cite>&#8211;watch</cite> flag in the background.</li>
 <li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
-<li><tt class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></tt> in Symfony DIC uses a set of
+<li><span class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></span> in Symfony DIC uses a set of
 recursive algorithms to replace aliases with the real services. That takes a
 huge amount of time in bigger applications including amounting calls to methods
 inside the pass over 100.000 times.</li>
 </ol>
 <p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
 To fix this just change the cache <strong>AND</strong> the log directory to
-<tt class="docutils literal"><span class="pre">sys_get_temp_dir()</span></tt> or shared memory (/dev/shm) instead of writing to the
+<span class="docutils literal"><span class="pre">sys_get_temp_dir()</span></span> or shared memory (/dev/shm) instead of writing to the
 NFS share. I actually tried this before, but since I forgot the log directory,
 this felt equally slow and I reverted the change.</p>
-<p>Here is the code you should add to your <tt class="docutils literal"><span class="pre">AppKernel</span></tt> to give you a
+<p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
 considerable performance boost on a Vagrant box:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
@@ -188,60 +182,36 @@ you wan&#8217;t to suffer.</p>
       </div>
     </div>
 
-    <div class="span-24 last">
-        
-          
-            <div class="yui-b" id="sidebar">
-              
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-<div class="widget">
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h3>Recent Posts</h3>
-    <ul>
-        <li class="recent_post">
+    <ul><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
             <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../12/31/2013_and_2014.html">2013 and 2014</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="#">Speedup Symfony2 on Vagrant boxes</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li>
-        <li class="recent_post">
+        </li><li>
             <a href="../../07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
-        </li>
-        <li class="recent_post">
-            <a href="../../06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a>
-        </li>
-    </ul>
+        </li></ul>
 </div>
-
-        </div>
-      </div>
-            </div> 
-          
-        
-    </div>
+</section>
+          </aside></div>
 </div>
+</div> <!-- #main-container -->
 
-      <div class="clearer"></div>
-    </div>
+        <div class="footer-container">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">
@@ -252,6 +222,11 @@ you wan&#8217;t to suffer.</p>
         </div>
     </div>
 </div>
+</div> <!-- footer-container -->
 
-  </body>
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
 </html>
