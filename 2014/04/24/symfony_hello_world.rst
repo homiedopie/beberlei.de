@@ -123,7 +123,7 @@ component has no such closure loader, so its not possible to avoid
 YAML in the first minutes of Symfony2 exposure and we reference
 the `app/config/routing.yml`:
 
-.. code-block: yaml
+.. code-block:: yaml
 
     hello:
       pattern: /
