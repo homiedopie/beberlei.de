@@ -1,4 +1,4 @@
-{% extends "tinkerbase/layout.html" %}
+{% extends "boilerplate/layout.html" %}
 
 {% block header %}
 <div class="container">
@@ -19,12 +19,13 @@
         </p>
     </div>
 </div>
-
 {% endblock %}
 
-{% block document %}
+{% block navigation %}
+{% endblock %}
+
+{% block content %}
 <div class="container">
-    
     <div class="span-24 content">
       <div>
         <div>
@@ -49,18 +50,23 @@
       </div>
     </div>
 
-    <div class="span-24 last">
-        {% block sidebarwrapper %}
-          {% if pagename != 'index' %}
-            <div class="yui-b" id="sidebar">
-              {{ sidebar() }}
-              {%- if last_updated %}
-                <h3>Last update:</h3>
-                <p class="topless">{{ last_updated }}</p>
-              {%- endif %}
-            </div> 
-          {% endif %}
-        {% endblock %}
+    <div class="span-24 last" style="margin-top: 20px">
+        {%- if render_sidebar -%}
+          <aside class="yui-b" id="sidebar" class="sidebar">
+            {%- if sidebars != None -%}
+              {%- for sidebartemplate in sidebars -%}
+              <section>
+                {%- include sidebartemplate -%}
+              </section>
+              {%- endfor -%}
+            {%- endif -%}
+
+            {%- if last_updated %}
+              <h3>Last update:</h3>
+              <p class="topless">{{ last_updated }}</p>
+            {%- endif %}
+          </aside>
+        {%- endif -%}
     </div>
 </div>
 {% endblock %}
@@ -82,9 +88,3 @@
     </div>
 </div>
 {% endblock %}
-
-{# Empty some default blocks out #}
-{% block relbar1 %}{% endblock %}
-{% block relbar2 %}{% endblock %}
-{% block sidebar1 %}{% endblock %}
-{% block sidebar2 %}{% endblock %}
