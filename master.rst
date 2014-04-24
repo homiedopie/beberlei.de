@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2014/04/24/symfony_hello_world
    2014/04/15/symfony_hello_world
    2014/01/31/soap_and_php_in_2014
    2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions
