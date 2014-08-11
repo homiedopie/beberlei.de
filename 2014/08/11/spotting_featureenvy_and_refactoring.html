@@ -76,8 +76,8 @@
 
     <div class="section" id="spotting-featureenvy-and-refactoring">
 <h1>Spotting FeatureEnvy and Refactoring</h1>
-<p>I was following [Aki&#8217;s](<a class="reference external" href="http://twitter.com/rinkkasatiainen">http://twitter.com/rinkkasatiainen</a>) on the
-[SoCraTes2014](<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">https://www.softwerkskammer.org/activities/socrates-2014</a>)
+<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki&#8217;s</a> on the
+<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
 conference last week about Legacy Code and Refactoring. In the session a piece
 of real-world code was shown that contained one of most common code smells in
 LegacyCode: Feature Envy.</p>
@@ -89,7 +89,7 @@ data.&#8221;</p>
 <li>Duplication of rules related to their data throughout the code base.</li>
 <li>Spreading domain concepts throughout the whole code-base.</li>
 </ul>
-<p>A simple example can show this problem with <cite>DateTime</cite> is wide-spread in many
+<p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
 PHP projects. We often see code such as the following computation to
 create a range of dates for a reporting function:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
@@ -110,7 +110,7 @@ create a range of dates for a reporting function:</p>
 <p>This is a really simple example for Feature Envy: The computation and
 validation of creating an end date some days in the future of a start date
 can easily be duplicated throughout the whole code base and implements
-business rules that belong to the class <cite>DateTime</cite> itself:</p>
+business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">DateTime</span>
