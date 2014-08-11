@@ -5,8 +5,93 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Thu, 24 Apr 2014 00:00:00 +0200</pubDate>
+        <pubDate>Mon, 11 Aug 2014 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>http://www.whitewashing.de/2014/08/11/spotting_featureenvy_and_refactoring.html</link>
+            <guid>http://www.whitewashing.de/2014/08/11/spotting_featureenvy_and_refactoring.html</guid>
+            <title><![CDATA[Spotting FeatureEnvy and Refactoring]]></title>
+            <description><![CDATA[<div class="section" id="spotting-featureenvy-and-refactoring">
+<h1>Spotting FeatureEnvy and Refactoring</h1>
+<p>I was following [Aki’s](<a class="reference external" href="http://twitter.com/rinkkasatiainen">http://twitter.com/rinkkasatiainen</a>) on the
+[SoCraTes2014](<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">https://www.softwerkskammer.org/activities/socrates-2014</a>)
+conference last week about Legacy Code and Refactoring. In the session a piece
+of real-world code was shown that contained one of most common code smells in
+LegacyCode: Feature Envy.</p>
+<p>Martin Fowler describes this smell as “a method that seems more interested in
+a class other than the one it is in. The most common focus of the envy is the
+data.”</p>
+<p>This code smell causes two very similar problems in a code base:</p>
+<ul class="simple">
+<li>Duplication of rules related to their data throughout the code base.</li>
+<li>Spreading domain concepts throughout the whole code-base.</li>
+</ul>
+<p>A simple example can show this problem with <cite>DateTime</cite> is wide-spread in many
+PHP projects. We often see code such as the following computation to
+create a range of dates for a reporting function:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$start</span><span class="p">;</span>
+    <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
+
+    <span class="c1">// calculation code here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a really simple example for Feature Envy: The computation and
+validation of creating an end date some days in the future of a start date
+can easily be duplicated throughout the whole code base and implements
+business rules that belong to the class <cite>DateTime</cite> itself:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">DateTime</span>
+<span class="p">{</span>
+    <span class="c1">// ... other methods</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+        <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$endDate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$endDate</span> <span class="o">=</span> <span class="nv">$start</span><span class="o">-&gt;</span><span class="na">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+
+    <span class="c1">// calculation code here.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>(Note: You cant extend the builtin DateTime this way and need to subclass).</p>
+<p>This is a great way to improve your code base massively and achieve what
+Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
+domain by encapsulating data and behavior.</p>
+<p>Learning to spot this kind of FeatureEnvy is a very good way to incrementally
+improve your legacy code base towards better models. I find it very interesting
+that the focus on fixing technical code-smells duplication and feature envy
+actually leads to a better domain model. As a side effect it massively
+deemphasizes DDD building blocks like Entity or Value Object, which in my
+opinion are a big cause for confusion. Testability increases as well, because
+data objects with behavior are much simpler to setup for testing.</p>
+<p>That is why I recommend learning about FeatureEnvy. For me it is a very simple
+approach to find improvements.</p>
+</div>]]></description>
+             <pubDate>Mon, 11 Aug 2014 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>http://www.whitewashing.de/2014/04/24/symfony_hello_world.html</link>
             <guid>http://www.whitewashing.de/2014/04/24/symfony_hello_world.html</guid>

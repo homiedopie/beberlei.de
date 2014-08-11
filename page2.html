@@ -70,6 +70,235 @@
           <div id="page2">
             
             <div class="timestamp postmeta">
+            <span>July 24, 2013</span>
+        </div>
+        <div class="section" id="doctrine-and-domain-events">
+<h1><a href="2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a></h1>
+<p>I have written about the <a class="reference external" href="/2012/08/25/decoupling_applications_with_domain_events.html">Domain Event Pattern</a> before and want
+to focus on this pattern again by explaining its integration into the Doctrine
+ORM on a very technical level.</p>
+<p>The Domain Event Pattern allows to attach events to entities and dispatch them
+to event listeners only when the transaction of the entity was successfully
+executed. This has several benefits over traditional event dispatching
+approaches:</p>
+<ul class="simple">
+<li>Puts focus on the behavior in the domain and what changes the domain
+triggers.</li>
+<li>Promotes decoupling in a very simple way</li>
+<li>No reference to the event dispatcher and all the listeners required except in
+the Doctrine UnitOfWork.</li>
+<li>No need to use unexplicit Doctrine Lifecycle events that are triggered on all
+update operations.</li>
+</ul>
+<p>This blog post will introduce a very simple implementation for Domain Events
+with Doctrine2. You should be able to easily extend it to be more flexible,
+reliable or optionally even asynchronuous. I skip some of the glue code in this blog post,
+but you can try the full code by checking out <a class="reference external" href="https://gist.github.com/beberlei/53cd6580d87b1f5cd9ca">this Gist</a> and running
+<span class="docutils literal"><span class="pre">composer</span> <span class="pre">install</span></span> and then <span class="docutils literal"><span class="pre">php</span> <span class="pre">domain_events.php</span></span>.</p>
+<p>Lets look at the following entity, an <span class="docutils literal"><span class="pre">InventoryItem</span></span> tracking the number
+we have this item in stock:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Domain</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">MyProject\DomainSuperTypes\AggregateRoot</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Entity</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">InventoryItem</span> <span class="k">extends</span> <span class="nx">AggregateRoot</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Id @GeneratedValue @Column(type=&quot;integer&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$id</span><span class="p">;</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Column</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$name</span><span class="p">;</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Column(type=&quot;integer&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="s1">'InventoryItemCreated'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">checkIn</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">counter</span> <span class="o">+=</span> <span class="nv">$count</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="s1">'ItemsCheckedIntoInventory'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'count'</span> <span class="o">=&gt;</span> <span class="nv">$count</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We want this entity to raise two domain events using the <span class="docutils literal"><span class="pre">raise($eventName,</span>
+<span class="pre">array</span> <span class="pre">$properties)</span></span> method.  Our preferred use case for this code looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$item</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InventoryItem</span><span class="p">(</span><span class="s1">'Cookies'</span><span class="p">);</span>
+<span class="nv">$item</span><span class="o">-&gt;</span><span class="na">checkIn</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$item</span><span class="p">);</span>
+<span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span> <span class="c1">// fire events here</span>
+</pre></div>
+</div>
+<p>One or many listeners should react to the events being fired, for example print their contents to the screen:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">EchoInventoryListener</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onInventoryItemCreated</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;New item created with name %s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onItemsCheckedIntoInventory</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;There were %d new items checked into inventory</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As the first building block, we need a <a class="reference external" href="http://martinfowler.com/eaaCatalog/layerSupertype.html">Layer Supertype</a> for our entities,
+called <span class="docutils literal"><span class="pre">AggregateRoot</span></span> adding the event raising capabilities to all entities that need it:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\DomainSuperTypes</span><span class="p">;</span>
+
+<span class="k">abstract</span> <span class="k">class</span> <span class="nc">AggregateRoot</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$events</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">popEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">events</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">events</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nv">$eventName</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$properties</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">events</span><span class="p">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DomainEvent</span><span class="p">(</span><span class="nv">$eventName</span><span class="p">,</span> <span class="nv">$properties</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This class allows us to add events to an entity using <span class="docutils literal"><span class="pre">raise()</span></span> as we have
+seen in the <span class="docutils literal"><span class="pre">InventoryItem</span></span> entity before.</p>
+<p>Now we need Doctrine to process the events during a transaction (<span class="docutils literal"><span class="pre">flush()</span></span>).
+We do this by keeping all entities with domain events, and then triggering
+the domain events after the transaction has completed. This is a vital part
+of the domain events pattern, because it guarantees every listener that the
+state leading to the event is already in the database.</p>
+<p>Technically we implement this with a Doctrine EventListener that listeners for
+the <span class="docutils literal"><span class="pre">postFlush</span></span>, <span class="docutils literal"><span class="pre">postPersist</span></span>, <span class="docutils literal"><span class="pre">postUpdate</span></span> and <span class="docutils literal"><span class="pre">postRemove</span></span> events:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\DomainEvents</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">MyProject\DomainSuperTypes\AggregateRoot</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">DomainEventListener</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$entities</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">postPersist</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">keepAggregateRoots</span><span class="p">(</span><span class="nv">$event</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">postUpdate</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">keepAggregateRoots</span><span class="p">(</span><span class="nv">$event</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">postRemove</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">keepAggregateRoots</span><span class="p">(</span><span class="nv">$event</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">postFlush</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$entityManager</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getEntityManager</span><span class="p">();</span>
+        <span class="nv">$evm</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">();</span>
+
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entities</span> <span class="k">as</span> <span class="nv">$entity</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$class</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">(</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$entity</span><span class="p">));</span>
+
+            <span class="k">foreach</span> <span class="p">(</span><span class="nv">$entity</span><span class="o">-&gt;</span><span class="na">popEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">setAggregate</span><span class="p">(</span><span class="nv">$class</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">,</span> <span class="nv">$class</span><span class="o">-&gt;</span><span class="na">getSingleIdReflectionProperty</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">(</span><span class="nv">$entity</span><span class="p">));</span>
+                <span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">dispatchEvent</span><span class="p">(</span><span class="s2">&quot;on&quot;</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">(),</span> <span class="nv">$event</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entities</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">function</span> <span class="nf">keepAggregateRoots</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$entity</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getEntity</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nv">$entity</span> <span class="nx">instanceof</span> <span class="nx">AggregateRoot</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entities</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$entity</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we only need to put this code together with Doctrine to get it working:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$evm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">();</span>
+<span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">addEventListener</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">'postInsert'</span><span class="p">,</span> <span class="s1">'postUpdate'</span><span class="p">,</span> <span class="s1">'postRemove'</span><span class="p">,</span> <span class="s1">'postFlush'</span><span class="p">),</span>
+    <span class="k">new</span> <span class="nx">DomainEventListener</span><span class="p">()</span>
+<span class="p">);</span>
+<span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">addEventListener</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">'onInventoryItemCreated'</span><span class="p">,</span> <span class="s1">'onItemsCheckedIntoInventory'</span><span class="p">),</span>
+    <span class="k">new</span> <span class="nx">EchoInventoryListener</span>
+<span class="p">);</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="cm">/* data */</span><span class="p">);</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Configuration</span><span class="p">();</span>
+<span class="nv">$entityManager</span> <span class="o">=</span> <span class="nx">EntityManager</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$config</span><span class="p">,</span> <span class="nv">$evm</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now the example from above, creating and checking in inventory items
+will trigger the <span class="docutils literal"><span class="pre">EchoInventoryListener</span></span> and print the data to the screen.</p>
+<p>This example is very simple but shows how you can incorporate Domain Events into
+your Doctrine projects. The following improvements can be made if necessary:</p>
+<ul class="simple">
+<li>Use a base EventSubscriber for the Domain Listeners, that automatically
+registers all the domain event listener methods. This way you don’t have
+to manually list them when calling <span class="docutils literal"><span class="pre">$evm-&gt;addListener()</span></span>.</li>
+<li>Implement one class for every domain event, allowing to typehint the events
+in listeners, with much more helpful information about the contained data.</li>
+<li>If you prefer asynchroneous processing, serialize the events into a
+<cite>domain_events</cite> table instead of triggering the events directly.
+Add a daemon to your project that tails the table and triggers the events
+in the background.</li>
+</ul>
+<p>I hope this blog post helps you when considering to use Domain Events Pattern with
+Doctrine. Again, <a class="reference external" href="https://gist.github.com/beberlei/53cd6580d87b1f5cd9ca">see the code on this Gist</a> for a working example.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/php.html">PHP</a>, <a href="tags/doctrine.html">Doctrine</a>, <a href="tags/domainevents.html">DomainEvents</a>, <a href="tags/patterns.html">Patterns</a></span>
+        </div>
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html#disqus_thread" data-disqus-identifier="2013/07/24/doctrine_and_domainevents">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>June 27, 2013</span>
         </div>
         <div class="section" id="extending-symfony2-controller-utilities">
@@ -1496,84 +1725,6 @@ Doctrine to make this possible.</p>
         </div>
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html#disqus_thread" data-disqus-identifier="2013/02/04/doctrine_and_solid">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 19, 2012</span>
-        </div>
-        <div class="section" id="composer-and-azure-websites-git-deployment">
-<h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
-<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com">Fortrabbit</a>), I turn to Microsoft Azure today. After some
-research I found out Azure supports post deployment hooks to run
-Composer and allows you to configure environment variables from the Management
-console.</p>
-<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites">Azure Websites</a> in June this
-year.  It is a platform as a service solution where you can deploy your
-websites via FTP or Git. With Azure Websites you can avoid having to deal with
-the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services">Azure Hosted Cloud
-Services</a>.
-As long as your website only requires an SQLServer, MySQL or external APIs you
-can actually achieve quite a lot already.</p>
-<p>For a <a class="reference external" href="http://www.symfony.com">Symfony2</a>, <a class="reference external" href="http://www.silex-project.org">Silex</a> or any other modern project however you want
-<a class="reference external" href="http://www.getcomposer.org">Composer</a> support during the deployment as
-long as failures with Composer don’t break your site.</p>
-<p>It turns out that Azure Websites - to support other platforms that require
-compiling - actually has an extremely robust deployment system (as far as I
-understood its internals). The Git repository is separated from the actual code
-that is served from the webserver and a number of old checkouts is kept to
-allow rollbacks through the Web interface. Once a Git push was recognized,
-Azure websites will execute a build step, and then copy all the files over to a
-directory with the name of the Git SHA hash. This directory is then symlinked
-to the document root.</p>
-<p>If Composer fails during this step, the website will still be served from the
-currently running version and you don’t have to face unexpected downtime.</p>
-<p>To actually run Composer as a post-deployment tool you have to do some manual
-work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
-</pre></div>
-</div>
-<p>If you are using PHP 5.4, then you probably have to change the command version
-name to “v5.4”, but I haven’t tested this.</p>
-<p>Then you need to create the <span class="docutils literal"><span class="pre">build_azure.php</span></span> file that is referenced in the
-deployment command. The actual implementation is up to you, my version is
-the most simple one:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nv">$url</span> <span class="o">=</span> <span class="s1">'https://getcomposer.org/composer.phar'</span><span class="p">;</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
-<span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This currently only works with a Composer version, where
-<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
-You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
-<span class="docutils literal"><span class="pre">./bin/compile</span></span> to generate a composer.phar that works.</p>
-</div>
-<p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
-You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/azure.html">Azure</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html#disqus_thread" data-disqus-identifier="2012/11/19/composer_and_azure_websites_git_deployment">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1598,6 +1749,8 @@ You can of course execute additional steps in the <span class="docutils literal"
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting FeatureEnvy and Refactoring</a>
+        </li><li>
             <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
         </li><li>
             <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
@@ -1615,8 +1768,6 @@ You can of course execute additional steps in the <span class="docutils literal"
             <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
         </li><li>
             <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li><li>
-            <a href="2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
         </li></ul>
 </div>
 </section>

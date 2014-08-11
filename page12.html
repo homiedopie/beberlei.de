@@ -70,6 +70,134 @@
           <div id="page12">
             
             <div class="timestamp postmeta">
+            <span>December 30, 2008</span>
+        </div>
+        <div class="section" id="dependency-injection-with-php-introducing-sphicy">
+<h1><a href="2008/12/30/dependency-injection-with-php-introducing-sphicy.html">Dependency Injection with PHP: Introducing Sphicy</a></h1>
+<p>I have written <a class="reference external" href="http://www.whitewashing.de/blog/articles/101">on dependency
+injection</a> before
+christmas and how <a class="reference external" href="http://code.google.com/p/guice">Guice</a>, googles DI
+framework, offers a simple solution. I copied the functionality for a
+PHP clone of Guice and named it
+<a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a>. You saw an early prototype of
+it in the blogpost mentioned above.</p>
+<p><a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a> configures object dependencies
+with modules: You explicitly state which implementation should be bound
+to which interface. An injector then creates instances of these objects
+via reflection: All constructor dependencies are resolved by looking at
+the given type hints and initializes those according to the specified
+bindings.</p>
+<p>Two examples included in the <a class="reference external" href="http://www.beberlei.de/dev/svn/sphicy">source code of
+Sphicy</a> are <a class="reference external" href="http://framework.zend.com">Zend
+Framework</a> and
+<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a> MVC bootstrapping modules.
+Sadly both frameworks default front controllers are engineered in such a
+way that useful dependency injection needs some workarounds.</p>
+<p>As an example I will now discuss the Sphicy Module for Zend Framework
+MVC applications. To circumvent the singleton and protected Constructor
+of Zend_Controller_Front, we have to build a new front controller that
+wraps around it and requires all the dependencies:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class Sphicy_Controller_Front
+{
+    protected $front;
+
+    /**
+     * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
+     *
+     * @param Zend_Controller_Request_Abstract      $request
+     * @param Zend_Controller_Response_Abstract     $response
+     * @param Zend_Controller_Router_Interface      $router
+     * @param Zend_Controller_Dispatcher_Interface  $dispatcher
+     */
+    public function __construct(
+        Zend_Controller_Request_Abstract $request,
+        Zend_Controller_Response_Abstract $response,
+        Zend_Controller_Router_Interface $router,
+        Zend_Controller_Dispatcher_Interface $dispatcher=null
+    )
+    {
+        $front = Zend_Controller_Front::getInstance();
+        $front-&gt;setRequest($request);
+        $front-&gt;setResponse($response);
+        $front-&gt;setRouter($router);
+
+        if($dispatcher === null) {
+            $dispatcher = $front-&gt;getDispatcher();
+        }
+        $front-&gt;setDispatcher($dispatcher);
+    }
+
+    public function dispatch()
+    {
+        $this-&gt;front-&gt;dispatch();
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You can see that the <strong>Sphicy_Controller_Front</strong> class requires
+dependencies in its constructor that are then forward injected into
+<strong>Zend_Controller_Front</strong>. You can now create a module that binds all
+the required dependencies to concrete implementations, for example a
+module for a Zend MVC Http Application might look like:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class Sphicy_ZendMvc_ExampleModule implements spModule {
+     public function configure(spBinder $binder) {
+         // Sphicy_Controller_Front does not extend Zend_Controller_Front, because of Singletonitis
+         // It offers the dispatch method to proxy against Zend_Controller_Front::dispatch.
+         $binder-&gt;bind(&quot;Sphicy_Controller_Front&quot;)-&gt;to(&quot;Sphicy_Controller_Front&quot;);
+         $binder-&gt;bind(&quot;Zend_Controller_Request_Abstract&quot;)-&gt;to(&quot;Zend_Controller_Request_Http&quot;);
+         $binder-&gt;bind(&quot;Zend_Controller_Response_Abstract&quot;)-&gt;to(&quot;Zend_Controller_Response_Http&quot;);
+         // loads all routes
+         $binder-&gt;bind(&quot;Zend_Controller_Router_Interface&quot;)-&gt;to(&quot;MyApplication_Router&quot;);
+     }
+ }
+</pre></div>
+</div>
+</div></blockquote>
+<p>The class <strong>MyApplication_Router</strong> might look up all the routing
+information of the application via a hardcoded configuration mechanism.
+You may say this is a hard dependency, but actually you can just switch
+modules or implementations at this position to replace the router with
+another implementation. You can also see that no implementation for the
+dispatcher is bound. But this dependency is optional and will be created
+automatically as can be seen in the <strong>Sphicy_Controller_Front</strong> class.</p>
+<p>The front controllers is now created by calling:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$injector = new spDefaultInjector(new Sphicy_ZendMvc_ExampleModule());
+$front = $injector-&gt;getInstance(&quot;Sphicy_Controller_Front&quot;);
+$front-&gt;dispatch();
+</pre></div>
+</div>
+</div></blockquote>
+<p>What happens in the <strong>$injector-&gt;getInstance()</strong> line? Sphicy looks at
+<strong>Sphicy_Controller_Front</strong>‘s constructor and finds that four
+dependencies are needed: Request, Response, Router and Dispatcher
+implementations. It looks up the bindings and searches for them,
+creating Zend_Controller_Request_Http,
+Zend_Controller_Response_Http and MyApplication_Router objects. A
+dispatcher implementation is not found, but Sphicy recognizes that null
+is a valid paramater and injects it. The 3 concrete implementations and
+one null are instantiated and used to construct a valid
+<strong>Sphicy_Controller_Front</strong> instance.</p>
+<p>You have now stated the dependencies of the Zend Controller Front
+explicitly and can switch them instantaneously by switching the bindings
+of interface to implementations in the configuration module.</p>
+<p>Have a look at the <a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy Website</a> and
+<a class="reference external" href="http://www.beberlei.de/sphicy/documentation/faq.html">FAQ</a> to see
+more examples and information about the possibilites of this dependency
+injection framework.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/12/30/dependency-injection-with-php-introducing-sphicy.html#disqus_thread" data-disqus-identifier="2008/12/30/dependency-injection-with-php-introducing-sphicy">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>December 01, 2008</span>
         </div>
         <div class="section" id="zend-jquery-enhancements-ajax-forms-tooltip-and-autofill">
@@ -651,82 +779,6 @@ that nicely present the functionality.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/07/17/zf-jquery-helper-first-prototype-ready.html#disqus_thread" data-disqus-identifier="2008/07/17/zf-jquery-helper-first-prototype-ready">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 21, 2008</span>
-        </div>
-        <div class="section" id="zend-dojo-and-the-django-template-language">
-<h1><a href="2008/07/21/zend-dojo-and-the-django-template-language.html">Zend, Dojo and the Django Template Language</a></h1>
-<p>With the Zend Framework <a class="reference external" href="http://www.nabble.com/1.6-RC1-Schedule-tp18538148p18538148.html">nearing its 1.6
-release</a>
-and full <a class="reference external" href="http://www.dojotoolkit.org">Dojo Toolkit</a> support I took
-some time to look up what Dojo is actually capable of. I found the
-<a class="reference external" href="http://dojotoolkit.org/book/dojo-book-0-9/part-5-dojox/dojox-dtl">DojoX Django Template
-Language</a>
-extension and remembered my neighbor talking about why Python + Django
-is so much better than PHP with any other framework. So I digged into
-the <a class="reference external" href="http://www.djangoproject.com/documentation/templates_python">Django template
-language</a>
-and found that it is quite awesome.</p>
-<p>Variable filtering and evaluation looks almost like Smarty the syntax
-being {{var.key|filter1|filter2:”arg1”:”arg2”}}. The logical syntax is
-quite different though, taking an somehow object oriented view on
-templates you can extend an existing template and override specific
-parts with your more special implementation. Have a look at the
-following two snippets:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>This is an example of Django template inheritance:
-
-{% block helloworld %}Hello World!{% endblock %}
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre>{% extends &quot;base.html&quot; %}
-
-{%block helloworld %}Hello World for Object Oriented Views!{% endblock %}
-</pre></div>
-</div>
-</div></blockquote>
-<p>What does Django do with this second template when rendering? It
-realizes it inherits logic from a parent template and substitutes all
-special blocks for the parent ones. With a little object oriented
-background you can guess the result looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>This is an example of Django template inheritance:
-
-Hello World for Object Oriented Views!
-</pre></div>
-</div>
-</div></blockquote>
-<p>So what was all the talking about Dojo being able to parse this kind of
-templates? If you envision a helper component that would function like
-this: 1.) make an ajax request to $url 2.) retrieve json object from the
-controller 3.) render json object with $template into container
-$container. The helper would know that the template is needed in this
-HTML response and appends it to the Dojo Helper output. A link would be
-generated performing steps 1 and 2, handing over the json data to the
-template and render the output. What do you get? Templates that can be
-used Client and Server side.</p>
-<p>For example on rendering the view of your blog you can send all the
-comments using a specific comment building Django template script.
-Additionally you can also use the same template to render any new
-comment to the comment list using via an ajax form submit, returning the
-(model or form) filtered data via JSON and appending it to the comment
-list using the DojoX DTL parser. For non-JS browsers you can always use
-a &lt;noscript&gt; variant to render the templates completely server-side.</p>
-<p>This generally being a cool idea since it makes developing applications
-with AJAX technology very easy I began to port the DTL to the Zend
-Framework and the whole weekend later I got a working implementation
-that supports at least the “extends”, “for”, “include”, and “comment”
-tags. As a next task I will implement the helper for DojoX DTL and will
-report back on my efforts.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/21/zend-dojo-and-the-django-template-language.html#disqus_thread" data-disqus-identifier="2008/07/21/zend-dojo-and-the-django-template-language">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -751,6 +803,8 @@ report back on my efforts.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting FeatureEnvy and Refactoring</a>
+        </li><li>
             <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
         </li><li>
             <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
@@ -768,8 +822,6 @@ report back on my efforts.</p>
             <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
         </li><li>
             <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li><li>
-            <a href="2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
         </li></ul>
 </div>
 </section>

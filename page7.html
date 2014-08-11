@@ -70,6 +70,46 @@
           <div id="page7">
             
             <div class="timestamp postmeta">
+            <span>October 05, 2009</span>
+        </div>
+        <div class="section" id="php-codesniffer-for-netbeans-v0-2">
+<h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
+<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">PHP CodeSniffer for
+Netbeans
+plugin</a>.
+Previously the plugin used an unnecessary API which restricted the use
+to Netbeans 6.7.0 only. This API was removed so that the plugin should
+now work with all Netbeans Versions &gt;= 6.7.0.</p>
+<p>Additionally when working the previous version would scan every PHP
+script on a file per file basis when the all projects or main projects
+filters were activated. This rendered made the plugin almost useless. In
+the current version scans of filters that contain more than one file are
+blocked. That means you will only see Coding Violations when you enable
+the “Current File” filter. Using any other filter will just do nothing
+and won’t put your Netbeans in permanent hibernation mode (aka useless
+mode).</p>
+<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
+<strong>`NbPreferences
+API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
+which allows to configure the coding standard. [STRIKEOUT:However this
+feature was contributed by <a class="reference external" href="http://manuel-pichler.de">Manuel
+Piechler</a> and I don’t yet understand how I
+can manipulate it. Maybe someone knows how (*Looking in Mapis general
+direction*)?] By default the Zend Coding Standard is used.</p>
+<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
+file .netbeans/6.7/config/Preferences.properties setting
+“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
+inline highlighting that did not refresh when lines in the file changed.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/10/05/php-codesniffer-for-netbeans-v0-2.html#disqus_thread" data-disqus-identifier="2009/10/05/php-codesniffer-for-netbeans-v0-2">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>December 19, 2009</span>
         </div>
         <div class="section" id="trying-a-two-step-pear-phar-approach-to-develop-and-deploy">
@@ -701,58 +741,6 @@ Zend is not taking part).</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/05/07/zend-form-rapid-development-plugin-for-eclipse.html#disqus_thread" data-disqus-identifier="2008/05/07/zend-form-rapid-development-plugin-for-eclipse">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 30, 2008</span>
-        </div>
-        <div class="section" id="implementing-zend-auth-acl-and-caching">
-<h1><a href="2008/06/30/implementing-zend-auth-acl-and-caching.html">Implementing Zend Auth, Acl and Caching</a></h1>
-<p>I managed to work a bit on the blog, enabling me to have new instance in
-the series, How to refactor and extend your own blog software using
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a>. This time: Implementing
-meaningful Auth and ACL mechanisms and <a class="reference external" href="http://www.whitewashing.de/blog/articles/41">fixing view
-caching</a>, which did not
-work in its original implementation due to different users groups
-sharing the same cached views.</p>
-<p>In the last days I came across two in depth tutorials on Zend_Acl and
-Zend_Auth integration to MVC. Most people probably saw the DevZone
-article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
-1)</a>”
-by Aldemar Bernal on the Frameworks Frontpage. Another good article was
-written by Frank Ruske in the latest german <a class="reference external" href="http://www.phpmagazin.de">PHP
-Magazin</a> (<a class="reference external" href="http://it-republik.de/zonen/magazine/ausgaben/psfile/source_file/14/Seite_80__482a98c572a5c.zip">Zipped Source Code of the
-Example</a>).
-I took the best ideas of both articles and merged them into the existing
-components of my blog.</p>
-<p>This now enables me to cache the site depending on the Auth status of
-the page user agent. The blog is now caching all views that are
-generated for guest users. Since there is no “registered” or “member”
-account yet, this means the blogs content is cached and served from
-cache for everyone except me when I am logged in. To get this work I
-added some simple additional check in <a class="reference external" href="http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Framework">Matthews Cache View Controller
-Plugin</a>:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
-{
-    $auth = Zend_Auth::getInstance();
-    if($auth-&gt;hasIdentity()) {
-        self::$doNotCache = true;
-        return;
-    }
-    [..]
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>This prevents caching for registered identities.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/30/implementing-zend-auth-acl-and-caching.html#disqus_thread" data-disqus-identifier="2008/06/30/implementing-zend-auth-acl-and-caching">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -777,6 +765,8 @@ Plugin</a>:</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting FeatureEnvy and Refactoring</a>
+        </li><li>
             <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
         </li><li>
             <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
@@ -794,8 +784,6 @@ Plugin</a>:</p>
             <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
         </li><li>
             <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
-        </li><li>
-            <a href="2013/07/24/doctrine_and_domainevents.html">Doctrine and Domain Events</a>
         </li></ul>
 </div>
 </section>
