@@ -1,5 +1,5 @@
-Spotting FeatureEnvy and Refactoring
-====================================
+Spotting Feature Envy and Refactoring
+=====================================
 
 I was following `Aki's <http://twitter.com/rinkkasatiainen>`_ on the
 `SoCraTes2014 <https://www.softwerkskammer.org/activities/socrates-2014>`_
@@ -75,7 +75,7 @@ This is a great way to improve your code base massively and achieve what
 Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
 domain by encapsulating data and behavior.
 
-Learning to spot this kind of FeatureEnvy is a very good way to incrementally
+Learning to spot this kind of Feature Envy is a very good way to incrementally
 improve your legacy code base towards better models. I find it very interesting
 that the focus on fixing technical code-smells duplication and feature envy
 actually leads to a better domain model. As a side effect it massively
@@ -83,7 +83,7 @@ deemphasizes DDD building blocks like Entity or Value Object, which in my
 opinion are a big cause for confusion. Testability increases as well, because
 data objects with behavior are much simpler to setup for testing.
 
-That is why I recommend learning about FeatureEnvy. For me it is a very simple
+That is why I recommend learning about Feature Envy. For me it is a very simple
 approach to find improvements.
 
 .. author:: default
