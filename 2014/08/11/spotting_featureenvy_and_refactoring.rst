@@ -1,8 +1,8 @@
 Spotting FeatureEnvy and Refactoring
 ====================================
 
-I was following [Aki's](http://twitter.com/rinkkasatiainen) on the
-[SoCraTes2014](https://www.softwerkskammer.org/activities/socrates-2014)
+I was following `Aki's <http://twitter.com/rinkkasatiainen>`_ on the
+`SoCraTes2014 <https://www.softwerkskammer.org/activities/socrates-2014>`_
 conference last week about Legacy Code and Refactoring. In the session a piece
 of real-world code was shown that contained one of most common code smells in
 LegacyCode: Feature Envy.
@@ -16,7 +16,7 @@ This code smell causes two very similar problems in a code base:
 - Duplication of rules related to their data throughout the code base.
 - Spreading domain concepts throughout the whole code-base.
 
-A simple example can show this problem with `DateTime` is wide-spread in many
+A simple example can show this problem with ``DateTime`` is wide-spread in many
 PHP projects. We often see code such as the following computation to
 create a range of dates for a reporting function:
 
@@ -39,7 +39,7 @@ create a range of dates for a reporting function:
 This is a really simple example for Feature Envy: The computation and
 validation of creating an end date some days in the future of a start date
 can easily be duplicated throughout the whole code base and implements
-business rules that belong to the class `DateTime` itself:
+business rules that belong to the class ``DateTime`` itself:
 
 .. code-block:: php
 
