@@ -1,23 +1,23 @@
 Spotting FeatureEnvy and Refactoring
 ====================================
 
-I was following a session on the SoCraTes2014 conference last week about
-Legacy Code and Refactoring. In the session a piece of real-world code was
-shown that contained one of most common code smells in LegacyCode: Feature
-Envy.
+I was following [Aki's](http://twitter.com/rinkkasatiainen) on the
+[SoCraTes2014](https://www.softwerkskammer.org/activities/socrates-2014)
+conference last week about Legacy Code and Refactoring. In the session a piece
+of real-world code was shown that contained one of most common code smells in
+LegacyCode: Feature Envy.
 
 Martin Fowler describes this smell as "a method that seems more interested in
 a class other than the one it is in. The most common focus of the envy is the
 data."
 
-This code smell causes two problems in a code base that can have severe
-consequences:
+This code smell causes two very similar problems in a code base:
 
-- Duplication of business rules related to data throughout the code base.
-- Spreading a domain concept throughout the whole code-base.
+- Duplication of rules related to their data throughout the code base.
+- Spreading domain concepts throughout the whole code-base.
 
 A simple example can show this problem with `DateTime` is wide-spread in many
-code bases. We often see code such as the following computation to
+PHP projects. We often see code such as the following computation to
 create a range of dates for a reporting function:
 
 .. code-block:: php
@@ -80,10 +80,11 @@ improve your legacy code base towards better models. I find it very interesting
 that the focus on fixing technical code-smells duplication and feature envy
 actually leads to a better domain model. As a side effect it massively
 deemphasizes DDD building blocks like Entity or Value Object, which in my
-opinion are a big cause for confusion.
+opinion are a big cause for confusion. Testability increases as well, because
+data objects with behavior are much simpler to setup for testing.
 
-That is why I recommend thinking about FeatureEnvy, keep the concept in mind
-and it will help you improve your code-base.
+That is why I recommend learning about FeatureEnvy. For me it is a very simple
+approach to find improvements.
 
 .. author:: default
 .. categories:: none
