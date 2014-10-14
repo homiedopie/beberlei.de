@@ -137,8 +137,12 @@ concise form code:
 
 Writing controllers in this way addresses my requirements Simplicity,
 Testability and Refactorability. For simple CRUD controllers they only ever
-need access to a repository. If one of your controllers grows too big,
+need access to a repository service. If one of your controllers grows too big,
 just refactor out its business logic into services and inject them.
+
+Check out the `repository on Github
+<https://github.com/QafooLabs/QafooLabsNoFrameworkBundle>`_ for some more
+features that we are using the `Profiler <https://qafoolabs.com/>`_.
 
 .. author:: default
 .. categories:: none

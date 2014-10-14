@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2014/10/14/lightweight_symfony2_controllers
    2014/08/11/spotting_featureenvy_and_refactoring
    2014/04/24/symfony_hello_world
    2014/04/15/symfony_hello_world
