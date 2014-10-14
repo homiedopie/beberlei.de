@@ -70,6 +70,222 @@
           <div id="page4">
             
             <div class="timestamp postmeta">
+            <span>August 16, 2012</span>
+        </div>
+        <div class="section" id="oop-business-applications-data-context-interaction">
+<h1><a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a></h1>
+<p>Other posts in this series:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
+mess</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
+</ul>
+<p>The next design pattern for technical system design is called “Data, Context,
+Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
+paradigm, in the context of PHPs language constraints it can be classified as
+architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
+through the book on DCI and trying to understand this pattern with me.</p>
+<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
+in use-cases (Context). Data objects are never directly involved in these
+use-cases, but are “casted” to their respective roles that they are taking in
+the use-case. This can be implemented with aggregation or traits in PHP.</p>
+<p>One goal of DCI is to get object-oriented programming to a place, where you
+can look at a use-case and its roles and be very sure that the program is
+running correctly, because you can guarantee that there are no unexpected side
+effects. It also aims at keeping the amount of code required to keep in mind
+for a given use-case as small as possible, allowing developers to reason about
+the code with more confidence.</p>
+<div class="section" id="terminology">
+<h2>Terminology</h2>
+<p>In DCI, <strong>data</strong> are objects that encapsulate the state of the application.
+As in EBI, they only contain logic that is true for all the possible use-cases.
+These classes represent <em>what the system is</em>.</p>
+<p><strong>Roles</strong> and <strong>Context</strong> represent <em>what the system does</em> and are supposed to
+capture the End User’s Mental Model as close as possible.</p>
+<p><strong>Roles</strong> add behavior to the data objects by either wrapping them or
+acting as traits for the data objects.</p>
+<p><strong>Context</strong> is the use-case and fulfils its role by making roles <strong>interact</strong> with
+each other. These roles then modify the underlying data.</p>
+</div>
+<div class="section" id="example">
+<h2>Example</h2>
+<p>Starting from the bank account example of the EBI post, we can introduce DCI
+quite easily by adding the missing concept of roles. In the use case of
+transferring money that would be:</p>
+<ul class="simple">
+<li>TransferMoneySource</li>
+<li>TransferMoneySink (Destination)</li>
+</ul>
+<p>We can do this by either introducing two interfaces and two concrete
+implementations that accept the <span class="docutils literal"><span class="pre">BankAccount</span></span> as object to work on
+or by building two traits. I will go down the route with traits, to show
+one possible use-case for this new PHP 5.4 feature. The idea here is to
+implement all the behavior necessary on a trait and then have simple dummy
+objects using them in the tests for this use-case.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySource</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">transferFrom</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySink</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Any checks for balances, credit limits or other things would also happen
+here. The <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>  on the data objects should be as
+dumb as possible, so that their implementation does not cause any side-effects
+on the execution of this use-case.</p>
+<p>The bank account would then be modified to look:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">BankAccount</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">TransferMoneySource</span><span class="p">,</span> <span class="nx">TransferMoneySink</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The use-case <span class="docutils literal"><span class="pre">TransferMoney</span></span> would then be modified to create Roles instead
+of Data objects from the DAO. This can be a bit tricky when you have multiple
+data objects implementing the same role and you have no way of knowing which
+underlying data object to pick. The binding of data objects to roles happens
+in the use-case. The use-case needs a means to retrieve objects with certain
+roles, which then access underlying data sources. To avoid that your use-cases
+have to know about how to bind roles to data, you could use GUIDs in your
+application and fetch all objects from one data store. Another way would be to
+implement data access objects for roles, that then know how to retrieve their
+corresponding data.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span><span class="o">-&gt;</span><span class="na">transferTo</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The simplicity of this is appealing, however don’t forget that we have
+abstracted I/O completely here. There has to be code that deals with that part
+of the system somewhere. However this again is not at the heart of all the DCI
+examples out there, making it difficult to reason about the actual practical
+implications.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">One drawback with this example is, that PHP does not support typehinting for
+traits.</p>
+</div>
+<p>Here is an example of how the bank application service could look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$destinationId</span><span class="p">);</span>
+
+        <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$destination</span><span class="p">);</span>
+
+        <span class="nv">$conn</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">conn</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$amount</span><span class="p">);</span>
+            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
+persistent data object by a global ID. This is necessary, because it
+doesn’t actually matter what data object uses the necessary traits
+for this use-case.</p>
+<p>Again as in EBI, in a bigger system you would need to find some abstraction
+layer that does this in a more generic way.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>When Gordon started showing me this pattern we were both puzzled as how
+to actually implement this in the real world. Especially the concept
+of binding roles to data objects still confuses us. Most notably why the use
+of traits or aggregates should actually constitute a new programming paradigm
+instead of just another way to do OOP.</p>
+<p>In Scala casting data objects to roles is actually possible by binding traits
+to objects at runtime. This is not possible in PHP however and has to be done
+statically.</p>
+<p>Compared to EBI, DCI focuses drastically on transaction script domain logic, by
+suggesting to implement roles for every use-case for the sake of avoiding
+side-effects. This is actually is very valuable lesson from this pattern.
+Finding means to decrease the complexity of software is always a good thing.
+And the explicit definition of this concept as <strong>roles</strong> is actually easy to
+explain to other programmers.</p>
+<p>One thing that is lacking in DCI is that there is no concrete mechanism to deal
+with the boundary to other parts of the system. This is actually a step back
+from EBI and I suggest using EBI pattern in combination with DCI to solve this.</p>
+<p>The largest benefit from DCI (and its self proclaimed goal) is the mapping from
+the users/customers mental model directly into the code by using Use-Cases and
+Roles. The communication with the customer about behavior can exclusively focus
+on the current context and its use-case. Mapping this behavior to actual data
+can then be done in a different step.</p>
+<p>This simplification of use-cases and reduction of side-effects between
+different parts of the system has other benefits: It can lead to easier to test
+code and makes it much easier for developers to develop on small and isolated
+parts of the system.</p>
+</div>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html#disqus_thread" data-disqus-identifier="2012/08/16/oop_business_applications__data__context__interaction">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 13, 2012</span>
         </div>
         <div class="section" id="oop-business-applications-entity-boundary-interactor">
@@ -1284,156 +1500,6 @@ used.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/01/08/immutable-datetime-objects.html#disqus_thread" data-disqus-identifier="2010/01/08/immutable-datetime-objects">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 10, 2010</span>
-        </div>
-        <div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
-<h1><a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></a></h1>
-<p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
-article</a> on using PEAR
-and PHAR for application lifecycle management and deployment. Since then
-I have gotten some feedback through comments, but also discussed the
-topic with colleagues. I have also optimized the approach quite
-considerably and even <a class="reference external" href="http://github.com/beberlei/pearanha">made an open-source project out of parts of
-it</a> and I want to share all that
-is new with you. First of all, yes the presented solution was somewhat
-complex, partly because it is still a proposed idea and definitely up
-for optimizations. However I am still very convinced of my approach,
-something I should discuss in more detail.</p>
-<p>The only other two languages I have ever programmed something in with
-more than 50 lines of code are Java and C#. In both languages you can
-explicitly import different dependencies like libraries and frameworks
-by adding them to your application, i.e. in java you would add for
-example Spring as an MVC Web layer, Hibernate as an ORM and several
-other things to your project and directly bundle them in your
-executable. This is very easy to configure and maintain in IDEs like
-Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
-libraries to your project). It also makes for a much more
-straightforward deployment.</p>
-<p>In the PHP world this situation was quite different (up to PHP 5.3) for
-several reasons:</p>
-<ul class="simple">
-<li>You could not package a library into a single distributable file.</li>
-<li>The PEAR installer as the only tool for updating and managing
-dependencies of your application by default installs into a
-system/global directory. This means dependencies your application
-uses are located in a completely different location than your
-application code.</li>
-<li>You can’t manage multiple versions of the same package with PEAR in
-this system directory, making it very hard to control servers with
-different applications.</li>
-<li>The global directory with your application dependencies is most often
-not under version control, which makes deployment of applications
-with PEAR dependencies somewhat difficult.</li>
-</ul>
-<p>There are some solutions to this problems:</p>
-<ul class="simple">
-<li>Don’t use PEAR, but put all dependencies in your version control
-system.</li>
-<li>Don’t use PEAR, and bundle dependencies to your code in the
-build/deployment process.</li>
-<li>Use PEAR like in the article described, on a per project basis.</li>
-</ul>
-<p>The solutions that don’t use PEAR suffer from the disadvantage that you
-need to keep track of all the library and framework dependencies
-yourself and upgrade them yourself. This might not be such a huge
-problem from a first glance, but in my opinion many PHP applications and
-projects suffer from using either no framework/library or just exactly
-one. There is no real cherry-picking going on the PHP world, for example
-I would really like to use Zend Framework for the general application
-layout, but still use Doctrine for the Modelling and HTML Purifier for
-the Output Escaping. Certain tasks might then only be solvable with the
-help of eZ Components, all of which are then to some extend dependencies
-of my application. With <a class="reference external" href="http://pearhub.org">PEARHUB</a> and
-<a class="reference external" href="http://pearfarm.org">PEARFARM</a> on the horizon (<a class="reference external" href="http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html">Read Padraic on this
-topic</a>)
-even more PHP code will be distributed using PEAR channels in the near
-future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
-DateTime</a> code for
-example makes for a great little open source library that could be
-distributed via PEAR, as well as
-<a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
-container I am using extensively.</p>
-<p>Question: Are you really going to manage all these dependencies
-correctly manually? Is everything up to date all the time, and
-upgradeable with ease?</p>
-<p>The PEAR driven solution then begins to look very desirable in this
-light, however it has a considerable disadvantage: The PEAR installer
-itself works on a system-wide/user-centric basis, making it impossible
-to manage dependencies of several applications using only one linux
-user. My little <a class="reference external" href="http://github.com/beberlei/pearanha">Pearanha</a> to the
-rescue: I have taken the PEAR installer code (which is distributed with
-all PHP installations across all systems) and put a new CLI tool on top
-of it. Its a very simple code-generator that allows to generate a
-re-configured PEAR installer script which only manages a single
-application in a given directory. This approach is also used by the
-symfony plugin mechanism, which internally uses the PEAR installer (did
-you know?).</p>
-<p>Lets revisit my blog application example <a class="reference external" href="%3Ca%20href=">from my previous PEAR
-post</a>, first install from
-<a class="reference external" href="http://github.com/beberlei/pearanha">Github</a> and make the “pearanha”
-file executable and put it in your PATH (A PEAR Server Channel will
-follow any time soon).</p>
-<p>Now we need to have an existing application directory somewhere, for
-example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
-with:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>benny@desktop: pearanha generate-project
-</pre></div>
-</div>
-</div></blockquote>
-<p>You then need to specify the project base dir and then the project
-style (for example Zend Framework or Manual) which prompts your for the
-directory that should be used for as the vendor/library directory that
-PEAR will install all the code in. You will also be prompted for a
-binary/scripts directory which will then hold a new PHP file for you,
-the file <strong>my_phpiranha</strong>.</p>
-<p><strong>Pro Argument:</strong> Switching to Pearanha can be done at any point in your
-application lifecycle. Just define an additional vendor directory for
-all the dependencies to go in and generate the applications pear
-installer and you are good to go.</p>
-<p>The generated script is your new application specific PEAR installer and
-you can begin to install all the required dependencies of your
-application:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>benny@desktop:~$ cd /var/www/blog
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.zfcampus.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install zfcampus/zf-alpha
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover htmlpurifier.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install hp/HTMLPurifier
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.phpdoctrine.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install pear.phpdoctrine.org/DoctrineORM-2.0.0
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover components.ez.no
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install ezc/ezcGraph
-</pre></div>
-</div>
-</div></blockquote>
-<p>All this stuff is now located in <strong>/var/www/blog/vendor</strong>. Again you can
-use PEARs complete upgrade, remove and install functionality for your
-application, now without the hazzle of having to create a linux user for
-each project you want to manage this way, which in my opinion is a
-considerable simplification. The complete application (including its
-dependencies) can then be put under version control and be readily
-packaged as a single executable PHAR file by your build process.</p>
-<p>As a side node, I did try Pyrus instead of PEAR for the same discussed
-purpose, however most of the current PEAR channels don’t validate
-against Pyrus strict standards for the package.xml file. In the future
-this might change and a Pyrus based application installer will then be
-integrated into Pearanha.</p>
-<p><strong>UPDATE:</strong> I renamed PHPiranha to Pearanha as its more appropriate.
-Also after apinsteins comment on “pear config-create” I rewrote the
-generate-project parts to use the config-create functionality
-internally, which allowed me to throw away half of the self-written
-code. Thanks!</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html#disqus_thread" data-disqus-identifier="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1458,6 +1524,8 @@ code. Thanks!</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
+        </li><li>
             <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
         </li><li>
             <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
@@ -1475,8 +1543,6 @@ code. Thanks!</p>
             <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
         </li><li>
             <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
-        </li><li>
-            <a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a>
         </li></ul>
 </div>
 </section>

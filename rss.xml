@@ -5,8 +5,145 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Mon, 11 Aug 2014 00:00:00 +0200</pubDate>
+        <pubDate>Tue, 14 Oct 2014 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html</link>
+            <guid>http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html</guid>
+            <title><![CDATA[Lightweight Symfony2 Controllers]]></title>
+            <description><![CDATA[<div class="section" id="lightweight-symfony2-controllers">
+<h1>Lightweight Symfony2 Controllers</h1>
+<p>For quite some time I have been experimenting how to best implement Symfony 2
+controllers to avoid depending on the framework. I have discussed many of these
+insights here in my blog.</p>
+<p>There are three reasons for my quest:</p>
+<p>Simplicity: Solutions to avoid the dependencies between framework
+and your model typically introduce layers of abstraction that produce
+complexity. Service layers, CQRS and various design patterns are useful
+tools, but developing every application with this kind of abstraction screams
+over-engineering.</p>
+<p>While the Domain-Driven Design slogan is “Tackling complexity in software”,
+there are many abstractions out there that can better be described as “Causing
+complexity in software”. I have written some of them myself.</p>
+<p>Testability: There is a mantra “Don’t unit-test your controllers” that arose
+because controllers in most frameworks are just not testable. They have many
+dependencies on other framework classes and cannot be created in a test
+environment. This lead many teams to use slow and brittle integration tests instead.</p>
+<p>But what if controllers were testable because they don’t depend on the
+framework anymore. We could avoid testing all the many layers that we
+have removed for the sake of simplicity and also reduce the number of
+slow integration tests.</p>
+<p>Refactorability: I found that when using service layer or CQRS, there is a
+tendency to use them for every use-case, because the abstraction is in place.
+Any use-case that is not written with those patterns is coupled against the
+framework again. Both development approaches are very different and refactoring
+from one to the other typically requires a rewrite.</p>
+<p>A good solution should allow refactoring from a lightweight controller to a
+service layer with a small number of extract method and extract class
+refactorings.</p>
+<p>While working on the <a class="reference external" href="https://qafoolabs.com">Qafoo PHP Profiler</a> product I
+went to work on a solution that allowed for Simplicity, Testability and
+Refactorability and came up with the
+<a class="reference external" href="https://github.com/qafoolabs/QafooLabsNoFrameworkBundle">NoFrameworkBundle</a>.</p>
+<p>The design of the bundle is careful to extend Symfony in a way that is easy
+for Symfony developers to understand. To achieve this it heavily extends
+upon the FrameworkExtraBundle that is bundled with Symfony.</p>
+<p>The design goals are:</p>
+<ul class="simple">
+<li>Favour Controller as Services to decouple them from the Framework.</li>
+<li>Replace every functionality of the Symfony Base controller in a way
+that does not require injecting a service into your controller.</li>
+<li>Never fetch state from services and inject it into the controller instead.</li>
+<li>Avoid annotations</li>
+</ul>
+<p>The concepts are best explained by showing an example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\FrameworkContext</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">TaskController</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">TaskRepository</span> <span class="nv">$taskRepository</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span> <span class="o">=</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">FrameworkContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">isGranted</span><span class="p">(</span><span class="s1">'ROLE_TASK'</span><span class="p">,</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">AccessDeniedHttpException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'task'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This example demos the following features:</p>
+<ul>
+<li><p class="first">The <span class="docutils literal"><span class="pre">FrameworkContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
+used for checking access permissions and retrieving the current User object.
+It is passed to the controller with the help of ParamConverter feature.</p>
+<p><span class="docutils literal"><span class="pre">FrameworkContext</span></span> here is just an interface and for testing you can
+use a very simple mock implementation to pass an authenticated user to your
+controller.</p>
+</li>
+<li><p class="first">View parameters are returned from the controller as an array, however
+without requiring the <span class="docutils literal"><span class="pre">@Template</span></span> annotation of the
+SensioFrameworkExtraBundle.</p>
+</li>
+</ul>
+<p>The next example demontrates the abstraction for form requests that help writing very
+concise form code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\FrameworkContext</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\FormRequest</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">TaskController</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">FrameworkContext</span> <span class="nv">$context</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Task</span><span class="p">(</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">());</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TaskType</span><span class="p">(),</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$task</span><span class="p">);</span>
+
+            <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectRouteResponse</span><span class="p">(</span><span class="s1">'Task.show'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()));</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'form'</span> <span class="o">=&gt;</span> <span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">createFormView</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The <span class="docutils literal"><span class="pre">RedirectRouteResponse</span></span> is used to redirect to a route without
+a need for the <span class="docutils literal"><span class="pre">router</span></span> service.</p>
+</li>
+<li><p class="first">Usage of the <span class="docutils literal"><span class="pre">FormRequest</span></span> object that is a wrapper around FormFactory and
+Request object. It is passed by using a ParamConverter. The method
+<span class="docutils literal"><span class="pre">$formRequest-&gt;handle</span></span> combines binding the request and checking for valid
+data.</p>
+<p>Again there is a set of mock form request that allow you to simulate valid or
+invalid form requests for testing.</p>
+</li>
+</ul>
+<p>Writing controllers in this way addresses my requirements Simplicity,
+Testability and Refactorability. For simple CRUD controllers they only ever
+need access to a repository service. If one of your controllers grows too big,
+just refactor out its business logic into services and inject them.</p>
+<p>Check out the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">repository on Github</a> for some more
+features that we are using the <a class="reference external" href="https://qafoolabs.com">Profiler</a>.</p>
+</div>]]></description>
+             <pubDate>Tue, 14 Oct 2014 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>http://www.whitewashing.de/2014/08/11/spotting_featureenvy_and_refactoring.html</link>
             <guid>http://www.whitewashing.de/2014/08/11/spotting_featureenvy_and_refactoring.html</guid>

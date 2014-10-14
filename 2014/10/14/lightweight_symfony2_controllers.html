@@ -1,0 +1,281 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Lightweight Symfony2 Controllers &mdash; Whitewashing</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Spotting Feature Envy and Refactoring" href="../../08/11/spotting_featureenvy_and_refactoring.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2014-10-14-lightweight_symfony2_controllers">
+            
+            
+    <div class="timestamp postmeta">
+            <span>October 14, 2014</span>
+        </div>
+
+    <div class="section" id="lightweight-symfony2-controllers">
+<h1>Lightweight Symfony2 Controllers</h1>
+<p>For quite some time I have been experimenting how to best implement Symfony 2
+controllers to avoid depending on the framework. I have discussed many of these
+insights here in my blog.</p>
+<p>There are three reasons for my quest:</p>
+<p>Simplicity: Solutions to avoid the dependencies between framework
+and your model typically introduce layers of abstraction that produce
+complexity. Service layers, CQRS and various design patterns are useful
+tools, but developing every application with this kind of abstraction screams
+over-engineering.</p>
+<p>While the Domain-Driven Design slogan is &#8220;Tackling complexity in software&#8221;,
+there are many abstractions out there that can better be described as &#8220;Causing
+complexity in software&#8221;. I have written some of them myself.</p>
+<p>Testability: There is a mantra &#8220;Don&#8217;t unit-test your controllers&#8221; that arose
+because controllers in most frameworks are just not testable. They have many
+dependencies on other framework classes and cannot be created in a test
+environment. This lead many teams to use slow and brittle integration tests instead.</p>
+<p>But what if controllers were testable because they don&#8217;t depend on the
+framework anymore. We could avoid testing all the many layers that we
+have removed for the sake of simplicity and also reduce the number of
+slow integration tests.</p>
+<p>Refactorability: I found that when using service layer or CQRS, there is a
+tendency to use them for every use-case, because the abstraction is in place.
+Any use-case that is not written with those patterns is coupled against the
+framework again. Both development approaches are very different and refactoring
+from one to the other typically requires a rewrite.</p>
+<p>A good solution should allow refactoring from a lightweight controller to a
+service layer with a small number of extract method and extract class
+refactorings.</p>
+<p>While working on the <a class="reference external" href="https://qafoolabs.com/">Qafoo PHP Profiler</a> product I
+went to work on a solution that allowed for Simplicity, Testability and
+Refactorability and came up with the
+<a class="reference external" href="https://github.com/qafoolabs/QafooLabsNoFrameworkBundle">NoFrameworkBundle</a>.</p>
+<p>The design of the bundle is careful to extend Symfony in a way that is easy
+for Symfony developers to understand. To achieve this it heavily extends
+upon the FrameworkExtraBundle that is bundled with Symfony.</p>
+<p>The design goals are:</p>
+<ul class="simple">
+<li>Favour Controller as Services to decouple them from the Framework.</li>
+<li>Replace every functionality of the Symfony Base controller in a way
+that does not require injecting a service into your controller.</li>
+<li>Never fetch state from services and inject it into the controller instead.</li>
+<li>Avoid annotations</li>
+</ul>
+<p>The concepts are best explained by showing an example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\FrameworkContext</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">TaskController</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">TaskRepository</span> <span class="nv">$taskRepository</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span> <span class="o">=</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">FrameworkContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">isGranted</span><span class="p">(</span><span class="s1">&#39;ROLE_TASK&#39;</span><span class="p">,</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">AccessDeniedHttpException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;task&#39;</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This example demos the following features:</p>
+<ul>
+<li><p class="first">The <span class="docutils literal"><span class="pre">FrameworkContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
+used for checking access permissions and retrieving the current User object.
+It is passed to the controller with the help of ParamConverter feature.</p>
+<p><span class="docutils literal"><span class="pre">FrameworkContext</span></span> here is just an interface and for testing you can
+use a very simple mock implementation to pass an authenticated user to your
+controller.</p>
+</li>
+<li><p class="first">View parameters are returned from the controller as an array, however
+without requiring the <span class="docutils literal"><span class="pre">&#64;Template</span></span> annotation of the
+SensioFrameworkExtraBundle.</p>
+</li>
+</ul>
+<p>The next example demontrates the abstraction for form requests that help writing very
+concise form code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\FrameworkContext</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\FormRequest</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">TaskController</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">FrameworkContext</span> <span class="nv">$context</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Task</span><span class="p">(</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">());</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TaskType</span><span class="p">(),</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$task</span><span class="p">);</span>
+
+            <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectRouteResponse</span><span class="p">(</span><span class="s1">&#39;Task.show&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()));</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">createFormView</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The <span class="docutils literal"><span class="pre">RedirectRouteResponse</span></span> is used to redirect to a route without
+a need for the <span class="docutils literal"><span class="pre">router</span></span> service.</p>
+</li>
+<li><p class="first">Usage of the <span class="docutils literal"><span class="pre">FormRequest</span></span> object that is a wrapper around FormFactory and
+Request object. It is passed by using a ParamConverter. The method
+<span class="docutils literal"><span class="pre">$formRequest-&gt;handle</span></span> combines binding the request and checking for valid
+data.</p>
+<p>Again there is a set of mock form request that allow you to simulate valid or
+invalid form requests for testing.</p>
+</li>
+</ul>
+<p>Writing controllers in this way addresses my requirements Simplicity,
+Testability and Refactorability. For simple CRUD controllers they only ever
+need access to a repository service. If one of your controllers grows too big,
+just refactor out its business logic into services and inject them.</p>
+<p>Check out the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">repository on Github</a> for some more
+features that we are using the <a class="reference external" href="https://qafoolabs.com/">Profiler</a>.</p>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2014/10/14/lightweight_symfony2_controllers";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="#">Lightweight Symfony2 Controllers</a>
+        </li><li>
+            <a href="../../08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
+        </li><li>
+            <a href="../../04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
+            <a href="../../01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
+        </li><li>
+            <a href="../../01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li><li>
+            <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li><li>
+            <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li><li>
+            <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li><li>
+            <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li><li>
+            <a href="../../../2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2012, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>
