@@ -70,6 +70,327 @@
           <div id="index">
             
             <div class="timestamp postmeta">
+            <span>October 26, 2014</span>
+        </div>
+        <div class="section" id="symfony-all-the-things-web">
+<h1><a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a></h1>
+<p>My <a class="reference external" href="http://www.whitewashing.de/2014/04/24/symfony_hello_world.html">Symfony Hello World post</a> introduced
+the smallest possible example of a Symfony application. Using this in trainings
+helps the participants understand of just how few parts a Symfony application
+contains. Sure, there are lots of classes participating under the hood, but
+I don’t care about the internals only about the public API.</p>
+<p>We use microservice architectures for the <a class="reference external" href="http://info.bepado.de">bepado</a> and
+<a class="reference external" href="https://qafoolabs.com">PHP Profiler</a> projects that Qafoo is working on at
+the monent. For the different components a mix of Symfony Framework, Silex,
+Symfony Components and our own Rest-Microframework (RMF) are used. This zoo of
+different solutions sparked a recent discussion with <a class="reference external" href="https://twitter.com/manuelp">my colleague Manuel</a> about when we would want to use Symfony for a
+web application.</p>
+<p>We quickly agreed on: Always. I can’t speak for Manuel, but these are my
+reasons for this decision:</p>
+<ul>
+<li><p class="first">I always want to use a technology that is based on Symfony HttpKernel,
+because of the built-in caching, ESI and the <a class="reference external" href="http://stackphp.com">Stack-PHP</a> project. I usually don’t need this at the beginning
+of a project, but at some point the simplicity of extending the Kernel
+through aggregation is incredible.</p>
+<p>This leaves three solutions: Silex, Symfony Framework and Plain Components.</p>
+</li>
+<li><p class="first">I want a well documented and standardized solution. We are working with
+a big team on bepado, often rotating team members for just some weeks or months.</p>
+<p>We can count the hours lost for developers when they have to start learning a
+new stack again. Knowing where to put routes, controllers, templates,
+configuration et al is important to make time for the real tasks.</p>
+<p>This leaves Symfony Framework and Silex. Everything built with the components
+is always custom and therefore not documented well enough.</p>
+</li>
+<li><p class="first">I want a stable and extendable solution. Even when you just use Symfony
+for a very small component you typically need to interface with the outside
+world: OAuth, REST-API, HTTP Clients, Databases (SQL and NoSQL). <a class="reference external" href="http://friendsofsymfony.github.io/slides/there_is_a_bundle_for_that.html#1">There is
+(always) a bundle for that</a> in Symfony.</p>
+<p>Yes, Silex typically has a copy-cat Provider for their own DIC system, but
+it is usually missing some configuration option or advanced use-case. In some
+cases its just missing something as simple as a WebDebug Toolbar integration
+that the Symfony Bundle has.</p>
+<p>My experience with Silex has been that its always several steps behind
+Symfony in terms of reusable functionality. One other downside with Silex in
+my opinion is its missing support for DIC and Route caching. Once your Silex
+application grows beyond its initial scope it starts to slow down.</p>
+</li>
+<li><p class="first">I want just one solution if its flexible enough.</p>
+<p>It is great to have so many options, but that is also a curse. <a class="reference external" href="https://twitter.com/lsmith/status/526284891718443009">Lukas</a> points out he is picking
+between Laravel, Silex or Symfony depending on the application use-case.</p>
+<p>But the web technology stack is already complex enough in my opionion. I
+rather have my developers learn and use different storage/queue or frontend
+technologies than have them juggle between three frameworks. If my experience
+with Symfony in the last 4 years taught me anything: Hands-on exposure
+with a single framework for that long leads to impressive productivity.</p>
+<p>And Symfony is flexible. The Dependency Injection based approach combined
+with the very balanced decoupling through bundles allows you to cherry-pick
+only what you need for every application: APIs, RAD, Large Teams. Everything
+is possible.</p>
+</li>
+</ul>
+<p>The analysis is obviously biased because of my previous exposure to the
+framework. The productivity gains are possible with any framework as long as it
+has a flourishing ecosystem. For anyone else this reasoning can end up to
+choose Laravel, Silex or Zend Framework 2.</p>
+<p>So what is the minimal Symfony distribution that would be a starting point.
+Extending on the <a class="reference external" href="http://www.whitewashing.de/2014/04/24/symfony_hello_world.html">Symfony Hello World post</a>:</p>
+<ol class="arabic simple">
+<li>composer.json</li>
+<li>index.php file</li>
+<li>A minimal <span class="docutils literal"><span class="pre">AppKernel</span></span></li>
+<li>A minimal config.yml file</li>
+<li>routing files</li>
+<li>A console script</li>
+<li>A minimal application bundle</li>
+</ol>
+<p>You can find <a class="reference external" href="https://github.com/beberlei/symfony-minimal-distribution">all the code on Github</a>.</p>
+<p>Start with the composer.json:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;symfony/symfony&quot;</span><span class="p">:</span> <span class="s">&quot;@stable&quot;</span><span class="p">,</span>
+        <span class="s">&quot;symfony/monolog-bundle&quot;</span><span class="p">:</span> <span class="s">&quot;@stable&quot;</span><span class="p">,</span>
+        <span class="s">&quot;vlucas/phpdotenv&quot;</span><span class="p">:</span> <span class="s">&quot;@stable&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;Acme&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The index.php:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// web/index.php</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../vendor/autoload.php&quot;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../app/AppKernel.php&quot;</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+
+<span class="nx">Dotenv</span><span class="o">::</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../'</span><span class="p">);</span>
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
+<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_ENV'</span><span class="p">],</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_DEBUG'</span><span class="p">]);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">terminate</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$response</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We are using the package <a class="reference external" href="https://github.com/vlucas/phpdotenv">vlucas/phpdotenv</a> to add <a class="reference external" href="http://12factor.net">Twelve Factor app</a> compatibility, simplyfing configuration. This allows us to get rid of
+the different front controller files based on environment. We need a file
+called <span class="docutils literal"><span class="pre">.env</span></span> in our application root containing key-value pairs of
+environment variables:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># .env</span>
+<span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
+<span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Add this file to <span class="docutils literal"><span class="pre">.gitignore</span></span>. Your deployment to production needs
+a mechanism to generate this file with production configuration.</p>
+<p>Our minimal AppKernel looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// app/AppKernel.php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$bundles</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\MonologBundle\MonologBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Acme\HelloBundle\AcmeHelloBundle</span><span class="p">()</span>
+        <span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEnvironment</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="nv">$bundles</span><span class="p">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Bundle\WebProfilerBundle\WebProfilerBundle</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$bundles</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/config/config.yml'</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEnvironment</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'web_profiler'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">'toolbar'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="p">));</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It points to a configuration file <span class="docutils literal"><span class="pre">config.yml</span></span>. We don’t use
+different configuration files per environment here because we don’t
+need it. Instead we use the closure loader to enable the web debug
+toolbar when we are in development environment.</p>
+<p>Symfony configuration becomes much simpler if we don’t use the inheritance
+and load everything from just a single file:</p>
+<div class="highlight-python"><div class="highlight"><pre># app/config/config.yml
+framework:
+    secret: %secret%
+    router:
+        resource: &quot;%kernel.root_dir%/config/routing_%kernel.environment%.yml&quot;
+        strict_requirements: %kernel.debug%
+    templating:
+        engines: ['twig']
+    profiler:
+        enabled: %kernel.debug%
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: %monolog_action_level%
+            handler:      nested
+        nested:
+            type:  stream
+            path:  &quot;%kernel.logs_dir%/%kernel.environment%.log&quot;
+            level: debug
+</pre></div>
+</div>
+<p>We can set the parameter values for <span class="docutils literal"><span class="pre">%secret%</span></span> and <span class="docutils literal"><span class="pre">%monolog_action_level%</span></span>
+by adding new lines to <span class="docutils literal"><span class="pre">.env</span></span> file, making use of the excellent <a class="reference external" href="http://symfony.com/doc/current/cookbook/configuration/external_parameters.html">external
+configuration parameter support</a>
+in Symfony.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># .env</span>
+<span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
+<span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">SYMFONY__SECRET</span><span class="o">=</span><span class="n">abcdefg</span>
+<span class="n">SYMFONY__MONOLOG_ACTION_LEVEL</span><span class="o">=</span><span class="n">debug</span>
+</pre></div>
+</div>
+<p>Now add a <span class="docutils literal"><span class="pre">routing_prod.yml</span></span> file with a hello world route:</p>
+<div class="highlight-python"><div class="highlight"><pre># app/config/routing_prod.yml
+hello_world:
+    pattern: /hello/{name}
+    defaults:
+        _controller: &quot;AcmeHelloBundle:Default:hello&quot;
+</pre></div>
+</div>
+<p>And because our routes are dependent on the environment in <span class="docutils literal"><span class="pre">config.yml</span></span> also a
+<span class="docutils literal"><span class="pre">routing_dev.yml</span></span> containing the WebDebug toolbar and profiler routes:</p>
+<div class="highlight-python"><div class="highlight"><pre># app/config/routing_dev.yml
+_wdt:
+    resource: &quot;@WebProfilerBundle/Resources/config/routing/wdt.xml&quot;
+    prefix:   /_wdt
+
+_profiler:
+    resource: &quot;@WebProfilerBundle/Resources/config/routing/profiler.xml&quot;
+    prefix:   /_profiler
+
+_main:
+    resource: routing_prod.yml
+</pre></div>
+</div>
+<p>We now need a bundle <span class="docutils literal"><span class="pre">AcmeHelloBundle</span></span> that is referenced
+in routing.yml and in the AppKernel. When we follow Fabiens best practice
+about adding services, routes and templates into the <span class="docutils literal"><span class="pre">app/config</span></span> and
+<span class="docutils literal"><span class="pre">app/Resources/views</span></span> folders adding a bundle just requires the bundle class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// src/Acme/HelloBundle/AcmeHelloBundle.php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\HelloBundle</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Bundle\Bundle</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AcmeHelloBundle</span> <span class="k">extends</span> <span class="nx">Bundle</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And the controller that renders our Hello World:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// src/Acme/HelloBundle/Controller/DefaultController.php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\HelloBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">DefaultController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span>
+            <span class="s1">'AcmeHelloBundle:Default:hello.html.twig'</span><span class="p">,</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we only put a template into <span class="docutils literal"><span class="pre">app/Resources</span></span>:</p>
+<div class="highlight-jinja"><div class="highlight"><pre><span class="c">{# app/Resources/AcmeHelloBundle/views/Default/hello.html.twig #}</span><span class="x"/>
+<span class="x">Hello </span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">!</span>
+</pre></div>
+</div>
+<p>As a last requirement we need a console script to manage our Symfony
+application. We reuse the vlucas/phpdotenv integration here to
+load all the required environment variables:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">#!/usr/bin/env php</span>
+<span class="cp">&lt;?php</span>
+<span class="c1">// app/console</span>
+
+<span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/AppKernel.php'</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Console\Application</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Console\Input\ArgvInput</span><span class="p">;</span>
+
+<span class="nx">Dotenv</span><span class="o">::</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../'</span><span class="p">);</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArgvInput</span><span class="p">();</span>
+<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_ENV'</span><span class="p">],</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_DEBUG'</span><span class="p">]);</span>
+<span class="nv">$application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">(</span><span class="nv">$kernel</span><span class="p">);</span>
+<span class="nv">$application</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Voila. The minimal Symfony distribution is done.</p>
+<p>Start the php built in webserver to take a look</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8080 web/index.php
+</pre></div>
+</div>
+<p>I personally like this simplicity of that, the only thing that annoys me are
+the two routing files that I need to conditionally load the web profiler routes
+and the closure loader for the web_profiler extension. I suppose the nicer
+approach would be a compiler pass that does all the magic behind the scenes.</p>
+<p>From this minimal distribution you can:</p>
+<ol class="arabic simple">
+<li>Add new services to <span class="docutils literal"><span class="pre">app/config/config.yml</span></span>.</li>
+<li>Add new routes to <span class="docutils literal"><span class="pre">app/config/routing_prod.yml</span></span>.</li>
+<li>Add controllers into new bundles and templates into <span class="docutils literal"><span class="pre">app/Resources</span></span>.</li>
+<li>Add third party bundles or Stack-PHP implementations when you need existing, reusable functionality such
+as OAuth, Databases etc.</li>
+<li>Add configuration variables to <span class="docutils literal"><span class="pre">.env</span></span> file instead of using the
+<span class="docutils literal"><span class="pre">app/config/parameters.yml</span></span> approach.</li>
+</ol>
+<p>This scales well, because at every point you can move towards abstracting
+bundles and configuration more using Symfony’s built in functionality.
+No matter what type of application you build, it is always based on Symfony
+and the building blocks are always the same.</p>
+<p>I suggest to combine this minimal Symfony with the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">QafooLabsFrameworkExtraBundle</a> that I <a class="reference external" href="http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html">blogged
+about two weeks ago</a>.
+Not only will the Symfony be lightweight also your controllers. You can built
+anything on top this foundation from simple CRUD, APIs, hexagonal- or CQRS-architextures.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2014/10/26/symfony_all_the_things_web.html#disqus_thread" data-disqus-identifier="2014/10/26/symfony_all_the_things_web">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 14, 2014</span>
         </div>
         <div class="section" id="lightweight-symfony2-controllers">
@@ -1304,106 +1625,6 @@ the Symfony Security component or the huge FOSUserBundle dependency.</p>
         </div>
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html#disqus_thread" data-disqus-identifier="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 19, 2013</span>
-        </div>
-        <div class="section" id="speedup-symfony2-on-vagrant-boxes">
-<h1><a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a></h1>
-<ul class="simple">
-<li><strong>Update:</strong> Added requirements to configure Vagrant and Virtualbox before
-trying my change.</li>
-<li><strong>Update 2:</strong> Added link to Virtualbox Guest Additions plugin for Vagrant,
-thanks Peter Kruithof for the hint.</li>
-</ul>
-<p>Using Symfony2 inside a Vagrant box is considered to be very slow (<a class="reference external" href="http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host">here</a>,
-<a class="reference external" href="https://twitter.com/spicy_sake/status/183135528567320576">here</a>), even when
-using NFS. I can confirm the experience and know many others that reported the
-same.</p>
-<p>Before doing this changes make sure:</p>
-<ul class="simple">
-<li>You are using Vagrant 1.2 (not sure that makes a difference though)</li>
-<li>You are using NFS with Vagrant (<a class="reference external" href="http://docs.vagrantup.com/v2/synced-folders/nfs.html">More</a>). If you are on
-Windows then this can already be the problem (Virtualbox FS is slow with
-Symfony, because of the large number of files.)</li>
-<li>You have the Vbox Guest Additions on the guest that match your system (<a class="reference external" href="https://github.com/dotless-de/vagrant-vbguest">Vagrant Plugin</a>, <a class="reference external" href="https://gist.github.com/fernandoaleman/5083680">Manual Update</a>)</li>
-<li>You have an opcode cache installed, either <cite>apc</cite> or <cite>opcache</cite>.</li>
-<li>You disable <cite>xdebug</cite> or <cite>xhprof</cite>.</li>
-</ul>
-<p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
-related to the huge number of files that a Symfony project normally ships with
-and the I/O that is generated from <span class="docutils literal"><span class="pre">filemtime</span></span> calls to check if the
-configuration files have changed.</p>
-<p>This is just a small part, there are other bottlenecks that I have found after
-finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
-<ol class="arabic simple">
-<li>Monolog logs to the NFS share and the huge number <span class="docutils literal"><span class="pre">fwrite</span></span> take their toll.</li>
-<li>Writing compiled Twig templates to the NFS share using <span class="docutils literal"><span class="pre">file_put_contents</span></span>.</li>
-<li>Assetic: Scanning for stylesheets and javascripts within templates is very
-slow, causing lots of I/O on the NFS share and CPU and changing it to using
-explicit bundling in the <span class="docutils literal"><span class="pre">app/config/config.yml</span></span> helps alot. You can use a
-cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
-a <cite>–watch</cite> flag in the background.</li>
-<li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
-<li><span class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></span> in Symfony DIC uses a set of
-recursive algorithms to replace aliases with the real services. That takes a
-huge amount of time in bigger applications including amounting calls to methods
-inside the pass over 100.000 times.</li>
-</ol>
-<p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
-To fix this just change the cache <strong>AND</strong> the log directory to
-<span class="docutils literal"><span class="pre">sys_get_temp_dir()</span></span> or shared memory (/dev/shm) instead of writing to the
-NFS share. I actually tried this before, but since I forgot the log directory,
-this felt equally slow and I reverted the change.</p>
-<p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
-considerable performance boost on a Vagrant box:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
-<span class="p">{</span>
-    <span class="c1">// ...</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="s1">'/dev/shm/appname/cache/'</span> <span class="o">.</span>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">;</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getCacheDir</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLogDir</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="s1">'/dev/shm/appname/logs'</span><span class="p">;</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getLogDir</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This brings the page rendering speeds down to between 0.5 and 1.5 seconds, which
-is quite normal for the development environment even outside a virtual machine.</p>
-<p>This tip obviously works for any kind of application that has a I/O intensive
-development environment: Don’t perform this operations on the NFS share unless
-you wan’t to suffer.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a>, <a href="categories/symfony.html">Symfony</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a>, <a href="tags/symfony.html">Symfony</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html#disqus_thread" data-disqus-identifier="2013/08/19/speedup_symfony2_on_vagrant_boxes">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1428,6 +1649,8 @@ you wan’t to suffer.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
+        </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li><li>
             <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
@@ -1445,8 +1668,6 @@ you wan’t to suffer.</p>
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li><li>
             <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
-        </li><li>
-            <a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a>
         </li></ul>
 </div>
 </section>
