@@ -18,7 +18,7 @@ tagline = ''
 author = 'Benjamin Eberlei'
 
 # Change this to your copyright string
-copyright = '2008-2012, ' + author
+copyright = '2008-2014, ' + author
 
 # Change this to your blog root URL (required for RSS feed)
 website = 'http://www.whitewashing.de'
