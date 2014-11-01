@@ -441,7 +441,7 @@ that does not require injecting a service into your controller.</li>
 <p>The concepts are best explained by showing an example:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\FrameworkContext</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">TaskController</span>
 <span class="p">{</span>
@@ -452,7 +452,7 @@ that does not require injecting a service into your controller.</li>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span> <span class="o">=</span> <span class="nv">$taskRepository</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">FrameworkContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">isGranted</span><span class="p">(</span><span class="s1">'ROLE_TASK'</span><span class="p">,</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
             <span class="k">throw</span> <span class="k">new</span> <span class="nx">AccessDeniedHttpException</span><span class="p">();</span>
@@ -465,10 +465,10 @@ that does not require injecting a service into your controller.</li>
 </div>
 <p>This example demos the following features:</p>
 <ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">FrameworkContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
+<li><p class="first">The <span class="docutils literal"><span class="pre">TokenContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
 used for checking access permissions and retrieving the current User object.
 It is passed to the controller with the help of ParamConverter feature.</p>
-<p><span class="docutils literal"><span class="pre">FrameworkContext</span></span> here is just an interface and for testing you can
+<p><span class="docutils literal"><span class="pre">TokenContext</span></span> here is just an interface and for testing you can
 use a very simple mock implementation to pass an authenticated user to your
 controller.</p>
 </li>
@@ -481,7 +481,7 @@ SensioFrameworkExtraBundle.</p>
 concise form code:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\FrameworkContext</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">QafooLabs\MVC\FormRequest</span><span class="p">;</span>
 
@@ -489,7 +489,7 @@ concise form code:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">FrameworkContext</span> <span class="nv">$context</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Task</span><span class="p">(</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">());</span>
 
@@ -522,6 +522,8 @@ need access to a repository service. If one of your controllers grows too big,
 just refactor out its business logic into services and inject them.</p>
 <p>Check out the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">repository on Github</a> for some more
 features that we are using the <a class="reference external" href="https://qafoolabs.com">Profiler</a>.</p>
+<p>Update 1: Renamed <span class="docutils literal"><span class="pre">FrameworkContext``to</span> <span class="pre">``TokenContext</span></span> as done
+in new 2.0 version of the bundle.</p>
 </div>
         <div class="postmeta">
         <div class="author">

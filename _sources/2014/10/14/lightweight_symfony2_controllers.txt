@@ -60,7 +60,7 @@ The concepts are best explained by showing an example:
 
     <?php
 
-    use QafooLabs\MVC\FrameworkContext;
+    use QafooLabs\MVC\TokenContext;
 
     class TaskController
     {
@@ -71,7 +71,7 @@ The concepts are best explained by showing an example:
             $this->taskRepository = $taskRepository;
         }
 
-        public function showAction(FrameworkContext $context, Task $task)
+        public function showAction(TokenContext $context, Task $task)
         {
             if (!$context->isGranted('ROLE_TASK', $task)) {
                 throw new AccessDeniedHttpException();
@@ -83,11 +83,11 @@ The concepts are best explained by showing an example:
 
 This example demos the following features:
 
-- The ``FrameworkContext`` wraps access to the ``security.context`` service and is
+- The ``TokenContext`` wraps access to the ``security.context`` service and is
   used for checking access permissions and retrieving the current User object.
   It is passed to the controller with the help of ParamConverter feature.
 
-  ``FrameworkContext`` here is just an interface and for testing you can 
+  ``TokenContext`` here is just an interface and for testing you can 
   use a very simple mock implementation to pass an authenticated user to your
   controller.
 
@@ -102,7 +102,7 @@ concise form code:
 
     <?php
 
-    use QafooLabs\MVC\FrameworkContext;
+    use QafooLabs\MVC\TokenContext;
     use QafooLabs\MVC\RedirectRouteResponse;
     use QafooLabs\MVC\FormRequest;
 
@@ -110,7 +110,7 @@ concise form code:
     {
         private $taskRepository;
 
-        public function newAction(FormRequest $formRequest, FrameworkContext $context)
+        public function newAction(FormRequest $formRequest, TokenContext $context)
         {
             $task = new Task($context->getUser());
 
@@ -143,6 +143,9 @@ just refactor out its business logic into services and inject them.
 Check out the `repository on Github
 <https://github.com/QafooLabs/QafooLabsNoFrameworkBundle>`_ for some more
 features that we are using the `Profiler <https://qafoolabs.com/>`_.
+
+Update 1: Renamed ``FrameworkContext``to ``TokenContext`` as done
+in new 2.0 version of the bundle.
 
 .. author:: default
 .. categories:: none
