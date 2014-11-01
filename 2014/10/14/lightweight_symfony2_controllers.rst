@@ -144,7 +144,7 @@ Check out the `repository on Github
 <https://github.com/QafooLabs/QafooLabsNoFrameworkBundle>`_ for some more
 features that we are using the `Profiler <https://qafoolabs.com/>`_.
 
-Update 1: Renamed ``FrameworkContext``to ``TokenContext`` as done
+Update 1: Renamed ``FrameworkContext`` to ``TokenContext`` as done
 in new 2.0 version of the bundle.
 
 .. author:: default
