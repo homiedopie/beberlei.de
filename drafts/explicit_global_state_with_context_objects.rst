@@ -34,12 +34,12 @@ Lets take a look at the Definition of a context object::
     living within a context to see the outside world. Objects living in a different
     context see a different view of the outside world.
 
-Besides the obvoius use of encapsulating services and config variables, the
-definition talks about two important properties:
+Besides the obvious use of encapsulating services and config variables, this
+definition mentions two important properties:
 
-1. Allows to see the outside world, does not mean it can change it.
+1. Allows to see the outside world, which does *not* mean it can change it.
    In my opinion it is essential that context objects are immutable,
-   to avoid problems of side effects.   
+   to avoid side effects.   
 
 2. The possibility of objects living in different contexts, seeing
    different context objects suggets that a context object
@@ -48,30 +48,138 @@ definition talks about two important properties:
 By using objects instead of global variables for context, we can use
 encapsulation to achieve immutability.
 
-Context Object Examples
------------------------
+Context already exists in PHP through the existance of superglobals. Frameworks
+usually wrap them to achieve the properties mentioned above: Immutability and
+Not-Singleton.
 
-As mentioned before, Request variables are one context that exists in your
-applications.  Introducing explicit context objects for them will yield
-considerable benefits over using the superglobals.
-
-In Symfony2 the ``Request`` is a context object that explicitly wrapts ``$_GET``,
-``$_POST`` and other superglobals. It is almost immutable (except attributes)
-and it is not a singleton. The way the Symfony2 Request works it even allows to
-create sub-contexts by creating new request objects.
-
-The Session object in Symfony2 can be exchanged with other implementations
-that run without ``$_SESSION``. Ever tried to run tests, workers or console
-tools with code that uses the PHP session? An abstraction implemented
-as a context object as Symfony provides allows different sessions in the
-same php process and would theoretically allow you to enforce immutability
-(not by default).
+The Symfony Request object is one good example, where these properties (almost)
+hold. Wrapping the superglobals with this object even allowed creating
+Subrequests inside PHP requests.
 
 Application Context
 -------------------
 
+Now that we have defined context and the properties that make it useful
+(Immutability and No-Singleton) we should talk about making use of context
+objects in your applications.
+
+Anything that is an important global information in your application is
+relevant for the context:
+
+1. Building a wiki? I actually have the idea for this approach from
+   `Fitnesse <http://www.fitnesse.org/>`_, a testing tool based on the wiki idea maintained by Uncle Bob
+   and his team. Their `context object
+   <https://github.com/unclebob/fitnesse/blob/master/src/fitnesse/FitNesseContext.java>`_ provides access to the current and the
+   root page nodes.
+
+2. Building a shop? The users basket id, selected language/locale, current
+   campaign (newsletter, google, social media?) can be information that should
+   be available all the time.
+
+3. Building an analytics software? The currently selected date/time-range is
+   probably important for all queries.
+
+4. Building a CMS/blog? The current page/post-id, the root page id, user
+   language/locale seem to be good candidates for an application context. 
+
+5. Building a multi-tenant app? The tenant-id and configuration for this
+   tentant (selected product plan, activated features, ...) are
+   good candidates for the context.
+
+Example: Qafoo Profiler Context
+-------------------------------
+
+How to introduce such a context? We could create an object in our application,
+for example how we did it for the `Qafoo Profiler <https://qafoolabs.com>`_
+with selected tenant (organization), application, date-range and server environment:
+
+.. code-block:: php
+
+    <?php
+
+    class PageContext
+    {
+        /**
+         * @var \Xhprof\Bundle\OrganizationBundle\Entity\Organization
+         */
+        private $organization;
+
+        /**
+         * @var \Xhprof\Bundle\OrganizationBundle\Entity\Application
+         */
+        private $application;
+
+        /**
+         * @var \Xhprof\Common\Date\DateRange
+         */
+        private $selectedDateRange;
+
+        /**
+         * @var \Xhprof\Bundle\ProfilerBundle\View\EnvironmentView
+         */
+        private $selectedEnvironment;
+
+        // constructor and getters
+    }
+
+This object is created during request boot, in my case with a framework
+listener. The listener already checks for access rights and security
+constraints, showing the 403/access denied page when necessary.
+
+The context is then made available for the application by using a Symfony
+`parameter converter
+<http://www.whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html>`_, every controller-action can get access to the context
+by type-hinting for it:
+
+.. code-block:: php
+
+    <?php
+
+    class ApplicationController
+    {
+        public function showAction(PageContext $pageContext)
+        {
+            return array('application' => $pageContext->getApplication());
+        }
+    }
+
+The beauty of this approach is avoiding global state and passing
+the context around in a non-singleton way. Depending on the framework
+you use, it might be hard to achieve this kind of context injection.
+
+Now when I build `lightweight Symfony2 controllers
+<http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html>`_
+in my applications, using a context object allows me to use even less services
+and move repetitive find and access control code outside of the controllers.
+
+I have also written a Twig extension that gives me access to the context
+object, so I don't have to return it from every controller and created
+a wrapper for the URL Generation that appends context information
+to every URL (current date range + environment):
+
+.. code-block:: jinja2
+
+    <h1>{{ pageContext.application.name }}</h1>
+
+    <a href="{{ page_path("some_route") }}">Link with Context query arguments</a>
+
+Conclusion
+----------
+
+A context object can help you make global state explicit and control access to
+it. Good requirements for a context object are immutability and not being a
+singleton.
+
+When this is the case and you found the right variables for a context, this
+pattern will save you tons of redundant code and simplify both controllers and
+views massively.
+
+The pattern has its drawbacks: You have to be careful not put too big objects
+into the context. Everything in there should be immutable and not a singleton
+as well. Additionally you must make sure that retrieval and creating the
+context is a very fast operation to avoid performance problems.
 
 .. author:: default
-.. categories:: none
+.. categories:: Symfony, PHP, DesignPattern
 .. tags:: none
 .. comments::
