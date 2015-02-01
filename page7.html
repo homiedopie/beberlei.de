@@ -73,6 +73,61 @@
           <div id="page7">
             
             <div class="timestamp postmeta">
+            <span>March 11, 2009</span>
+        </div>
+        <div class="section" id="using-zend-soap-server-and-autodiscover-in-a-controller">
+<h1><a href="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html">Using Zend_Soap Server and Autodiscover in a Controller</a></h1>
+<p>I am in a dilemma. I have condemned the usage of Zend_Soap_Server (or
+any other webservice server handler) <a class="reference external" href="http://www.whitewashing.de/blog/articles/106">inside a Model-View-Controller
+application</a> before.
+Still I get questions about <a class="reference external" href="http://www.whitewashing.de/blog/articles/65">my old Zend_Soap_Server and
+Zend_Soap_AutoDiscover
+example</a> not working in
+the MVC scenario. The following example provides you with a working Soap
+server inside a Zend_Controller_Action, although I discourage the use
+of it and would suggest using a dedicated script outside the dispatching
+process to gain multitudes of performance, which webservices often
+require.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>require_once &quot;/path/to/HelloWorldService.php&quot;;
+
+class MyDiscouragedSoapServerController extends Zend_Controller_Action
+{
+    public function serverAction()
+    {
+        $server = new Zend_Soap_Server(&quot;http://example.com/pathto/wsdl&quot;);
+        $server-&gt;setClass('HelloWorldService');
+        $server-&gt;handle();
+    }
+
+    public function wsdlAction()
+    {
+        $wsdl = new Zend_Soap_AutoDiscover();
+        $wsdl-&gt;setUri('http://example.com/pathto/server');
+        $wsdl-&gt;setClass('HelloWorldService');
+        $wsdl-&gt;handle();
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now all you have to do is create two routes, one that makes
+<strong>http://example.com/pathto/server</strong> point to
+<strong>MyDiscouragedSoapServerController::serverAction</strong> and the other route
+that makes <strong>http://example.com/pathto/wsdl</strong> point to
+<strong>MyDiscouragedSoapServerController::wsdlAction</strong>. The wrong version
+(Version Mismatch) error comes from sending a request for the WSDL file
+to the actual Soap Server, which he doesn’t like.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html#disqus_thread" data-disqus-identifier="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>March 27, 2009</span>
         </div>
         <div class="section" id="test-your-legacy-php-application-with-function-mocks">
@@ -732,65 +787,6 @@ reindexed and deletes multiple entries of one article.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html#disqus_thread" data-disqus-identifier="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 17, 2008</span>
-        </div>
-        <div class="section" id="integrated-zend-layout-into-this-blog">
-<h1><a href="2008/05/17/integrated-zend-layout-into-this-blog.html">Integrated Zend_Layout into this blog</a></h1>
-<p>I finished with integrating Zend_Layout into this blog software today.
-At first I thought it is quite hard to use especially if you want to
-integrate dynamic navigational contents depending on the current
-module/controller/action setup. But I came up with a combination of
-actionStack and Named Response Sections as <a class="reference external" href="http://framework.zend.com/manual/en/zend.layout.quickstart.html#zend.layout.quickstart.mvc">described in the ZF
-Documentation of the Layout
-component</a>,
-which is quite easy to understand, use and extend.</p>
-<p>At each of the major Controllers I put different actions from a specific
-Navigation Controller on the
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.controller.actionhelpers.html#zend.controller.actionhelpers.actionstack">ActionStack</a>
-(mostly global per Controller using the init() class method).</p>
-<p>A typical controller looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class BlogController extends Zend_Controller_Action
-{
-    public function init()
-    {
-        $this-&gt;_helper-&gt;actionStack('tagcloud', 'Navigation');
-        $this-&gt;_helper-&gt;actionStack('userinfo', 'Navigation');
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>The NavigationController looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class NavigationController extends Zend_Controller_Action
-{
-    public function tagcloudAction()
-    {
-        // Do not render the content of this action to the default output.
-        $this-&gt;getHelper(&quot;ViewRenderer&quot;)-&gt;setNoRender();
-
-        [...]
-
-        // Append content to secondaryNavigation named response section
-        $this-&gt;getResponse()-&gt;append('secondaryNavigation', $this-&gt;view-&gt;render('navigation/tagcloud.phtml'));
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>The layout.pthml then just calls certain named sections, for example &lt;=?
-$this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/17/integrated-zend-layout-into-this-blog.html#disqus_thread" data-disqus-identifier="2008/05/17/integrated-zend-layout-into-this-blog">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -815,6 +811,8 @@ $this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+        </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
@@ -832,8 +830,6 @@ $this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li><li>
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li><li>
-            <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
         </li></ul>
 </div>
 </section>

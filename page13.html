@@ -73,6 +73,45 @@
           <div id="page13">
             
             <div class="timestamp postmeta">
+            <span>July 14, 2008</span>
+        </div>
+        <div class="section" id="jquery-helper-what-is-to-include">
+<h1><a href="2008/07/14/jquery-helper-what-is-to-include.html">jQuery Helper - What is to include?</a></h1>
+<p>I took some time in the last days to develop the concept for a possible
+jQuery View Helper that could pass the integration into the <a class="reference external" href="http://framework.zend.com">ZF
+Core</a>. Since
+<a class="reference external" href="http://www.jquery.com">jQuery</a> is organized somewhat different than
+Dojo is, its possible implementation for ZF will differ.</p>
+<p>The jQuery Helper itself will manage inclusion of jQuery javascript
+files and the base library, much like the Dojo component works (Using
+the Google CDN). On top of this simple Helpers should mimic $.get,
+$.post, $.load and $.getJSON in a simple way, so that with a simple
+function call you can generate an XmlHttpRequest that updates a
+specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
+Ajax</a>)</p>
+<p>Problematic are the next ideas: Additional Helpers will allow to
+specify the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
+(DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete">jQuery
+Autocomplete</a>
+or <a class="reference external" href="http://malsup.com/jquery/form">jQuery Form</a> (AjaxForm and
+AjaxSubmit). These libraries need additional javascript content to be
+downloaded and implemented in the Zend Framework project. There
+currently exists no way to implement them using a CDN. Therefore any
+documentation must clearly specify which additional content has to be
+installed and how. The helpers will have to be general enough to support
+this.</p>
+<p>My proposal is currently in the workings and will be on the ZF Wiki in
+the next couple of hours.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/07/14/jquery-helper-what-is-to-include.html#disqus_thread" data-disqus-identifier="2008/07/14/jquery-helper-what-is-to-include">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>July 22, 2008</span>
         </div>
         <div class="section" id="multidimensional-array-via-spl">
@@ -308,6 +347,8 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+        </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
@@ -325,8 +366,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li><li>
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li><li>
-            <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
         </li></ul>
 </div>
 </section>

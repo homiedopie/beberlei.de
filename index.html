@@ -73,6 +73,78 @@
           <div id="index">
             
             <div class="timestamp postmeta">
+            <span>February 01, 2015</span>
+        </div>
+        <div class="section" id="running-hhvm-with-a-webserver">
+<h1><a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a></h1>
+<p>I haven’t used [HHVM](<a class="reference external" href="http://hhvm.com">http://hhvm.com</a>) yet because the use-case for the
+alternative PHP runtime didn’t came up. Today I was wondering if our [Qafoo
+Profiler](<a class="reference external" href="https://qafoolabs.com">https://qafoolabs.com</a>) would run out of the box with HHVM using the
+[builtin XHProf extension](<a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">http://docs.hhvm.com/manual/en/ref.xhprof.php</a>)
+(Answer: It does).</p>
+<p>For this experiment I wanted to run the wordpress blog of my wife on HHVM
+locally. It turns out this is not very easy with an existing LAMP stack,
+because mod-php5 and mod-fastcgi obviously compete for the execution of <cite>.php</cite>
+files.</p>
+<p>Quick googling didn’t turn up a solution (there probably is one, hints in the
+comments are appreciated) and I didn’t want to install a Vagrant Box just for
+this. So I decided to turn this into a sunday side project. Requirements: A
+simple webserver that acts as proxy in front of HHVMs Fast-CGI. Think of it as
+the “builtin webserver” that HHVM is missing.</p>
+<p>This turns out to be really simple with Go, a language I use a lot for small
+projects in the last months.</p>
+<p>The code is [very simple
+plumbing](<a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go</a>)
+starting with a HTTP Server that accepts client requests, translates them to FastCGI
+requests, sending them to HHVM and then parsing the FastCGI Response to turn it into a
+HTTP Response.</p>
+<p>As a PHP developer I am amazed how Go makes it easy to write this kind of
+infrastructure tooling. I prefer PHP for everything web related, but as I tried
+to explain in [my talk at PHPBenelux last
+week](<a class="reference external" href="https://joind.in/event/view/2564">https://joind.in/event/view/2564</a>), Go is a fantastic language to write
+small, self-contained infrastructure components (or Microservices if you want a
+buzzword).</p>
+<p>Back to playing with HHVM, if you want to give your application a try with HHVM
+instead of ZendEngine PHP it boils down to [installing a prebuilt HHVM
+package](<a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM</a>) and
+then using my <cite>hhvm-serve</cite> command:</p>
+<blockquote>
+<div>$ go get github.com/beberlei/hhvm-serve
+$ hhvm-serve –document-root /var/www
+Listening on <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>
+Document root is /var/www
+Press Ctrl-C to quit.</div></blockquote>
+<p>The server passes all the necessary environment variables to HHVM so that
+catch-all front-controller scripts such as Wordpress <cite>index.php</cite> or Symfony’s
+<cite>app.php</cite> should just work.</p>
+<p>If you don’t have a running Go Compiler setup this few lines should help you out on
+Ubuntu:</p>
+<blockquote>
+<div>$ sudo apt-get install golang
+$ GOPATH=~/go
+$ mkdir -p ~/go/{src,bin,pkg}
+$ PATH=”$GOPATH/bin:$PATH”</div></blockquote>
+<p>You should put the <cite>$GOPATH</cite> and <cite>$PATH</cite> changes into your bashrc to make this
+a permanent solution.</p>
+<p>Starting to run HHVM, a Wordpress installation is a good first candidate to
+check on, as I knew from HHVM team blog posts that Wordpress works. Using a
+simple siege based benchmark I was able to trigger the JIT compiler and the
+Profiler charts showed a nice performance boost minute after minute as HHVM
+replaces dynamic PHP with optimized (assembler?) code.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/go.html">Go</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2015/02/01/running_hhvm_webserver.html#disqus_thread" data-disqus-identifier="2015/02/01/running_hhvm_webserver">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 26, 2014</span>
         </div>
         <div class="section" id="symfony-all-the-things-web">
@@ -1513,123 +1585,6 @@ the future.</p>
         </div>
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/11/19/setting_up_development_machines_ansible_edition.html#disqus_thread" data-disqus-identifier="2013/11/19/setting_up_development_machines_ansible_edition">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>September 04, 2013</span>
-        </div>
-        <div class="section" id="decoupling-from-symfony-security-and-fosuserbundle">
-<h1><a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a></h1>
-<p>In this blog post I will show how to decouple your core application
-from the Symfony Security component and User bundles such as the FOSUserBundle.</p>
-<p>In my opinion a framework has to be evaluated by how much it allows you to hide
-it from your actual application. This blog post will add another perspective on
-how to achieve decoupling from Symfony user and security with a very simple
-approach. With this puzzle piece and others I wrote about before (<a class="reference external" href="http://whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html">Controllers
-as Service</a>,
-<a class="reference external" href="http://whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html">Param Converters</a>)
-and other pieces I still need to write about, I would classify Symfony2 as a
-good framework.</p>
-<p>A number of other authors have written blog posts on decoupling Symfony and your model
-code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first">on project structure</a>
-, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure">on project structure as well</a>
-and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities">Decoupling Forms from Entities</a>.</p>
-<p>User management breaks the isolation of your business model open,
-by introducing the <span class="docutils literal"><span class="pre">UserInterface</span></span> from the Security component into your
-code base. In combination with the <em>FOSUserBundle</em> this can cause a dependency
-on quite a bit of code already because I wouldn’t call the <span class="docutils literal"><span class="pre">FOS\UserBundle\Model\User</span></span> object
-leightweight. However this and other FriendsOfSymfony bundles
-are very helpful to get annoying features of your application done in a matter
-of hours.</p>
-<p>You can decouple the <em>FOSUserBundle</em> from our own entities and code by
-introducing a second object that representes the user concept in our model.
-The <span class="docutils literal"><span class="pre">UserInterface</span></span> entities need fields for username, password, enabled and
-some more. Except the username and email, the business model rarely needs other
-properties.</p>
-<p>Take an ecommerce system as example, where customers can register as users.
-In this example we could create two entities <span class="docutils literal"><span class="pre">MyProject\UserBundle\Entity\User</span></span> and
-<span class="docutils literal"><span class="pre">MyProject\ShopBundle\Entity\Customer</span></span>. Two strategies exist now:</p>
-<ol class="arabic simple">
-<li>Use the same table for both entities with some shared and other exclusive columns</li>
-<li>Use different tables in the database</li>
-</ol>
-<p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
-<p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
-
-<span class="k">namespace</span> <span class="nx">MyProject\UserBundle\Entity</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">FOS\UserBundle\Model\User</span> <span class="k">as</span> <span class="nx">BaseUser</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\Table(name=&quot;fos_user&quot;)</span>
-<span class="sd"> */</span>
-<span class="k">class</span> <span class="nc">User</span> <span class="k">extends</span> <span class="nx">BaseUser</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Id</span>
-<span class="sd">     * @ORM\Column(type=&quot;integer&quot;)</span>
-<span class="sd">     * @ORM\GeneratedValue(strategy=&quot;AUTO&quot;)</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The <span class="docutils literal"><span class="pre">Customer</span></span> entity is a completly new object, not depending
-on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
-<p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
-correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
-
-<span class="k">namespace</span> <span class="nx">MyProject\ShopBundle\Entity</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\Table(name=&quot;customer&quot;)</span>
-<span class="sd"> */</span>
-<span class="k">class</span> <span class="nc">Customer</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Id</span>
-<span class="sd">     * @ORM\Column(type=&quot;integer&quot;)</span>
-<span class="sd">     * @ORM\GeneratedValue(strategy=&quot;NONE&quot;)</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type=&quot;string&quot;)</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="nv">$username</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Now you need to extend the application to synchronize all changes from the
-<span class="docutils literal"><span class="pre">User</span></span> entity to the <span class="docutils literal"><span class="pre">Customer</span></span> entity. You can
-achieve this relatively easy by overwriting the <span class="docutils literal"><span class="pre">ModelManager</span></span> or when finally
-supported by <em>FOSUserBundle</em> listening to events.  Your own code can
-exclusively work with <span class="docutils literal"><span class="pre">Customer</span></span> objects now, void of any reference to
-the Symfony Security component or the huge FOSUserBundle dependency.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a>, <a href="categories/symfony2.html">Symfony2</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a>, <a href="tags/symfony2.html">Symfony2</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html#disqus_thread" data-disqus-identifier="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1654,6 +1609,8 @@ the Symfony Security component or the huge FOSUserBundle dependency.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+        </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
@@ -1671,8 +1628,6 @@ the Symfony Security component or the huge FOSUserBundle dependency.</p>
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li><li>
             <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
-        </li><li>
-            <a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
         </li></ul>
 </div>
 </section>
