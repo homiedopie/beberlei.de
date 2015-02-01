@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2015/02/01/playing_around_with_hhvm
    2014/10/26/symfony_all_the_things_web
    2014/10/14/lightweight_symfony2_controllers
    2014/08/11/spotting_featureenvy_and_refactoring

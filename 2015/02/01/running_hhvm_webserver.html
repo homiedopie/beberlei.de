@@ -1,0 +1,211 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Running HHVM with a Webserver &mdash; Whitewashing</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2015-02-01-running_hhvm_webserver">
+            
+            
+    <div class="timestamp postmeta">
+            <span>February 01, 2015</span>
+        </div>
+
+    <div class="section" id="running-hhvm-with-a-webserver">
+<h1>Running HHVM with a Webserver</h1>
+<p>I haven&#8217;t used [HHVM](<a class="reference external" href="http://hhvm.com">http://hhvm.com</a>) yet because the use-case for the
+alternative PHP runtime didn&#8217;t came up. Today I was wondering if our [Qafoo
+Profiler](<a class="reference external" href="https://qafoolabs.com">https://qafoolabs.com</a>) would run out of the box with HHVM using the
+[builtin XHProf extension](<a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">http://docs.hhvm.com/manual/en/ref.xhprof.php</a>)
+(Answer: It does).</p>
+<p>For this experiment I wanted to run the wordpress blog of my wife on HHVM
+locally. It turns out this is not very easy with an existing LAMP stack,
+because mod-php5 and mod-fastcgi obviously compete for the execution of <cite>.php</cite>
+files.</p>
+<p>Quick googling didn&#8217;t turn up a solution (there probably is one, hints in the
+comments are appreciated) and I didn&#8217;t want to install a Vagrant Box just for
+this. So I decided to turn this into a sunday side project. Requirements: A
+simple webserver that acts as proxy in front of HHVMs Fast-CGI. Think of it as
+the &#8220;builtin webserver&#8221; that HHVM is missing.</p>
+<p>This turns out to be really simple with Go, a language I use a lot for small
+projects in the last months.</p>
+<p>The code is [very simple
+plumbing](<a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go</a>)
+starting with a HTTP Server that accepts client requests, translates them to FastCGI
+requests, sending them to HHVM and then parsing the FastCGI Response to turn it into a
+HTTP Response.</p>
+<p>As a PHP developer I am amazed how Go makes it easy to write this kind of
+infrastructure tooling. I prefer PHP for everything web related, but as I tried
+to explain in [my talk at PHPBenelux last
+week](<a class="reference external" href="https://joind.in/event/view/2564">https://joind.in/event/view/2564</a>), Go is a fantastic language to write
+small, self-contained infrastructure components (or Microservices if you want a
+buzzword).</p>
+<p>Back to playing with HHVM, if you want to give your application a try with HHVM
+instead of ZendEngine PHP it boils down to [installing a prebuilt HHVM
+package](<a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM</a>) and
+then using my <cite>hhvm-serve</cite> command:</p>
+<blockquote>
+<div>$ go get github.com/beberlei/hhvm-serve
+$ hhvm-serve &#8211;document-root /var/www
+Listening on <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>
+Document root is /var/www
+Press Ctrl-C to quit.</div></blockquote>
+<p>The server passes all the necessary environment variables to HHVM so that
+catch-all front-controller scripts such as Wordpress <cite>index.php</cite> or Symfony&#8217;s
+<cite>app.php</cite> should just work.</p>
+<p>If you don&#8217;t have a running Go Compiler setup this few lines should help you out on
+Ubuntu:</p>
+<blockquote>
+<div>$ sudo apt-get install golang
+$ GOPATH=~/go
+$ mkdir -p ~/go/{src,bin,pkg}
+$ PATH=&#8221;$GOPATH/bin:$PATH&#8221;</div></blockquote>
+<p>You should put the <cite>$GOPATH</cite> and <cite>$PATH</cite> changes into your bashrc to make this
+a permanent solution.</p>
+<p>Starting to run HHVM, a Wordpress installation is a good first candidate to
+check on, as I knew from HHVM team blog posts that Wordpress works. Using a
+simple siege based benchmark I was able to trigger the JIT compiler and the
+Profiler charts showed a nice performance boost minute after minute as HHVM
+replaces dynamic PHP with optimized (assembler?) code.</p>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2015/02/01/running_hhvm_webserver";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2015/02/01/running_hhvm_webserver.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
+        </li><li>
+            <a href="../../../2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
+        </li><li>
+            <a href="../../../2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
+        </li><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li><li>
+            <a href="../../../2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
+        </li><li>
+            <a href="../../../2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
+        </li><li>
+            <a href="../../../2013/12/31/2013_and_2014.html">2013 and 2014</a>
+        </li><li>
+            <a href="../../../2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
+        </li><li>
+            <a href="../../../2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
+        </li><li>
+            <a href="../../../2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2014, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>
