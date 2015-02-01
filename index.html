@@ -105,22 +105,24 @@ buzzword).</p>
 <p>Back to playing with HHVM, if you want to give your application a try with HHVM
 instead of ZendEngine PHP it boils down to <a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">installing a prebuilt HHVM package</a> and then
 using my <span class="docutils literal"><span class="pre">hhvm-serve</span></span> command:</p>
-<blockquote>
-<div>$ go get github.com/beberlei/hhvm-serve
-$ hhvm-serve –document-root /var/www
-Listening on <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>
+<div class="highlight-python"><div class="highlight"><pre>$ go get github.com/beberlei/hhvm-serve
+$ hhvm-serve --document-root /var/www
+Listening on http://localhost:8080
 Document root is /var/www
-Press Ctrl-C to quit.</div></blockquote>
+Press Ctrl-C to quit.
+</pre></div>
+</div>
 <p>The server passes all the necessary environment variables to HHVM so that
 catch-all front-controller scripts such as Wordpress <span class="docutils literal"><span class="pre">index.php</span></span> or Symfony’s
 <span class="docutils literal"><span class="pre">app.php</span></span> should just work.</p>
 <p>If you don’t have a running Go Compiler setup this few lines should help you out on
 Ubuntu:</p>
-<blockquote>
-<div>$ sudo apt-get install golang
+<div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get install golang
 $ GOPATH=~/go
 $ mkdir -p ~/go/{src,bin,pkg}
-$ PATH=”$GOPATH/bin:$PATH”</div></blockquote>
+$ PATH=&quot;$GOPATH/bin:$PATH&quot;
+</pre></div>
+</div>
 <p>You should put the <span class="docutils literal"><span class="pre">$GOPATH</span></span> and <span class="docutils literal"><span class="pre">$PATH</span></span> changes into your bashrc to make this
 a permanent solution.</p>
 <p>Starting to run HHVM, a Wordpress installation is a good first candidate to
