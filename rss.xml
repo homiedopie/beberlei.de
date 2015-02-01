@@ -13,10 +13,10 @@
             <title><![CDATA[Running HHVM with a Webserver]]></title>
             <description><![CDATA[<div class="section" id="running-hhvm-with-a-webserver">
 <h1>Running HHVM with a Webserver</h1>
-<p>I haven’t used [HHVM](<a class="reference external" href="http://hhvm.com">http://hhvm.com</a>) yet because the use-case for the
-alternative PHP runtime didn’t came up. Today I was wondering if our [Qafoo
-Profiler](<a class="reference external" href="https://qafoolabs.com">https://qafoolabs.com</a>) would run out of the box with HHVM using the
-[builtin XHProf extension](<a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">http://docs.hhvm.com/manual/en/ref.xhprof.php</a>)
+<p>I haven’t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
+alternative PHP runtime didn’t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
+Profiler</a> would run out of the box with HHVM using the
+<a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">builtin XHProf extension</a>
 (Answer: It does).</p>
 <p>For this experiment I wanted to run the wordpress blog of my wife on HHVM
 locally. It turns out this is not very easy with an existing LAMP stack,
@@ -29,21 +29,18 @@ simple webserver that acts as proxy in front of HHVMs Fast-CGI. Think of it as
 the “builtin webserver” that HHVM is missing.</p>
 <p>This turns out to be really simple with Go, a language I use a lot for small
 projects in the last months.</p>
-<p>The code is [very simple
-plumbing](<a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go</a>)
+<p>The code is <a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">very simple plumbing</a>
 starting with a HTTP Server that accepts client requests, translates them to FastCGI
 requests, sending them to HHVM and then parsing the FastCGI Response to turn it into a
 HTTP Response.</p>
 <p>As a PHP developer I am amazed how Go makes it easy to write this kind of
 infrastructure tooling. I prefer PHP for everything web related, but as I tried
-to explain in [my talk at PHPBenelux last
-week](<a class="reference external" href="https://joind.in/event/view/2564">https://joind.in/event/view/2564</a>), Go is a fantastic language to write
+to explain in <a class="reference external" href="https://joind.in/event/view/2564">my talk at PHPBenelux last week</a>, Go is a fantastic language to write
 small, self-contained infrastructure components (or Microservices if you want a
 buzzword).</p>
 <p>Back to playing with HHVM, if you want to give your application a try with HHVM
-instead of ZendEngine PHP it boils down to [installing a prebuilt HHVM
-package](<a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM</a>) and
-then using my <cite>hhvm-serve</cite> command:</p>
+instead of ZendEngine PHP it boils down to <a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">installing a prebuilt HHVM package</a> and then
+using my <span class="docutils literal"><span class="pre">hhvm-serve</span></span> command:</p>
 <blockquote>
 <div>$ go get github.com/beberlei/hhvm-serve
 $ hhvm-serve –document-root /var/www
@@ -51,8 +48,8 @@ Listening on <a class="reference external" href="http://localhost:8080">http://l
 Document root is /var/www
 Press Ctrl-C to quit.</div></blockquote>
 <p>The server passes all the necessary environment variables to HHVM so that
-catch-all front-controller scripts such as Wordpress <cite>index.php</cite> or Symfony’s
-<cite>app.php</cite> should just work.</p>
+catch-all front-controller scripts such as Wordpress <span class="docutils literal"><span class="pre">index.php</span></span> or Symfony’s
+<span class="docutils literal"><span class="pre">app.php</span></span> should just work.</p>
 <p>If you don’t have a running Go Compiler setup this few lines should help you out on
 Ubuntu:</p>
 <blockquote>
@@ -60,7 +57,7 @@ Ubuntu:</p>
 $ GOPATH=~/go
 $ mkdir -p ~/go/{src,bin,pkg}
 $ PATH=”$GOPATH/bin:$PATH”</div></blockquote>
-<p>You should put the <cite>$GOPATH</cite> and <cite>$PATH</cite> changes into your bashrc to make this
+<p>You should put the <span class="docutils literal"><span class="pre">$GOPATH</span></span> and <span class="docutils literal"><span class="pre">$PATH</span></span> changes into your bashrc to make this
 a permanent solution.</p>
 <p>Starting to run HHVM, a Wordpress installation is a good first candidate to
 check on, as I knew from HHVM team blog posts that Wordpress works. Using a
