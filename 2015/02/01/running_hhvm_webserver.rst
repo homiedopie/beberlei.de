@@ -38,6 +38,8 @@ instead of ZendEngine PHP it boils down to `installing a prebuilt HHVM package
 <https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM>`_ and then
 using my ``hhvm-serve`` command:
 
+::
+
     $ go get github.com/beberlei/hhvm-serve
     $ hhvm-serve --document-root /var/www
     Listening on http://localhost:8080
@@ -50,6 +52,8 @@ catch-all front-controller scripts such as Wordpress ``index.php`` or Symfony's
 
 If you don't have a running Go Compiler setup this few lines should help you out on
 Ubuntu:
+
+::
 
     $ sudo apt-get install golang
     $ GOPATH=~/go
