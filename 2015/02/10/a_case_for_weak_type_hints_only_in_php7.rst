@@ -1,14 +1,13 @@
 A case for weak type hints only in PHP7
 =======================================
 
-TL;DR: @Andrea + Pro v0.3 RFC Camp: I was one voice for having strict type
-hints until I used them. From both a library and application developer POV they
-don't bring much to the table. I think PHP would be more consistent with weak type
-hints only.
+TL;DR: I was one voice for having strict type hints until I tried the current
+patch. From both a library and application developer POV they don't bring much
+to the table. I think PHP would be more consistent with weak type hints only.
 
-These last weeks there have been tons of discussions about [scalar type
-hints](https://wiki.php.net/rfc/scalar_type_hints)
-in PHP following [Andrea Faulds](https://twitter.com/andreafaulds) RFC
+These last weeks there have been tons of discussions about `scalar type
+hints <https://wiki.php.net/rfc/scalar_type_hints>`_
+in PHP following `Andrea Faulds <https://twitter.com/andreafaulds>`_ RFC
 that is currently in voting. Most of them were limited to PHP Internals
 mailinglist but since the voting started some days ago much has also been said
 on Twitter and blogs.
@@ -34,8 +33,8 @@ PHP's current approach is one of the main benefits of the language.
 
 ## Real World Weak vs Strict Code Example
 
-Lets look at an example of everyday framework code [Full
-Code](https://gist.github.com/beberlei/8b23160dd0b4466fe1c5) to
+Lets look at an example of everyday framework code `Full
+Code <https://gist.github.com/beberlei/8b23160dd0b4466fe1c5>`_ to
 support my case:
 
 .. code-block:: php
