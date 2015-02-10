@@ -73,6 +73,44 @@
           <div id="page6">
             
             <div class="timestamp postmeta">
+            <span>February 13, 2009</span>
+        </div>
+        <div class="section" id="update-on-unittest-and-metrics-tool">
+<h1><a href="2009/02/13/update-on-unittest-and-metrics-tool.html">Update on Unittest and Metrics Tool</a></h1>
+<p>Some days ago i posted about the <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PHP Unittest and Metrics
+Aggregator</a> tool that i
+have written on (and which I have dubbed PUMA). Discussing it with
+people I came to the conclusion that the approach using
+<a class="reference external" href="http://ezcomponents.org">ezcMvcTools</a> is quite problematic that it
+forces to use this application, although the reporting and the
+application are quite separate. This is not against ezcMvcTools: I love
+it, its just the wrong type of support.</p>
+<p>I began to split up the aggregator into some sort of importing-exporting
+tool. You can specify library-, test- and output-directory of your
+application and it will use the tools at hand
+(<a class="reference external" href="http://www.phpunit.de">PHPUnit</a>, <a class="reference external" href="http://www.pdepend.org">PDepend</a>
+and CodeSniffer currently) to generate their XML formatted reports. It
+then parses those XML outputted files and combines their result to give
+a consistent view on your application.</p>
+<p>The Import-To-Output generator uses a three-step approach. An importer
+emits signals to report observers, which will then hand over their
+collected data to specific html pages that are then generated to the
+disc. This is a very flexible approach that allows anyone to extend and
+re-use the tool to generate project metrics, unittest overview and other
+interesting details on your application.</p>
+<p><a class="reference external" href="http://github.com/beberlei/puma/tree/master">Have a look at the tool on
+Github</a> and play with it.
+I would really like to hear your thoughts.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/02/13/update-on-unittest-and-metrics-tool.html#disqus_thread" data-disqus-identifier="2009/02/13/update-on-unittest-and-metrics-tool">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>May 01, 2009</span>
         </div>
         <div class="section" id="explicit-code-requires-no-comments-only-bad-code-does">
@@ -907,71 +945,6 @@ at all.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/01/12/on-publishing-webservices-within-mvc-frameworks.html#disqus_thread" data-disqus-identifier="2009/01/12/on-publishing-webservices-within-mvc-frameworks">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 07, 2009</span>
-        </div>
-        <div class="section" id="seven-things">
-<h1><a href="2009/01/07/seven-things.html">Seven Things</a></h1>
-<p>I have been tagged by
-<a class="reference external" href="http://dolfschimmel.freeaqingme.com/?p=78">Freeaqingme</a> and the blog
-letter machinery. So read on for seven things you probably may not know
-about me.</p>
-<ul class="simple">
-<li>I will get my degree in some weeks, currently intensively writting on
-my thesis. My major is economics though. I probably won’t get a job
-with that sooner or later. I actually don’t want to, I have a job as
-programmer already.</li>
-<li>One christmas many years ago (Pentium PCs to 200Mhz were the coolest
-thing around) i wished and wished for a computer for playing Command
-and Conquer and stuff. What i got was a 3/86 i could only run crap
-with. So i had to start programming.</li>
-<li>In 11th grade (7 years ago) I took part in the german computer
-science olympics (<a class="reference external" href="http://www.bwinf.de/uploads/media/bwi20/runde1/20bwinf.pdf">exercise still
-online</a>)
-using PHP and writing thousands of lines of nested aray and for loop
-code and print the solution to the browser. No need to say I utterly
-failed, because I didn’t know a bit about algorithms, pointers and
-objects at all.</li>
-<li>I have only learned about what good programming practices are (OO,
-functional, whatever) really means in the last two years, spending
-almost every free minute of those many i had on projects to test
-around with patterns and programming styles.</li>
-<li>I went to my first conference last year september, the IPC in Mainz,
-getting to know lots of great people in the community.</li>
-<li>I don’t have a license at all (<a class="reference external" href="http://blog.libssh2.org/index.php?/archives/122-Seven-Things.html">Reference to
-Sara</a>).
-I am afraid of driving cars, although I drive my bike through the
-biggest crossroads in town like nuts.</li>
-<li>I am a timeline oriented reader, having made me masterplans to read
-both all the Discworld and Ian Rankin novels in the correct order to
-not miss a single reference.</li>
-</ul>
-<p>Its sad that everyone I would want to tag was already tagged by someone
-else, still for the head count:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://weierophinney.net/matthew">Matthew Weierophinney</a>, because
-he helped me understand Zend Framework alot.</li>
-<li><a class="reference external" href="http://www.dasprids.de">Ben Scholzen</a>, because he is a fun guy to
-be around <strong>#zftalk.dev</strong>.</li>
-<li><a class="reference external" href="http://www.thomasweidner.com/flatpress">Thomas Weidner</a>, because
-I like his dedication towards his ZF components.</li>
-<li><a class="reference external" href="http://kore-nordmann.de/blog.html">Kore Nordmann</a>, Bastian Feder
-and Thomas Weinert, because I had great discussions with him on IPC.</li>
-<li><a class="reference external" href="http://codeutopia.net/blog">zomg aka Jani</a> because of his skills
-to be referenced by PHPDeveloper.org (joke) and the good IRC
-discussions.</li>
-<li><a class="reference external" href="http://blogs.sun.com/netbeansphp">Petr Pisl</a> because of the
-awesome NetBeans PHP support.</li>
-</ul>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/01/07/seven-things.html#disqus_thread" data-disqus-identifier="2009/01/07/seven-things">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -996,6 +969,8 @@ awesome NetBeans PHP support.</li>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
@@ -1013,8 +988,6 @@ awesome NetBeans PHP support.</li>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
         </li><li>
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li><li>
-            <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li></ul>
 </div>
 </section>

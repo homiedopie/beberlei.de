@@ -73,6 +73,227 @@
           <div id="index">
             
             <div class="timestamp postmeta">
+            <span>February 10, 2015</span>
+        </div>
+        <div class="section" id="a-case-for-weak-type-hints-only-in-php7">
+<h1><a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a></h1>
+<p>TL;DR: @Andrea + Pro v0.3 RFC Camp: I was one voice for having strict type
+hints until I used them. From both a library and application developer POV they
+don’t bring much to the table. I think PHP would be more consistent with weak type
+hints only.</p>
+<p>These last weeks there have been tons of discussions about [scalar type
+hints](<a class="reference external" href="https://wiki.php.net/rfc/scalar_type_hints">https://wiki.php.net/rfc/scalar_type_hints</a>)
+in PHP following [Andrea Faulds](<a class="reference external" href="https://twitter.com/andreafaulds">https://twitter.com/andreafaulds</a>) RFC
+that is currently in voting. Most of them were limited to PHP Internals
+mailinglist but since the voting started some days ago much has also been said
+on Twitter and blogs.</p>
+<p>This post is my completly subjective opinion on the issue.</p>
+<p>I would have preferred strict type hints, however after trying the patch, I
+think that strict type hints</p>
+<ul class="simple">
+<li>will cause considerable problems for application developers, forcing them to
+“replicate weak type hinting” by manually casting everywhere.</li>
+<li>are useless for library developers, because they have to assume the user
+is in weak type mode.</li>
+<li>are useless within a library because I already know the types at the public
+API, weak mode would suffice for all the lower layers of my library.</li>
+</ul>
+<p>Neither group of developers gets a considerable benefit from the current RFCs strict mode.</p>
+<p>The simple reason for this, request, console inputs and many databases provide
+us with strings, casting has to happen somewhere. Having strict type hints
+would not save us from this, type juggling and casting has to happen and
+PHP’s current approach is one of the main benefits of the language.</p>
+<p>## Real World Weak vs Strict Code Example</p>
+<p>Lets look at an example of everyday framework code [Full
+Code](<a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">https://gist.github.com/beberlei/8b23160dd0b4466fe1c5</a>) to
+support my case:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">listAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$status</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">);</span> <span class="c1">// this is a string</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">'users'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchUsers</span><span class="p">(</span><span class="nv">$status</span><span class="p">),</span>
+            <span class="s1">'total'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchTotalCount</span><span class="p">(</span><span class="nv">$status</span><span class="p">)</span>
+        <span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">UserService</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">STATUS_INACTIVE</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_WAITING</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_APPROVED</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$connection</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchUsers</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT u.id, u.username FROM users u WHERE u.status = ? LIMIT 10'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchTotalCount</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT count(*) FROM users u WHERE u.status = ?'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchColumn</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span> <span class="c1">// returns a string</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See how the code on <span class="docutils literal"><span class="pre">UserService</span></span> is guarded by scalar typehints to enforce
+having the right types inside the service:</p>
+<ul class="simple">
+<li><span class="docutils literal"><span class="pre">$status</span></span> is a flag to filter the result by and it is one of the integer constants, the type hint coerces an integer from the request string.</li>
+<li><span class="docutils literal"><span class="pre">fetchTotalCount()</span></span> returns an integer of total number of users matching the query, the type hint coerces an integer from the database string.</li>
+</ul>
+<p>This code example <em>only</em> works with weak typehinting mode as described in the RFC.</p>
+<p>Now lets enable strict type hinting to see how the code fails:</p>
+<ul class="simple">
+<li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
+<li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>Catchable fatal error: Argument 1 passed to UserService::fetchUsers() must
+be of the type integer, string given, called in /tmp/hints.php on line 22
+and defined in /tmp/hints.php on line 37
+
+Catchable fatal error: Return value of UserService::fetchTotalCount() must
+be of the type integer, string returned in /tmp/hints.php on line 48
+</pre></div>
+</div>
+<p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function listAction(Request $request)</span>
+<span class="x">{</span>
+<span class="x">    $status = (int)$request-&gt;get('status'); // this is a string</span>
+
+<span class="x">    return [</span>
+<span class="x">        'users' =&gt; $this-&gt;service-&gt;fetchUsers($status),</span>
+<span class="x">        'total' =&gt; $this-&gt;service-&gt;fetchTotalCount($status)</span>
+<span class="x">    ];</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<span class="x">{</span>
+<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
+
+<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>It feels to me that enabling strict mode completly defeats the purpose, because
+now we are forced to convert manually, reimplementing weak type hinting in our
+own code.</p>
+<p>More important: We write code with casts already, the scalar type hints patch
+is not necessary for that! Only a superficial level of additional safety is
+gained, one additional check of something we already know is true!</p>
+<p>As a developer of the <span class="docutils literal"><span class="pre">UserService</span></span> I have to assume weak mode, so there is
+some code missing for the case  invalid status flag <span class="docutils literal"><span class="pre">&quot;string&quot;</span></span> is passed to
+the function:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<span class="x">{</span>
+<span class="x">    if ($status === 0) {</span>
+<span class="x">        throw \RuntimeException;</span>
+<span class="x">    }</span>
+
+<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
+
+<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>Strict mode is useless for library developers, because I always have to assume
+weak mode anyways.</p>
+<p>## Do we need strict mode?</p>
+<p>In a well designed application or library, the developer can already trust the
+types of his variables today, 95% of the time, without even having type hints,
+using carefully designed abstractions (example Symfony Forms and Doctrine ORM): No
+substantial win for her from having strict type hints.</p>
+<p>In a badly designed application, the developer is uncertain about the types of
+variables. Using strict mode in this scenario she needs to start casting
+everywhere just to be sure. I cannot imagine the resulting code to look
+anything but bad. Strict would actually be counterproductive here.</p>
+<p>I also see a danger here, that writing “strict mode” code will become a best
+practice and this might lead developers working on badly desigend applications
+to write even crappier code just to follow best practices.</p>
+<p>As a pro strict mode developer I could argue:</p>
+<ul class="simple">
+<li>that libraries such as Doctrine ORM and Symfony Forms already
+abstract all the nitty gritty casting from request or database today. But I
+don’t think that is valid: They are two of the most sophisticated PHP libraries
+out there, maybe used by 1-5% of the userbase. I don’t want to force this
+level of abstraction on all users. I can’t use this level myself all the
+time. Also if libraries already abstract this for us, why need to duplicate
+the checks again if we can trust the variables types?</li>
+<li>that I might have complex (mathematical) algorithms that benefit from strict
+type hinting. But that is not really true: Once the variables have passed
+through the public API of my fully typehinted library I know the types and can rely
+on them on all lower levels. Weak or strict type hinting doesn’t make a
+difference anymore. Well designed libraries written in PHP5 already provide
+this kind of trust using carefully designed value objects and guard clauses.</li>
+<li>that using strict type in my library reduce the likelihood of bugs, but that
+is not guaranteed.  Users of my library can always decide not to use strict
+type hints and that requires me as a library author to consider this use-case
+and prevent possible problems. Again using strict mode doesn’t provide a
+benefit here.</li>
+<li>to write parts of the code in strict and parts in weak mode. But how to
+decide this? Projects usually pick only one paradigm for good reason:
+<span class="docutils literal"><span class="pre">E_STRICT</span></span> compatible code yes or no for example. Switching is arbitrary
+and dangerously inconsistent. As a team lead I would reject such kind of
+convention because it is impractible. Code that follows this paradigm in
+strict languages such as Java and C# has an aweful lot of converting methods
+such as <span class="docutils literal"><span class="pre">$connection-&gt;fetchColumnAsInteger()</span></span>. I do not want to go down
+that road.</li>
+</ul>
+<p>## Would we benefit from only strict mode?</p>
+<p>Supporters of strict mode only: Make sure to understand why this will never happen!</p>
+<p>Say the current RFC gets rejected, would we benefit from a strict type hinting
+RFC? No, and the current RFC details the exact reasons why. Most notably
+for BC reasons all the PHP API will not use the new strict type hinting.</p>
+<p>This current RFC is the only chance to get any kind of strict hinting into PHP.
+Yet with the limited usefullness as described before, we can agree that just
+having weak mode would be more consistent and therefore better for everyone.</p>
+<p>## Conclusion</p>
+<p>I as PHP developer using frameworks and libraries that help me write type safe
+code today, strict typing appeals to me. But put to a test in real code it
+proves to be impractical for many cases, and not actually much more useful
+than weak type hinting in many other cases.</p>
+<p>Weak types provide me with much of the type safety I need: In any given method,
+using only typehinted parameters and return values, I am safe from type
+juggling. As a library developer I have to assume caller uses weak mode all the
+time.</p>
+<p>Having strict type hints suggests that we can somehow get rid of type juggling
+all together. But that is not true, because we still have to work with user
+input and databases.</p>
+<p>The current RFC only introduced the extra strict mode because developers had a
+very negative reactions towards weak type hints. Strike me from this list, weak
+type hints are everything that PHP should have. I will go as far that others
+strict-typers would probably agree when actually working with the patch.</p>
+<p>I would rather prefer just having weak types for now, this is already
+a big change for the language and would prove to be valuable for everyone.</p>
+<p>I fear Strict mode will have no greater benefit than gamification of the
+language, the winner is the one with the highest percentage of strict mode
+code.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html#disqus_thread" data-disqus-identifier="2015/02/10/a_case_for_weak_type_hints_only_in_php7">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 01, 2015</span>
         </div>
         <div class="section" id="running-hhvm-with-a-webserver">
@@ -1469,121 +1690,6 @@ Entities metadata.</p>
         </div>
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html#disqus_thread" data-disqus-identifier="2013/12/05/feature_flags_and_doctrine_entities">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 19, 2013</span>
-        </div>
-        <div class="section" id="setting-up-development-machines-ansible-edition">
-<h1><a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a></h1>
-<p>A little over a year ago I posted on using <a class="reference external" href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html">Puppet for setting up development
-machines</a>.
-This approach prooved useful as during that time I did setup a new machine
-several times and benefited from the mostly automatic installation with Puppet.
-Github is thinking the same on a bigger scale. Earlier this year they
-introduced <a class="reference external" href="https://github.com/blog/1345-introducing-boxen">Boxen</a> which is
-using Puppet to setup mac-development machines.</p>
-<p>The space of deployment- and configuration management tools
-is exploding these last years and it is not always feasible to evaluate all of
-them. The benefit of Puppet over all these tools is its huge userbase and
-online resources. However the steep learning curve can be a huge pain coupled
-with the fact that most of the modules online are not reusable at all and
-mostly serve a documentation for “how not to work with Puppet”. On top of that
-Puppet is only for configuration management and not suitable for deployment
-of applications.</p>
-<div class="section" id="introduction-to-ansible">
-<h2>Introduction to Ansible</h2>
-<p>I came across a <a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible">blog post on Ansible</a> by the
-awesome guys at Qandidate.com which lead me to investigate <a class="reference external" href="http://ansibleworks.com">Ansible</a>. It is essentially a hybrid between Capistrano and Puppet,
-solving both the deployment and configuration management problems with a focus
-on simplicity. In fact the learning curve of Ansible is much more flat than
-that of Puppet and you can read the whole documentation and understand even the
-advanced concepts in a few hours.</p>
-<p>Ansible is used from a developer- or continuous-integration-machine, which
-executes tasks on hosts from an inventory. You only need SSH servers running
-and private keys to connect to them to get it working. With the inventory of
-hosts to operate on, you can chose to execute ad-oc commands using the
-<cite>ansible</cite> command or playbooks using the <cite>ansible-playbook</cite> command. Playbooks
-are files written in YAML.</p>
-<p><a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible">Read Sanders post on the Qandidate blog</a> to get an introduction to Ansible.</p>
-</div>
-<div class="section" id="development-machine-setup">
-<h2>Development-Machine Setup</h2>
-<p>Using Ansible to setup a development machine is a bit pointless, given that
-Ansible excels at remote task execution and distribution. The benefit in
-development-machine setup over Puppet is the simplicity of configuration
-compared to Puppet modules + DSL.</p>
-<p>For demonstration I have converted the puppet examples from my blog post on
-Puppet to Ansible.  To start we have to create a folder and create a new file
-<cite>inventory</cite> in it containing our local machine:</p>
-<div class="highlight-python"><div class="highlight"><pre>localhost   ansible_connection=local
-</pre></div>
-</div>
-<p>This is necessary to convince the remote task execution part of Ansible that
-localhost exists and there is no SSH necessary to get into that machine.</p>
-<p>Now I can create playbooks for the different tools I might want to install and
-setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre>---
-- hosts: localhost
-  tasks:
-    - name: Install VIM
-      apt: pkg=vim state=present
-      sudo: yes
-    - name: Install Dotfiles
-      git: &gt;
-        repo=git@github.com/beberlei/vim-dotfiles.git
-        dest=/home/${ansible_user_id}/.vim
-    - name: Create .vimrc Symlink
-      file: &gt;
-        src=/home/${ansible_user_id}/.vim/vimrc
-        dest=/home/${ansible_user_id}/.vimrc
-        state=symlink
-    - name: Compile and Install Command-T plugin
-      command: &gt;
-        rake make
-        chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
-        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe
-</pre></div>
-</div>
-<p>You can see here, tasks are a list of commands to execute. They are always
-executed in order and stop when the first task in the chain fails. Like in
-puppet you try to make those tasks idempotent through flags such as <cite>creates</cite>,
-signaling when a task needs to be or was already executed. I can optionally
-use sudo to run commands such as installing packages.</p>
-<p>To execute the playbook I call:</p>
-<div class="highlight-python"><div class="highlight"><pre>$&gt; ansible-playbook -K -i inventory vim.yml
-</pre></div>
-</div>
-<p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the
-local machine and the playbook applies the <cite>hosts</cite> filter to that inventory.
-The <cite>-K</cite> parameter prompts me to enter the sudo password for my Ubuntu machine,
-otherwise the tasks will fail.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>Compared to Puppet, the configuration management of Ansible simplifies a lot of
-the assumptions for example on ordering and reusability of tasks. For a
-part-time “devop” like me this is great news, as I don’t need to understand a
-complex tool and can focus on solving problems.</p>
-<p>On top of that the deployment features of Ansible with parallel remote
-execution over SSH make Ansible a powerful tool that I hope to use much more in
-the future.</p>
-</div>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/devops.html">Devops</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/ansible.html">Ansible</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/11/19/setting_up_development_machines_ansible_edition.html#disqus_thread" data-disqus-identifier="2013/11/19/setting_up_development_machines_ansible_edition">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1608,6 +1714,8 @@ the future.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
@@ -1625,8 +1733,6 @@ the future.</p>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
         </li><li>
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li><li>
-            <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li></ul>
 </div>
 </section>

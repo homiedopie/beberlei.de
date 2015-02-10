@@ -73,6 +73,33 @@
           <div id="page11">
             
             <div class="timestamp postmeta">
+            <span>January 22, 2008</span>
+        </div>
+        <div class="section" id="a-knight-s-tour-solver-in-pascal-supplement">
+<h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html">A knight’s tour solver in pascal - supplement</a></h1>
+<p>Following my <a class="reference external" href="http://www.whitewashing.de/blog/articles/6">earlier post on the Knights
+tour</a>: It seems it is
+crucial for a backtracking algorithm what the knights starting position
+is, and even more important in what order the jumps are tried. Because
+there are 8 possible moves for a knight, you have to decide in which
+order they should be performed. If there is not a deviation when
+backtracking the algorithm gets stuck in almost the same positions very
+very often.</p>
+<p>I rewrote the order of jumps for my 7x7 board and found a solution in
+seconds. Using the same order for an 8x8 board gets me stuck in endless
+tries again. I see its important to implement the <a class="reference external" href="http://en.wikipedia.org/wiki/Warnsdorff's_algorithm">Warnsdorff’s
+algorithm</a>,
+perhaps I will do so.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html#disqus_thread" data-disqus-identifier="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 28, 2008</span>
         </div>
         <div class="section" id="linux-style-mysql-shell-prompt">
@@ -527,75 +554,6 @@ integrates lots of stuff of the Zym component).</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html#disqus_thread" data-disqus-identifier="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>April 27, 2008</span>
-        </div>
-        <div class="section" id="ox-cross-correlation-coefficients-with-lags">
-<h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
-<p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
-class</a> I
-realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
-calculate correlation coefficients like Mathlab has.</p>
-<p>Our assignment was to replicate the Dynamic Correlations graph in
-<a class="reference external" href="http://www.amazon.de/gp/redirect.html?ie=UTF8&amp;location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&amp;s=books-intl-de&amp;qid=1209289935&amp;sr=8-1&amp;site-redirect=de&amp;tag=economystuden-21&amp;linkCode=ur2&amp;camp=1638&amp;creative=6742">Walshs’ Monetary Theory and
-Policy</a>
-for European Data, which shows the cross-correlation of different
-monetary aggregates (M0,M1,M2) with GDP over lagging periods of -8 to +8
-quarters.</p>
-<p>What was missing for me to do that assignment in Ox was a function to
-calculate cross-correlation coefficients for two vectors for a specified
-lag length:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>#include &lt;oxfloat.h&gt;
-
-/**
- * Computes the cross-correlation coefficient for two vector series allowing
- * to optionally specify the number of positive and negative lags the ccc
- * should be calculated for.
- *
- * @author Benjamin Eberlei (kontakt at beberlei dot de)
- * @param vVarY Tx1 vector of variable related to
- * @param vVarX Tx1 vector of variable which is tested in different lags
- * @param lags Integer indicating the number of negative and positive lags.
- * @returns (1+lags*2)*1 vector of correlations from -lags to lags
- **/
-ccf(const vVarY, const vVarX, const lags)
-{
-    // Generate positive and negative lags of given length and fill with NaN, so
-    // that rows with not available numbers can be dropped from calculating the CCF later on.
-    decl mXLag = lag0(vVarX, range(lags, -lags), M_NAN);
-
-    decl mCorr, sCov;
-
-    // initialize result vector holding one crosscorrelation per lag
-    decl vCorrLags = zeros(1+lags*2, 1);
-
-    // sadly there are no matrix operations to ease this computation, loop over all lags
-    for(decl i = 0; i &lt; 1+lags*2; i++) {
-        mCorr = deleter(vVarY ~ mXLag[][i]); // stick y and current lagged x together and delete NaN rows
-
-        // calculate covariance of both time series
-        sCov = 1/(rows(mCorr)-1) * sumc( (mCorr[][0]-meanc(mCorr[][0]))' * (mCorr[][1]-meanc(mCorr[][1])) );
-
-        // calculate correlation coefficient
-        vCorrLags[i][0] = sCov / ( sqrt(varc(mCorr[][0])) * sqrt(varc(mCorr[][1])) );
-    }
-
-    return vCorrLags;
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>It may prove useful to someone.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/04/27/ox-cross-correlation-coefficients-with-lags.html#disqus_thread" data-disqus-identifier="2008/04/27/ox-cross-correlation-coefficients-with-lags">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -620,6 +578,8 @@ ccf(const vVarY, const vVarX, const lags)
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
@@ -637,8 +597,6 @@ ccf(const vVarY, const vVarX, const lags)
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
         </li><li>
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li><li>
-            <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li></ul>
 </div>
 </section>

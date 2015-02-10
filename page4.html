@@ -73,6 +73,160 @@
           <div id="page4">
             
             <div class="timestamp postmeta">
+            <span>August 25, 2012</span>
+        </div>
+        <div class="section" id="decoupling-applications-with-domains-events">
+<h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
+<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
+I have described 3 architectural patterns for business applications. Applying
+them to your software helps you decouple the business logic from the
+application/framework/UI. However given sufficient complexity, you will want to
+decouple different parts of your business model from each other as well.</p>
+<p>As an example, lets think of a batch process in your application that updates
+orders from a CRM or logistics system:</p>
+<ul class="simple">
+<li>You receive an XML with full users and order representations</li>
+<li>You need to update certain user fields</li>
+<li>You need to update certain order fields</li>
+<li>Some orders require creating accounts in different remote systems</li>
+<li>If the user has not confirmed his email yet he should receive an opt-in
+mail instead.</li>
+<li>If the user confirms his opt-in mail, all outstanding remote accounts are
+created.</li>
+</ul>
+<p>You can build all the steps into a single batch processing service. This will
+be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
+principle</a>.</p>
+<p>the part with updating of users and fields has nothing to with the sending of
+mails and creation of remote accounts.  We want to decouple them from each
+other.</p>
+<p>The first obvious choice is to decouple them into distinct services:</p>
+<ul class="simple">
+<li>Import Service</li>
+<li>Authentication Service</li>
+<li>Account Generation Service</li>
+</ul>
+<p>All these services have dependencies on infrastructure objects, database,
+mailer and so on. We could inject the authentication and account generation
+services into the Import Service, but with rising complexity this will lead to
+a lasagna of services and the execution path will dig deep into this and this
+is not nearly as tasty as eating real lasagna.</p>
+<div class="highlight-python"><div class="highlight"><pre>ImportService
+|_AuthenticationService
+| |_Mailer
+| |_Database
+|_AccountGenerationService
+| |_Database
+| \_RemoteFacade
+\_Database
+</pre></div>
+</div>
+<p>This becomes more complicated when transaction semantics need to be taken care
+of. For example dependencies between mailer and database services. Also you
+have to take into account that the code in entities and value objects
+participating in this use-case.</p>
+<p>What we want instead is a sequential execution of those nested services, but
+only if the parent service executed successfully:</p>
+<div class="highlight-python"><div class="highlight"><pre>ImportService
+\_Database
+
+AuthenticationService
+|_Mailer
+\_Database
+
+AccountGenerationService
+|_Database
+\_RemoteFacade
+</pre></div>
+</div>
+<p>We could use an event dispatcher in all of the services to notify each other,
+but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
+cleaner way:</p>
+<p>Every entity is an event provider and can emit events. Whenever a transaction
+is committed and an hence an operation is completed successfully, we take all
+the events emitted from all entities (looking at the identity map for example)
+and trigger observing event handlers. However if the operation fails, we do not
+trigger these event handlers.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// 1. do something with $data</span>
+
+        <span class="c1">// 2. raise event</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s2">&quot;id&quot;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+        <span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The Event provider trait aggregates all the events, and offers
+and API for external services to pull them from the entity:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">trait</span> <span class="nx">EventProvider</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Our infrastructure must then trigger event handlers, based
+on the event names. It will use <span class="docutils literal"><span class="pre">dequeueEmittedEvents</span></span> and making
+sure the events are not emitted multiple times.</p>
+<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
+<ul class="simple">
+<li>Command executes</li>
+<li>Entities emit events</li>
+<li>Command transaction succeeds</li>
+<li>Events trigger event handlers</li>
+<li>Event handlers execute more commands</li>
+<li>Restart from 1.</li>
+</ul>
+<p>With this approach we can decouple all services from each other and avoid
+deep nesting in each other. Yet we still have transactional dependencies,
+by dropping all events when the parent command fails. Transactions over
+multiple commands will not have ACID properties though, instead you will have
+to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
+that are important in systems with eventual consistency. This is one downside
+that you need to take into account.</p>
+<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
+implementation of DomainEvent and EventProvider classes and integration into
+Symfony and Doctrine ORM. Generally this pattern is very easy to implement
+though, so that you can just have a look at the implementation and take the
+best parts for your own.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html#disqus_thread" data-disqus-identifier="2012/08/25/decoupling_applications_with_domain_events">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 22, 2012</span>
         </div>
         <div class="section" id="building-an-object-model-no-setters-allowed">
@@ -1568,85 +1722,6 @@ control ignore files.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/02/25/symfony2_controller_testing.html#disqus_thread" data-disqus-identifier="2012/02/25/symfony2_controller_testing">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 07, 2010</span>
-        </div>
-        <div class="section" id="resources-for-a-php-and-hudson-ci-integration">
-<h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
-<p>Yesterday I finally had the time to setup my first continuous
-integration environment. Possible solutions for CI are
-<a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
-<a class="reference external" href="http://www.hudson-ci.org">Hudson</a> or
-<a class="reference external" href="http://www.arbitracker.org">Arbit</a>. Although phpUnderControl is the
-most wide-spread, but from I heard complex to setup/maintain, solution
-[STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
-to give Hudson a shoot. Another reason for this decision, I heard it has
-a simple plugin architecture and is easy to install and use.
-Additionally Hudson is easily integrated into
-<a class="reference external" href="http://www.netbeans.org">Netbeans</a> and
-<a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
-development.</p>
-<p>My motivation to dive into CI is easily explained. I just never felt it
-was necessary to add a continuous integration environment to my projects,
-since I had one or two simple bash scripts that did the job. In general
-this is rather annoying, because they mostly only run PHPUnit and have
-to be done using a cronjob or manually, without any real process of
-notification. Additionally you have no way to navigate the test-results,
-code-coverage and no history of the last builds. For projects like
-<a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> we have the additional
-requirement to support 4 different database platforms, i.e. 4 different
-PHPUnit configurations. Currently that is solved by me using a Bash
-script that iterates over the configuration file names and invokes
-PHPUnit.</p>
-<p>There are already some awesome sources how to get Hudson and PHP
-working. I’ll list them here:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849">Sebastian Bergmann’s Howto in
-Screenshots</a></li>
-<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
-Hudson</a></li>
-<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson">Justin Palmers Guide to install PHP and Hudson (With
-Screenshots)</a></li>
-</ul>
-<p>All those guides are already awesome and I would recommend choosing one
-of those to install Hudson, I think i can’t add anything new to those. I
-have used Sebastians Howto, however i also like the third one. David
-Luhmans guide adds lots of details that are important to get the
-different parts of a build process to work.</p>
-<p>Now what these tutorials all do is that they use a bash command to
-execute the build process or specify an Ant Build file. However there
-is also a Phing Build process plugin for Hudson that allows to specify
-the build.xml targets to execute in the process. From the “Available
-Plugins” list you can choose the “Phing plugin”.</p>
-<p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
-Plugin Wiki
-Page</a> shows how
-to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
-look for Phing. There you find the dialog to configure your phing
-installations.</p>
-<p>In the context of choosing a build script for your project you can now
-choose “Phing” instead of Ant:</p>
-<div class="figure align-center">
-<img alt="" src="http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849"/>
-</div>
-<p>You can enter the targets to build, for example on my local Hudson
-instance I only execute “test” for Doctrine 2, since I am not interested
-in the building and deployment onto the PEAR channel at this development
-stage.</p>
-<p>From inside Netbeans you can then start builds by pointing to the Hudson
-instance. See this tutorial by one of the <a class="reference external" href="http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6">Hudson + Netbeans
-Developers</a>.
-You can then start all the builds from inside Netbeans and be notified
-of the success or failure.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/02/07/resources-for-a-php-and-hudson-ci-integration.html#disqus_thread" data-disqus-identifier="2010/02/07/resources-for-a-php-and-hudson-ci-integration">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1671,6 +1746,8 @@ of the success or failure.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
@@ -1688,8 +1765,6 @@ of the success or failure.</p>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
         </li><li>
             <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
-        </li><li>
-            <a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a>
         </li></ul>
 </div>
 </section>

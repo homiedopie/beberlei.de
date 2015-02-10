@@ -5,8 +5,222 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Fri, 31 Jan 2014 00:00:00 +0100</pubDate>
+        <pubDate>Tue, 10 Feb 2015 00:00:00 +0100</pubDate>
         
+        <item>
+            <link>http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</link>
+            <guid>http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</guid>
+            <title><![CDATA[A case for weak type hints only in PHP7]]></title>
+            <description><![CDATA[<div class="section" id="a-case-for-weak-type-hints-only-in-php7">
+<h1>A case for weak type hints only in PHP7</h1>
+<p>TL;DR: @Andrea + Pro v0.3 RFC Camp: I was one voice for having strict type
+hints until I used them. From both a library and application developer POV they
+don’t bring much to the table. I think PHP would be more consistent with weak type
+hints only.</p>
+<p>These last weeks there have been tons of discussions about [scalar type
+hints](<a class="reference external" href="https://wiki.php.net/rfc/scalar_type_hints">https://wiki.php.net/rfc/scalar_type_hints</a>)
+in PHP following [Andrea Faulds](<a class="reference external" href="https://twitter.com/andreafaulds">https://twitter.com/andreafaulds</a>) RFC
+that is currently in voting. Most of them were limited to PHP Internals
+mailinglist but since the voting started some days ago much has also been said
+on Twitter and blogs.</p>
+<p>This post is my completly subjective opinion on the issue.</p>
+<p>I would have preferred strict type hints, however after trying the patch, I
+think that strict type hints</p>
+<ul class="simple">
+<li>will cause considerable problems for application developers, forcing them to
+“replicate weak type hinting” by manually casting everywhere.</li>
+<li>are useless for library developers, because they have to assume the user
+is in weak type mode.</li>
+<li>are useless within a library because I already know the types at the public
+API, weak mode would suffice for all the lower layers of my library.</li>
+</ul>
+<p>Neither group of developers gets a considerable benefit from the current RFCs strict mode.</p>
+<p>The simple reason for this, request, console inputs and many databases provide
+us with strings, casting has to happen somewhere. Having strict type hints
+would not save us from this, type juggling and casting has to happen and
+PHP’s current approach is one of the main benefits of the language.</p>
+<p>## Real World Weak vs Strict Code Example</p>
+<p>Lets look at an example of everyday framework code [Full
+Code](<a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">https://gist.github.com/beberlei/8b23160dd0b4466fe1c5</a>) to
+support my case:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">listAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$status</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">);</span> <span class="c1">// this is a string</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">'users'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchUsers</span><span class="p">(</span><span class="nv">$status</span><span class="p">),</span>
+            <span class="s1">'total'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchTotalCount</span><span class="p">(</span><span class="nv">$status</span><span class="p">)</span>
+        <span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">UserService</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">STATUS_INACTIVE</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_WAITING</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_APPROVED</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$connection</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchUsers</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT u.id, u.username FROM users u WHERE u.status = ? LIMIT 10'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchTotalCount</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT count(*) FROM users u WHERE u.status = ?'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchColumn</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span> <span class="c1">// returns a string</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See how the code on <span class="docutils literal"><span class="pre">UserService</span></span> is guarded by scalar typehints to enforce
+having the right types inside the service:</p>
+<ul class="simple">
+<li><span class="docutils literal"><span class="pre">$status</span></span> is a flag to filter the result by and it is one of the integer constants, the type hint coerces an integer from the request string.</li>
+<li><span class="docutils literal"><span class="pre">fetchTotalCount()</span></span> returns an integer of total number of users matching the query, the type hint coerces an integer from the database string.</li>
+</ul>
+<p>This code example <em>only</em> works with weak typehinting mode as described in the RFC.</p>
+<p>Now lets enable strict type hinting to see how the code fails:</p>
+<ul class="simple">
+<li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
+<li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>Catchable fatal error: Argument 1 passed to UserService::fetchUsers() must
+be of the type integer, string given, called in /tmp/hints.php on line 22
+and defined in /tmp/hints.php on line 37
+
+Catchable fatal error: Return value of UserService::fetchTotalCount() must
+be of the type integer, string returned in /tmp/hints.php on line 48
+</pre></div>
+</div>
+<p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function listAction(Request $request)</span>
+<span class="x">{</span>
+<span class="x">    $status = (int)$request-&gt;get('status'); // this is a string</span>
+
+<span class="x">    return [</span>
+<span class="x">        'users' =&gt; $this-&gt;service-&gt;fetchUsers($status),</span>
+<span class="x">        'total' =&gt; $this-&gt;service-&gt;fetchTotalCount($status)</span>
+<span class="x">    ];</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<span class="x">{</span>
+<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
+
+<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>It feels to me that enabling strict mode completly defeats the purpose, because
+now we are forced to convert manually, reimplementing weak type hinting in our
+own code.</p>
+<p>More important: We write code with casts already, the scalar type hints patch
+is not necessary for that! Only a superficial level of additional safety is
+gained, one additional check of something we already know is true!</p>
+<p>As a developer of the <span class="docutils literal"><span class="pre">UserService</span></span> I have to assume weak mode, so there is
+some code missing for the case  invalid status flag <span class="docutils literal"><span class="pre">&quot;string&quot;</span></span> is passed to
+the function:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<span class="x">{</span>
+<span class="x">    if ($status === 0) {</span>
+<span class="x">        throw \RuntimeException;</span>
+<span class="x">    }</span>
+
+<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
+
+<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>Strict mode is useless for library developers, because I always have to assume
+weak mode anyways.</p>
+<p>## Do we need strict mode?</p>
+<p>In a well designed application or library, the developer can already trust the
+types of his variables today, 95% of the time, without even having type hints,
+using carefully designed abstractions (example Symfony Forms and Doctrine ORM): No
+substantial win for her from having strict type hints.</p>
+<p>In a badly designed application, the developer is uncertain about the types of
+variables. Using strict mode in this scenario she needs to start casting
+everywhere just to be sure. I cannot imagine the resulting code to look
+anything but bad. Strict would actually be counterproductive here.</p>
+<p>I also see a danger here, that writing “strict mode” code will become a best
+practice and this might lead developers working on badly desigend applications
+to write even crappier code just to follow best practices.</p>
+<p>As a pro strict mode developer I could argue:</p>
+<ul class="simple">
+<li>that libraries such as Doctrine ORM and Symfony Forms already
+abstract all the nitty gritty casting from request or database today. But I
+don’t think that is valid: They are two of the most sophisticated PHP libraries
+out there, maybe used by 1-5% of the userbase. I don’t want to force this
+level of abstraction on all users. I can’t use this level myself all the
+time. Also if libraries already abstract this for us, why need to duplicate
+the checks again if we can trust the variables types?</li>
+<li>that I might have complex (mathematical) algorithms that benefit from strict
+type hinting. But that is not really true: Once the variables have passed
+through the public API of my fully typehinted library I know the types and can rely
+on them on all lower levels. Weak or strict type hinting doesn’t make a
+difference anymore. Well designed libraries written in PHP5 already provide
+this kind of trust using carefully designed value objects and guard clauses.</li>
+<li>that using strict type in my library reduce the likelihood of bugs, but that
+is not guaranteed.  Users of my library can always decide not to use strict
+type hints and that requires me as a library author to consider this use-case
+and prevent possible problems. Again using strict mode doesn’t provide a
+benefit here.</li>
+<li>to write parts of the code in strict and parts in weak mode. But how to
+decide this? Projects usually pick only one paradigm for good reason:
+<span class="docutils literal"><span class="pre">E_STRICT</span></span> compatible code yes or no for example. Switching is arbitrary
+and dangerously inconsistent. As a team lead I would reject such kind of
+convention because it is impractible. Code that follows this paradigm in
+strict languages such as Java and C# has an aweful lot of converting methods
+such as <span class="docutils literal"><span class="pre">$connection-&gt;fetchColumnAsInteger()</span></span>. I do not want to go down
+that road.</li>
+</ul>
+<p>## Would we benefit from only strict mode?</p>
+<p>Supporters of strict mode only: Make sure to understand why this will never happen!</p>
+<p>Say the current RFC gets rejected, would we benefit from a strict type hinting
+RFC? No, and the current RFC details the exact reasons why. Most notably
+for BC reasons all the PHP API will not use the new strict type hinting.</p>
+<p>This current RFC is the only chance to get any kind of strict hinting into PHP.
+Yet with the limited usefullness as described before, we can agree that just
+having weak mode would be more consistent and therefore better for everyone.</p>
+<p>## Conclusion</p>
+<p>I as PHP developer using frameworks and libraries that help me write type safe
+code today, strict typing appeals to me. But put to a test in real code it
+proves to be impractical for many cases, and not actually much more useful
+than weak type hinting in many other cases.</p>
+<p>Weak types provide me with much of the type safety I need: In any given method,
+using only typehinted parameters and return values, I am safe from type
+juggling. As a library developer I have to assume caller uses weak mode all the
+time.</p>
+<p>Having strict type hints suggests that we can somehow get rid of type juggling
+all together. But that is not true, because we still have to work with user
+input and databases.</p>
+<p>The current RFC only introduced the extra strict mode because developers had a
+very negative reactions towards weak type hints. Strike me from this list, weak
+type hints are everything that PHP should have. I will go as far that others
+strict-typers would probably agree when actually working with the patch.</p>
+<p>I would rather prefer just having weak types for now, this is already
+a big change for the language and would prove to be valuable for everyone.</p>
+<p>I fear Strict mode will have no greater benefit than gamification of the
+language, the winner is the one with the highest percentage of strict mode
+code.</p>
+</div>]]></description>
+            <category><![CDATA[ PHP ]]></category>
+             <pubDate>Tue, 10 Feb 2015 00:00:00 +0100</pubDate>
+        </item>
+    
         <item>
             <link>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</link>
             <guid>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</guid>
