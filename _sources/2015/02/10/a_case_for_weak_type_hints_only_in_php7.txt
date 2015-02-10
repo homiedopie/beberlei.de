@@ -132,25 +132,12 @@ More important: We write code with casts already, the scalar type hints patch
 is not necessary for that! Only a superficial level of additional safety is
 gained, one additional check of something we already know is true!
 
-As a developer of the ``UserService`` I have to assume weak mode, so there is
-some code missing for the case  invalid status flag ``"string"`` is passed to
-the function:
-
-.. code-block:: php
-
-    public function fetchTotalCount(int $status): int
-    {
-        if ($status === 0) {
-            throw \RuntimeException;
-        }
-
-        $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';
-
-        return (int)$this->connection->fetchColumn($sql, [$status]);
-    }
-
 Strict mode is useless for library developers, because I always have to assume
 weak mode anyways.
+
+**EDIT:** I argued before that you have to check for casting strings to 0 when
+using weak typehints. That is not necessary. Passing ``fetchTotalCount("foo")``
+will throw a catchable fatal error in weak mode already!
 
 ## Do we need strict mode?
 

@@ -192,23 +192,11 @@ own code.</p>
 <p>More important: We write code with casts already, the scalar type hints patch
 is not necessary for that! Only a superficial level of additional safety is
 gained, one additional check of something we already know is true!</p>
-<p>As a developer of the <span class="docutils literal"><span class="pre">UserService</span></span> I have to assume weak mode, so there is
-some code missing for the case  invalid status flag <span class="docutils literal"><span class="pre">&quot;string&quot;</span></span> is passed to
-the function:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
-<span class="x">{</span>
-<span class="x">    if ($status === 0) {</span>
-<span class="x">        throw \RuntimeException;</span>
-<span class="x">    }</span>
-
-<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
-
-<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
-<span class="x">}</span>
-</pre></div>
-</div>
 <p>Strict mode is useless for library developers, because I always have to assume
 weak mode anyways.</p>
+<p><strong>EDIT:</strong> I argued before that you have to check for casting strings to 0 when
+using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount(&quot;foo&quot;)</span></span>
+will throw a catchable fatal error in weak mode already!</p>
 <p>## Do we need strict mode?</p>
 <p>In a well designed application or library, the developer can already trust the
 types of his variables today, 95% of the time, without even having type hints,
