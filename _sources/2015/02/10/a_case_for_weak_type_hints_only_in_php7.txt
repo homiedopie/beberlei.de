@@ -31,7 +31,8 @@ us with strings, casting has to happen somewhere. Having strict type hints
 would not save us from this, type juggling and casting has to happen and
 PHP's current approach is one of the main benefits of the language.
 
-## Real World Weak vs Strict Code Example
+Real World Weak vs Strict Code Example
+--------------------------------------
 
 Lets look at an example of everyday framework code `Full
 Code <https://gist.github.com/beberlei/8b23160dd0b4466fe1c5>`_ to
@@ -139,7 +140,8 @@ weak mode anyways.
 using weak typehints. That is not necessary. Passing ``fetchTotalCount("foo")``
 will throw a catchable fatal error in weak mode already!
 
-## Do we need strict mode?
+Do we need strict mode?
+-----------------------
 
 In a well designed application or library, the developer can already trust the
 types of his variables today, 95% of the time, without even having type hints,
@@ -187,7 +189,8 @@ As a pro strict mode developer I could argue:
   such as ``$connection->fetchColumnAsInteger()``. I do not want to go down
   that road.
 
-## Would we benefit from only strict mode?
+Would we benefit from only strict mode?
+---------------------------------------
 
 Supporters of strict mode only: Make sure to understand why this will never happen!
 
@@ -199,7 +202,8 @@ This current RFC is the only chance to get any kind of strict hinting into PHP.
 Yet with the limited usefullness as described before, we can agree that just
 having weak mode would be more consistent and therefore better for everyone.
 
-## Conclusion
+Conclusion
+----------
 
 I as PHP developer using frameworks and libraries that help me write type safe
 code today, strict typing appeals to me. But put to a test in real code it

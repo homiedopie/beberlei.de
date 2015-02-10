@@ -102,7 +102,8 @@ API, weak mode would suffice for all the lower layers of my library.</li>
 us with strings, casting has to happen somewhere. Having strict type hints
 would not save us from this, type juggling and casting has to happen and
 PHP’s current approach is one of the main benefits of the language.</p>
-<p>## Real World Weak vs Strict Code Example</p>
+<div class="section" id="real-world-weak-vs-strict-code-example">
+<h2>Real World Weak vs Strict Code Example</h2>
 <p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
 Code</a> to
 support my case:</p>
@@ -197,7 +198,9 @@ weak mode anyways.</p>
 <p><strong>EDIT:</strong> I argued before that you have to check for casting strings to 0 when
 using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount(&quot;foo&quot;)</span></span>
 will throw a catchable fatal error in weak mode already!</p>
-<p>## Do we need strict mode?</p>
+</div>
+<div class="section" id="do-we-need-strict-mode">
+<h2>Do we need strict mode?</h2>
 <p>In a well designed application or library, the developer can already trust the
 types of his variables today, 95% of the time, without even having type hints,
 using carefully designed abstractions (example Symfony Forms and Doctrine ORM): No
@@ -238,7 +241,9 @@ strict languages such as Java and C# has an aweful lot of converting methods
 such as <span class="docutils literal"><span class="pre">$connection-&gt;fetchColumnAsInteger()</span></span>. I do not want to go down
 that road.</li>
 </ul>
-<p>## Would we benefit from only strict mode?</p>
+</div>
+<div class="section" id="would-we-benefit-from-only-strict-mode">
+<h2>Would we benefit from only strict mode?</h2>
 <p>Supporters of strict mode only: Make sure to understand why this will never happen!</p>
 <p>Say the current RFC gets rejected, would we benefit from a strict type hinting
 RFC? No, and the current RFC details the exact reasons why. Most notably
@@ -246,7 +251,9 @@ for BC reasons all the PHP API will not use the new strict type hinting.</p>
 <p>This current RFC is the only chance to get any kind of strict hinting into PHP.
 Yet with the limited usefullness as described before, we can agree that just
 having weak mode would be more consistent and therefore better for everyone.</p>
-<p>## Conclusion</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
 <p>I as PHP developer using frameworks and libraries that help me write type safe
 code today, strict typing appeals to me. But put to a test in real code it
 proves to be impractical for many cases, and not actually much more useful
@@ -267,6 +274,7 @@ a big change for the language and would prove to be valuable for everyone.</p>
 <p>I fear Strict mode will have no greater benefit than gamification of the
 language, the winner is the one with the highest percentage of strict mode
 code.</p>
+</div>
 </div>
         <div class="postmeta">
         <div class="author">
