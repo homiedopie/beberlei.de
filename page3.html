@@ -73,6 +73,105 @@
           <div id="page3">
             
             <div class="timestamp postmeta">
+            <span>April 06, 2013</span>
+        </div>
+        <div class="section" id="lessons-learned-a-failed-side-project">
+<h1><a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a></h1>
+<p>Side projects have always been an important part of how I learn new skills and
+technologies. This usually ends with me dumping some prototype on <a class="reference external" href="https://github.com/beberlei?tab=repositories">Github</a>, sometimes even with an open
+source project that I commit to maintain over a long time.</p>
+<p>Two years ago, for the first time, I pursued a project idea which should
+not be open-source but a commercial SAAS product. It grew out of the
+<a class="reference external" href="http://www.doctrine-project.org">Doctrine</a> teams desire to synchronize
+Github Pull Requests with our Jira instance: A workflow engine for HTTP
+services. <a class="reference external" href="https://ifttt.com">If this, then that (IFTTT)</a> already existed at
+that point, but was far too limited for my use-case. I wanted something to
+allow:</p>
+<ul class="simple">
+<li>Accept a Github Pull Request Event</li>
+<li>Open a Jira Ticket</li>
+<li>Comment back on the Pull Request with a link to the Pull Request</li>
+<li>Optionally mention that the Pull Request should be made to master, instead of
+<span class="docutils literal"><span class="pre">$BRANCH</span></span></li>
+</ul>
+<p>I started developing this in my free time based on PHP, Symfony2, CouchDB,
+PostgreSQL and Backbone.js and got a prototype working early. However
+instead of reaching the state where I could release the project to others I
+hit some hurdles:</p>
+<ol class="arabic simple">
+<li>The project had a UI where you could add/remove and reconnect tasks through
+a graphical workflow editor. The javascript became very messy fast, because
+I didn’t understand Backbone fully and also didn’t know patterns for
+decoupling and testing Javascript code.</li>
+<li>I had to restart with the core domain service side code, because I based it
+on the Zeta Components workflow library and it was too unflexible for my
+special requirements, messing the code up.</li>
+<li>I wanted to implement way too many features and had a huge backlog of
+issues to implement before “beta”.</li>
+</ol>
+<p>Last year in July, when I finally had something remotely usable <a class="reference external" href="https://zapier.com">Zapier</a> hit the market with a beautiful product and support
+for gazillions of services. At that point my service just had support for
+Github, Twitter and Jira and for generic HTTP POST requests and a UI that
+could not be operated by anyone else but me. I was quite demotivated
+that day I found out about Zapier.</p>
+<p>Nevertheless I continued to work on the project and tried to make it even more
+powerful than Zapier, by introducing more features that neither IFTTT nor
+Zapier had. Adding this complexity ended up being the nail into the coffin of
+the project.</p>
+<p>Each week I worked less and less on the project, because I couldn’t find the
+motivation. When Zapier got funded in October I was both sad and happy:
+Apparently my idea was a good one, however somebody else executed this idea
+much better than myself. I stopped working on the project that week.</p>
+<p>Today I took the day to migrate the Doctrine Pull Request workflow to a
+<a class="reference external" href="https://github.com/beberlei/githubpr_to_jira">simple hardcoded application</a>
+and disabled my projects website entirely.</p>
+<p>I want to use this moment to share my personal lessons learned:</p>
+<ul>
+<li><p class="first">Choosing a scope that allows you to finish a working prototype within 1-2 months
+is an important key to success.</p>
+<p>The longer it takes to get something working and useable for others, the less
+motivation you have. I know from my open-source experience that people using your project
+is a huge motivation boost.</p>
+<p>The side projects I started since last October are much smaller in scope.</p>
+</li>
+<li><p class="first">You can actually get burned out by a side project: by designing its scope
+way too big.</p>
+</li>
+<li><p class="first">You cannot compete feature-wise with startups that put their full attention into
+a project from morning to night. Either make something small working better
+than commercial products or quit your job and put your full time into this.</p>
+</li>
+<li><p class="first">Side projects are either about learning new technologies or about trying
+to build something commercially successful. Don’t try to combine this or
+you might get frustrated by choosing the wrong technology for the job.</p>
+</li>
+<li><p class="first">Never ever use an existing open-source library as the core of your
+complicated business domain. If your domain is something remotely interesting
+you will fail to achieve your goals with the restrictions of the library.</p>
+</li>
+<li><p class="first">Starting a big project alone is not a good idea. I found out that
+discussing ideas with people is very valuable and at the point where I
+started sharing my idea with others I was already too far into the project
+to be able to take most of the advice into account.</p>
+</li>
+<li><p class="first">Keeping a project idea secret is completely useless. Others will come up with the
+same idea regardless. People have ideas all the day, however nobody ever has
+time to implement them. When they do, execution is even more important than
+the idea itself.</p>
+</li>
+</ul>
+<p>What are your lessons learned from failed side projects? I would be happy to
+hear other stories.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/04/06/a_failed_side_project.html#disqus_thread" data-disqus-identifier="2013/04/06/a_failed_side_project">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>March 12, 2013</span>
         </div>
         <div class="section" id="code-coffee-bonn">
@@ -1263,46 +1362,6 @@ Request.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/08/26/symfony__monolog_and_different_log_types.html#disqus_thread" data-disqus-identifier="2012/08/26/symfony__monolog_and_different_log_types">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 26, 2012</span>
-        </div>
-        <div class="section" id="froscon-2012">
-<h1><a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a></h1>
-<p>This years <a class="reference external" href="http://www.froscon.org">Free and Open Source Conference (FrOSCon)</a> took place this weekend in Bonn, St.  Augustin.
-Because I live in Bonn, visiting the conference is a given for very many years
-now. This year I also did a talk on “Architecture Design Patterns” with <a class="reference external" href="http://twitter.com/go_oh">Gordon</a> so there was an incentive to show up besides
-meeting friends, all the Club Mate and <a class="reference external" href="http://www.quijote-kaffee.de">good open source coffee</a>.</p>
-<p>The most interesting topic in this years conference for me has been the <a class="reference external" href="http://graylog2.org">Graylog2</a> talk by Lennart Koopmann. Graylog is a logging server
-that uses Elastic Search for persistence and searching. It is sponsored by
-Xing, a pretty big german based Linkedin clone.</p>
-<p>The talk <a class="reference external" href="http://programm.froscon.de/2012/events/954.html">The State of PHPUnit</a> by <a class="reference external" href="http://twitter.com/__edorian">Volker</a> was interesting to see all the new stuff in
-PHPUnit 3.7 and that it fixes a bunch of annoyances that I stumbled on myself.
-I actually realized that they are so deeply rooted in my brain already, that
-they constitute features for me, not something that could actually be
-optimized. Well done to Volker and Sebastian to the new version.</p>
-<p>Igors talk about building an HTTP server in PHP was interesting to see the
-stream/socket server APIs of PHP at work. Ever since I took part in <a class="reference external" href="https://github.com/conradmueller/maexchen">the
-SoCraTes 2012 Conference Maexchen UDP Bot</a> challenge I think network
-programming is an interesting topic for learning about languages and
-programming itself.</p>
-<p>Volker did a second talk on sunday about Clean Code that was both entertaining
-and interesting. He was reminding the audience that shipping the code is what
-actually creates the value in our profession. Hence clean code is not about
-the beauty of code itself, but its ability to be shippable, changeable and
-adaptable to the business.</p>
-<p>Again FrOSCon 2012 was awesome. Thank you very much especially to all the
-volunteers that organized this event. It really good event to bring together
-people from many different open-source communities and I already look forward
-to the next FrOSCon 2013.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/26/froscon_2012.html#disqus_thread" data-disqus-identifier="2012/08/26/froscon_2012">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1327,6 +1386,8 @@ to the next FrOSCon 2013.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
@@ -1344,8 +1405,6 @@ to the next FrOSCon 2013.</p>
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
         </li><li>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li><li>
-            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li></ul>
 </div>
 </section>

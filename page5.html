@@ -73,6 +73,152 @@
           <div id="page5">
             
             <div class="timestamp postmeta">
+            <span>February 25, 2012</span>
+        </div>
+        <div class="section" id="symfony2-controller-testing-without-application">
+<h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
+<p>Controller testing using the WebTestCase requires a Symfony Kernel and with
+that a complete application. However you can just ship your own simple kernel
+with just the dependencies necessary to test your application. This way you can
+easily create functional tests for bundles without the bundle requiring an
+application.</p>
+<div class="section" id="create-a-testkernel">
+<h2>Create a TestKernel</h2>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// Tests/Controller/App/AppKernel.php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$bundles</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="c1">// Dependencies</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\SecurityBundle\SecurityBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\MonologBundle\MonologBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">JMS\SerializerBundle\JMSSerializerBundle</span><span class="p">(</span><span class="nv">$this</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nx">FOS\RestBundle\FOSRestBundle</span><span class="p">(),</span>
+            <span class="c1">// My Bundle to test</span>
+            <span class="k">new</span> <span class="nx">Beberlei\WorkflowBundle\BeberleiWorkflowBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$bundles</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// We don't need that Environment stuff, just one config</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-config-yml">
+<h2>Creating the config.yml</h2>
+<div class="highlight-yaml"><div class="highlight"><pre># Tests/Controller/App/config.yml
+framework:
+    secret:          secret
+    charset:         UTF-8
+    test: ~
+    router:          { resource: &quot;%kernel.root_dir%/routing.yml&quot; }
+    form:            true
+    csrf_protection: true
+    validation:      { enable_annotations: true }
+    templating:      { engines: ['twig'] }
+    session:
+        auto_start:     false
+        storage_id: session.storage.filesystem
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-routing-yml">
+<h2>Creating the routing.yml</h2>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># Tests/Controller/App/routing.yml</span>
+<span class="l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">resource</span><span class="p-Indicator">:</span> <span class="s">&quot;@BeberleiWorkflowBundle/Controller/&quot;</span>
+    <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">annotation</span>
+    <span class="l-Scalar-Plain">prefix</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">/</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-phpunit-bootstrap">
+<h2>Adding a PHPUnit bootstrap</h2>
+<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree">Travis &amp; Composer sitting in a
+Tree K-I-S-S-I-N-G” blog post</a>.</p>
+<p>His setup is missing the spl_autoload_register() call in the bootstrap file
+though.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// Tests/bootstrap.php</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../vendor/.composer/autoload.php'</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;'EOT'</span>
+<span class="s">You must set up the project dependencies, run the following commands:</span>
+<span class="s">wget http://getcomposer.org/composer.phar</span>
+<span class="s">php composer.phar install</span>
+<span class="s">EOT</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">'loadClass'</span><span class="p">));</span>
+
+<span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">'Beberlei\\WorkflowBundle\\'</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">require_once</span> <span class="nv">$path</span><span class="p">;</span>
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p>That means your bundle should have a composer.json that loads all the
+dependencies.</p>
+</div>
+<div class="section" id="modifying-the-phpunit-xml-dist">
+<h2>Modifying the phpunit.xml.dist</h2>
+<p>We have to tell the WebTestCase base class where to find this kernel:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Tests/bootstrap.php&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;php&gt;</span>
+        <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">&quot;KERNEL_DIR&quot;</span> <span class="na">value=</span><span class="s">&quot;Tests/Controller/App&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/php&gt;</span>
+<span class="nt">&lt;/phpunit&gt;</span>
+</pre></div>
+</div>
+<p>Now just run your web-test cases.</p>
+<p>If you want to debug the logging happening inside the Kernel just comment out
+the Monolog lines to get the log-messages printed to the screen.</p>
+<p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
+control ignore files.</p>
+</div>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/02/25/symfony2_controller_testing.html#disqus_thread" data-disqus-identifier="2012/02/25/symfony2_controller_testing">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 07, 2010</span>
         </div>
         <div class="section" id="resources-for-a-php-and-hudson-ci-integration">
@@ -910,44 +1056,6 @@ done, I will pack it all up as a PEAR package for anyone to test out.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/02/25/git-is-great-helping-out-with-mutateme.html#disqus_thread" data-disqus-identifier="2009/02/25/git-is-great-helping-out-with-mutateme">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 08, 2009</span>
-        </div>
-        <div class="section" id="unittest-and-metrics-aggregator-tool-for-php">
-<h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
-<p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
-<a class="reference external" href="http://www.pdepend.org">PDepend</a> offer export functionality in XML or
-in a Test-database that is not quite readable for any user from the
-start. Over the last month I have gradually written <a class="reference external" href="http://wiki.github.com/beberlei/puma">a nice webbased
-tool</a>, that aggregates this data
-and (todo in the future) relates them to help me with my open source
-projects.</p>
-<p>PHPUnit can be used with a <strong>–test-db-dsn</strong> command, which saves all
-information about tests into a Database and PDepend has a strong Package
-centric source parser for all sorts of project metrics.</p>
-<p>What I needed for my <a class="reference external" href="http://framework.zend.com">Zend Framework</a>
-related work (and other projects) was a tool that does a run of the
-complete test-suite for me and saves the information, so that I can see
-where problems occur (and if they are due to my changes or other
-peoples). Since PHPUnit will stopped calculating additional metrics, I
-have also integrated the fabulous PDepend Tool into this aggregator. It
-shows me, what classes and functions need refactoring due to complexity
-issues and draws some nice graphs that summarize all sorts of project
-related information on a per package basis.</p>
-<p>You can <a class="reference external" href="http://wiki.github.com/beberlei/puma">download or clone the an alpha version at
-Github</a>. Its written with
-<a class="reference external" href="http://www.ezcomponents.org">ezcMvcTools</a>, so you need this to work
-too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
-page</a>.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html#disqus_thread" data-disqus-identifier="2009/02/08/unittest-and-metrics-aggregator-tool-for-php">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -972,6 +1080,8 @@ page</a>.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
@@ -989,8 +1099,6 @@ page</a>.</p>
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
         </li><li>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li><li>
-            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li></ul>
 </div>
 </section>

@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse
    2015/02/10/a_case_for_weak_type_hints_only_in_php7
    2015/02/01/running_hhvm_webserver
    2014/10/26/symfony_all_the_things_web

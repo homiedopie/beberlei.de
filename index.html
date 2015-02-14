@@ -73,6 +73,165 @@
           <div id="index">
             
             <div class="timestamp postmeta">
+            <span>February 14, 2015</span>
+        </div>
+        <div class="section" id="phpunit-before-annotations-and-traits-for-code-reuse">
+<h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
+<p>I have written about why I think <a class="reference external" href="http://www.whitewashing.de/2013/04/12/traits_are_static_access.html">traits should be avoided</a>. There
+is a practical use-case that serves me well however: Extending PHPUnit tests.</p>
+<p>The PHPUnit TestCase is not very extendable except through inheritance. This
+often leads to a weird, deep inheritance hierachy in testsuites to achieve code
+reuse. For example the Doctrine ORM testsuite having <span class="docutils literal"><span class="pre">OrmFunctionalTestCase</span></span>
+extending from <span class="docutils literal"><span class="pre">OrmTestCase</span></span> extending from PHPUnits testcase.</p>
+<p>Dependency Injection is something that is not possible easily in a PHPUnit
+testcase, but could be solved using an additional listener and some
+configuration in <span class="docutils literal"><span class="pre">phpunit.xml</span></span>.</p>
+<p>This leaves traits as a simple mechanism that doesn’t require writing an
+extension for PHPUnit and allows “multiple inheritance” to compose different
+features for our test cases.</p>
+<p>See this simple example that is adding some more assertions:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">trait</span> <span class="nx">MyAssertions</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">assertIsNotANumber</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nx">is_nan</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MathTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">MyAssertions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testIsNotANumber</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertIsNotANumber</span><span class="p">(</span><span class="nb">acos</span><span class="p">(</span><span class="mi">8</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When you have more complex requirements, you might need the trait to implement
+<span class="docutils literal"><span class="pre">setUp()</span></span> method. This will prevent you from using multiple traits that all
+need to invoke <span class="docutils literal"><span class="pre">setUp()</span></span>. You could use the trait conflict resolution, but
+then the renamed setup methods do not get called anymore.</p>
+<p>Fortunately PHPUnit 3.8+ comes to the rescue with new <span class="docutils literal"><span class="pre">@before</span></span> and
+<span class="docutils literal"><span class="pre">@beforeClass</span></span> annotations.</p>
+<p>See this trait I use for making sure my database is using the
+most current database version by invoking migrations in <span class="docutils literal"><span class="pre">@beforeClass</span></span></p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\DBAL\DriverManager</span><span class="p">;</span>
+
+<span class="k">trait</span> <span class="nx">DatabaseSetup</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var bool</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="nv">$initialized</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @beforeClass</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">initializeDatabase</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+        <span class="nv">$conn</span> <span class="o">=</span> <span class="nx">DriverManager</span><span class="o">::</span><span class="na">getConnection</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'TEST_DATABASE_DSN'</span><span class="p">]</span>
+        <span class="p">));</span>
+
+        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../../src/schema'</span><span class="p">));</span>
+        <span class="nv">$dbDeploy</span><span class="o">-&gt;</span><span class="na">migrate</span><span class="p">();</span>
+        <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>I could mix this with a second trait <span class="docutils literal"><span class="pre">SymfonySetup</span></span> that makes the DIC
+container available for my integration tests:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
+
+<span class="k">trait</span> <span class="nx">SymfonySetup</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$kernel</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @before</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">setupKernel</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createKernel</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">boot</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">getContainer</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">createKernel</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">\AppKernel</span><span class="p">(</span><span class="s1">'test'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @after</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">tearDownSymfonyKernel</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">!==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">shutdown</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The Symfony setup trait uses <span class="docutils literal"><span class="pre">@before</span></span> and <span class="docutils literal"><span class="pre">@after</span></span> to setup and cleanup
+without clashing with the traditional PHPUnit <span class="docutils literal"><span class="pre">setUp</span></span> method.</p>
+<p>Combining all this we could write a testcase like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserRepositoryTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">DatabaseSetup</span><span class="p">;</span>
+    <span class="k">use</span> <span class="nx">SymfonySetup</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// do setup here</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testNotFindUserReturnsNull</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$userRepository</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'user_repository'</span><span class="p">);</span>
+        <span class="nv">$unusedId</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">;</span>
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$userRepository</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$unusedId</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Sadly the <span class="docutils literal"><span class="pre">@before</span></span> calls are invoced <em>after</em> the original <span class="docutils literal"><span class="pre">setup()</span></span> method
+so we cannot access the Symfony container here already. Maybe it would be more
+practical to have it work the other way around. I have <a class="reference external" href="https://github.com/sebastianbergmann/phpunit/issues/1616">opened an issue on
+PHPUnit</a> for that.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html#disqus_thread" data-disqus-identifier="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 10, 2015</span>
         </div>
         <div class="section" id="a-case-for-weak-type-hints-only-in-php7">
@@ -1613,78 +1772,6 @@ discussions that the new year will bring.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/12/31/2013_and_2014.html#disqus_thread" data-disqus-identifier="2013/12/31/2013_and_2014">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>December 05, 2013</span>
-        </div>
-        <div class="section" id="feature-flags-and-doctrine-entities">
-<h1><a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a></h1>
-<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com">EasyBib developers</a> this week about how to use feature flags with
-Doctrine Entities, Metadata Mapping and their database.</p>
-<p>The problem of feature flags with Doctrine is easily explained: If you add
-properties for a new feature that is disabled in the Doctrine metadata, then you
-need to upgrade the database before deployment, even when the feature is not
-being rolled out for some days/weeks. Doctrine requires the database to look
-exactly like the metadata specifies it.</p>
-<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
-easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
-                    <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
-                <span class="p">));</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// more mapping</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
-<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
-<p>Then if the feature is enabled fore some time and accepted into the pool of
-permanent features, you can remove the listener and move the mapping onto the
-Entities metadata.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a>, <a href="tags/doctrine.html">Doctrine</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html#disqus_thread" data-disqus-identifier="2013/12/05/feature_flags_and_doctrine_entities">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1709,6 +1796,8 @@ Entities metadata.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
@@ -1726,8 +1815,6 @@ Entities metadata.</p>
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
         </li><li>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li><li>
-            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li></ul>
 </div>
 </section>

@@ -73,6 +73,44 @@
           <div id="page6">
             
             <div class="timestamp postmeta">
+            <span>February 08, 2009</span>
+        </div>
+        <div class="section" id="unittest-and-metrics-aggregator-tool-for-php">
+<h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
+<p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
+<a class="reference external" href="http://www.pdepend.org">PDepend</a> offer export functionality in XML or
+in a Test-database that is not quite readable for any user from the
+start. Over the last month I have gradually written <a class="reference external" href="http://wiki.github.com/beberlei/puma">a nice webbased
+tool</a>, that aggregates this data
+and (todo in the future) relates them to help me with my open source
+projects.</p>
+<p>PHPUnit can be used with a <strong>–test-db-dsn</strong> command, which saves all
+information about tests into a Database and PDepend has a strong Package
+centric source parser for all sorts of project metrics.</p>
+<p>What I needed for my <a class="reference external" href="http://framework.zend.com">Zend Framework</a>
+related work (and other projects) was a tool that does a run of the
+complete test-suite for me and saves the information, so that I can see
+where problems occur (and if they are due to my changes or other
+peoples). Since PHPUnit will stopped calculating additional metrics, I
+have also integrated the fabulous PDepend Tool into this aggregator. It
+shows me, what classes and functions need refactoring due to complexity
+issues and draws some nice graphs that summarize all sorts of project
+related information on a per package basis.</p>
+<p>You can <a class="reference external" href="http://wiki.github.com/beberlei/puma">download or clone the an alpha version at
+Github</a>. Its written with
+<a class="reference external" href="http://www.ezcomponents.org">ezcMvcTools</a>, so you need this to work
+too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
+page</a>.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html#disqus_thread" data-disqus-identifier="2009/02/08/unittest-and-metrics-aggregator-tool-for-php">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 13, 2009</span>
         </div>
         <div class="section" id="update-on-unittest-and-metrics-tool">
@@ -861,90 +899,6 @@ old bugs in a wide range of different components.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/01/11/what-will-be-new-in-zf-1-8.html#disqus_thread" data-disqus-identifier="2009/01/11/what-will-be-new-in-zf-1-8">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 12, 2009</span>
-        </div>
-        <div class="section" id="on-publishing-webservices-within-mvc-frameworks">
-<h1><a href="2009/01/12/on-publishing-webservices-within-mvc-frameworks.html">On Publishing Webservices within MVC Frameworks</a></h1>
-<p>Webservices are a very important part in today’s enterprise applications.
-They tie applications of different age or programming languages together
-or allow applications of different subcontracters to speak to each
-other. Because they use HTTP, a stateless network protocol, considerable
-overhead floods the pipes when you use them, which should be minimized.</p>
-<p><a class="reference external" href="http://martinfowler.com">Martin Fowler</a> writes in his <a class="reference external" href="http://martinfowler.com/eaaCatalog">PEAA
-book</a>, that if you have the
-option not to use distributed objects (which are implemented via
-webservice) you should not distribute them. Considerable effort has to
-be brought into keeping complex webservices performant.</p>
-<p>Still people make mistakes about webservices all the time (me included
-for example proposing a dispatcher for the ZF that could be used for
-webservices).</p>
-<p>When people report problems with the Zend Soap component they often post
-a stripped down example that involes their webservice being instantiated
-within a controller. This is a very bad decision based on different
-arguments:</p>
-<ul class="simple">
-<li><strong>Dispatching overhead</strong>: Dispatching, Routing, Pre- and
-Postfiltering is costly in all frameworks. You give up the
-performance of having numerous PHP scripts that act as controller on
-their own. You get centralized filtering, authentication and other
-benefits. But those benefits generally do not aply to XML, JSON or
-SOAP requests, because you cannot parse them or access their
-properties. You give up the performance of a page controller for
-webservices to gain mostly nothing.</li>
-<li><strong>HTTP Request uselessness</strong>: Web frameworks work with HTTP request
-objects. The request of webservices facilitates HTTP to act as a far
-more complex request. No framework I know off, allows to work with
-the webservice requests outside the Webservice handler. What a SOAP
-or XML-RPC request does in your MVC is only get passed through
-numerous costly stages that offer no benefit, before it hits the
-target. Only the parsing of HTTP-Headers might offer additional
-benefit, but the gain is low, since they are available to PHP scripts
-at no cost.</li>
-<li><strong>Webservices already seperate concerns</strong>: Take the PHP SOAPServer as
-an example. It is an MVC application on its own, the controlling
-aspect of the SOAPServer parses the SOAP Request and sends it to the
-model, a class given by the user, which in turn works and returns the
-result as an SOAP Response View. You have to decouple model and view
-for a webservice handler otherwise it would generate invalid
-responses. Why nest a perfectly separated operation into another one?
-You gain no more of this additional separation, except performance
-decrease.</li>
-</ul>
-<p>So what are good practices to implement webservices?</p>
-<ul class="simple">
-<li>Use a page controller that generates no MVC overhead. In context of
-the Zend Framework: Add a new php script to your web root and add a
-new route into your .htaccess file that redirectes the desired
-location of the webservice to the script that overwrites the standard
-catch-all incoming requests to the front controller script.</li>
-<li>Use the proxy pattern and the invaluable __call() method to
-implement wrapper objects for authentication and session management
-of the webservice. These classes can easily be reused by all
-webservice page controllers of your site. If you do your homework you
-can even share parts of these objects inside your Web-MVC application
-to keep the code DRY. Those proxies keep authentication logic out of
-your service class.</li>
-<li>Use the remote facade pattern to implement a few, powerful methods
-that delegate the service request to underlying domain objects. Never
-ever publish direct access to domain objects with your webservices.
-As a rule of thumb, talking to a webservice during a logical
-operation should never involve more than one or two calls. The first
-call is for data fetching, the second for data saving. Authentication
-should be handled via HTTP Authentication to save an additional call.</li>
-</ul>
-<p>If you follow these simple rules, you should get around the performance
-issues that generally come with webservices, without loosing flexibility
-at all.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/01/12/on-publishing-webservices-within-mvc-frameworks.html#disqus_thread" data-disqus-identifier="2009/01/12/on-publishing-webservices-within-mvc-frameworks">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -969,6 +923,8 @@ at all.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
@@ -986,8 +942,6 @@ at all.</p>
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
         </li><li>
             <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
-        </li><li>
-            <a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a>
         </li></ul>
 </div>
 </section>
