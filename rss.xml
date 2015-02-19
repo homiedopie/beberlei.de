@@ -22,8 +22,8 @@ node stack.</p>
 <p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn’t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
 #3565</a> because a chmod fails and
 apparently from the ticket, this is not going to be fixed.</p>
-<p>I finally got it working with a workaround script by [Kevin
-Stone](<a class="reference external" href="https://github.com/kevinastone">https://github.com/kevinastone</a>) that mimics NPM, but
+<p>I finally got it working with a workaround script by <a class="reference external" href="https://github.com/kevinastone">Kevin
+Stone</a> that mimics NPM, but
 moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/bash
 # roles/nodejs/files/tmpnpm.sh
