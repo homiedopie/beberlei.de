@@ -73,6 +73,98 @@
           <div id="index">
             
             <div class="timestamp postmeta">
+            <span>February 19, 2015</span>
+        </div>
+        <div class="section" id="vagrant-nfs-and-npm">
+<h1><a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a></h1>
+<p>I have ranted about Node.JS and NPM on Twitter before, costing me lots of time,
+so I have to make up for this now and offer some solutions.</p>
+<p>One problem I regularly have is the following: I have a Vagrant/Virtualbox
+using NFS and want to run NPM inside of that. Running it inside the box
+is necessary, because I don’t want everyone using the box have to setup the
+node stack.</p>
+<p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn’t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
+#3565</a> because a chmod fails and
+apparently from the ticket, this is not going to be fixed.</p>
+<p>I finally got it working with a workaround script by [Kevin
+Stone](<a class="reference external" href="https://github.com/kevinastone">https://github.com/kevinastone</a>) that mimics NPM, but
+moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
+<div class="highlight-python"><div class="highlight"><pre>#!/bin/bash
+# roles/nodejs/files/tmpnpm.sh
+
+BASE_DIR=${TMPDIR:-/var/tmp}
+ORIG_DIR=$PWD
+HASH_CMD=&quot;md5sum&quot;
+
+DIR_NAME=`echo $PWD | $HASH_CMD | cut -f1 -d &quot; &quot;`
+
+TMP_DIR=$BASE_DIR/$DIR_NAME
+mkdir -p $TMP_DIR
+
+pushd $TMP_DIR
+
+ln -sf $ORIG_DIR/package.json
+npm $1
+
+# Can't use archive mode cause of the permissions
+rsync --recursive --links --times node_modules $ORIG_DIR
+
+popd
+</pre></div>
+</div>
+<p>Integrating this into my Ansible setup of the machine it looked like this:</p>
+<div class="highlight-python"><div class="highlight"><pre># roles/nodejs/tasks/main.yml
+# More tasks here before this...
+- name: &quot;Install npm workaround&quot;
+  copy: &gt;
+      src=tmpnpm.sh
+      dest=/usr/local/bin/tmpnpm
+      mode=&quot;0755&quot;
+
+- name: &quot;Install Global Dependencies&quot;
+  command: &gt;
+      /usr/local/bin/tmpnpm install -g {{ item }}
+  with_items: global_packages
+
+- name: &quot;Install Package Dependencies&quot;
+  command: &gt;
+      /usr/local/bin/tmpnpm install
+      chdir={{ item }}
+  with_items: package_dirs
+</pre></div>
+</div>
+<p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
+outside when invoking the role:</p>
+<div class="highlight-python"><div class="highlight"><pre># deploy.yml
+---
+- hosts: all
+  roles:
+    - name: nodejs
+      global_packages:
+        - grunt-cli
+      package_dirs:
+        - &quot;/var/www/project&quot;
+</pre></div>
+</div>
+<p>This way the Ansible Node.JS role is reusable in different projects.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/nodejs.html">NodeJS</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/npm.html">NPM</a>, <a href="tags/ansible.html">Ansible</a></span>
+        </div>
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2015/02/19/vagrant_nfs_and_npm.html#disqus_thread" data-disqus-identifier="2015/02/19/vagrant_nfs_and_npm">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 14, 2015</span>
         </div>
         <div class="section" id="phpunit-before-annotations-and-traits-for-code-reuse">
@@ -1714,64 +1806,6 @@ the value and constraint data for translating into human readable messages.</p>
         </div>
         <div class="comments">
             <a href="http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html#disqus_thread" data-disqus-identifier="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>December 31, 2013</span>
-        </div>
-        <div class="section" id="and-2014">
-<h1><a href="2013/12/31/2013_and_2014.html">2013 and 2014</a></h1>
-<p>This year was amazing with my new job, various talks on conferences and also
-for this blog. A total of 15 new posts attracted more than 30.000 unique
-visitors. Most amazing was all the positive feedback that I got at SymfonyCon
-in Warsaw with regard to my posts and the projects I have been working on in
-2013. Thank you all very much for reading and discussing with me. It has been
-a very insightful year for me!</p>
-<p>The three most viewed posts have been on <a class="reference external" href="http://whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Symfony with Vagrant</a>
-(5470),
-<a class="reference external" href="http://whitewashing.de/2013/04/12/traits_are_static_access.html">Traits</a>
-(4450) and
-<a class="reference external" href="http://whitewashing.de/2013/03/04/doctrine_repositories.html">Doctrine Repositories</a> (3850).</p>
-<p>I am always interested in end of the year reading lists to give me an idea what
-I might want to read the next year. This years reading list of <a class="reference external" href="http://www.paperplanes.de/2013/12/30/reading-list-2013.html">Matthias Meyer</a> of TravisCI
-provides many ideas for my next years reading list.  My own sad list contains
-only one technical book that I have read this year, but I think you will
-appreciate the hint if you havent seen this before: <a class="reference external" href="http://www.amazon.de/gp/product/0321834577/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1638&amp;creative=6742&amp;creativeASIN=0321834577&amp;linkCode=as2&amp;tag=whitewashin0c-21">Implementing Domain-Driven
-Design</a>
-by Vaughn Vernon. That book has influenced many of my blog posts, discussions
-and experiments this year and you will see effects of it in 2014 as
-well.</p>
-<p>For 2014 I want to keep up the pace of blogging and complement all those ideas
-with a sample Symfony application that I want to write. The idea for this
-project spawned from discussions with readers at various events, mostly at the
-SymfonyCon in Warsaw. My initial plans were to write an ebook on this issue,
-but various attempts throughout 2013 ended with motivation failures. This is
-one reason why I have explicitly put the item “Do NOT write a book” in my 2014
-todo list.</p>
-<p>Most of my blog posts on architecture are very general and even with the
-practical Symfony and Doctrine posts it is complicated to see the benefits
-without a good open source sample. That is why I want to write one and discuss
-the development on this blog.</p>
-<p>To support this effort I would be very grateful if you consider supporting me
-with a regular <a class="reference external" href="https://www.gittip.com/beberlei">Gittip donation</a>. Gittip is
-a fairly new service that allows you to make very small microdonations to
-others on a weekly basis.</p>
-<p>There is also a roadmap of ideas in my mind for 2014 blog posts, specifically
-about:</p>
-<ul class="simple">
-<li>Doctrine and Domain-Driven Design</li>
-<li>Hexagonal Architecture</li>
-<li>Domain Events</li>
-</ul>
-<p>I hope to see you again in 2014 and am very eager for the learnings and
-discussions that the new year will bring.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/12/31/2013_and_2014.html#disqus_thread" data-disqus-identifier="2013/12/31/2013_and_2014">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1796,6 +1830,8 @@ discussions that the new year will bring.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
             <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
         </li><li>
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
@@ -1813,8 +1849,6 @@ discussions that the new year will bring.</p>
             <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
         </li><li>
             <a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a>
-        </li><li>
-            <a href="2013/12/31/2013_and_2014.html">2013 and 2014</a>
         </li></ul>
 </div>
 </section>

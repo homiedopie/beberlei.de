@@ -15,7 +15,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Code &amp; Coffee Bonn &mdash; Whitewashing</title>
+        <title>Vagrant, NFS and NPM &mdash; Whitewashing</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 
             <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
@@ -31,7 +31,7 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="On Taming Repository Classes in Doctrine" href="../04/doctrine_repositories.html" /><link rel="prev" title="Lessons learned: A failed side project" href="../../04/06/a_failed_side_project.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="next" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
         VERSION:     '1.3.0',
@@ -70,28 +70,85 @@
     <div class="span-24 content">
       <div>
         <div>
-          <div id="2013-03-12-code_coffee_bonn">
+          <div id="2015-02-19-vagrant_nfs_and_npm">
             
             
     <div class="timestamp postmeta">
-            <span>March 12, 2013</span>
+            <span>February 19, 2015</span>
         </div>
 
-    <div class="section" id="code-coffee-bonn">
-<h1>Code &amp; Coffee Bonn</h1>
-<p>On last years <a class="reference external" href="http://www.socrates-conference.de/">SoCraTes Conference</a> I had
-the pleasure to meet <a class="reference external" href="https://twitter.com/sandromancuso">Sandro Mancuso</a> from
-the London Software Craftsmanship Community (LSCC). Following his Twitter
-account I stumbled upon a meetup concept called &#8220;Code &amp; Coffee&#8221; which the LSCC
-organizes very regularly. At a &#8220;Code &amp; Coffee&#8221; developers would meet up early
-in the morning before work to discuss and hack at some coffee place.</p>
-<p>I liked the idea very much and started such an event in Bonn. Our first
-test-event was a success, so that we now open up the concept to anyone who
-wants to join.</p>
-<p>There is a <a class="reference external" href="https://plus.google.com/u/0/communities/118268893445703199868">Google+ Community Code &amp; Coffee Bonn</a> where you can
-join and get regular invites to the events.</p>
-<p>Our next event is on March 26th. For more details see the Google+ page.</p>
-<p>Looking forward to seeing you there!</p>
+    <div class="section" id="vagrant-nfs-and-npm">
+<h1>Vagrant, NFS and NPM</h1>
+<p>I have ranted about Node.JS and NPM on Twitter before, costing me lots of time,
+so I have to make up for this now and offer some solutions.</p>
+<p>One problem I regularly have is the following: I have a Vagrant/Virtualbox
+using NFS and want to run NPM inside of that. Running it inside the box
+is necessary, because I don&#8217;t want everyone using the box have to setup the
+node stack.</p>
+<p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn&#8217;t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
+#3565</a> because a chmod fails and
+apparently from the ticket, this is not going to be fixed.</p>
+<p>I finally got it working with a workaround script by [Kevin
+Stone](<a class="reference external" href="https://github.com/kevinastone">https://github.com/kevinastone</a>) that mimics NPM, but
+moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
+<div class="highlight-python"><div class="highlight"><pre>#!/bin/bash
+# roles/nodejs/files/tmpnpm.sh
+
+BASE_DIR=${TMPDIR:-/var/tmp}
+ORIG_DIR=$PWD
+HASH_CMD=&quot;md5sum&quot;
+
+DIR_NAME=`echo $PWD | $HASH_CMD | cut -f1 -d &quot; &quot;`
+
+TMP_DIR=$BASE_DIR/$DIR_NAME
+mkdir -p $TMP_DIR
+
+pushd $TMP_DIR
+
+ln -sf $ORIG_DIR/package.json
+npm $1
+
+# Can&#39;t use archive mode cause of the permissions
+rsync --recursive --links --times node_modules $ORIG_DIR
+
+popd
+</pre></div>
+</div>
+<p>Integrating this into my Ansible setup of the machine it looked like this:</p>
+<div class="highlight-python"><div class="highlight"><pre># roles/nodejs/tasks/main.yml
+# More tasks here before this...
+- name: &quot;Install npm workaround&quot;
+  copy: &gt;
+      src=tmpnpm.sh
+      dest=/usr/local/bin/tmpnpm
+      mode=&quot;0755&quot;
+
+- name: &quot;Install Global Dependencies&quot;
+  command: &gt;
+      /usr/local/bin/tmpnpm install -g {{ item }}
+  with_items: global_packages
+
+- name: &quot;Install Package Dependencies&quot;
+  command: &gt;
+      /usr/local/bin/tmpnpm install
+      chdir={{ item }}
+  with_items: package_dirs
+</pre></div>
+</div>
+<p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
+outside when invoking the role:</p>
+<div class="highlight-python"><div class="highlight"><pre># deploy.yml
+---
+- hosts: all
+  roles:
+    - name: nodejs
+      global_packages:
+        - grunt-cli
+      package_dirs:
+        - &quot;/var/www/project&quot;
+</pre></div>
+</div>
+<p>This way the Ansible Node.JS role is reusable in different projects.</p>
 </div>
 
 
@@ -100,13 +157,13 @@ join and get regular invites to the events.</p>
         <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
     </div>
 
-    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2013/03/12/code_coffee_bonn";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2015/02/19/vagrant_nfs_and_npm";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
 
             <div id="disqus_thread"></div>
             <script type="text/javascript">
                 var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/2013/03/12/code_coffee_bonn.html';
+                var disqus_url = 'http://www.whitewashing.de/2015/02/19/vagrant_nfs_and_npm.html';
                 (function() {
                     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
@@ -123,13 +180,13 @@ join and get regular invites to the events.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
-            <a href="../../../2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+            <a href="#">Vagrant, NFS and NPM</a>
         </li><li>
-            <a href="../../../2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+            <a href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
         </li><li>
-            <a href="../../../2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+            <a href="../10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
-            <a href="../../../2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+            <a href="../01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
