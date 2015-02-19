@@ -13,8 +13,8 @@ However running ``npm install`` on an NFS share doesn't work as per `issue
 #3565 <https://github.com/npm/npm/issues/3565>`_ because a chmod fails and
 apparently from the ticket, this is not going to be fixed.
 
-I finally got it working with a workaround script by [Kevin
-Stone](https://github.com/kevinastone) that mimics NPM, but
+I finally got it working with a workaround script by `Kevin
+Stone <https://github.com/kevinastone>`_ that mimics NPM, but
 moves the ``package.json`` to a temporary directory and then rsyncs its back:
 
 ::
