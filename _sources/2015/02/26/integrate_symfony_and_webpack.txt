@@ -87,7 +87,7 @@ This will start serving the combined javascript file at
 ``http://localhost:8090/assets/bundle.js`` as well as the asset ``page.css`` at
 ``http://localhost:8090/css/page.css`` by using the ``--content-base`` flag.
 Every change to any of the files that are part of the result will trigger a
-rebuilt similar to the ``--watch`` flag of Assetic, Grunt or Gulp.
+rebuild similar to the ``--watch`` flag of Assetic, Grunt or Gulp.
 
 Webpack can be installed globally so it is easy to get started with. I find
 this a huge benefit not having to require a ``package.json`` and Node+npm
@@ -168,7 +168,7 @@ purely operation/workflow based:
 
 1. React encourages modular design of applications, something that you
    have to get working first using require.js for example.
-2. Differentation between development (refresh on moify) and production assets
+2. Differentation between development (refresh on modify) and production assets
    (minified).
 3. React uses a template language JSX that requires cross-compiling the
    ``*.jsx`` files they are written in into plain javascript files.
@@ -197,9 +197,9 @@ in ``webpack.config.js``:
     }
 
 Now it is trivally easy to use React, just create a file with the ``*.jsx``
-extension an Webpack will automatically load it through Facebooks JSX
-transformer before serving it as plain javascript. The only requirement is
-you have to install the NPM package ``jsx-loader`` to make this work.
+extension and Webpack will automatically load it through Facebooks JSX
+transformer before serving it as plain javascript. The only requirement is that
+you have to install the NPM package ``jsx-loader``.
 
 So far I have used webpack only for two playground projects, but I am very
 confident integrating it into some of my production projects now.
