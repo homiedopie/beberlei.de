@@ -5,8 +5,186 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Thu, 19 Feb 2015 00:00:00 +0100</pubDate>
+        <pubDate>Thu, 26 Feb 2015 00:00:00 +0100</pubDate>
         
+        <item>
+            <link>http://www.whitewashing.de/2015/02/26/integrate_symfony_and_webpack.html</link>
+            <guid>http://www.whitewashing.de/2015/02/26/integrate_symfony_and_webpack.html</guid>
+            <title><![CDATA[Integrate Symfony and Webpack]]></title>
+            <description><![CDATA[<div class="section" id="integrate-symfony-and-webpack">
+<h1>Integrate Symfony and Webpack</h1>
+<p>Asset Management in Symfony2 is handled with the PHP based library Assetic by
+default, however I have never really connected to this library and at least for
+me it usually wastes more time than it saves.</p>
+<p>I am also not a big fan of the Node.JS based stack, because it tends to fail
+alot for me as well. With teams that primarily consist of PHP developers and
+web-designers the transition to use Node.JS tools should be very conservative
+in my opinion. Each team member should not feel overburdend by this new
+technology stack.</p>
+<p>Frontend development is really not my strong suit, so these first steps
+I document here may seem obvious to some readers.</p>
+<p>While researching about <a class="reference external" href="https://github.com/facebook/react">React.JS</a> I came across
+a tool called <a class="reference external" href="http://webpack.github.io">Webpack</a> which you could compare
+to Symfony’s Assetic. It is primarily focussing on bundling Javascript modules,
+but you can also ship CSS assets with it.</p>
+<p>The real benefits for Webpack however are:</p>
+<ol class="arabic simple">
+<li>the builtin support for AMD or CommonJS style module loaders</li>
+<li>a builtin development web-server that runs on a dedicated port, serving your
+combined assets.</li>
+<li>a hot reloading plugin that automatically refreshes either the full page or
+just selected code when the assets change.</li>
+<li>module loaders that allow instant translation of JSX or other languages
+with Javascript transpilers (CoffeeScript, ...)</li>
+</ol>
+<p>Let’s have a look at a simple example javascript application in <span class="docutils literal"><span class="pre">app.js</span></span>
+requiring jQuery. The code is part of the Symfony2 document root in <span class="docutils literal"><span class="pre">web/</span></span>:</p>
+<div class="highlight-python"><div class="highlight"><pre>web/
+   css/
+     page.css
+   js/
+     vendor/
+       jquery.js
+     app.js
+</pre></div>
+</div>
+<p>Then we can use <a class="reference external" href="http://webpack.github.io/docs/amd.html">AMD-style</a> modules
+to resolve the dependencies in our code:</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="c1">// app.js</span>
+<span class="nx">define</span><span class="p">([</span><span class="s1">'./vendor/jquery.js'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#content&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;Webpack Hello World!&quot;</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p>You can compare this to PHPs <span class="docutils literal"><span class="pre">require()</span></span> and autoloading functionality,
+something that Javascript has historically been lacking and usually leading
+to some many thousands lines of code javascript files. You can also use
+<a class="reference external" href="http://webpack.github.io/docs/commonjs.html">CommonJS-style</a> module loading
+if your prefer this approach.</p>
+<p>The downside of adding this functionality is that your code <strong>always</strong> has to
+run through Webpack to work on the browser. But Webpack solves this geniously
+by including a web-server that does the translation for you in the background
+all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span> we can
+start our assets development server <span class="docutils literal"><span class="pre">webpack-dev-server</span> <span class="pre">--progress</span> <span class="pre">--colors</span>
+<span class="pre">--port</span> <span class="pre">8090</span> <span class="pre">--content-base=web/</span></span>:</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">&quot;./web/js/app.js&quot;</span><span class="p">,</span>
+    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">filename</span><span class="o">:</span> <span class="s2">&quot;bundle.js&quot;</span><span class="p">,</span>
+        <span class="nx">path</span> <span class="o">:</span> <span class="s1">'web/assets/'</span><span class="p">,</span>
+        <span class="nx">publicPath</span> <span class="o">:</span> <span class="s1">'/assets/'</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And it will serve the combined file at
+<span class="docutils literal"><span class="pre">http://localhost:8090/assets/bundle.js</span></span> as well as the asset <span class="docutils literal"><span class="pre">page.css</span></span> at
+<span class="docutils literal"><span class="pre">http://localhost:8090/css/page.css</span></span> by using the <span class="docutils literal"><span class="pre">--content-base</span></span> flag.
+Every change to any of the files that are part of the result will trigger a
+rebuilt similar to the <span class="docutils literal"><span class="pre">--watch</span></span> flag of Assetic, Grunt or Gulp.</p>
+<p>Webpack can be installed globally so it is easy to get started with. I find
+this a huge benefit not having to require a <span class="docutils literal"><span class="pre">package.json</span></span> and Node+npm
+workflow for your PHP/Symfony project.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo npm install -g webpack
+</pre></div>
+</div>
+<p>For integration into Symfony we make use of some Framework configuration to
+change the base path used for the <span class="docutils literal"><span class="pre">{{</span> <span class="pre">asset()</span> <span class="pre">}}</span></span> twig-function:</p>
+<div class="highlight-python"><div class="highlight"><pre># app/config/config.yml
+framework:
+  templating:
+    assets_base_url: &quot;%assets_base_url%&quot;
+
+# app/config/parameters.yml
+parameters:
+  assets_base_url: &quot;http://localhost:8090&quot;
+</pre></div>
+</div>
+<p>This adds a base path in front of all your assets pointing to the Webpack dev
+server.</p>
+<p>The only thing left for integration is to load the javascript file from your
+twig layout file:</p>
+<div class="highlight-jinja"><div class="highlight"><pre><span class="x">&lt;html&gt;</span>
+<span class="x">    &lt;body&gt;</span>
+<span class="x">        &lt;div id=&quot;content&quot;&gt;&lt;/div&gt;</span>
+
+<span class="x">        </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">app.environment</span> <span class="o">==</span> <span class="s2">&quot;dev&quot;</span> <span class="cp">%}</span><span class="x"/>
+<span class="x">        &lt;script src=&quot;</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'webpack-dev-server.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">&quot;&gt;&lt;/script&gt;</span>
+<span class="x">        </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="x"/>
+<span class="x">        &lt;script type=&quot;text/javascript&quot; src=&quot;</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'assets/bundle.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">&quot;&gt;&lt;/script&gt;</span>
+<span class="x">    &lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">webpack-dev-server.js</span></span> file loaded only in development environment
+handles the <a class="reference external" href="http://webpack.github.io/docs/hot-module-replacement-with-webpack.html">hot module reload</a>
+exchanging, adding, or removing modules while an application is running without
+a page reload whenever possible.</p>
+<p>For production use the <span class="docutils literal"><span class="pre">assets_base_url</span></span> parameter has to be adjusted
+to your specific needs and you use the <span class="docutils literal"><span class="pre">webpack</span></span> command to generate a
+minified and optimized version of your javascript code.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ webpack
+Hash: 69657874504a1a1db7cf
+Version: webpack 1.6.0
+Time: 329ms
+    Asset   Size  Chunks             Chunk Names
+bundle.js  30533       0  [emitted]  main
+   [2] ./web/js/app.js 1608 {0} [built]
+   [5] ./web/js/vendor/jquery.js 496 {0} [built]
+</pre></div>
+</div>
+<p>It will be placed inside <span class="docutils literal"><span class="pre">web/assets/bundle.js</span></span> as specified by the output
+configuration in the Webpack configuration. Getting started in production is as
+easy as seting the assets base url to null and pushing the bundle.js to your
+production server.</p>
+<p>I hope this example shows you some of the benefits of using Webpack over
+Assetic, Grunt or Gulp and the simplicity using it between development and
+production. While the example is Symfony2 related, the concepts apply to any
+kind of application.</p>
+<p>Back to why I stumbled over Webpack in the first place: React.JS. I have been
+circling around React for a while with the impression that is extremly
+well-suited for frontend development. The problems I had with React where
+purely operation/workflow based:</p>
+<ol class="arabic simple">
+<li>React encourages modular design of applications, something that you
+have to get working first using require.js for example.</li>
+<li>Differentation between development (refresh on moify) and production assets
+(minified).</li>
+<li>React uses a template language JSX that requires cross-compiling the
+<span class="docutils literal"><span class="pre">*.jsx</span></span> files they are written in into plain javascript files.</li>
+</ol>
+<p>Now this blog post has already shown that Webpack solves points one and two,
+but it also solves the JSX Transformation with some extra configuration
+in <span class="docutils literal"><span class="pre">webpack.config.js</span></span>:</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">entry</span><span class="o">:</span> <span class="s1">'./web/js/app.jsx'</span><span class="p">,</span>
+    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">filename</span><span class="o">:</span> <span class="s1">'bundle.js'</span><span class="p">,</span>
+        <span class="nx">path</span><span class="o">:</span> <span class="s1">'web/assets/'</span><span class="p">,</span>
+        <span class="nx">publicPath</span><span class="o">:</span> <span class="s1">'/assets'</span>
+    <span class="p">},</span>
+    <span class="nx">module</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.jsx$/</span><span class="p">,</span> <span class="nx">loader</span><span class="o">:</span> <span class="s1">'jsx-loader?insertPragma=React.DOM&amp;harmony'</span> <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="nx">externals</span><span class="o">:</span> <span class="p">{</span><span class="s1">'react'</span><span class="o">:</span> <span class="s1">'React'</span><span class="p">},</span>
+    <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span><span class="nx">extensions</span><span class="o">:</span> <span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'.js'</span><span class="p">,</span> <span class="s1">'.jsx'</span><span class="p">]}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now it is trivally easy to use React, just create a file with the <span class="docutils literal"><span class="pre">*.jsx</span></span>
+extension an Webpack will automatically load it through Facebooks JSX
+transformer before serving it as plain javascript. The only requirement is
+you have to install the NPM package <span class="docutils literal"><span class="pre">jsx-loader</span></span> to make this work.</p>
+</div>]]></description>
+             <pubDate>Thu, 26 Feb 2015 00:00:00 +0100</pubDate>
+        </item>
+    
         <item>
             <link>http://www.whitewashing.de/2015/02/19/vagrant_nfs_and_npm.html</link>
             <guid>http://www.whitewashing.de/2015/02/19/vagrant_nfs_and_npm.html</guid>
