@@ -55,17 +55,15 @@ to resolve the dependencies in our code:
     });
 
 You can compare this to PHPs ``require()`` and autoloading functionality,
-something that Javascript has historically been lacking and usually leading
-to some many thousands lines of code javascript files. You can also use
+something that Javascript has historically been lacking and usually leads to
+javascript files with many thousands lines of code. You can also use
 `CommonJS-style <http://webpack.github.io/docs/commonjs.html>`_ module loading
 if your prefer this approach.
 
 The downside of adding this functionality is that your code **always** has to
 run through Webpack to work on the browser. But Webpack solves this geniously
 by including a web-server that does the translation for you in the background
-all the time.  With a little help of a configuration file called ``webpack.config.js`` we can
-start our assets development server ``webpack-dev-server --progress --colors
---port 8090 --content-base=web/``:
+all the time.  With a little help of a configuration file called ``webpack.config.js``
 
 .. code-block:: js
 
@@ -79,7 +77,13 @@ start our assets development server ``webpack-dev-server --progress --colors
         }
     }
 
-And it will serve the combined file at
+we can start our assets development server by calling:
+
+:: 
+
+    $ webpack-dev-server --progress --colors --port 8090 --content-base=web/
+
+This will start serving the combined javascript file at
 ``http://localhost:8090/assets/bundle.js`` as well as the asset ``page.css`` at
 ``http://localhost:8090/css/page.css`` by using the ``--content-base`` flag.
 Every change to any of the files that are part of the result will trigger a
@@ -196,6 +200,9 @@ Now it is trivally easy to use React, just create a file with the ``*.jsx``
 extension an Webpack will automatically load it through Facebooks JSX
 transformer before serving it as plain javascript. The only requirement is
 you have to install the NPM package ``jsx-loader`` to make this work.
+
+So far I have used webpack only for two playground projects, but I am very
+confident integrating it into some of my production projects now.
 
 .. author:: default
 .. categories:: none

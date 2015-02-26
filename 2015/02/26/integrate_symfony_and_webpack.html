@@ -126,16 +126,14 @@ to resolve the dependencies in our code:</p>
 </pre></div>
 </div>
 <p>You can compare this to PHPs <span class="docutils literal"><span class="pre">require()</span></span> and autoloading functionality,
-something that Javascript has historically been lacking and usually leading
-to some many thousands lines of code javascript files. You can also use
+something that Javascript has historically been lacking and usually leads to
+javascript files with many thousands lines of code. You can also use
 <a class="reference external" href="http://webpack.github.io/docs/commonjs.html">CommonJS-style</a> module loading
 if your prefer this approach.</p>
 <p>The downside of adding this functionality is that your code <strong>always</strong> has to
 run through Webpack to work on the browser. But Webpack solves this geniously
 by including a web-server that does the translation for you in the background
-all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span> we can
-start our assets development server <span class="docutils literal"><span class="pre">webpack-dev-server</span> <span class="pre">--progress</span> <span class="pre">--colors</span>
-<span class="pre">--port</span> <span class="pre">8090</span> <span class="pre">--content-base=web/</span></span>:</p>
+all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span></p>
 <div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">&quot;./web/js/app.js&quot;</span><span class="p">,</span>
@@ -147,7 +145,11 @@ start our assets development server <span class="docutils literal"><span class="
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>And it will serve the combined file at
+<p>we can start our assets development server by calling:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ webpack-dev-server --progress --colors --port 8090 --content-base=web/
+</pre></div>
+</div>
+<p>This will start serving the combined javascript file at
 <span class="docutils literal"><span class="pre">http://localhost:8090/assets/bundle.js</span></span> as well as the asset <span class="docutils literal"><span class="pre">page.css</span></span> at
 <span class="docutils literal"><span class="pre">http://localhost:8090/css/page.css</span></span> by using the <span class="docutils literal"><span class="pre">--content-base</span></span> flag.
 Every change to any of the files that are part of the result will trigger a
@@ -248,6 +250,8 @@ in <span class="docutils literal"><span class="pre">webpack.config.js</span></sp
 extension an Webpack will automatically load it through Facebooks JSX
 transformer before serving it as plain javascript. The only requirement is
 you have to install the NPM package <span class="docutils literal"><span class="pre">jsx-loader</span></span> to make this work.</p>
+<p>So far I have used webpack only for two playground projects, but I am very
+confident integrating it into some of my production projects now.</p>
 </div>
 
 
