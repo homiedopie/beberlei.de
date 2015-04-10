@@ -76,7 +76,7 @@ still managed from one central repository. Technical tools are used to make
 each component usable on its own from Composer/Packagist. Given my experience
 from Doctrine I am glad they didn't.
 
-At `Qafoo <http://qafoo.com>` we have always preferred monolithic project
+At `Qafoo <http://qafoo.com>`_ we have always preferred monolithic project
 repositories over many small independent ones and advised many customers to
 choose this approach except in some special cases where going small was
 economically more efficient.
