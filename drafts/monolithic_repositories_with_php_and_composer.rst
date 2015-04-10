@@ -159,6 +159,10 @@ With this setup you can now generate the autoloading files for each package
 exactly like Composer would by calling::
 
     $ php fiddler.phar build
+    Building fiddler.json projects.
+     [Build] components/foo
+     [Build] components/bar
+     [Build] components/baz
 
 Now in each package Foo, Bar and Baz you can ``require "vendor/autoload.php";``
 and it loads an autoloader with all the dependencies specified for each
