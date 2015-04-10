@@ -27,7 +27,7 @@ performance.
 Google open-sourced `Bazel <http://bazel.io>`_, the build tool behind a huge
 chunk of their codebase out of a single Perforce repository with over 20 million
 commits (`Reference
-<http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf>`).
+<http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf>`_).
 
 Twitter has open-sourced their clone of Google's Bazels build system a little
 longer: `Pants <https://pantsbuild.github.io/>`_ is also designed for
