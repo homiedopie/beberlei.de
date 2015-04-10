@@ -166,7 +166,9 @@ exactly like Composer would by calling::
 
 Now in each package Foo, Bar and Baz you can ``require "vendor/autoload.php";``
 and it loads an autoloader with all the dependencies specified for each
-component, for example in ``components/foo/index.php``::
+component, for example in ``components/foo/index.php``
+
+.. code-block:: php
 
     <?php
 
