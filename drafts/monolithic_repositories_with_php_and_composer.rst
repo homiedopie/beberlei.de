@@ -29,9 +29,9 @@ chunk of their codebase out of a single Perforce repository with over 20 million
 commits (`Reference
 <http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf>`_).
 
-Twitter has open-sourced their clone of Google's Bazels build system a little
-longer: `Pants <https://pantsbuild.github.io/>`_ is also designed for
-monolithic repositories.
+Twitter, Foursquare and Square are working on their clone of Google's Bazels
+build system called `Pants <https://pantsbuild.github.io/>`_. It is also
+designed for monolithic repositories.
 
 All three companies cite huge developer productivity benefits,
 code-reusability, large-scale refactorings and development at scale for
@@ -179,7 +179,10 @@ component, for example in ``components/foo/index.php``
 This is an early access preview, please test this, provide feedback if you see
 this as a valuable or not and about possible extensions. See the `README
 <https://github.com/beberlei/fiddler>`_ for more details about functionality
-and implementation details.
+and implementation details. One possible future development could be picking
+one of the existing build tools and adding PHP support that replicates this
+prototype. Pants looks to be the only one offering sane plugin mechanism at the
+moment.
 
 The code is very rough and simple right now, you will probably stumble accross
 some bugs. It is stable enough so that we could actually port `Tideways
