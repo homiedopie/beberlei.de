@@ -125,11 +125,15 @@ So today I prototyped a build system that complements Composer to manage
 multiple separate projects/packages in a single repository. I call it `Fiddler
 <https://github.com/beberlei/fiddler>`_.
 
-It allows you to define lightweight packages inside one big repository by
-adding ``fiddler.json`` files to each package directory. Fiddler packages can
-depend on each other or on third party packages defined in a single global
-``composer.json`` in the project root. The ``fiddler.json`` also defines the
-autoload rules for each package.
+Fiddler allows you to manage all your *third-party* dependencies using a
+`composer.json` file, while adding a new way of managing your internal
+dependencies. Fiddler combines both external and internal packages to a single
+pool and allows you to pick them as dependencies for your projects.
+
+You define packages inside the repository by adding ``fiddler.json`` files to
+the packages directory. Fiddler packages can depend on each other or on third
+party packages defined in a single global ``composer.json`` in the project
+root. The ``fiddler.json`` also defines the autoload rules for each package.
 
 Say you have three packages in your application, Foo, Bar and Baz and both Bar
 and Baz depend on Foo, and Foo depends on ``symfony/dependency-injection`` with
@@ -162,9 +166,10 @@ The ``fiddler.json`` of Bar and Baz look similar (except the autoload):::
     }
 
 As you can see dependencies are specified without version constraints and as
-directory paths relative to the project root. As the repository can only be at
-a single revision at the same time, every package is at the same version. This
-makes version constraints superfluous.
+directory paths relative to the project root. Since everything is in one
+repository, all internal code is always versioned, tested and deployed
+together. Dropping the need for explicit versions when specifying internal
+dependencies.
 
 With this setup you can now generate the autoloading files for each package
 exactly like Composer would by calling::
