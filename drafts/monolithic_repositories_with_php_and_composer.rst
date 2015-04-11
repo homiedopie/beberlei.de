@@ -23,9 +23,9 @@ cost for version control productivity, because Composer, NPM, Bower force you
 to have exactly one repository for one package to benefit from the
 reusability/distribution.
 
-This blog post compares monolithic repositories with one repository per
-package approach. The main focus is on organizations and companies here,
-a seperate blog post focussing on open source projects will follow.
+This blog post compares monolithic repositories with one repository per package
+approach. It focuses on internal projects and repositories in organizations and
+companies. I will discuss open source projects in a follow-up post.
 
 Workflow at Facebook, Google, Twitter
 -------------------------------------
