@@ -132,7 +132,7 @@ project.
 
 In practice Fiddler allows you to manage all your third-party dependencies using a
 ``composer.json`` file, while adding a new way of managing your internal
-dependencies. Fiddler combines both external and internal packages to a single
+dependencies. It combines both external and internal packages to a single
 pool and allows you to pick them as dependencies for your projects.
 
 For each project you add a ``fiddler.json`` file where you specify both your
