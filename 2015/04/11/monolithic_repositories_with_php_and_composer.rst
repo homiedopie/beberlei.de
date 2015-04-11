@@ -182,7 +182,7 @@ The global ``composer.json`` as you would expect:::
 
     {
         "require": {
-            "symfony/dpendency-injection": "~2.6"
+            "symfony/dependency-injection": "~2.6"
         }
     }
 
