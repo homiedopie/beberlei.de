@@ -1,6 +1,10 @@
 Monolithic Repositories with PHP and Composer
 =============================================
 
+    | tl;dr: Monolithic repositories can bring a lot of benefits. I prototyped
+    | `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer to
+    | add dependency management for monolithic repositories to PHP.
+
 As Git becomes more ubiquitous in open-source projects and within companies,
 monolithic repositories containing multiple packages and repositories have
 become a bit of a bad practice. This is a similar trend to how monolithic
@@ -182,13 +186,11 @@ component, for example in ``components/foo/index.php``
 This is an early access preview, please test this, provide feedback if you see
 this as a valuable or not and about possible extensions. See the `README
 <https://github.com/beberlei/fiddler>`_ for more details about functionality
-and implementation details. One possible future development could be picking
-one of the existing build tools and adding PHP support that replicates this
-prototype. Pants looks to be the only one offering sane plugin mechanism at the
-moment.
+and implementation details.
 
 The code is very rough and simple right now, you will probably stumble accross
-some bugs. It is stable enough so that we could actually port `Tideways
+some bugs, please `report them <https://github.com/beberlei/fiddler/issues>`_.
+It is stable enough so that we could actually port `Tideways
 <https://tideways.io>`_ to it already which is a multi package repository.
 
 .. author:: default
