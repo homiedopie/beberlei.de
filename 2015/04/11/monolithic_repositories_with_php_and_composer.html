@@ -1,0 +1,348 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Monolithic Repositories with PHP and Composer &mdash; Whitewashing</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Integrate Symfony and Webpack" href="../../02/26/integrate_symfony_and_webpack.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei and covers topics in software development. Benjamin works
+            for <a href="http://qafoo.com/" target="_blank">Qafoo</a> and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2015-04-11-monolithic_repositories_with_php_and_composer">
+            
+            
+    <div class="timestamp postmeta">
+            <span>April 11, 2015</span>
+        </div>
+
+    <div class="section" id="monolithic-repositories-with-php-and-composer">
+<h1>Monolithic Repositories with PHP and Composer</h1>
+<blockquote>
+<div>tl;dr Monolithic repositories can bring a lot of benefits. I prototyped
+<a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> that complements Composer
+to add dependency management for monolithic repositories to PHP.</div></blockquote>
+<p>Thanks to <a class="reference external" href="https://twitter.com/iam_asm89">Alexander</a> for discussing this
+topic with me as well as reviewing the draft of this post.</p>
+<p>As Git and Composer are more ubiquitous in open-source projects and within
+companies, monolithic repositories containing multiple projects have become a
+bit of a bad practice. This is a similar trend to how monolithic applications
+are out of fashion and the recent focus on microservices and Docker.</p>
+<p>Composer has made it possible to create many small packages and distribute them
+easily through Packagist. This has massively improved the PHP ecosystem by
+increasing re-usability and sharing.</p>
+<p>But it is important to consider package distribution and development seperate
+from each other. The current progress in package manager tooling comes at a
+cost for version control productivity, because Composer, NPM, Bower force you
+to have exactly one repository for one package to benefit from the
+reusability/distribution.</p>
+<p>This blog post compares monolithic repositories with one repository per package
+approach. It focuses on internal projects and repositories in organizations and
+companies. I will discuss open source projects in a follow-up post.</p>
+<div class="section" id="workflow-at-facebook-google-twitter">
+<h2>Workflow at Facebook, Google, Twitter</h2>
+<p>The move towards smaller repositories is called into question by three extremely
+productive organizations that work at incredible scale.</p>
+<ul class="simple">
+<li>Facebook <a class="reference external" href="https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale">mentioned on their talk &#8220;Big Code: Developer Infrastructure at
+Facebook&#8217;s Scale&#8221;</a>
+that they are going to merge their three big code repositories Server, iOS
+and Android into a single big repository over the course of 2015.</li>
+<li>Google open-sourced <a class="reference external" href="http://bazel.io">Bazel</a>, the build tool behind a huge
+chunk of their codebase managed in a single Perforce repository with over 20 million
+commits (<a class="reference external" href="http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf">Reference</a>).</li>
+<li>Twitter, Foursquare and Square are working on their clone of Google&#8217;s Bazels
+build system called <a class="reference external" href="https://pantsbuild.github.io/">Pants</a>. It is also
+designed for monolithic repositories.</li>
+</ul>
+<p>All three companies cite huge developer productivity benefits,
+code-reusability, large-scale refactorings and development at scale for
+choosing this approach. The Facebook talk even mentions how all their
+development infrastructure efforts focus on keeping this workflow because of
+the benefits it brings.</p>
+</div>
+<div class="section" id="downsides-of-having-many-repositories">
+<h2>Downsides of having many Repositories</h2>
+<p>In contrast working with ever smaller repositories can be a huge burden for
+developer mental models: I have seen this in open-source projects such as
+Doctrine and several customer projects:</p>
+<ol class="arabic simple">
+<li>Cross repository changes require certain pull-requests on Github/Gitlab to
+be merged in order or in combination yet the tools don&#8217;t provide visibility
+into these dependencies. They are purely informal, leading to high error
+rates.</li>
+<li>Version pinning through NPM and Composer package managers is great for
+managing third party dependencies as long its not too many of them and they
+don&#8217;t change too often. For internal dependencies its a lot of work to
+update dependencies between repositories all the time. Time gets lost by
+developers that don&#8217;t have the correct dependencies or because of mistakes
+in the merge process.</li>
+<li>Changing code in core libraries can break dependencies without the developer
+even realizing this because tests don&#8217;t run together. This introduces a
+longer feedback cycle between code that depends on each other, with all the
+downsides.</li>
+</ol>
+<p>One important remark about monolithic repositories: It does not automatically
+lead to a monolithic code-base. Especially Symfony2 and ZF2 are a very
+good example of how you can build individual components with a clean dependency
+graph.</p>
+<p>At <a class="reference external" href="http://qafoo.com">Qafoo</a> we have always preferred monolithic project
+repositories containing several components over many small independent ones. We
+advised many customers to choose this approach except in some special cases
+where going small was economically more efficient.</p>
+</div>
+<div class="section" id="benefits-of-monlithic-repositories">
+<h2>Benefits of Monlithic Repositories</h2>
+<p>Even if you are not at the scale of Facebook or Google, a single repository
+still provides the mentioned benefits:</p>
+<ul class="simple">
+<li>Adjusting to constant change by factoring out libraries, merging libraries
+and introducing new dependencies for multiple projects is much easier when
+done in a single, atomic VCS commit.</li>
+<li>Discoverability of code is much higher, if you have all the code in a single
+place. Github and Gitlab don&#8217;t offer powerful tools like find, grep, sed over
+more than one repository. Hunting down dependencies, in specific versions can
+cost alot of time.</li>
+<li>Reusability increases as it is much easier to just use code from the same
+repository than from another repository. Composer and NPM simplify combining
+repositories at specific versions, however one problem is actually knowing
+that the code exists in the first place.</li>
+<li>From an operational perspective it is much easier to get a new developer
+up to speed setting up projects from a single repository. Just practically
+its easier to add his public key to only one Team/Repository/Directory than
+to hundreds. On top of that setting up many small repositories and
+familiarizing with each of them costs a lot of time.</li>
+</ul>
+<p>This is why I have been struggling with how Packagist and Satis force the move
+to smaller repositories through the technical constraint &#8220;one repository equals
+one composer.json file&#8221;. For reusable open source projects this is perfectly
+fine, but for company projects I have seen it hurt developer productivity more
+often than is acceptable.</p>
+</div>
+<div class="section" id="introducing-fiddler">
+<h2>Introducing Fiddler</h2>
+<p>So today I prototyped a build system that complements Composer to manage
+multiple separate projects/packages in a single repository. I call it <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a>. Fiddler introduces a maintainable
+approach to managing dependencies for multiple projects in a single repository,
+without losing the benefits of having explicit dependencies for each separate
+project.</p>
+<p>In practice Fiddler allows you to manage all your third-party dependencies using a
+<span class="docutils literal"><span class="pre">composer.json</span></span> file, while adding a new way of managing your internal
+dependencies. It combines both external and internal packages to a single
+pool and allows you to pick them as dependencies for your projects.</p>
+<p>For each project you add a <span class="docutils literal"><span class="pre">fiddler.json</span></span> file where you specify both your
+third-party and internal dependencies. Fiddler will take care of generating a
+specific autoloader for each project, containing only the dependencies of the
+project.  This allows you to have one repository, while still having <em>explicit</em>
+dependencies per project.</p>
+<p>Keeping explicit dependencies for each project means it&#8217;s still easy to find
+out which components are affected by changes in internal or third-party
+dependencies.</p>
+</div>
+<div class="section" id="example-project">
+<h2>Example Project</h2>
+<p>Say you have three packages in your application, Library_1, Project_A
+and Project_B and both projects depend on the library which in turn depends
+on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
+<div class="highlight-python"><div class="highlight"><pre>projects
+├── components
+│   ├── Project_A
+│   │   └── fiddler.json
+│   ├── Project_B
+│   │   └── fiddler.json
+│   └── Library_1
+│       └── fiddler.json
+├── composer.json
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;Foo</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span><span class="p">}},</span>
+    <span class="s">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;vendor/symfony/dependency-injection&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;Bar</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span><span class="p">}},</span>
+    <span class="s">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;components/Library_1&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;symfony/dpendency-injection&quot;</span><span class="p">:</span> <span class="s">&quot;~2.6&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As you can see dependencies are specified without version constraints and as
+directory paths relative to the project root. Since everything is in one
+repository, all internal code is always versioned, tested and deployed
+together. Dropping the need for explicit versions when specifying internal
+dependencies.</p>
+<p>With this setup you can now generate the autoloading files for each package
+exactly like Composer would by calling:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php fiddler.phar build
+Building fiddler.json projects.
+ [Build] components/Library_1
+ [Build] components/Project_A
+ [Build] components/Project_B
+</pre></div>
+</div>
+<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">&quot;vendor/autoload.php&quot;;</span></span> and it loads an
+autoloader with all the dependencies specified for each component, for example
+in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="s2">&quot;vendor/autoload.php&quot;</span><span class="p">;</span>
+
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Component\DependencyInjection\ContainerBuilder</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This is an early access preview, please test this, provide feedback if you see
+this as a valuable or not and about possible extensions. See the <a class="reference external" href="https://github.com/beberlei/fiddler">README</a> for more details about functionality
+and implementation details.</p>
+<p>The code is very rough and simple right now, you will probably stumble accross
+some bugs, please <a class="reference external" href="https://github.com/beberlei/fiddler/issues">report them</a>.
+It is stable enough so that we could actually port <a class="reference external" href="https://tideways.io">Tideways</a> to it already which is a multi package repository.</p>
+</div>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2015/04/11/monolithic_repositories_with_php_and_composer";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="#">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="../../02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="../../02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="../../02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="../../02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
+            <a href="../../02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+        </li><li>
+            <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
+        </li><li>
+            <a href="../../../2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
+        </li><li>
+            <a href="../../../2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
+        </li><li>
+            <a href="../../../2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2014, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

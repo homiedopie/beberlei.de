@@ -74,6 +74,137 @@
           <div id="page6">
             
             <div class="timestamp postmeta">
+            <span>December 18, 2010</span>
+        </div>
+        <div class="section" id="generate-proxy-code-using-a-stream-wrapper">
+<h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
+<p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
+<p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
+<p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <span class="docutils literal"><span class="pre">include()</span></span>. The client code looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">stream_wrapper_register</span><span class="p">(</span><span class="s2">&quot;dc2proxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Doctrine\ORM\Proxy\ProxyStreamWrapper&quot;</span><span class="p">);</span>
+
+<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">&quot;dc2proxy:///proxies&quot;</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$em</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$className</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$proxyClass</span><span class="p">;</span>
+
+<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;.php&quot;</span><span class="p">;</span>
+
+<span class="nb">unset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
+The stream wrapper to make this work looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$proxyCode</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="nf">stream_open</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$options</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$opened_path</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span>
+                <span class="o">-&gt;</span><span class="na">getProxyFactory</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">getProxyClassCode</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">stream_stat</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
+        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">url_stat</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
+        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_read</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$ret</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$ret</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_write</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$left</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
+        <span class="nv">$right</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$left</span> <span class="o">.</span> <span class="nv">$data</span> <span class="o">.</span> <span class="nv">$right</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_tell</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_eof</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">&gt;=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_seek</span><span class="p">(</span><span class="nv">$offset</span><span class="p">,</span> <span class="nv">$whence</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$whence</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">SEEK_SET</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">case</span> <span class="nx">SEEK_CUR</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">case</span> <span class="nx">SEEK_END</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What do you think about this approach? Are there any potential problems I am not seeing?</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/12/18/generate-proxy-code-using-a-stream-wrapper.html#disqus_thread" data-disqus-identifier="2010/12/18/generate-proxy-code-using-a-stream-wrapper">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>December 07, 2010</span>
         </div>
         <div class="section" id="blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">
@@ -836,41 +967,6 @@ mechanism to save some lines of code.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html#disqus_thread" data-disqus-identifier="2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 14, 2009</span>
-        </div>
-        <div class="section" id="finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">
-<h1><a href="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html">Finally: Zend_Mail charset and/or long lines header encoding bug fixed</a></h1>
-<p>There was this <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">lurking bug in
-Zend_Mail</a> which
-destroyed every Mail-Header (and corresponding Mail) with non US-ASCII
-Chars and more than an encoded length of 74 chars. This is quite a huge
-subset of mails, but it seems a nice solution was not so easy, at least
-nobody tried to fixed it for quite some time.</p>
-<p>Where many hackish solutions we’re offered, Ota Mares aka Littlex spent
-incredible time to hunt the original problem down and with his help I
-tag-teamed the bug to death today. Saturo Yoshida of Zend Fame added
-some further spice regarding an alternative solution with Base64
-Encoding instead of Quoted Printable Mime Header encoding.</p>
-<p>In the end the solution we chose was, not to re-use the Mime encoding
-function that is specific to MIME bodies according to
-<a class="reference external" href="http://tools.ietf.org/html/rfc2045">RFC2045</a>, but to write a
-completely new algorithm for Mime Headers, whose rules are specified in
-<a class="reference external" href="http://tools.ietf.org/html/rfc2047">RFC2047</a>. This is now done and
-unit-tests prove its working according to standard.</p>
-<p>What is missing now is people trying that fix on as many Mail platforms
-as possible and <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">giving feedback in the
-issue</a> if a lengthy
-subject with non-ASCII chars is displayed correctly.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html#disqus_thread" data-disqus-identifier="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -895,6 +991,8 @@ subject with non-ASCII chars is displayed correctly.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
             <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
         </li><li>
             <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
@@ -912,8 +1010,6 @@ subject with non-ASCII chars is displayed correctly.</p>
             <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
         </li><li>
             <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
-        </li><li>
-            <a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a>
         </li></ul>
 </div>
 </section>
