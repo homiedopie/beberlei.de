@@ -7,31 +7,29 @@ become a bit of a bad practice. This is a similar trend to how monolithic
 applications are out of fashion and the recent focus on microservices and
 Docker.
 
-Yet just several years ago it was common that companies had just a single (or
+Yet just some years ago it was common that companies had just a single (or
 few) SVN repository and within it contained the code for all the projects.  One
 open source example of this even today is the `SVN repository
 <http://svn.apache.org/repos/asf/>`_ of the Apache Software Foundation with a
 breath taking number of 1.672.730 commits across many of their projects.
 
-However recently the move towards smaller repositories is questioned by three
-extremely productive organizations at incredible scale (compared to the usual
-PHP shop) speaking about their use of monolithic repositories.
+However recently the move towards smaller repositories is called to question by
+three extremely productive organizations at incredible scale (compared to the
+usual PHP shop) speaking about their use of monolithic repositories.
 
-Facebook `mentioned on their F8 2015 conference
-<https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale>`_
-that they are going to merge their three big code repositories Server, iOS and
-Android into a single big repository over the course of 2015. A dedicated team
-working on Mercurial at Facebook made this possible and even increase the
-performance.
+- Facebook `mentioned on their F8 2015 conference
+  <https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale>`_
+  that they are going to merge their three big code repositories Server, iOS and
+  Android into a single big repository over the course of 2015.
 
-Google open-sourced `Bazel <http://bazel.io>`_, the build tool behind a huge
-chunk of their codebase out of a single Perforce repository with over 20 million
-commits (`Reference
-<http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf>`_).
+- Google open-sourced `Bazel <http://bazel.io>`_, the build tool behind a huge
+  chunk of their codebase managed in a single Perforce repository with over 20 million
+  commits (`Reference
+  <http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf>`_).
 
-Twitter, Foursquare and Square are working on their clone of Google's Bazels
-build system called `Pants <https://pantsbuild.github.io/>`_. It is also
-designed for monolithic repositories.
+- Twitter, Foursquare and Square are working on their clone of Google's Bazels
+  build system called `Pants <https://pantsbuild.github.io/>`_. It is also
+  designed for monolithic repositories.
 
 All three companies cite huge developer productivity benefits,
 code-reusability, large-scale refactorings and development at scale for
@@ -76,13 +74,18 @@ still managed from one central repository. Technical tools are used to make
 each component usable on its own from Composer/Packagist. Given my experience
 from Doctrine I am glad they didn't.
 
+One important remark about monolithic repositories: It does not automatically
+lead to a monolithic code-base. Especially Symfony2 and ZF2 are a very
+good example of how you can build individual components with a clean dependency
+graph. 
+
 At `Qafoo <http://qafoo.com>`_ we have always preferred monolithic project
-repositories over many small independent ones and advised many customers to
-choose this approach except in some special cases where going small was
-economically more efficient.
+repositories containing several components over many small independent ones. We
+advised many customers to choose this approach except in some special cases
+where going small was economically more efficient.
 
 Even if you are not at the scale of Facebook or Google, a single repository
-still provides their mentioned benefits:
+still provides the mentioned benefits:
 
 - Adjusting to constant change by factoring out libraries, merging libraries
   and introducing new dependencies for multiple projects is much easier when
@@ -104,11 +107,11 @@ still provides their mentioned benefits:
   to hundrets. On top of that setting up many small repositories and
   familiarizing with each of them costs a lot of time.
 
-This is why I have been struggling with how Composer forces the move to smaller
-repositories through the technical constraint "one repository equals one
-composer.json file". For reusable open source project with few dependencies
-this is perfectly fine, but for company projects I have seen it hurt developer
-productivity more often than is acceptable.
+This is why I have been struggling with how Packagist and Satis force the move
+to smaller repositories through the technical constraint "one repository equals
+one composer.json file". For reusable open source project this is perfectly
+fine, but for company projects I have seen it hurt developer productivity more
+often than is acceptable.
 
 So today I took some time to work on a prototype build system that integrates
 Composer with multiple packages in a single large repository.
@@ -152,7 +155,7 @@ The ``fiddler.json`` of Bar and Baz look similar (except the autoload):::
 
 As you can see dependencies are specified without version constraints and as
 directory paths relative to the project root. As the repository can only be at
-a single revision at the same time, every package it at the same version. This
+a single revision at the same time, every package is at the same version. This
 makes version constraints superfluous.
 
 With this setup you can now generate the autoloading files for each package
