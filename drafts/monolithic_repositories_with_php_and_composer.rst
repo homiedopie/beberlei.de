@@ -1,9 +1,9 @@
 Monolithic Repositories with PHP and Composer
 =============================================
 
-     tl;dr: Monolithic repositories can bring a lot of benefits. I prototyped
-    `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer to
-     add dependency management for monolithic repositories to PHP.
+     tl;dr Monolithic repositories can bring a lot of benefits. I prototyped
+     `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer
+     to add dependency management for monolithic repositories to PHP.
 
 As Git becomes more ubiquitous in open-source projects and within companies,
 monolithic repositories containing multiple packages and repositories have
