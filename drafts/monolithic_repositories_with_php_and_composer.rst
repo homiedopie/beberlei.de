@@ -125,13 +125,12 @@ Introducing Fiddler
 
 So today I prototyped a build system that complements Composer to manage
 multiple separate projects/packages in a single repository. I call it `Fiddler
-<https://github.com/beberlei/fiddler>`_.
+<https://github.com/beberlei/fiddler>`_. Fiddler introduces a maintainable
+approach to managing dependencies for multiple projects in a single repository,
+without losing the benefits of having explicit dependencies for each separate
+project.
 
-Fiddler introduces a maintainable approach to managing dependencies for
-multiple projects in a single repository, without losing the benefits of having
-explicit dependencies for each separate project.
-
-Fiddler allows you to manage all your *third-party* dependencies using a
+In practice Fiddler allows you to manage all your third-party dependencies using a
 ``composer.json`` file, while adding a new way of managing your internal
 dependencies. Fiddler combines both external and internal packages to a single
 pool and allows you to pick them as dependencies for your projects.
