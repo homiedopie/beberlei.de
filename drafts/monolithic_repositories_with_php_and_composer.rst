@@ -178,6 +178,14 @@ The ``fiddler.json`` of Bar and Baz look similar (except the autoload):::
         "deps": ["components/foo"]
     }
 
+The global ``composer.json`` as you would expect:::
+
+    {
+        "require": {
+            "symfony/dpendency-injection": "~2.6"
+        }
+    }
+
 As you can see dependencies are specified without version constraints and as
 directory paths relative to the project root. Since everything is in one
 repository, all internal code is always versioned, tested and deployed
