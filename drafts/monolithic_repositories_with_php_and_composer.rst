@@ -5,6 +5,8 @@ Monolithic Repositories with PHP and Composer
      `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer
      to add dependency management for monolithic repositories to PHP.
 
+Thanks to `Alexander <https://twitter.com/iam_asm89>`_ for discussing this topic with me as well as reviewing the draft of this post.
+
 As Git and Composer are more ubiquitous in open-source projects and within
 companies, monolithic repositories containing multiple projects have become a
 bit of a bad practice. This is a similar trend to how monolithic applications
@@ -125,15 +127,27 @@ So today I prototyped a build system that complements Composer to manage
 multiple separate projects/packages in a single repository. I call it `Fiddler
 <https://github.com/beberlei/fiddler>`_.
 
+Fiddler introduces a maintainable approach to managing dependencies for
+multiple projects in a single repository, without losing the benefits of having
+explicit dependencies for each separate project.
+
 Fiddler allows you to manage all your *third-party* dependencies using a
-`composer.json` file, while adding a new way of managing your internal
+``composer.json`` file, while adding a new way of managing your internal
 dependencies. Fiddler combines both external and internal packages to a single
 pool and allows you to pick them as dependencies for your projects.
 
-You define packages inside the repository by adding ``fiddler.json`` files to
-the packages directory. Fiddler packages can depend on each other or on third
-party packages defined in a single global ``composer.json`` in the project
-root. The ``fiddler.json`` also defines the autoload rules for each package.
+For each project you add a ``fiddler.json`` file where you specify both your
+third-party and internal dependencies. Fiddler will take care of generating a
+specific autoloader for each project, containing only the dependencies of the
+project.  This allows you to have one repository, while still having *explicit*
+dependencies per project.
+
+Keeping explicit dependencies for each project means it's still easy to find
+out which components are affected by changes in internal or third-party
+dependencies.
+
+Example Project
+---------------
 
 Say you have three packages in your application, Foo, Bar and Baz and both Bar
 and Baz depend on Foo, and Foo depends on ``symfony/dependency-injection`` with
