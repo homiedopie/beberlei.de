@@ -5,21 +5,18 @@ Monolithic Repositories with PHP and Composer
      `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer
      to add dependency management for monolithic repositories to PHP.
 
-As Git becomes more ubiquitous in open-source projects and within companies,
-monolithic repositories containing multiple packages and repositories have
-become a bit of a bad practice. This is a similar trend to how monolithic
-applications are out of fashion and the recent focus on microservices and
-Docker.
+As Git and Composer becomes more ubiquitous in open-source projects and within
+companies, monolithic repositories containing multiple projects have become a
+bit of a bad practice. This is a similar trend to how monolithic applications
+are out of fashion and the recent focus on microservices and Docker.
 
-Yet just some years ago it was common that companies had just a single (or
-few) SVN repository and within it contained the code for all the projects.  One
-open source example of this even today is the `SVN repository
-<http://svn.apache.org/repos/asf/>`_ of the Apache Software Foundation with a
-breath taking number of 1.672.730 commits across many of their projects.
+Composer has made it possible to create many small packages and distribute them
+easily through Packagist. This has massivly improved the PHP ecosystem by
+increasing re-usability and sharing.
 
-However recently the move towards smaller repositories is called to question by
-three extremely productive organizations at incredible scale (compared to the
-usual PHP shop) speaking about their use of monolithic repositories.
+The move towards smaller repositories is called to question by three extremely
+productive organizations at incredible scale (compared to the usual PHP shop)
+speaking about their use of monolithic repositories.
 
 - Facebook `mentioned on their F8 2015 conference
   <https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale>`_
@@ -41,9 +38,12 @@ choosing this approach. The Facebook talk even mentions how all their
 development infrastructure efforts focus on keeping this workflow because of
 the benefits it brings.
 
+Downsides of having many Repositories
+-------------------------------------
+
 In contrast working with ever smaller repositories can be a huge burden for
 developer mental models: I have seen this in open-source projects such as
-Doctrine and many customer projects as well as our own product Tideways:
+Doctrine and several customer projects:
 
 1. Cross repository changes require certain pull-requests on Github/Gitlab to
    be merged in order or in combination yet the tools don't provide visibility
@@ -88,6 +88,9 @@ repositories containing several components over many small independent ones. We
 advised many customers to choose this approach except in some special cases
 where going small was economically more efficient.
 
+Benefits of Monlithic Repositories
+----------------------------------
+
 Even if you are not at the scale of Facebook or Google, a single repository
 still provides the mentioned benefits:
 
@@ -108,7 +111,7 @@ still provides the mentioned benefits:
 - From an operational perspective it is much easier to get a new developer
   up to speed setting up projects from a single repository. Just practically
   its easier to add his public key to only one Team/Repository/Directory than
-  to hundrets. On top of that setting up many small repositories and
+  to hundreds. On top of that setting up many small repositories and
   familiarizing with each of them costs a lot of time.
 
 This is why I have been struggling with how Packagist and Satis force the move
@@ -116,6 +119,9 @@ to smaller repositories through the technical constraint "one repository equals
 one composer.json file". For reusable open source project this is perfectly
 fine, but for company projects I have seen it hurt developer productivity more
 often than is acceptable.
+
+Introducing Fiddler
+-------------------
 
 So today I took some time to work on a prototype build system that integrates
 Composer with multiple packages in a single large repository.
