@@ -5,23 +5,37 @@ Monolithic Repositories with PHP and Composer
      `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer
      to add dependency management for monolithic repositories to PHP.
 
-As Git and Composer becomes more ubiquitous in open-source projects and within
+As Git and Composer are more ubiquitous in open-source projects and within
 companies, monolithic repositories containing multiple projects have become a
 bit of a bad practice. This is a similar trend to how monolithic applications
 are out of fashion and the recent focus on microservices and Docker.
 
 Composer has made it possible to create many small packages and distribute them
-easily through Packagist. This has massivly improved the PHP ecosystem by
+easily through Packagist. This has massively improved the PHP ecosystem by
 increasing re-usability and sharing.
 
-The move towards smaller repositories is called to question by three extremely
-productive organizations at incredible scale (compared to the usual PHP shop)
-speaking about their use of monolithic repositories.
+But it is important to consider package distribution and development seperate
+from each other. The current progress in package manager tooling comes at a
+cost for version control productivity, because Composer, NPM, Bower force you
+to have exactly one repository for one package to benefit from the
+reusability/distribution.
 
-- Facebook `mentioned on their F8 2015 conference
+This blog post compares monolithic repositories with one repository per
+package approach. The main focus is on organizations and companies here,
+a seperate blog post focussing on open source projects will follow.
+
+Workflow at Facebook, Google, Twitter
+-------------------------------------
+
+The move towards smaller repositories is called to question by three extremely
+productive organizations at incredible scale speaking about their use of
+monolithic repositories.
+
+- Facebook `mentioned on their talk "Big Code: Developer Infrastructure at
+  Facebook's Scale"
   <https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale>`_
-  that they are going to merge their three big code repositories Server, iOS and
-  Android into a single big repository over the course of 2015.
+  that they are going to merge their three big code repositories Server, iOS
+  and Android into a single big repository over the course of 2015.
 
 - Google open-sourced `Bazel <http://bazel.io>`_, the build tool behind a huge
   chunk of their codebase managed in a single Perforce repository with over 20 million
@@ -62,22 +76,6 @@ Doctrine and several customer projects:
    longer feedback cycle between code that depends on each other, with all the
    downsides.
 
-Take for example Doctrine, which was managed in a single Git repository until
-the late 2.0 Beta, then split into Common, DBAL and ORM and later split into
-even smaller packages by splitting Common. This was only possible because
-Composer exists.
-
-However in my opinion since the splits the visibility of Pull Requests and
-problems in smaller components has suffered a lot. Each Common subproject now
-has its own versioning numbers, confusing even seasoned contributors on which
-versions are compatible with each other. 
-
-Symfony2 and ZendFramework2 have rejected this split into smaller packages.
-Both frameworks have a lot of independent and reusable components, but are
-still managed from one central repository. Technical tools are used to make
-each component usable on its own from Composer/Packagist. Given my experience
-from Doctrine I am glad they didn't.
-
 One important remark about monolithic repositories: It does not automatically
 lead to a monolithic code-base. Especially Symfony2 and ZF2 are a very
 good example of how you can build individual components with a clean dependency
@@ -116,22 +114,22 @@ still provides the mentioned benefits:
 
 This is why I have been struggling with how Packagist and Satis force the move
 to smaller repositories through the technical constraint "one repository equals
-one composer.json file". For reusable open source project this is perfectly
+one composer.json file". For reusable open source projects this is perfectly
 fine, but for company projects I have seen it hurt developer productivity more
 often than is acceptable.
 
 Introducing Fiddler
 -------------------
 
-So today I took some time to work on a prototype build system that integrates
-Composer with multiple packages in a single large repository.
+So today I prototyped a build system that complements Composer to manage
+multiple separate projects/packages in a single repository. I call it `Fiddler
+<https://github.com/beberlei/fiddler>`_.
 
-I call it `Fiddler <https://github.com/beberlei/fiddler>`_. It allows you to define
-lightweight packages inside one big repository by adding ``fiddler.json`` files
-to each package directory. Fiddler packages can depend on each other or on
-third party packages defined in a single global ``composer.json`` in the
-project root. The ``fiddler.json`` also defines the autoload rules for each
-package.
+It allows you to define lightweight packages inside one big repository by
+adding ``fiddler.json`` files to each package directory. Fiddler packages can
+depend on each other or on third party packages defined in a single global
+``composer.json`` in the project root. The ``fiddler.json`` also defines the
+autoload rules for each package.
 
 Say you have three packages in your application, Foo, Bar and Baz and both Bar
 and Baz depend on Foo, and Foo depends on ``symfony/dependency-injection`` with
