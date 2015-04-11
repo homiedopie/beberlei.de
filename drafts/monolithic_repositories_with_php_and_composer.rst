@@ -5,7 +5,8 @@ Monolithic Repositories with PHP and Composer
      `Fiddler <https://github.com/beberlei/fiddler>`_ that complements Composer
      to add dependency management for monolithic repositories to PHP.
 
-Thanks to `Alexander <https://twitter.com/iam_asm89>`_ for discussing this topic with me as well as reviewing the draft of this post.
+Thanks to `Alexander <https://twitter.com/iam_asm89>`_ for discussing this
+topic with me as well as reviewing the draft of this post.
 
 As Git and Composer are more ubiquitous in open-source projects and within
 companies, monolithic repositories containing multiple projects have become a
@@ -148,34 +149,34 @@ dependencies.
 Example Project
 ---------------
 
-Say you have three packages in your application, Foo, Bar and Baz and both Bar
-and Baz depend on Foo, and Foo depends on ``symfony/dependency-injection`` with
-the following file structure:
+Say you have three packages in your application, Library_1, Project_A
+and Project_B and both projects depend on the library which in turn depends
+on ``symfony/dependency-injection``. The repository has the following file structure:
 
 ::
 
     projects
     ├── components
-    │   ├── bar
+    │   ├── Project_A
     │   │   └── fiddler.json
-    │   ├── baz
+    │   ├── Project_B
     │   │   └── fiddler.json
-    │   └── foo
+    │   └── Library_1
     │       └── fiddler.json
     ├── composer.json
 
-The ``fiddler.json`` of Foo looks like this:::
+The ``fiddler.json`` of Library_1 looks like this:::
 
     {
         "autoload": {"psr-0": {"Foo\\": "src/"}},
         "deps": ["vendor/symfony/dependency-injection"]
     }
 
-The ``fiddler.json`` of Bar and Baz look similar (except the autoload):::
+The ``fiddler.json`` of Project_A and Project_B look similar (except the autoload):::
 
     {
         "autoload": {"psr-0": {"Bar\\": "src/"}},
-        "deps": ["components/foo"]
+        "deps": ["components/Library_1"]
     }
 
 The global ``composer.json`` as you would expect:::
@@ -197,13 +198,13 @@ exactly like Composer would by calling::
 
     $ php fiddler.phar build
     Building fiddler.json projects.
-     [Build] components/foo
-     [Build] components/bar
-     [Build] components/baz
+     [Build] components/Library_1
+     [Build] components/Project_A
+     [Build] components/Project_B
 
-Now in each package Foo, Bar and Baz you can ``require "vendor/autoload.php";``
-and it loads an autoloader with all the dependencies specified for each
-component, for example in ``components/foo/index.php``
+Now in each package you can ``require "vendor/autoload.php";`` and it loads an
+autoloader with all the dependencies specified for each component, for example
+in ``components/Library_1/index.php``
 
 .. code-block:: php
 
