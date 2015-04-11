@@ -81,15 +81,15 @@ Doctrine and several customer projects:
 One important remark about monolithic repositories: It does not automatically
 lead to a monolithic code-base. Especially Symfony2 and ZF2 are a very
 good example of how you can build individual components with a clean dependency
-graph. 
+graph in a single big repository.  
 
 At `Qafoo <http://qafoo.com>`_ we have always preferred monolithic project
 repositories containing several components over many small independent ones. We
 advised many customers to choose this approach except in some special cases
 where going small was economically more efficient.
 
-Benefits of Monlithic Repositories
-----------------------------------
+Benefits of Monolithic Repositories
+-----------------------------------
 
 Even if you are not at the scale of Facebook or Google, a single repository
 still provides the mentioned benefits:
