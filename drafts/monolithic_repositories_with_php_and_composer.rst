@@ -30,7 +30,7 @@ companies. I will discuss open source projects in a follow-up post.
 Workflow at Facebook, Google, Twitter
 -------------------------------------
 
-The move towards smaller repositories is called to question by three extremely
+The move towards smaller repositories is called into question by three extremely
 productive organizations at incredible scale speaking about their use of
 monolithic repositories.
 
