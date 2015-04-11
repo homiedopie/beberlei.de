@@ -31,8 +31,7 @@ Workflow at Facebook, Google, Twitter
 -------------------------------------
 
 The move towards smaller repositories is called into question by three extremely
-productive organizations at incredible scale speaking about their use of
-monolithic repositories.
+productive organizations that work at incredible scale.
 
 - Facebook `mentioned on their talk "Big Code: Developer Infrastructure at
   Facebook's Scale"
