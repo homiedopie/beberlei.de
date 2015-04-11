@@ -167,14 +167,14 @@ on ``symfony/dependency-injection``. The repository has the following file struc
 The ``fiddler.json`` of Library_1 looks like this:::
 
     {
-        "autoload": {"psr-0": {"Foo\\": "src/"}},
+        "autoload": {"psr-0": {"Library1\\": "src/"}},
         "deps": ["vendor/symfony/dependency-injection"]
     }
 
 The ``fiddler.json`` of Project_A and Project_B look similar (except the autoload):::
 
     {
-        "autoload": {"psr-0": {"Bar\\": "src/"}},
+        "autoload": {"psr-0": {"ProjectA\\": "src/"}},
         "deps": ["components/Library_1"]
     }
 
