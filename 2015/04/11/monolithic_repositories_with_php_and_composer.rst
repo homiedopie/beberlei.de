@@ -33,7 +33,7 @@ Workflow at Facebook, Google, Twitter
 The move towards smaller repositories is called into question by three extremely
 productive organizations that work at incredible scale.
 
-- Facebook `mentioned on their talk "Big Code: Developer Infrastructure at
+- Facebook `mentioned in their talk "Big Code: Developer Infrastructure at
   Facebook's Scale"
   <https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale>`_
   that they are going to merge their three big code repositories Server, iOS
@@ -44,7 +44,7 @@ productive organizations that work at incredible scale.
   commits (`Reference
   <http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf>`_).
 
-- Twitter, Foursquare and Square are working on their clone of Google's Bazels
+- Twitter, Foursquare and Square are working on their clone of Google's Bazel
   build system called `Pants <https://pantsbuild.github.io/>`_. It is also
   designed for monolithic repositories.
 
