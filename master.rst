@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2015/06/12/the_containertest
    2015/04/11/monolithic_repositories_with_php_and_composer
    2015/02/26/integrate_symfony_and_webpack
    2015/02/19/vagrant_nfs_and_npm
