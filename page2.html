@@ -76,6 +76,173 @@
           <div id="page2">
             
             <div class="timestamp postmeta">
+            <span>April 24, 2014</span>
+        </div>
+        <div class="section" id="symfony2-a-simple-hello-world">
+<h1><a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a></h1>
+<p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
+I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
+to start with a very simple “Hello World” example.</p>
+<p>The Symfony2 Standard Edition already contains a huge burden of concepts,
+assumptions and conventions that can be confusing for a beginner.</p>
+<ul class="simple">
+<li>YAML</li>
+<li>Twig</li>
+<li>Environments and Dependency Injection Container</li>
+<li>Various weird and magic syntaxes for bundles, <span class="docutils literal"><span class="pre">_controller</span></span> and template names</li>
+<li>Various files to open and poke around in</li>
+<li>Composer</li>
+<li>Maybe even Doctrine</li>
+</ul>
+<p>As a trainer it is very hard to explain all this at the same time.
+It makes a lot of sense to avoid as many of them as possible.</p>
+<p>That is why the Standard Edition is not the best way to start teaching Symfony,
+but one should actually consider a much lighter version of the framework and
+then gradually add more and more features until you end up with the standard
+edition.</p>
+<p>Fabien discussed the simplification of the Symfony Standard Edition from
+another angle before, considering the minimum necessary code to use when
+reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">“Packing a Symfony Full-Stack Application in
+one file”</a>.</p>
+<p>This blog post is about a truely minimal Symfony edition to start learning
+about the framework.  The first thing I like to show is a really simple Hello
+World controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Response</span><span class="p">(</span><span class="s1">'Hello World!'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What is the necessary framework glue code to support this Hello World? Lets start
+from the index file <cite>web/index.php</cite>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../vendor/autoload.php&quot;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../app/AppKernel.php&quot;</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
+<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
+at them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">{</span>
+<span class="x">    &quot;require&quot;: {</span>
+<span class="x">        &quot;symfony/symfony&quot;: &quot;@stable&quot;</span>
+<span class="x">    },</span>
+<span class="x">    &quot;autoload&quot;: {</span>
+<span class="x">        &quot;psr-0&quot;: { &quot;Acme&quot;: &quot;src/&quot; }</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The <cite>composer.json</cite> file installs the latest stable Symfony release and
+adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
+<p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
+and the minimal version of this looks like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'framework'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">'secret'</span> <span class="o">=&gt;</span> <span class="s1">'some secret here'</span><span class="p">,</span>
+                <span class="s1">'router'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">'resource'</span> <span class="o">=&gt;</span> <span class="s1">'%kernel.root_dir%/config/routing.yml'</span>
+                <span class="p">),</span>
+                <span class="s1">'templating'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'engines'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'twig'</span><span class="p">))</span>
+            <span class="p">));</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In trainings we are starting with a single <span class="docutils literal"><span class="pre">config.yml</span></span> file but that is
+technically not necessary by using the <span class="docutils literal"><span class="pre">ClosureLoader</span></span>. The routing
+component has no such closure loader, so its not possible to avoid
+YAML in the first minutes of Symfony2 exposure and we reference
+the <cite>app/config/routing.yml</cite>:</p>
+<div class="highlight-yaml"><div class="highlight"><pre>hello:
+  pattern: /
+  defaults:
+    _controller: &quot;Acme\TrainingBundle\Controller\HelloController::helloAction&quot;
+</pre></div>
+</div>
+<p>Did you know that you can specify controllers in Symfony by using the static callback
+syntax? It has disadvantages when considering bundle inheritance, but why
+bother a beginner with this feature and confuse him with the convention of
+<span class="docutils literal"><span class="pre">&quot;AcmeTrainingBundle:Hello:hello&quot;</span></span>.</p>
+<p>There are still lots of trip wires to stumble upon in this simple piece of <span class="docutils literal"><span class="pre">routing.yml</span></span>:</p>
+<ul class="simple">
+<li>Tabs are not allowed in YAML, in every training at least one person gets
+bitten by that.</li>
+<li>2 vs 4 spaces ambiguity.</li>
+<li>What is this magic <span class="docutils literal"><span class="pre">_controller</span></span> key?</li>
+<li>I carefully avoid the <span class="docutils literal"><span class="pre">{}</span></span> inline syntax of YAML here as well as it
+introduces yet another ambiguity.</li>
+</ul>
+<p>Run this application with the build in webserver:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 web/index.php
+</pre></div>
+</div>
+<p>Hello World!</p>
+<p>The next step for a beginner is his first twig template to print the Hello
+World. To avoid another confusing convention at the beginning, the <span class="docutils literal"><span class="pre">&quot;AcmeTrainingBundle:Hello:hello.html.twig&quot;</span></span>
+template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
+that is automatically registered in the Twig Bundle. Just create
+a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'hello.html.twig'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The total number of files is 5 (6 with template) for this example. Note that we
+haven’t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
+the static syntax we don’t need it.</p>
+<p>This is a very good starting point to start exploring more features of Symfony
+and gradually add the required configuration and files for this.</p>
+</div>
+        <div class="postmeta">
+        
+        
+        
+        </div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 31, 2014</span>
         </div>
         <div class="section" id="soap-and-php-in-2014">
@@ -1489,116 +1656,6 @@ Doctrine. Again, <a class="reference external" href="https://gist.github.com/beb
         </div>
         <div class="comments">
             <a href="http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html#disqus_thread" data-disqus-identifier="2013/07/24/doctrine_and_domainevents">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 27, 2013</span>
-        </div>
-        <div class="section" id="extending-symfony2-controller-utilities">
-<h1><a href="2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a></h1>
-<p>Controllers as a service are a heated topic in the Symfony world. Developers
-mainly choose to extend the base class, because its much simpler to use and
-less to write. But less to write is not necessarily true.</p>
-<div class="section" id="the-problem-injecting-tons-of-services">
-<h2>The problem: Injecting tons of services</h2>
-<p>The Symfony controller base class uses quite a lot of services, if
-you need them in your controller as a service, you have to inject them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
-        <span class="nx">RouterInterface</span> <span class="nv">$router</span><span class="p">,</span>
-        <span class="nx">EngineInterface</span> <span class="nv">$engine</span><span class="p">,</span>
-        <span class="nx">HttpKernel</span> <span class="nv">$kernel</span><span class="p">,</span>
-        <span class="nx">FormFactoryInterface</span> <span class="nv">$formFactory</span><span class="p">,</span>
-        <span class="nx">SecurityContextInterface</span> <span class="nv">$security</span>
-    <span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">router</span> <span class="o">=</span> <span class="nv">$router</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">engine</span> <span class="o">=</span> <span class="nv">$engine</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFactory</span> <span class="o">=</span> <span class="nv">$formFactory</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">security</span> <span class="o">=</span> <span class="nv">$security</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>There are some problems here:</p>
-<ul class="simple">
-<li>The services are not loaded lazily, we probably end up with a resource overuse here.</li>
-<li>The constructor is MUCH too big, this doesn’t even include your own
-application, database or mailer services.</li>
-</ul>
-</div>
-<div class="section" id="the-quick-and-dirty-solution">
-<h2>The quick and dirty solution</h2>
-<p>You could as a first solution, inject the container into your controller.
-But this is actually the same as just using the base controller from Symfony
-or just use the <span class="docutils literal"><span class="pre">ContainerAware</span></span> interface in a controller of your own.</p>
-</div>
-<div class="section" id="the-solution-introduce-a-utilities-service">
-<h2>The solution: Introduce a Utilities Service</h2>
-<p>To avoid the mentioned problems with controller as a service, introduce a
-controller utilities service and register it as <span class="docutils literal"><span class="pre">controller_utils</span></span> service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">ControllerUtils</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$container</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">createForm</span><span class="p">(</span><span class="nv">$type</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// ..</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$template</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// ..</span>
-    <span class="p">}</span>
-    <span class="c1">// ...</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>You can implement this by just copying the over from
-<span class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></span> all the methods you
-need.</p>
-<p>Then you can simplify the controller as a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">UserController</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$utils</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span><span class="nx">ControllerUtils</span> <span class="nv">$utils</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">utils</span> <span class="o">=</span> <span class="nv">$utils</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>You don’t have to stop here. You can introduce lots of helper objects
-and inject them into your controller, depending on your use-cases.
-Generic handling of file uploads comes to mind for example.</p>
-<p>From medium to large applications this can lead to much smaller
-controllers, because they can much more easily reuse code between
-each other than in the case of inheritance.</p>
-</div>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/symfony.html">Symfony</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html#disqus_thread" data-disqus-identifier="2013/06/27/extending_symfony2__controller_utilities">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1623,6 +1680,8 @@ each other than in the case of inheritance.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
             <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
         </li><li>
             <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
@@ -1640,8 +1699,6 @@ each other than in the case of inheritance.</p>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li><li>
             <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
-        </li><li>
-            <a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a>
         </li></ul>
 </div>
 </section>

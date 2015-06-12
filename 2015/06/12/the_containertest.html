@@ -1,0 +1,202 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>The ContainerTest &mdash; Whitewashing</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/webfont.css" type="text/css">
+
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Monolithic Repositories with PHP and Composer" href="../../04/11/monolithic_repositories_with_php_and_composer.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
+            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
+            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
+            and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2015-06-12-the_containertest">
+            
+            
+    <div class="timestamp postmeta">
+            <span>June 12, 2015</span>
+        </div>
+
+    <div class="section" id="the-containertest">
+<h1>The ContainerTest</h1>
+<p>This is a short post before the weekend about testing in applications with
+dependency injection container (DIC). This solution helps me with a problem
+that I occasionally trip over in environments with large amounts of services
+connected through a DIC.</p>
+<p>The problem is forgetting to adjust the DIC configuration when you add a new or
+remove a dependency to a service. This can easily slip through into production
+if you rely on your functional- and unit-tests to catch the problem.</p>
+<p>I can avoid this problem by adding a functional test in my application that
+instantiate all the various services and checks if they are created correctly.
+The first time I saw this pattern was during development of some of the early
+Symfony2 bundles, most notably DoctrineBundle.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ContainerTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">SymfonySetup</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">dataServices</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;AcmeDemoBundle.FooService&#39;</span><span class="p">,</span> <span class="s1">&#39;Acme\DemoBundle\Service\FooService&#39;</span><span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;AcmeDemoBundle.BarController&#39;</span><span class="p">,</span> <span class="s1">&#39;Acme\DemoBundle\Controller\BarController&#39;</span><span class="p">),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @test</span>
+<span class="sd">     * @dataProvider dataServices</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">it_creates_service</span><span class="p">(</span><span class="nv">$id</span><span class="p">,</span> <span class="nv">$class</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$service</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContainer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertInstanceOf</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="nv">$service</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Whenever you create or modify I service check the ContainerTest if its already
+guarded by a test. Add a test if necesary and then make the change. It&#8217;s as
+easy as that.</p>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2015/06/12/the_containertest";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2015/06/12/the_containertest.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="#">The ContainerTest</a>
+        </li><li>
+            <a href="../../04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="../../02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="../../02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="../../02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="../../02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
+            <a href="../../02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+        </li><li>
+            <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
+        </li><li>
+            <a href="../../../2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
+        </li><li>
+            <a href="../../../2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2014, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>
