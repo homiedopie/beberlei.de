@@ -44,7 +44,7 @@ Symfony2 bundles, most notably DoctrineBundle.
         }
     }
 
-Whenever you create or modify I service check the ContainerTest if its already
+Whenever you create or modify a service check the ContainerTest if its already
 guarded by a test. Add a test if necesary and then make the change. It's as
 easy as that.
 
