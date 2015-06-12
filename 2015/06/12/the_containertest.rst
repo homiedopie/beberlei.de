@@ -48,6 +48,11 @@ Whenever you create or modify I service check the ContainerTest if its already
 guarded by a test. Add a test if necesary and then make the change. It's as
 easy as that.
 
+The ``SymfonySetup`` trait provides access to the Symfony DIC using
+``getContainer()`` as you can see in the test method. See `my blog post
+<http://www.whitewashing.de/2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html>`_
+on traits in tests for more information.
+
 .. author:: default
 .. categories:: none
 .. tags:: none
