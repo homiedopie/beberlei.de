@@ -18,7 +18,7 @@ tagline = ''
 author = 'Benjamin Eberlei'
 
 # Change this to your copyright string
-copyright = '2008-2014, ' + author
+copyright = '2008-2015, ' + author
 
 # Change this to your blog root URL (required for RSS feed)
 website = 'http://www.whitewashing.de'
@@ -34,7 +34,7 @@ disqus_shortname = 'whitewashing'
 html_favicon = 'tinkerer.ico'
 
 # Pick another Tinkerer theme or use your own
-html_theme = "whitewashing"
+html_theme = "bootstrap"
 
 # Theme-specific options, see docs
 html_theme_options = { }
