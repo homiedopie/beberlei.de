@@ -34,7 +34,7 @@ disqus_shortname = 'whitewashing'
 html_favicon = 'tinkerer.ico'
 
 # Pick another Tinkerer theme or use your own
-html_theme = "bootstrap"
+html_theme = "whitewashing"
 
 # Theme-specific options, see docs
 html_theme_options = { }
