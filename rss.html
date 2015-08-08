@@ -5,8 +5,61 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Fri, 12 Jun 2015 00:00:00 +0200</pubDate>
+        <pubDate>Sat, 08 Aug 2015 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>http://www.whitewashing.de/2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html</link>
+            <guid>http://www.whitewashing.de/2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html</guid>
+            <title><![CDATA[Monolithic Repositories with Composer and Relative Autoloading]]></title>
+            <description><![CDATA[<div class="section" id="monolithic-repositories-with-composer-and-relative-autoloading">
+<h1>Monolithic Repositories with Composer and Relative Autoloading</h1>
+<p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
+is a way for monolithic PHP repositories with multiple components
+that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
+<p>It relies on a new composer.json for each component and uses
+the autoloading capabilities of Composer in a hackish way.</p>
+<p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
+<span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
+its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>{</dt>
+<dd><dl class="first docutils">
+<dt>“autoload”: {</dt>
+<dd><dl class="first docutils">
+<dt>“psr-0”: {</dt>
+<dd>“Foo”: ”../foo/src/”</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>This approach is very simple to start with, however it has some downsides
+you must take into account:</p>
+<ul class="simple">
+<li>you have to redefine dependencies in every composer.json that relies
+on another component.</li>
+<li>if foo and bar depend on different versions of some third library <span class="docutils literal"><span class="pre">baz</span></span>
+that are not compatible, then composer will not realize this and your
+code will break at runtime.</li>
+<li>if you want to generate deployable units (tarballs, debs, ..) then
+you will have a hard time to collect all the implicit dependencies
+by traversing the autoloader for relative definitions.</li>
+<li>A full checkout has multiple vendor directories with a lot of duplicated
+code.</li>
+</ul>
+<p>I think this approach is ok, if you are only sharing a small number of
+components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
+problems by forcing to rely on the same dependencies in a project globally and
+only once.</p>
+</div>]]></description>
+             <pubDate>Sat, 08 Aug 2015 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>http://www.whitewashing.de/2015/06/12/the_containertest.html</link>
             <guid>http://www.whitewashing.de/2015/06/12/the_containertest.html</guid>

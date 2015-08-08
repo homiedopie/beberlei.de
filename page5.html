@@ -16,19 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 5 &mdash; Whitewashing</title>
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/font-awesome.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/whitewashing.css" type="text/css" />
-<link rel="alternate" type="application/rss+xml" title="RSS Feed for whitewashing.de" href="http://www.whitewashing.de/rss.xml" />
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-
             <link rel="stylesheet" href="_static/normalize.css" type="text/css">
             <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
             <link rel="stylesheet" href="_static/webfont.css" type="text/css">
-
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -43,40 +35,301 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body>
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<div class="container">
-    <div class="row" id="header">
-        <div class="col-md-4">
-            <a href="index.html"><img class="img img-responsive" src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+      <div id="container"><header>
+            <hgroup>
+              <h1><a href="index.html">Whitewashing</a></h1></hgroup>
+          </header>
+      <nav>
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="webfont">B</span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              </ul>
+          </nav><div class="main-container"><div class="main wrapper clearfix"><article><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page4.html">Newer</a></li>
+            <li class="right"><a href="page6.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>August 13, 2012</span>
         </div>
-        <div class="col-md-6 hidden-sm hidden-xs" id="about">
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </div>
-        <div class="col-md-2 hidden-xs hidden-sm">
-            <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-            <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-        </div>
-    </div>
+        <div class="section" id="oop-business-applications-entity-boundary-interactor">
+<h1><a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></h1>
+<p>Other posts in this series:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
+mess</a></li>
+</ul>
+<p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
+an architectural design pattern. I first heard about it in a keynote video of
+<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc">Uncle Bob</a> on Ruby
+Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
+This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
+by Alistair Cockburn.</p>
+<p>In this pattern any client of the system talks to the model using a model
+request object and receives data from the model in form of model responses objects.
+Additionally when your model talks to any kind of persistence or subsystem it
+should go through an adapter that is replaceable. For a model architecture
+designed this way, you can replace any part of the UI oder lower layers by
+writing new adapters and plug them in.</p>
+<div class="section" id="terminology">
+<h2>Terminology</h2>
+<p>To iterate the terminology:</p>
+<p><strong>Entities</strong> are objects that represent the system data of the application. They don’t contain
+much logic except rules that are set in stone and are never going to change
+(based on physic or mathematical laws or something).</p>
+<p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
+in the current use-case and works with entities to fulfil their task.</p>
+<p>The <strong>boundary</strong> is responsible for translating model request/response into a
+format that the UI or actor can understand. They also mediate between model
+and lower levels, for example to manage database transactions.</p>
 </div>
+<div class="section" id="an-example">
+<h2>An example</h2>
+<p>Lets start with an example in PHP code. We will keep using a common example
+throughout all blog posts, the usual Bank Account/Money Transfer. The use case
+is the money transfer from one bank account (source) to another one
+(destination).</p>
+<p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankAccount</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-<div class="main-container">
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 content">
-          <div>
-            <div>
-              <div id="page5">
-                
-                <div class="timestamp postmeta">
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is straightforward to implement the <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>
+functionality. The Money object implementation is omitted here.</p>
+<p>The Interactor handles the use-case of transferring money from the
+source to the destination account:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$amount</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">MoneyTransferResponse</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$transfer</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
+
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">MoneyTransferResponse</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">MoneyTransferRequest</span></span> and <span class="docutils literal"><span class="pre">MoneyTransferResponse</span></span> objects are dumb
+php objects (so called data-transfer objects, DTO).</p>
+<p>You can see in the example that we use a Data Access object to retrieve the
+source and destination account entities from some storage subsystem. To follow the EBI
+design pattern, we have to decouple this data access object from the model,
+by offering a port (Interface):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This way our business logic is storage independent.</p>
+<p>An example for a boundary would be the requirement for a transaction in
+the bank account sample. We need to wrap the whole MoneyTransfer use-case in
+a transaction. Lets say the invocation of our Use-Case is controlled through
+some kind of application boundary object:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$connection</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">applicationFactory</span><span class="o">-&gt;</span><span class="na">createConnection</span><span class="p">();</span>
+        <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createAccountDao</span><span class="p">());</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a very elaborate way to describe that calling the transfer money
+use-case is wrapped in a Transaction, another port for the storage system to
+manage transactions in this case. The code here is very explicit about
+the actual task. In a real application you would probably find a more
+generic approach to getting this job done.</p>
+</div>
+<div class="section" id="boundary-abstraction">
+<h2>Boundary Abstraction</h2>
+<p>Thinking about the boundaries I came up with a library several month ago called
+<a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
+(Reason below).  It allows you to wrap calls to the model by some sort of proxy
+that transforms the request and response and also handles transactions and
+such. Loosely spoken this was actually some kind of AOP library, using the
+limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
+<p>With context you would do something like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
+
+<span class="c1">// 1. direct invocation</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyService</span><span class="p">();</span>
+<span class="nv">$context</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'service'</span> <span class="o">=&gt;</span> <span class="nv">$myService</span><span class="p">,</span> <span class="s1">'method'</span> <span class="o">=&gt;</span> <span class="s1">'doSomething'</span><span class="p">,</span> <span class="s1">'arguments'</span> <span class="o">=&gt;</span> <span class="nv">$args</span><span class="p">));</span>
+
+<span class="c1">// 2. proxy wrapping</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="nv">$context</span><span class="o">-&gt;</span><span class="na">wrap</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">());</span>
+<span class="nv">$myService</span><span class="o">-&gt;</span><span class="na">doSomething</span><span class="p">(</span><span class="nv">$args</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The second way is obviously way more readable, but its also rather magic.</p>
+<p>I deprecated this library because in the end it wasn’t really helpful that
+much. Implementing an application specific proxy for services is done in
+almost no time and then it solves all your specific needs. My main problem with
+the library is that it tries to magically take away the need to design the
+boundary of your application yourself - in a way that is not really coherent to
+other developers.</p>
+<p>In my own current greenfield applications I quickly went away from using it,
+since a custom application proxy as shown in this
+<a class="reference external" href="https://gist.github.com/3272909">Gist</a> is really much simpler to implement and
+use.</p>
+</div>
+<div class="section" id="using-with-symfony2">
+<h2>Using with Symfony2</h2>
+<p>As I am currently exclusively developing Symfony2/Silex applications, applying
+EBI to Symfony2 framework based applications is very important to me. The
+biggest difficulty here is the Form layer, especially the request data-mapping and
+validation concerns, which are normally part of the model. There are two
+approaches I came up with to solve this:</p>
+<ul class="simple">
+<li>Build Forms for arrays or DTOs and send them through to the boundary to the model.
+You have to validate the data again on the model, which is annoying, but in
+this case the clean way. This is not so easy to do with complex forms though
+as you need to map the request objects to your entities.</li>
+<li>Create a Model Request that wraps and hides the form behind a simple data
+mapping API. This way you can make it look as if you would map a DTO onto
+an object, but in this case you are using the Form API as the mapper.</li>
+</ul>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$entity</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dataMapper</span><span class="o">-&gt;</span><span class="na">transform</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The problem with this approach is, that you cant really unit-test these methods
+anymore, because the complexity of the form layer mapping cannot be mocked with
+this API. Instead your tests always need the full form layer (with validation,
+depending services etc.) to allow for real-world testing. Additionally you have
+to make the DataMapper throw an exception that you can catch in the controller,
+rendering the appropriate response. Using exceptions for controlling executions
+paths is not a very good practice though.</p>
+<p>Another thing that actually helped was the SensioFrameworkExtraBundle and
+ParamConverters. In my project I now have the framework building the Model
+Request objects by convention from the HTTP Request, so that I only need to
+pass them on and can skip the actual mapping of HTTP Request to Model Request.</p>
+</div>
+<div class="section" id="pros-and-cons">
+<h2>Pros and Cons</h2>
+<p>This design pattern very closely resembles what Fowler calls <strong>Service Layer</strong>
+pattern in PoEAA. EBI is going a bit more into detail by naming individual
+parts of the pattern more explicit. Without more restrictions however using
+this pattern will drive you towards many of the problems described in my
+previous post.</p>
+<p>Clean separation from frameworks is achieved, depending on the actual usage
+however only at a significant cost.  Never forget stepping back and thinking
+about further abstractions, otherwise applying EBI is leading to lots of code
+being manually written.</p>
+<p>This already shows one particular annoyance are the data-transfer objects. You
+need to invest quite some work to get a mapping working from entities to
+transfer objects and back. In the process you will loose the convenience of
+“Open Entity Manager in the View”, where you can lazy load any
+data you want to access in the view. This is quite a painful step, because you
+are loosing lots of flexibility. Much more annoying is the need to update
+entities from data-transfer objects, requiring sophisticated code for merging
+of partial object graphs.</p>
+<p>What this design pattern improves is the testability of code and also the
+execution of tests is MUCH better, when you don’t have to go through the whole
+application stack to test something.</p>
+<p>Implementing behavior into the use-cases also avoids lots of lasagna code
+compared to a messy domain driven design. You get a very good overview of
+what is actually happening just by looking at the Model Request and Interactor
+classes. However depending on the use-case the classes can get very big
+and might need lots of collaborators, which make the problem complex again.</p>
+<p>It is important to note that aggregating the domain logic in the use-cases
+actually means going to some sort of transaction script processing, away from
+domain driven design. I am pretty sure that this is not necessarily the
+intention of this design pattern from a POV of Uncle Bob. However depending on
+the sophistication of the applications domain logic, transaction script is
+actually a very good pattern for simple to medium complex use-cases and
+I like to have this as a general rule for developers (“Put behavior on the
+use-case”).</p>
+<p>In conclusion I can partially recommend using the EBI pattern. You have to be
+careful to find abstraction layers that keep your code DRY and SOLID however,
+something which does not come naturally with this pattern. If you are not
+careful you end up with all the “messy points” that I mentioned in my previous
+blog post.</p>
+<p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
+by using some code-generation for example to do parts of this job for you. The
+worst outcome with this pattern is, when you manually code layers for HTTP
+Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
+</div>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html#disqus_thread" data-disqus-identifier="2012/08/13/oop_business_applications_entity_boundary_interactor">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 11, 2012</span>
         </div>
         <div class="section" id="oop-business-applications-trying-to-escape-the-mess">
@@ -1167,134 +1420,16 @@ code. Thanks!</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html#disqus_thread" data-disqus-identifier="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>April 27, 2010</span>
-        </div>
-        <div class="section" id="doctrine-2-beta-1-released">
-<h1><a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a></h1>
-<p>Today we are happy to announce that the first beta of <a class="reference external" href="http://www.doctrine-project.org/blog/doctrine-2-0-0-beta1-released">Doctrine
-2</a>
-has been released and we fixed 165 issues kindly reported by several
-early adopters.</p>
-<p>You can grab the code from the Github project:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt><a class="reference external" href="http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1">http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1</a></dt>
-<dd>git clone git://github.com/doctrine/doctrine2.git</dd>
-</dl>
-</div></blockquote>
-<p>Or download it from our website:</p>
-<blockquote>
-<div><a class="reference external" href="http://www.doctrine-project.org/download#2_0">http://www.doctrine-project.org/download#2_0</a></div></blockquote>
-<p>It is our believe that Doctrine 2 brings PHP ORMs to a new level. We are
-leaving behind the Active Record pattern because we think it hurts
-testability, project maintainability and is not a suitable abstraction
-(80/20) for models that exceed the complexity of a blog or otherwise
-simple web application. Instead we implemented a pure Data Mapper
-approach with help of the new Reflection functionalities of PHP 5.3, so
-your Domain Objects neither have to extend a base class nor implement an
-interface.</p>
-<p>We also dropped most of the magical features of Doctrine 1 in favour of
-a simple and standardized API that is loosely based on the <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_API">Java
-Persistence API</a>, a
-technical standard for Object Relational Mappers. However we try not to
-blindly follow the “Program PHP like Java” approach and and deviated
-from JPA where applicable to make the concepts fit better into the PHP
-environment, such as alternatively hydrating all results into nested
-array structures for very high read performance.</p>
-<p>The cornerstone of Doctrine 2 is the query language DQL. It allows to
-execute queries on the object level defined by your metadata in a
-similar fashion to SQL. You can even do Joins, Subselects and Aggregates
-and Group Clauses in DQL, eliminating the need to circumvent ORMs for
-more advanced SQL features. Nevertheless it is also possible to write
-plain SQL and let Doctrine 2 hydrate the results into an object graph.</p>
-<p>In the last three month since alpha 4 we have done considerable changes
-and integrated lots of feedback from our users. The most notable changes
-are:</p>
-<ul class="simple">
-<li>Allowing Constructors of your Domain Objects to have non-optional
-parameters.</li>
-<li>Allow to define a natural ordering of to Many Collections that is
-automatically enforced trough an SQL ORDER BY statement when
-retrieved from the database.</li>
-<li>Shipping the Symfony Console Component to replace our own Console
-Implementation</li>
-<li>New DQL syntax to load objects partially, omitting potentially
-expensive fields from retrieval for the current request.</li>
-<li>Changes to how bi-directional have to be defined in the mapping
-files.</li>
-<li>Several changes to the Events API inside the ORM, to make sure many
-possible extension scenarios work smoothly.</li>
-<li>Enhancements to our Console Tools</li>
-<li>Surpassed the 1000 unit-tests each running against Postgres, Mysql,
-Sqlite and Oci8 drivers.</li>
-<li>Moved from SVN to Git:
-<a class="reference external" href="http://github.com/doctrine/doctrine2">http://github.com/doctrine/doctrine2</a></li>
-</ul>
-<p>We also did several painful backwards incompatible changes that seemed
-necessary to clean up and optimize the API or allow the ORM to be even
-faster than before. The beta phase beginning today will not contain any
-larger BC breaks anymore, opening up this release for a broader testing
-audience.</p>
-<p>For the next iteration several enhancements are planned:</p>
-<ul class="simple">
-<li>Support for PDO IBM, IBM DB2, SqlSrv and PDO SqlSrv und MsSql drivers</li>
-<li>Pessimistic Lock Support (FOR UPDATE and SHARED)</li>
-<li>Support for Custom Hydration Modes</li>
-<li>Support for Custom Persister Implementations</li>
-<li>Support for handling very large collections of related objects
-without needing an in-memory representation of the collection</li>
-<li>Separation of Doctrine\Common, Doctrine\DBAL and Doctrine\ORM into
-three different projects</li>
-<li>Extend the documentation even further, adding quickstart tutorials,
-cookbook recipes and enhancing the existing chapters.</li>
-</ul>
-<p>We also plan to support several extensions for the 2.0 release such as:</p>
-<ul class="simple">
-<li>Migrations</li>
-<li>PHPUnit Database Testing Integration</li>
-<li>NestedSet Support</li>
-<li>Symfony 2 Support</li>
-<li>Zend Framework 2 Support</li>
-</ul>
-<p>Please try out the new Beta release If you find the time and leave your
-feedback in our <a class="reference external" href="http://www.doctrine-project.org/jira/secure/Dashboard.jspa">Issue
-Tracker</a>,
-the <a class="reference external" href="http://groups.google.com/group/doctrine-user">Mailing-List</a> or
-come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/04/27/doctrine-2-beta-1-released.html#disqus_thread" data-disqus-identifier="2010/04/27/doctrine-2-beta-1-released">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-
-                <div id="disqus_thread"></div>
-                <script type="text/javascript">
-                    var disqus_shortname = 'whitewashing';
-                    var disqus_url = 'http://www.whitewashing.de/page5.html';
-                    (function() {
-                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                    })();
-                </script>
-                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-              </div>         
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-12 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page4.html">Newer</a></li>
+            <li class="right"><a href="page6.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
         </li><li>
             <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
@@ -1312,44 +1447,11 @@ come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
-        </li><li>
-            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
         </li></ul>
 </div>
-</section>
-              </aside></div>
-    </div>
-</div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container">
-<div class="container" id="footer">
-    <div class="container">
-        <div class="row" id="header">
-            <div class="col-md-6 hidden-sm hidden-xs" id="about">
-                Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-                <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-                Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-                and you can book him for consulting and trainings.
-            </div>
-            <div class="col-md-12 hidden-xs hidden-sm">
-                <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-                <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-                &copy; Copyright 2008-2015, Benjamin Eberlei.
-                Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-
-</div> <!-- footer-container -->
+        <div class="footer-container"><footer class="wrapper">&copy; Copyright 2008-2015, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

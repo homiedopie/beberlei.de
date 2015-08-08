@@ -16,19 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 12 &mdash; Whitewashing</title>
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/font-awesome.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/whitewashing.css" type="text/css" />
-<link rel="alternate" type="application/rss+xml" title="RSS Feed for whitewashing.de" href="http://www.whitewashing.de/rss.xml" />
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-
             <link rel="stylesheet" href="_static/normalize.css" type="text/css">
             <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
             <link rel="stylesheet" href="_static/webfont.css" type="text/css">
-
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -43,40 +35,117 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body>
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<div class="container">
-    <div class="row" id="header">
-        <div class="col-md-4">
-            <a href="index.html"><img class="img img-responsive" src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+      <div id="container"><header>
+            <hgroup>
+              <h1><a href="index.html">Whitewashing</a></h1></hgroup>
+          </header>
+      <nav>
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="webfont">B</span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              </ul>
+          </nav><div class="main-container"><div class="main wrapper clearfix"><article><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page11.html">Newer</a></li>
+            <li class="right"><a href="page13.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>January 20, 2008</span>
         </div>
-        <div class="col-md-6 hidden-sm hidden-xs" id="about">
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </div>
-        <div class="col-md-2 hidden-xs hidden-sm">
-            <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-            <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-        </div>
-    </div>
-</div>
+        <div class="section" id="using-a-self-defined-zend-loader">
+<h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
+<p>When you start writing with a Framework like Zend like I did in the last
+weeks, you probably are still haunted by all the bad habits of pseudo
+object orientated PHP design, using lots of require and include’s.
+Zend_Loader doesn’t seem to help at first, its just another command
+(Zend_Loader::loadClass or ::loadFile). It sucks to register lots of
+autoload paths too.</p>
+<p>I wrote my own Zend_Loader child class. It grabs all include paths from
+a config File using the Zend_Config class, and completely frees you of
+thinking about includes.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class WWLoader extends Zend_Loader
+{
+    private static $dirs = NULL;
 
-<div class="main-container">
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 content">
-          <div>
-            <div>
-              <div id="page12">
-                
-                <div class="timestamp postmeta">
+    public static function loadClass($class)
+    {
+        if(self::$dirs===NULL) {
+            //
+            // Include directories of this application are saved in a configuration file. If it has not been
+            // loaded before do so now and safe everything to the private static variable $dirs which will
+            // then be used in further loadings
+            //
+            $dirs = array();
+            $conf_app_path = new Zend_Config_Ini(sprintf('%s%s', constant('ZEND_CONFIG_PATH'), 'application.ini'), 'appincludepath');
+            self::extractPaths($conf_app_path-&gt;toArray(), $dirs);
+            self::$dirs = $dirs;
+        }
+
+        parent::loadClass($class, self::$dirs, true);
+    }
+
+    public static function autoload($class)
+    {
+        try {
+            self::loadClass($class);
+            return $class;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Given an array with subkeys of include paths this function unifies this array to
+     * a single one and returns the result in the second argument $dirs which is given
+     * by reference.
+     *
+     * @param Array $array
+     * @param Array $dirs
+     */
+    public static function extractPaths($array, &amp;$dirs)
+    {
+        foreach($array AS $k =&gt; $v) {
+            if(is_array($v)) {
+                self::extractPaths($v, $dirs);
+            } else {
+                $dirs[] = $v;
+            }
+        }
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>ZEND_CONFIG_PATH is the only constant I use in my application. I
+initialize the following at the beginning of my bootstrap file:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>define('ZEND_CONFIG_PATH', dirname(__FILE__).&quot;/../application/config/&quot;);
+
+require_once 'Zend/Loader.php';
+require_once dirname(__FILE__).'/../application/include/WWLoader.php';
+Zend_Loader::registerAutoload();
+Zend_Loader::registerAutoload('WWLoader');
+</pre></div>
+</div>
+</div></blockquote>
+<p>After that, its just Objects.</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/20/using-a-self-defined-zend-loader.html#disqus_thread" data-disqus-identifier="2008/01/20/using-a-self-defined-zend-loader">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 17, 2008</span>
         </div>
         <div class="section" id="zf-managing-404-errors-with-version-1-0-3">
@@ -578,158 +647,16 @@ registered class instance.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/09/20/dependency-injection-via-interface-in-php-an-example.html#disqus_thread" data-disqus-identifier="2008/09/20/dependency-injection-via-interface-in-php-an-example">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>December 30, 2008</span>
-        </div>
-        <div class="section" id="dependency-injection-with-php-introducing-sphicy">
-<h1><a href="2008/12/30/dependency-injection-with-php-introducing-sphicy.html">Dependency Injection with PHP: Introducing Sphicy</a></h1>
-<p>I have written <a class="reference external" href="http://www.whitewashing.de/blog/articles/101">on dependency
-injection</a> before
-christmas and how <a class="reference external" href="http://code.google.com/p/guice">Guice</a>, googles DI
-framework, offers a simple solution. I copied the functionality for a
-PHP clone of Guice and named it
-<a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a>. You saw an early prototype of
-it in the blogpost mentioned above.</p>
-<p><a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a> configures object dependencies
-with modules: You explicitly state which implementation should be bound
-to which interface. An injector then creates instances of these objects
-via reflection: All constructor dependencies are resolved by looking at
-the given type hints and initializes those according to the specified
-bindings.</p>
-<p>Two examples included in the <a class="reference external" href="http://www.beberlei.de/dev/svn/sphicy">source code of
-Sphicy</a> are <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a> and
-<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a> MVC bootstrapping modules.
-Sadly both frameworks default front controllers are engineered in such a
-way that useful dependency injection needs some workarounds.</p>
-<p>As an example I will now discuss the Sphicy Module for Zend Framework
-MVC applications. To circumvent the singleton and protected Constructor
-of Zend_Controller_Front, we have to build a new front controller that
-wraps around it and requires all the dependencies:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class Sphicy_Controller_Front
-{
-    protected $front;
-
-    /**
-     * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
-     *
-     * @param Zend_Controller_Request_Abstract      $request
-     * @param Zend_Controller_Response_Abstract     $response
-     * @param Zend_Controller_Router_Interface      $router
-     * @param Zend_Controller_Dispatcher_Interface  $dispatcher
-     */
-    public function __construct(
-        Zend_Controller_Request_Abstract $request,
-        Zend_Controller_Response_Abstract $response,
-        Zend_Controller_Router_Interface $router,
-        Zend_Controller_Dispatcher_Interface $dispatcher=null
-    )
-    {
-        $front = Zend_Controller_Front::getInstance();
-        $front-&gt;setRequest($request);
-        $front-&gt;setResponse($response);
-        $front-&gt;setRouter($router);
-
-        if($dispatcher === null) {
-            $dispatcher = $front-&gt;getDispatcher();
-        }
-        $front-&gt;setDispatcher($dispatcher);
-    }
-
-    public function dispatch()
-    {
-        $this-&gt;front-&gt;dispatch();
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>You can see that the <strong>Sphicy_Controller_Front</strong> class requires
-dependencies in its constructor that are then forward injected into
-<strong>Zend_Controller_Front</strong>. You can now create a module that binds all
-the required dependencies to concrete implementations, for example a
-module for a Zend MVC Http Application might look like:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class Sphicy_ZendMvc_ExampleModule implements spModule {
-     public function configure(spBinder $binder) {
-         // Sphicy_Controller_Front does not extend Zend_Controller_Front, because of Singletonitis
-         // It offers the dispatch method to proxy against Zend_Controller_Front::dispatch.
-         $binder-&gt;bind(&quot;Sphicy_Controller_Front&quot;)-&gt;to(&quot;Sphicy_Controller_Front&quot;);
-         $binder-&gt;bind(&quot;Zend_Controller_Request_Abstract&quot;)-&gt;to(&quot;Zend_Controller_Request_Http&quot;);
-         $binder-&gt;bind(&quot;Zend_Controller_Response_Abstract&quot;)-&gt;to(&quot;Zend_Controller_Response_Http&quot;);
-         // loads all routes
-         $binder-&gt;bind(&quot;Zend_Controller_Router_Interface&quot;)-&gt;to(&quot;MyApplication_Router&quot;);
-     }
- }
-</pre></div>
-</div>
-</div></blockquote>
-<p>The class <strong>MyApplication_Router</strong> might look up all the routing
-information of the application via a hardcoded configuration mechanism.
-You may say this is a hard dependency, but actually you can just switch
-modules or implementations at this position to replace the router with
-another implementation. You can also see that no implementation for the
-dispatcher is bound. But this dependency is optional and will be created
-automatically as can be seen in the <strong>Sphicy_Controller_Front</strong> class.</p>
-<p>The front controllers is now created by calling:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$injector = new spDefaultInjector(new Sphicy_ZendMvc_ExampleModule());
-$front = $injector-&gt;getInstance(&quot;Sphicy_Controller_Front&quot;);
-$front-&gt;dispatch();
-</pre></div>
-</div>
-</div></blockquote>
-<p>What happens in the <strong>$injector-&gt;getInstance()</strong> line? Sphicy looks at
-<strong>Sphicy_Controller_Front</strong>‘s constructor and finds that four
-dependencies are needed: Request, Response, Router and Dispatcher
-implementations. It looks up the bindings and searches for them,
-creating Zend_Controller_Request_Http,
-Zend_Controller_Response_Http and MyApplication_Router objects. A
-dispatcher implementation is not found, but Sphicy recognizes that null
-is a valid paramater and injects it. The 3 concrete implementations and
-one null are instantiated and used to construct a valid
-<strong>Sphicy_Controller_Front</strong> instance.</p>
-<p>You have now stated the dependencies of the Zend Controller Front
-explicitly and can switch them instantaneously by switching the bindings
-of interface to implementations in the configuration module.</p>
-<p>Have a look at the <a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy Website</a> and
-<a class="reference external" href="http://www.beberlei.de/sphicy/documentation/faq.html">FAQ</a> to see
-more examples and information about the possibilites of this dependency
-injection framework.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/12/30/dependency-injection-with-php-introducing-sphicy.html#disqus_thread" data-disqus-identifier="2008/12/30/dependency-injection-with-php-introducing-sphicy">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-
-                <div id="disqus_thread"></div>
-                <script type="text/javascript">
-                    var disqus_shortname = 'whitewashing';
-                    var disqus_url = 'http://www.whitewashing.de/page12.html';
-                    (function() {
-                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                    })();
-                </script>
-                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-              </div>         
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-12 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page11.html">Newer</a></li>
+            <li class="right"><a href="page13.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
         </li><li>
             <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
@@ -747,44 +674,11 @@ injection framework.</p>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
-        </li><li>
-            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
         </li></ul>
 </div>
-</section>
-              </aside></div>
-    </div>
-</div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container">
-<div class="container" id="footer">
-    <div class="container">
-        <div class="row" id="header">
-            <div class="col-md-6 hidden-sm hidden-xs" id="about">
-                Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-                <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-                Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-                and you can book him for consulting and trainings.
-            </div>
-            <div class="col-md-12 hidden-xs hidden-sm">
-                <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-                <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-                &copy; Copyright 2008-2015, Benjamin Eberlei.
-                Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-
-</div> <!-- footer-container -->
+        <div class="footer-container"><footer class="wrapper">&copy; Copyright 2008-2015, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

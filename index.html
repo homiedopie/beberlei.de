@@ -16,19 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Home &mdash; Whitewashing</title>
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/font-awesome.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/whitewashing.css" type="text/css" />
-<link rel="alternate" type="application/rss+xml" title="RSS Feed for whitewashing.de" href="http://www.whitewashing.de/rss.xml" />
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-
             <link rel="stylesheet" href="_static/normalize.css" type="text/css">
             <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
             <link rel="stylesheet" href="_static/webfont.css" type="text/css">
-
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -43,40 +35,84 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body>
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<div class="container">
-    <div class="row" id="header">
-        <div class="col-md-4">
-            <a href="#"><img class="img img-responsive" src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+      <div id="container"><header>
+            <hgroup>
+              <h1><a href="#">Whitewashing</a></h1></hgroup>
+          </header>
+      <nav>
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="webfont">B</span></a>
+    </div></li><li class="main-nav">
+                  <a href="#">Home</a>
+                </li>
+              </ul>
+          </nav><div class="main-container"><div class="main wrapper clearfix"><article><ul class="related clearfix">
+            <li class="left"></li>
+            <li class="right"><a href="page2.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>August 08, 2015</span>
         </div>
-        <div class="col-md-6 hidden-sm hidden-xs" id="about">
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </div>
-        <div class="col-md-2 hidden-xs hidden-sm">
-            <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-            <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-        </div>
-    </div>
+        <div class="section" id="monolithic-repositories-with-composer-and-relative-autoloading">
+<h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
+<p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
+is a way for monolithic PHP repositories with multiple components
+that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
+<p>It relies on a new composer.json for each component and uses
+the autoloading capabilities of Composer in a hackish way.</p>
+<p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
+<span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
+its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>{</dt>
+<dd><dl class="first docutils">
+<dt>“autoload”: {</dt>
+<dd><dl class="first docutils">
+<dt>“psr-0”: {</dt>
+<dd>“Foo”: ”../foo/src/”</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>This approach is very simple to start with, however it has some downsides
+you must take into account:</p>
+<ul class="simple">
+<li>you have to redefine dependencies in every composer.json that relies
+on another component.</li>
+<li>if foo and bar depend on different versions of some third library <span class="docutils literal"><span class="pre">baz</span></span>
+that are not compatible, then composer will not realize this and your
+code will break at runtime.</li>
+<li>if you want to generate deployable units (tarballs, debs, ..) then
+you will have a hard time to collect all the implicit dependencies
+by traversing the autoloader for relative definitions.</li>
+<li>A full checkout has multiple vendor directories with a lot of duplicated
+code.</li>
+</ul>
+<p>I think this approach is ok, if you are only sharing a small number of
+components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
+problems by forcing to rely on the same dependencies in a project globally and
+only once.</p>
 </div>
-
-<div class="main-container">
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 content">
-          <div>
-            <div>
-              <div id="index">
-                
-                <div class="timestamp postmeta">
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html#disqus_thread" data-disqus-identifier="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>June 12, 2015</span>
         </div>
         <div class="section" id="the-containertest">
@@ -1535,119 +1571,16 @@ in new 2.0 version of the bundle.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html#disqus_thread" data-disqus-identifier="2014/10/14/lightweight_symfony2_controllers">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 11, 2014</span>
-        </div>
-        <div class="section" id="spotting-feature-envy-and-refactoring">
-<h1><a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a></h1>
-<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki’s</a> on the
-<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
-conference last week about Legacy Code and Refactoring. In the session a piece
-of real-world code was shown that contained one of most common code smells in
-LegacyCode: Feature Envy.</p>
-<p>Martin Fowler describes this smell as “a method that seems more interested in
-a class other than the one it is in. The most common focus of the envy is the
-data.”</p>
-<p>This code smell causes two very similar problems in a code base:</p>
-<ul class="simple">
-<li>Duplication of rules related to their data throughout the code base.</li>
-<li>Spreading domain concepts throughout the whole code-base.</li>
-</ul>
-<p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
-PHP projects. We often see code such as the following computation to
-create a range of dates for a reporting function:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$start</span><span class="p">;</span>
-    <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
-
-    <span class="c1">// calculation code here</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This is a really simple example for Feature Envy: The computation and
-validation of creating an end date some days in the future of a start date
-can easily be duplicated throughout the whole code base and implements
-business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">DateTime</span>
-<span class="p">{</span>
-    <span class="c1">// ... other methods</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-        <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="nv">$endDate</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$endDate</span> <span class="o">=</span> <span class="nv">$start</span><span class="o">-&gt;</span><span class="na">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-
-    <span class="c1">// calculation code here.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>(Note: You cant extend the builtin DateTime this way and need to subclass).</p>
-<p>This is a great way to improve your code base massively and achieve what
-Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
-domain by encapsulating data and behavior.</p>
-<p>Learning to spot this kind of Feature Envy is a very good way to incrementally
-improve your legacy code base towards better models. I find it very interesting
-that the focus on fixing technical code-smells duplication and feature envy
-actually leads to a better domain model. As a side effect it massively
-deemphasizes DDD building blocks like Entity or Value Object, which in my
-opinion are a big cause for confusion. Testability increases as well, because
-data objects with behavior are much simpler to setup for testing.</p>
-<p>That is why I recommend learning about Feature Envy. For me it is a very simple
-approach to find improvements.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/08/11/spotting_featureenvy_and_refactoring.html#disqus_thread" data-disqus-identifier="2014/08/11/spotting_featureenvy_and_refactoring">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-
-                <div id="disqus_thread"></div>
-                <script type="text/javascript">
-                    var disqus_shortname = 'whitewashing';
-                    var disqus_url = 'http://www.whitewashing.de/index.html';
-                    (function() {
-                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                    })();
-                </script>
-                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-              </div>         
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-12 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    </div><ul class="related clearfix">
+            <li class="left"></li>
+            <li class="right"><a href="page2.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
         </li><li>
             <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
@@ -1665,44 +1598,11 @@ approach to find improvements.</p>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
-        </li><li>
-            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
         </li></ul>
 </div>
-</section>
-              </aside></div>
-    </div>
-</div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container">
-<div class="container" id="footer">
-    <div class="container">
-        <div class="row" id="header">
-            <div class="col-md-6 hidden-sm hidden-xs" id="about">
-                Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-                <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-                Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-                and you can book him for consulting and trainings.
-            </div>
-            <div class="col-md-12 hidden-xs hidden-sm">
-                <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-                <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-                &copy; Copyright 2008-2015, Benjamin Eberlei.
-                Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-
-</div> <!-- footer-container -->
+        <div class="footer-container"><footer class="wrapper">&copy; Copyright 2008-2015, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

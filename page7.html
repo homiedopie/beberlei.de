@@ -16,19 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 7 &mdash; Whitewashing</title>
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/font-awesome.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/whitewashing.css" type="text/css" />
-<link rel="alternate" type="application/rss+xml" title="RSS Feed for whitewashing.de" href="http://www.whitewashing.de/rss.xml" />
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-
             <link rel="stylesheet" href="_static/normalize.css" type="text/css">
             <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
             <link rel="stylesheet" href="_static/webfont.css" type="text/css">
-
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -43,40 +35,127 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body>
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<div class="container">
-    <div class="row" id="header">
-        <div class="col-md-4">
-            <a href="index.html"><img class="img img-responsive" src="_static/logo.jpg" alt="Whitewashing.de" /></a>
+      <div id="container"><header>
+            <hgroup>
+              <h1><a href="index.html">Whitewashing</a></h1></hgroup>
+          </header>
+      <nav>
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="webfont">B</span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              </ul>
+          </nav><div class="main-container"><div class="main wrapper clearfix"><article><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page6.html">Newer</a></li>
+            <li class="right"><a href="page8.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>August 31, 2009</span>
         </div>
-        <div class="col-md-6 hidden-sm hidden-xs" id="about">
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </div>
-        <div class="col-md-2 hidden-xs hidden-sm">
-            <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-            <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-        </div>
-    </div>
-</div>
+        <div class="section" id="enums-in-php">
+<h1><a href="2009/08/31/enums-in-php.html">Enums in PHP</a></h1>
+<p><a class="reference external" href="http://blog.tobias-olry.de">A colleague of mine</a> complained about the
+missing support for Enums in PHP and how one often wants to have a
+variable that is constant and has one of several specific values. We
+came up with an elegant solution that we want to share, maybe its even
+helpful to you.
+If you want to implement Enum behaviour with a simple string or int
+value you end up with having to validate the values at several different
+locations in the code rather than being able to strictly enforce the
+Enum structure by using typehints.</p>
+<p>We discussed several approaches to this problem that all seemed a bit
+ugly in one or another way. For example the <strong>SplEnum</strong> class is a step
+in the right direction, however you can only use a type hint for
+“SplEnum” or add another inheritance layer. Also you have to implement
+different classes for each enum type, which requires you to implement a
+factory method for your enum to help with creation of the different
+types.</p>
+<p>We came up with a very simple Enum concept. It uses reflection in the
+constructor to check if the given value is a valid Enum value by
+checking it against all the defined constants of the implementing class
+and throws an Exception if it is not. The __toString() magic method is
+implemented to allow for simple checks of the enums value. Strict
+type-checks are not possible with this construct, however in our opinion
+it is a very elegant solution to enforce a limited set of specific
+values throughout your code-base.</p>
+<p>Here is the code plus a small example:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>abstract class MyEnum
+{
+    final public function __construct($value)
+    {
+        $c = new ReflectionClass($this);
+        if(!in_array($value, $c-&gt;getConstants())) {
+            throw IllegalArgumentException();
+        }
+        $this-&gt;value = $value;
+    }
 
-<div class="main-container">
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 content">
-          <div>
-            <div>
-              <div id="page7">
-                
-                <div class="timestamp postmeta">
+    final public function __toString()
+    {
+        return $this-&gt;value;
+    }
+}
+
+class Foo extends MyEnum
+{
+    const FOO = &quot;foo&quot;;
+    const BAR = &quot;bar&quot;;
+}
+
+$a = new Foo(Foo::FOO);
+$b = new Foo(Foo::BAR);
+$c = new Foo(Foo::BAR);
+
+if($a == Foo::FOO) {
+    echo &quot;My value is Foo::FOO\n&quot;;
+} else {
+    echo &quot;I dont match!\n&quot;;
+}
+
+if($a == $b) {
+    echo &quot;a value equals b value!\n&quot;;
+}
+if($b == $c) {
+    echo &quot;b value equals c value!\n&quot;;
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now you could nice things such as:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>function doStuff(Foo $foo) {
+    switch($foo) {
+        case Foo::FOO:
+            echo &quot;do more here!\n&quot;;
+            break;
+        case Foo::BAR;
+            echo &quot;evil stop!\n&quot;;
+            break;
+    }
+}
+
+doStuff($a);
+</pre></div>
+</div>
+</div></blockquote>
+<p>What are your thoughts?</p>
+</div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2009/08/31/enums-in-php.html#disqus_thread" data-disqus-identifier="2009/08/31/enums-in-php">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 23, 2009</span>
         </div>
         <div class="section" id="zend-form-and-the-model-yet-another-perspective-using-a-mediator">
@@ -716,70 +795,16 @@ looking forward to see you at IPC.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09.html#disqus_thread" data-disqus-identifier="2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>October 05, 2009</span>
-        </div>
-        <div class="section" id="php-codesniffer-for-netbeans-v0-2">
-<h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
-<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">PHP CodeSniffer for
-Netbeans
-plugin</a>.
-Previously the plugin used an unnecessary API which restricted the use
-to Netbeans 6.7.0 only. This API was removed so that the plugin should
-now work with all Netbeans Versions &gt;= 6.7.0.</p>
-<p>Additionally when working the previous version would scan every PHP
-script on a file per file basis when the all projects or main projects
-filters were activated. This rendered made the plugin almost useless. In
-the current version scans of filters that contain more than one file are
-blocked. That means you will only see Coding Violations when you enable
-the “Current File” filter. Using any other filter will just do nothing
-and won’t put your Netbeans in permanent hibernation mode (aka useless
-mode).</p>
-<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
-<strong>`NbPreferences
-API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
-which allows to configure the coding standard. [STRIKEOUT:However this
-feature was contributed by <a class="reference external" href="http://manuel-pichler.de">Manuel
-Piechler</a> and I don’t yet understand how I
-can manipulate it. Maybe someone knows how (*Looking in Mapis general
-direction*)?] By default the Zend Coding Standard is used.</p>
-<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
-file .netbeans/6.7/config/Preferences.properties setting
-“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
-inline highlighting that did not refresh when lines in the file changed.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/10/05/php-codesniffer-for-netbeans-v0-2.html#disqus_thread" data-disqus-identifier="2009/10/05/php-codesniffer-for-netbeans-v0-2">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-
-                <div id="disqus_thread"></div>
-                <script type="text/javascript">
-                    var disqus_shortname = 'whitewashing';
-                    var disqus_url = 'http://www.whitewashing.de/page7.html';
-                    (function() {
-                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                    })();
-                </script>
-                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-              </div>         
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-12 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page6.html">Newer</a></li>
+            <li class="right"><a href="page8.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
         </li><li>
             <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
@@ -797,44 +822,11 @@ inline highlighting that did not refresh when lines in the file changed.</p>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li><li>
             <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
-        </li><li>
-            <a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a>
         </li></ul>
 </div>
-</section>
-              </aside></div>
-    </div>
-</div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container">
-<div class="container" id="footer">
-    <div class="container">
-        <div class="row" id="header">
-            <div class="col-md-6 hidden-sm hidden-xs" id="about">
-                Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-                <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-                Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-                and you can book him for consulting and trainings.
-            </div>
-            <div class="col-md-12 hidden-xs hidden-sm">
-                <a href="https://twitter.com/beberlei"><i class="fa fa-twitter fa-3x"></i></a>
-                <a href="https://github.com/beberlei"><i class="fa fa-github fa-3x"></i></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-                &copy; Copyright 2008-2015, Benjamin Eberlei.
-                Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-
-</div> <!-- footer-container -->
+        <div class="footer-container"><footer class="wrapper">&copy; Copyright 2008-2015, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
