@@ -21,23 +21,15 @@ the autoloading capabilities of Composer in a hackish way.</p>
 <p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
 <span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
 its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>{</dt>
-<dd><dl class="first docutils">
-<dt>“autoload”: {</dt>
-<dd><dl class="first docutils">
-<dt>“psr-0”: {</dt>
-<dd>“Foo”: ”../foo/src/”</dd>
-</dl>
-<p class="last">}</p>
-</dd>
-</dl>
-<p class="last">}</p>
-</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;Foo&quot;</span><span class="p">:</span> <span class="s">&quot;../foo/src/&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>This approach is very simple to start with, however it has some downsides
 you must take into account:</p>
 <ul class="simple">

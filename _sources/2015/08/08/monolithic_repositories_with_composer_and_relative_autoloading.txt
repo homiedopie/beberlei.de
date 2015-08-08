@@ -14,6 +14,8 @@ Assume we have two components located in ``components/foo`` and
 ``components/bar``, then if bar depends on foo, it could define
 its ``components/bar/composer.json`` file as:
 
+::
+
     {
         "autoload": {
             "psr-0": {
