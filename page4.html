@@ -24,7 +24,7 @@
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/default.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -35,13 +35,13 @@
         <link rel="next" title="Older" href="page5.html" /><link rel="prev" title="Newer" href="page3.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.0',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
-    <body>
+    <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" role="main">
 <div class="container">
     <div class="span-24 content">
       <div>
@@ -76,18 +76,196 @@
           <div id="page4">
             
             <div class="timestamp postmeta">
+            <span>February 04, 2013</span>
+        </div>
+        <div class="section">
+            <h1><a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a></h1>
+<p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
+time. It bugs me having to reply: It is not really possible.  Because Doctrine2
+does not support value-objects (or embedded-objects), it is very hard to pull
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
+<p>These problems are related to the inability to share behavioral code through
+aggregation and the complexity of state transformations. Combining both, your
+average entity with 5-15 fields can end up with hundreds or thousands lines of
+code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
+maximizing clarity</a>.</p>
+<div class="section" id="extracting-value-objects-minimize-duplication">
+<h2>Extracting Value Objects: Minimize Duplication</h2>
+<p>Entity classes responsibility are the state transformations of their internal
+fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
+setters</a>,
+with use-case driven methods.  These state transformations can be part of
+different responsibilities, specifically when properties belong to different
+groups of concepts.</p>
+<p>Take a very simple entity that contains updated/created at logic:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\HasLifecycleCallbacks</span>
+<span class="sd"> **/</span>
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type="datetime")</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type="datetime")</span>
+<span class="sd">     **/</span>
+    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\PreUpdate</span>
+<span class="sd">     **/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you want to duplicate this logic to another second entity, then in Doctrine
+the solution for this is using traits. <a class="reference external" href="http://kore-nordmann.de/blog.html">Kore</a> will dismiss this solution, because
+traits create a hard dependency. Even if we accept the static dependency,
+traits are not perfect even for this very simple example, because its very
+likely that you cannot override the constructor of every entity.</p>
+<p>The solution is to extract a value object <span class="docutils literal"><span class="pre">Timestamped</span></span> that contains
+all the logic:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Timestamped</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$timestamped</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">timestamped</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamped</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See how all the code could be moved into <span class="docutils literal"><span class="pre">Timestamped</span></span> and is now reusable
+in other entities.</p>
+<p>Doctrine has no support for embedded objects, which is very sad. I am working
+very hard to get this feature into Doctrine as soon as possible. You can use
+the “object” type as a workaround and <span class="docutils literal"><span class="pre">serialize()</span></span> the value object into
+the database. However this is beyond ugly in my opinion.</p>
+</div>
+<div class="section" id="extract-method-objects-maximizing-clarity">
+<h2>Extract Method Objects: Maximizing clarity</h2>
+<p>Once you have identified groups of fields that are modified, then the
+complexity of the state transformations can attract lots of code.</p>
+<p>Take an <span class="docutils literal"><span class="pre">Order</span></span> object that has a method for calculating the shipping costs,
+depending all the order items and products.
+To separate calculations from state transformations you can extract
+method objects instead of inlining the code into the <span class="docutils literal"><span class="pre">Order</span></span> object.</p>
+<p>For this kind of extraction I create a folder <span class="docutils literal"><span class="pre">Order</span></span> and put all
+the extracted method objects in the <span class="docutils literal"><span class="pre">Order</span></span> subnamespace.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">Order</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="nv">$calculator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ShippingCostCalculator</span><span class="p">();</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">namespace</span> <span class="nx">MyProject\Entity\Order</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">ShippingCostCalculator</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nx">Order</span> <span class="nv">$order</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>From this step its easy to make the code reusable by passing the shipping cost
+calculator:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Order</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Another benefit is that you can test the shipping cost calculator directly in a
+unit-test and avoid checking for the correctness indirectly through a getter
+method for the shipping costs.</p>
+<p>Extracting every method of an entity into a method object is obviously
+overkill. You should exercise caution and common sense when performing this
+refactoring.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Not all the techniques to implement SOLID code can be exploited when using Doctrine
+for technical reasons. In the future I hope to support value objects in
+Doctrine to make this possible.</p>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/php.html">PHP</a></span>
+        </div>
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html#disqus_thread" data-disqus-identifier="2013/02/04/doctrine_and_solid">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>November 19, 2012</span>
         </div>
-        <div class="section" id="composer-and-azure-websites-git-deployment">
-<h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
-<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com">Fortrabbit</a>), I turn to Microsoft Azure today. After some
+        <div class="section">
+            <h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
+<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
 console.</p>
-<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites">Azure Websites</a> in June this
+<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites/">Azure Websites</a> in June this
 year.  It is a platform as a service solution where you can deploy your
 websites via FTP or Git. With Azure Websites you can avoid having to deal with
-the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services">Azure Hosted Cloud
+the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services/">Azure Hosted Cloud
 Services</a>.
 As long as your website only requires an SQLServer, MySQL or external APIs you
 can actually achieve quite a lot already.</p>
@@ -107,7 +285,7 @@ currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
+<span class="na">command</span> <span class="o">=</span> <span class="s">"D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
@@ -116,15 +294,15 @@ name to “v5.4”, but I haven’t tested this.</p>
 deployment command. The actual implementation is up to you, my version is
 the most simple one:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">))</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">))</span> <span class="p">{</span>
     <span class="nv">$url</span> <span class="o">=</span> <span class="s1">'https://getcomposer.org/composer.phar'</span><span class="p">;</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
-<span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"update"</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"--prefer-dist"</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"-v"</span><span class="p">;</span>
+<span class="k">require</span> <span class="s2">"composer.phar"</span><span class="p">;</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -136,7 +314,8 @@ You can check out <a class="reference external" href="https://github.com/beberle
 </div>
 <p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
 You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -156,12 +335,12 @@ You can of course execute additional steps in the <span class="docutils literal"
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 27, 2012</span>
         </div>
-        <div class="section" id="babysteps-with-fortrabbit-php-cloud">
-<h1><a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a></h1>
+        <div class="section">
+            <h1><a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a></h1>
 <p>I wanted to host a simple application to play around with the <a class="reference external" href="https://tent.io">Tent Protocol</a> (see <a class="reference external" href="http://whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html">my last blogpost</a>), so
 I checked through some of the PHP Cloud providers again for the fun of it. One
 requirement was to deploy from Git and update dependencies from Composer. I
-found a new provider that i haven’t heard of before, <a class="reference external" href="http://www.fortrabbit.com">Fortrabbit</a> that supports this so I had to check it out.
+found a new provider that i haven’t heard of before, <a class="reference external" href="http://www.fortrabbit.com/">Fortrabbit</a> that supports this so I had to check it out.
 It has some more features that I really dig:</p>
 <p>Fortrabbit provides you with a Git url where you can push your repository.
 It is directly deployed during the push operation. You can trigger composer
@@ -182,7 +361,8 @@ all sorts of cache warmup and other deployment tasks.</p>
 you don’t regularly click on a reset button. Its definitely enough to get small
 prototypes up and running. From there you can upgrade in many small steps from
 small plans (10€/month) to bigger ones (80€/month).</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -194,8 +374,8 @@ small plans (10€/month) to bigger ones (80€/month).</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 22, 2012</span>
         </div>
-        <div class="section" id="a-tent-io-app-zelten-bookmarks">
-<h1><a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a></h1>
+        <div class="section">
+            <h1><a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a></h1>
 <p>Over the weekend I built a <a class="reference external" href="http://zelten.eu1.frbit.net">very simple bookmarking application</a> for <a class="reference external" href="http://tent.io">tent.io</a>. I wanted to try the tent functionality to create
 arbitrary entities of data using something as simple as a “Bookmark”.</p>
 <p>The application retrieves and stores bookmarks on your own tent-server, nothing
@@ -249,7 +429,8 @@ that Facebook and other social networks provides:</p>
 <li>Importing all sorts of existing content (RSS,..)</li>
 </ul>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -261,8 +442,8 @@ that Facebook and other social networks provides:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>September 04, 2012</span>
         </div>
-        <div class="section" id="using-assertions-for-validation">
-<h1><a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a></h1>
+        <div class="section">
+            <h1><a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a></h1>
 <p>We all know PHP is weakly typed and has some weird type-conversion rules.
 This can often complicate our code checking for invalid or illegal data.
 Using if/else clauses we can do all sorts of validation, but with standard
@@ -337,7 +518,8 @@ allows you to overwrite the exception class:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -353,8 +535,8 @@ allows you to overwrite the exception class:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 26, 2012</span>
         </div>
-        <div class="section" id="symfony-monolog-and-different-log-types">
-<h1><a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a></h1>
 <p>Symfony uses the excellent Monolog library for logging everything related
 to the symfony application stack. But sometimes you need a different logger
 that responds differently to the log error levels. Ideally you don’t want
@@ -378,9 +560,9 @@ option:</p>
 </div>
 <p>To actually write to <span class="docutils literal"><span class="pre">mychannel</span></span> you have to tag all the services that use
 <span class="docutils literal"><span class="pre">mychannel</span></span> with the following tag:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">&quot;my_service&quot;</span> <span class="na">class=</span><span class="s">&quot;MyService&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">&quot;monolog.logger&quot;</span> <span class="na">channel=</span><span class="s">&quot;mychannel&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">&quot;service&quot;</span> <span class="na">id=</span><span class="s">&quot;logger&quot;</span> <span class="nt">/&gt;</span>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_service"</span> <span class="na">class=</span><span class="s">"MyService"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">"monolog.logger"</span> <span class="na">channel=</span><span class="s">"mychannel"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">"service"</span> <span class="na">id=</span><span class="s">"logger"</span> <span class="nt">/&gt;</span>
 <span class="nt">&lt;/service&gt;</span>
 </pre></div>
 </div>
@@ -395,7 +577,8 @@ usable and works.</p>
 cookbook entry</a>,
 however some insights of this blog post are still inside a pending Pull
 Request.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -407,16 +590,16 @@ Request.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 26, 2012</span>
         </div>
-        <div class="section" id="froscon-2012">
-<h1><a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a></h1>
 <p>This years <a class="reference external" href="http://www.froscon.org">Free and Open Source Conference (FrOSCon)</a> took place this weekend in Bonn, St.  Augustin.
 Because I live in Bonn, visiting the conference is a given for very many years
 now. This year I also did a talk on “Architecture Design Patterns” with <a class="reference external" href="http://twitter.com/go_oh">Gordon</a> so there was an incentive to show up besides
 meeting friends, all the Club Mate and <a class="reference external" href="http://www.quijote-kaffee.de">good open source coffee</a>.</p>
-<p>The most interesting topic in this years conference for me has been the <a class="reference external" href="http://graylog2.org">Graylog2</a> talk by Lennart Koopmann. Graylog is a logging server
+<p>The most interesting topic in this years conference for me has been the <a class="reference external" href="http://graylog2.org/">Graylog2</a> talk by Lennart Koopmann. Graylog is a logging server
 that uses Elastic Search for persistence and searching. It is sponsored by
 Xing, a pretty big german based Linkedin clone.</p>
-<p>The talk <a class="reference external" href="http://programm.froscon.de/2012/events/954.html">The State of PHPUnit</a> by <a class="reference external" href="http://twitter.com/__edorian">Volker</a> was interesting to see all the new stuff in
+<p>The talk <a class="reference external" href="http://programm.froscon.de/2012/events/954.html">The State of PHPUnit</a> by <a class="reference external" href="http://twitter.com/__edorian/">Volker</a> was interesting to see all the new stuff in
 PHPUnit 3.7 and that it fixes a bunch of annoyances that I stumbled on myself.
 I actually realized that they are so deeply rooted in my brain already, that
 they constitute features for me, not something that could actually be
@@ -435,7 +618,8 @@ adaptable to the business.</p>
 volunteers that organized this event. It really good event to bring together
 people from many different open-source communities and I already look forward
 to the next FrOSCon 2013.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -447,8 +631,8 @@ to the next FrOSCon 2013.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 25, 2012</span>
         </div>
-        <div class="section" id="decoupling-applications-with-domains-events">
-<h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
 <p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
 I have described 3 architectural patterns for business applications. Applying
 them to your software helps you decouple the business logic from the
@@ -531,8 +715,8 @@ trigger these event handlers.</p>
 
         <span class="c1">// 2. raise event</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-            <span class="s2">&quot;id&quot;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
-            <span class="s2">&quot;data&quot;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+            <span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+            <span class="s2">"data"</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
         <span class="p">)));</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -589,7 +773,8 @@ implementation of DomainEvent and EventProvider classes and integration into
 Symfony and Doctrine ORM. Generally this pattern is very easy to implement
 though, so that you can just have a look at the implementation and take the
 best parts for your own.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -601,8 +786,8 @@ best parts for your own.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 22, 2012</span>
         </div>
-        <div class="section" id="building-an-object-model-no-setters-allowed">
-<h1><a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a></h1>
 <p>If you are using an object relational mapper or any other database
 abstraction technology that converts rows to objects, then you will probably
 use getter/setter methods or properties (C#) to encapsulate object properties.</p>
@@ -651,8 +836,8 @@ blog example the <span class="docutils literal"><span class="pre">Post</span></s
     <span class="p">{</span>
         <span class="c1">// check invariants, business logic, filters</span>
 
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">state</span>       <span class="o">=</span> <span class="s2">&quot;published&quot;</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$onDate</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">state</span>       <span class="o">=</span> <span class="s2">"published"</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$onDate</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -805,7 +990,8 @@ is one building block towards clean object oriented code and domain driven desig
 <p>I am very interested in your opinions on this topic and my attempt to avoid them,
 please leave comments when leaving this website :-)</p>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -821,8 +1007,8 @@ please leave comments when leaving this website :-)</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 18, 2012</span>
         </div>
-        <div class="section" id="oop-business-applications-command-query-responsibility-segregation-cqrs">
-<h1><a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a></h1>
 <p>Other posts in this series about OOP Business Applications:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">Trying to escape the
@@ -1010,7 +1196,8 @@ testing. This might be more difficult for developers to use and understand.
 This problem goes away however, if you combine CQRS with Event Sourcing. A
 topic that I will discuss in the next blog post.</p>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -1023,222 +1210,6 @@ topic that I will discuss in the next blog post.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html#disqus_thread" data-disqus-identifier="2012/08/18/oop_business_applications__command_query_responsibility_seggregation">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 16, 2012</span>
-        </div>
-        <div class="section" id="oop-business-applications-data-context-interaction">
-<h1><a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a></h1>
-<p>Other posts in this series:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
-mess</a></li>
-<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
-</ul>
-<p>The next design pattern for technical system design is called “Data, Context,
-Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
-paradigm, in the context of PHPs language constraints it can be classified as
-architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
-through the book on DCI and trying to understand this pattern with me.</p>
-<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
-in use-cases (Context). Data objects are never directly involved in these
-use-cases, but are “casted” to their respective roles that they are taking in
-the use-case. This can be implemented with aggregation or traits in PHP.</p>
-<p>One goal of DCI is to get object-oriented programming to a place, where you
-can look at a use-case and its roles and be very sure that the program is
-running correctly, because you can guarantee that there are no unexpected side
-effects. It also aims at keeping the amount of code required to keep in mind
-for a given use-case as small as possible, allowing developers to reason about
-the code with more confidence.</p>
-<div class="section" id="terminology">
-<h2>Terminology</h2>
-<p>In DCI, <strong>data</strong> are objects that encapsulate the state of the application.
-As in EBI, they only contain logic that is true for all the possible use-cases.
-These classes represent <em>what the system is</em>.</p>
-<p><strong>Roles</strong> and <strong>Context</strong> represent <em>what the system does</em> and are supposed to
-capture the End User’s Mental Model as close as possible.</p>
-<p><strong>Roles</strong> add behavior to the data objects by either wrapping them or
-acting as traits for the data objects.</p>
-<p><strong>Context</strong> is the use-case and fulfils its role by making roles <strong>interact</strong> with
-each other. These roles then modify the underlying data.</p>
-</div>
-<div class="section" id="example">
-<h2>Example</h2>
-<p>Starting from the bank account example of the EBI post, we can introduce DCI
-quite easily by adding the missing concept of roles. In the use case of
-transferring money that would be:</p>
-<ul class="simple">
-<li>TransferMoneySource</li>
-<li>TransferMoneySink (Destination)</li>
-</ul>
-<p>We can do this by either introducing two interfaces and two concrete
-implementations that accept the <span class="docutils literal"><span class="pre">BankAccount</span></span> as object to work on
-or by building two traits. I will go down the route with traits, to show
-one possible use-case for this new PHP 5.4 feature. The idea here is to
-implement all the behavior necessary on a trait and then have simple dummy
-objects using them in the tests for this use-case.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">trait</span> <span class="nx">TransferMoneySource</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">transferFrom</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="k">trait</span> <span class="nx">TransferMoneySink</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Any checks for balances, credit limits or other things would also happen
-here. The <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>  on the data objects should be as
-dumb as possible, so that their implementation does not cause any side-effects
-on the execution of this use-case.</p>
-<p>The bank account would then be modified to look:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">BankAccount</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">TransferMoneySource</span><span class="p">,</span> <span class="nx">TransferMoneySink</span><span class="p">;</span>
-
-    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The use-case <span class="docutils literal"><span class="pre">TransferMoney</span></span> would then be modified to create Roles instead
-of Data objects from the DAO. This can be a bit tricky when you have multiple
-data objects implementing the same role and you have no way of knowing which
-underlying data object to pick. The binding of data objects to roles happens
-in the use-case. The use-case needs a means to retrieve objects with certain
-roles, which then access underlying data sources. To avoid that your use-cases
-have to know about how to bind roles to data, you could use GUIDs in your
-application and fetch all objects from one data store. Another way would be to
-implement data access objects for roles, that then know how to retrieve their
-corresponding data.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">MoneyTransfer</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span><span class="o">-&gt;</span><span class="na">transferTo</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The simplicity of this is appealing, however don’t forget that we have
-abstracted I/O completely here. There has to be code that deals with that part
-of the system somewhere. However this again is not at the heart of all the DCI
-examples out there, making it difficult to reason about the actual practical
-implications.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">One drawback with this example is, that PHP does not support typehinting for
-traits.</p>
-</div>
-<p>Here is an example of how the bank application service could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">BankApplicationService</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">);</span>
-        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$destinationId</span><span class="p">);</span>
-
-        <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$destination</span><span class="p">);</span>
-
-        <span class="nv">$conn</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">conn</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
-
-        <span class="k">try</span> <span class="p">{</span>
-            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$amount</span><span class="p">);</span>
-            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
-
-            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
-persistent data object by a global ID. This is necessary, because it
-doesn’t actually matter what data object uses the necessary traits
-for this use-case.</p>
-<p>Again as in EBI, in a bigger system you would need to find some abstraction
-layer that does this in a more generic way.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>When Gordon started showing me this pattern we were both puzzled as how
-to actually implement this in the real world. Especially the concept
-of binding roles to data objects still confuses us. Most notably why the use
-of traits or aggregates should actually constitute a new programming paradigm
-instead of just another way to do OOP.</p>
-<p>In Scala casting data objects to roles is actually possible by binding traits
-to objects at runtime. This is not possible in PHP however and has to be done
-statically.</p>
-<p>Compared to EBI, DCI focuses drastically on transaction script domain logic, by
-suggesting to implement roles for every use-case for the sake of avoiding
-side-effects. This is actually is very valuable lesson from this pattern.
-Finding means to decrease the complexity of software is always a good thing.
-And the explicit definition of this concept as <strong>roles</strong> is actually easy to
-explain to other programmers.</p>
-<p>One thing that is lacking in DCI is that there is no concrete mechanism to deal
-with the boundary to other parts of the system. This is actually a step back
-from EBI and I suggest using EBI pattern in combination with DCI to solve this.</p>
-<p>The largest benefit from DCI (and its self proclaimed goal) is the mapping from
-the users/customers mental model directly into the code by using Use-Cases and
-Roles. The communication with the customer about behavior can exclusively focus
-on the current context and its use-case. Mapping this behavior to actual data
-can then be done in a different step.</p>
-<p>This simplification of use-cases and reduction of side-effects between
-different parts of the system has other benefits: It can lead to easier to test
-code and makes it much easier for developers to develop on small and isolated
-parts of the system.</p>
-</div>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html#disqus_thread" data-disqus-identifier="2012/08/16/oop_business_applications__data__context__interaction">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1263,6 +1234,8 @@ parts of the system.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
         </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
@@ -1280,8 +1253,6 @@ parts of the system.</p>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
-        </li><li>
-            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li></ul>
 </div>
 </section>
@@ -1289,7 +1260,7 @@ parts of the system.</p>
 </div>
 </div> <!-- #main-container -->
 
-        <div class="footer-container">
+        <div class="footer-container" role="contentinfo">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">

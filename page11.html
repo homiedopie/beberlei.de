@@ -24,7 +24,7 @@
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/default.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -35,13 +35,13 @@
         <link rel="next" title="Older" href="page12.html" /><link rel="prev" title="Newer" href="page10.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.0',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
-    <body>
+    <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" role="main">
 <div class="container">
     <div class="span-24 content">
       <div>
@@ -76,10 +76,45 @@
           <div id="page11">
             
             <div class="timestamp postmeta">
+            <span>August 10, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html">Import and PYTHONPATH Problems with PyDev and Linux</a></h1>
+<p>Today is began to configure my <a class="reference external" href="http://pydev.sf.net">PyDev</a> Eclipse
+environment since I want to learn Python and need it for a programming
+aspect of my forthcoming diploma thesis. I ran into several difficulties
+getting the plugins run dialog to work. It seems that configuring the
+python interpreter under linux and adding all the correct include paths
+is not enough, even when following the <a class="reference external" href="http://pydev.sourceforge.net/faq.html#how_do_i_configure_my_pythonpath">PyDev
+FAQ</a>.</p>
+<p>Nearly giving up I came up with sort of a hack to get it running.
+Eclipse can execute arbitrary “External Tools” (Find it at: “<strong>Run -&gt;
+External Tools -&gt; Open External Tools Dioalog</strong>”). I used this facility
+to integrate an external tool “Python” with path “<strong>/usr/bin/python</strong>”.
+Now to automatically execute the currently active python script, you can
+specify the line: “<strong>${resource_loc}</strong>” in the arguments field of the
+dialog and you’re good to go.</p>
+<p>You now circumvented the PyDev internal execution scheme and work with
+the pure command line interpreter. This way all the problems of PyDev
+with the PythonPath, Symlinks and whatever are gone.</p>
+<p><strong>Update:</strong> Another note maybe, you can also add the action “running the
+last used external tool again” as keyboard shortcut in the Eclipse
+preferences. This simplifies the execution even more.</p>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html#disqus_thread" data-disqus-identifier="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 04, 2008</span>
         </div>
-        <div class="section" id="complete-django-template-engine-implementation-for-php5-downloadable-now">
-<h1><a href="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html">Complete Django Template Engine Implementation for PHP5 - Downloadable Now</a></h1>
+        <div class="section">
+            <h1><a href="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html">Complete Django Template Engine Implementation for PHP5 - Downloadable Now</a></h1>
 <p>I prepared a downloadable version of my <a class="reference external" href="http://www.djangoproject.com">Django Template
 Language</a> Engine Clone for PHP5 and the
 Zend Framework (although it can easily be used Standalone). It also
@@ -100,10 +135,11 @@ I will have to say again: This View Renderer shall be no replacement for
 the current Zend View. It is only an alternative which allows for some
 neat functionality and stricter View / Controller logic separation.</p>
 <p><strong>UPDATE:</strong> I finished a little page for what I call the Calypso DTL.
-See it here: <a class="reference external" href="http://www.beberlei.de/calypso">Calypso Site</a>. I have
+See it here: <a class="reference external" href="http://www.beberlei.de/calypso/">Calypso Site</a>. I have
 put up a little tutorial how to get the Template Engine running with
 Zend Framework and as a standalone component.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -115,8 +151,8 @@ Zend Framework and as a standalone component.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 31, 2008</span>
         </div>
-        <div class="section" id="greaat-python-can-control-your-wiimote">
-<h1><a href="2008/08/31/greaat-python-can-control-your-wiimote.html">Greaat, Python can control your Wiimote</a></h1>
+        <div class="section">
+            <h1><a href="2008/08/31/greaat-python-can-control-your-wiimote.html">Greaat, Python can control your Wiimote</a></h1>
 <p>In the last days I had lots of time to play with my Wiimote and its
 bluetooth capabilities. Sadly there is actively supported driver in non-C
 (and I am not the biggest C programmer). I found this little prototype
@@ -129,7 +165,8 @@ applications, but that might still be included in the future. You can
 <a class="reference external" href="http://www.beberlei.de/sources/wiipylib-0.1.tar.gz">download this little
 goodie</a> and have a
 look at it.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -141,15 +178,16 @@ look at it.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 23, 2008</span>
         </div>
-        <div class="section" id="constructions">
-<h1><a href="2008/01/23/constructions.html">Constructions...</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/23/constructions.html">Constructions...</a></h1>
 <p>Some people complained: Yes comments do not work YET, and also the links
 behind categories and Tags show nothing. Everything else follows
 shortly. I am programming this whole blog using the <a class="reference external" href="http://framework.zend.com">Zend
 Framework</a> to have a bit of learning
 experience. It will take some more time than if I would do it in “the
 old ways”.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -161,8 +199,8 @@ old ways”.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 14, 2008</span>
         </div>
-        <div class="section" id="helpers-in-zend-view-class-prefix">
-<h1><a href="2008/01/14/helpers-in-zend-view-class-prefix.html">Helpers in Zend_View: Class Prefix</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/14/helpers-in-zend-view-class-prefix.html">Helpers in Zend_View: Class Prefix</a></h1>
 <p>I have to say, the Zend Framework documentation is a bit imprecise
 sometimes. Regarding custom Helpers in Zend_View it states:</p>
 <blockquote>
@@ -190,12 +228,13 @@ Zend_Controller_Action you have to do something like this:</p>
 <span class="x">{</span>
 <span class="x">    function init() {</span>
 <span class="x">        $this-&gt;initView();</span>
-<span class="x">        $this-&gt;view-&gt;addHelperPath(&quot;pathtohelpers&quot;, &quot;ClassPrefix&quot;);</span>
+<span class="x">        $this-&gt;view-&gt;addHelperPath("pathtohelpers", "ClassPrefix");</span>
 <span class="x">    }</span>
 <span class="x">}</span>
 </pre></div>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -207,8 +246,8 @@ Zend_Controller_Action you have to do something like this:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 22, 2008</span>
         </div>
-        <div class="section" id="a-knight-s-tour-solver-in-pascal">
-<h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal.html">A knight’s tour solver in pascal</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal.html">A knight’s tour solver in pascal</a></h1>
 <p>My professor has a task on the current problem set of my pascal
 programming course to program, demanding a recursive program finding a
 solution to the <a class="reference external" href="http://en.wikipedia.org/wiki/Knight's_tour">knights tour problem</a> on a chess board
@@ -226,7 +265,8 @@ problem set.</p>
 <li><a class="reference external" href="http://mathworld.wolfram.com/KnightsTour.html">Wolfram MathWorld: Knights Tour</a></li>
 <li><a class="reference external" href="http://www.zaik.uni-koeln.de/AFS/teachings/ss07/InfoSeminar/handout/leonid_torgovitski_nknighttours.pdf">Presentation Knights Tour (German Language)</a></li>
 </ul>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -238,8 +278,8 @@ problem set.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 22, 2008</span>
         </div>
-        <div class="section" id="knights-tour-using-warndorff-s-rule">
-<h1><a href="2008/01/22/knights-tour-using-warndorff-s-rule.html">Knights Tour using Warndorff’s rule</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/22/knights-tour-using-warndorff-s-rule.html">Knights Tour using Warndorff’s rule</a></h1>
 <p>When using <a class="reference external" href="http://web.telia.com/~u85905224/knight/eWarnsd.htm">Warndorff’s
 rule</a> for solving
 the Knights Tour problem, the solution is found within a second. It took
@@ -247,7 +287,8 @@ some time for me to realize it in PASCAL though using a <strong>RECORD</strong> 
 to match the jumps to the number of free fields and then sort them. You
 can view my source code
 <a class="reference external" href="http://www.beberlei.de/sources/knightstour.txt">here</a>.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -259,8 +300,8 @@ can view my source code
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 22, 2008</span>
         </div>
-        <div class="section" id="a-knight-s-tour-solver-in-pascal-supplement">
-<h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html">A knight’s tour solver in pascal - supplement</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html">A knight’s tour solver in pascal - supplement</a></h1>
 <p>Following my <a class="reference external" href="http://www.whitewashing.de/blog/articles/6">earlier post on the Knights
 tour</a>: It seems it is
 crucial for a backtracking algorithm what the knights starting position
@@ -274,7 +315,8 @@ seconds. Using the same order for an 8x8 board gets me stuck in endless
 tries again. I see its important to implement the <a class="reference external" href="http://en.wikipedia.org/wiki/Warnsdorff's_algorithm">Warnsdorff’s
 algorithm</a>,
 perhaps I will do so.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -286,8 +328,8 @@ perhaps I will do so.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 28, 2008</span>
         </div>
-        <div class="section" id="linux-style-mysql-shell-prompt">
-<h1><a href="2008/01/28/linux-style-mysql-shell-prompt.html">Linux style MySQL Shell prompt</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/28/linux-style-mysql-shell-prompt.html">Linux style MySQL Shell prompt</a></h1>
 <dl class="docutils">
 <dt>Just add the following to the [mysql] section in your .my.cnf file:</dt>
 <dd><div class="first last highlight-python"><div class="highlight"><pre>prompt=\u@\h [\d]&gt;\
@@ -295,7 +337,8 @@ perhaps I will do so.</p>
 </div>
 </dd>
 </dl>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -307,8 +350,8 @@ perhaps I will do so.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 27, 2008</span>
         </div>
-        <div class="section" id="writing-a-game-for-kde4">
-<h1><a href="2008/01/27/writing-a-game-for-kde4.html">Writing a Game for KDE4</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/27/writing-a-game-for-kde4.html">Writing a Game for KDE4</a></h1>
 <p>I am writing PHP / Web Applications for about 8 years now, but I am not
 so much the pro in writing desktop applications. I know little or no
 C/C++/Java, but want to change that soon. Since I use KDE for both my
@@ -331,7 +374,8 @@ will decide in the next weeks, but I should probably concentrate on my
 semesters final exams in the first place.</p>
 <p><strong>Update:</strong> Moruba seems to have different rules than the game we are
 playing. I will elaborate on that soon.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -340,30 +384,6 @@ playing. I will elaborate on that soon.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/01/27/writing-a-game-for-kde4.html#disqus_thread" data-disqus-identifier="2008/01/27/writing-a-game-for-kde4">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 20, 2008</span>
-        </div>
-        <div class="section" id="zend-view-hack-for-implementation-of-rss-feed">
-<h1><a href="2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html">Zend_View Hack for implementation of RSS Feed</a></h1>
-<p>Using Zend_View for your site and want to implement an RSS Feed? You
-might run into the problem that the XML header definition is interpreted
-as PHP code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="cp">?&gt;</span><span class="x"/>
-</pre></div>
-</div>
-<p>Before you start cursing the world try this (rather obvious) workaround:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="s1">'&lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;'</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"/>
-</pre></div>
-</div>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html#disqus_thread" data-disqus-identifier="2008/01/20/zend-view-hack-for-implementation-of-rss-feed">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -388,6 +408,8 @@ as PHP code:</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
         </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
@@ -405,8 +427,6 @@ as PHP code:</p>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
-        </li><li>
-            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li></ul>
 </div>
 </section>
@@ -414,7 +434,7 @@ as PHP code:</p>
 </div>
 </div> <!-- #main-container -->
 
-        <div class="footer-container">
+        <div class="footer-container" role="contentinfo">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">

@@ -24,7 +24,7 @@
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/default.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -35,13 +35,13 @@
         <link rel="next" title="Older" href="page13.html" /><link rel="prev" title="Newer" href="page11.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.0',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
-    <body>
+    <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" role="main">
 <div class="container">
     <div class="span-24 content">
       <div>
@@ -78,8 +78,33 @@
             <div class="timestamp postmeta">
             <span>January 20, 2008</span>
         </div>
-        <div class="section" id="using-a-self-defined-zend-loader">
-<h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html">Zend_View Hack for implementation of RSS Feed</a></h1>
+<p>Using Zend_View for your site and want to implement an RSS Feed? You
+might run into the problem that the XML header definition is interpreted
+as PHP code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">"1.0"</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="cp">?&gt;</span><span class="x"/>
+</pre></div>
+</div>
+<p>Before you start cursing the world try this (rather obvious) workaround:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="s1">'&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;'</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"/>
+</pre></div>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html#disqus_thread" data-disqus-identifier="2008/01/20/zend-view-hack-for-implementation-of-rss-feed">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 20, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
 <p>When you start writing with a Framework like Zend like I did in the last
 weeks, you probably are still haunted by all the bad habits of pseudo
 object orientated PHP design, using lots of require and include’s.
@@ -146,7 +171,7 @@ thinking about includes.</p>
 <p>ZEND_CONFIG_PATH is the only constant I use in my application. I
 initialize the following at the beginning of my bootstrap file:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>define('ZEND_CONFIG_PATH', dirname(__FILE__).&quot;/../application/config/&quot;);
+<div><div class="highlight-python"><div class="highlight"><pre>define('ZEND_CONFIG_PATH', dirname(__FILE__)."/../application/config/");
 
 require_once 'Zend/Loader.php';
 require_once dirname(__FILE__).'/../application/include/WWLoader.php';
@@ -156,7 +181,8 @@ Zend_Loader::registerAutoload('WWLoader');
 </div>
 </div></blockquote>
 <p>After that, its just Objects.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -168,8 +194,8 @@ Zend_Loader::registerAutoload('WWLoader');
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 17, 2008</span>
         </div>
-        <div class="section" id="zf-managing-404-errors-with-version-1-0-3">
-<h1><a href="2008/01/17/zf-managing-404-errors-with-version-1-0-3.html">ZF: Managing 404 Errors with Version 1.0.3</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/17/zf-managing-404-errors-with-version-1-0-3.html">ZF: Managing 404 Errors with Version 1.0.3</a></h1>
 <p>Ok, the description of the Link referring to the <a class="reference external" href="http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework">version 0.9 solution
 for Managing 404
 errors</a>
@@ -228,7 +254,8 @@ renamed, my current snippet is:</p>
 </pre></div>
 </div>
 <p>I hope someone needs this as much as me.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -240,8 +267,8 @@ renamed, my current snippet is:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 24, 2008</span>
         </div>
-        <div class="section" id="complaining-about-zend-filter-input">
-<h1><a href="2008/01/24/complaining-about-zend-filter-input.html">Complaining about Zend_Filter_Input</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/24/complaining-about-zend-filter-input.html">Complaining about Zend_Filter_Input</a></h1>
 <p>Zend_Filter_Input is really nice to be sure form data is filtered
 correctly, but i have some serious complaints: Why the hell are the
 error messages so user-unfriendly? I really would like to use the output
@@ -279,7 +306,8 @@ friendly messages one had to make child objects of each of the
 Validators and edit the error messages accordingly. I avoid this by
 printing my own errors from outside the Zend_Filter_Input, rather than
 using the object for what it is probably supposed to do.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -291,8 +319,8 @@ using the object for what it is probably supposed to do.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 24, 2008</span>
         </div>
-        <div class="section" id="how-my-zend-db-table-models-look-like">
-<h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
+        <div class="section">
+            <h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
 <p>I am not too happy with the ZF Frameworks Table access solution. Not
 that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
 pattern</a>,
@@ -306,8 +334,8 @@ and
 An example:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeModel extends Zend_Db_Table_Abstract</span>
 <span class="x">{</span>
-<span class="x">  $_name = &quot;someTable&quot;;</span>
-<span class="x">  $_primary = &quot;id&quot;;</span>
+<span class="x">  $_name = "someTable";</span>
+<span class="x">  $_primary = "id";</span>
 
 <span class="x">  public function getSomethingByJoin($param1, $param2)</span>
 <span class="x">  {</span>
@@ -324,7 +352,8 @@ An example:</p>
 <p>That way you still follow the MVC pattern and don’t have to take one
 compromise after another for getting the Table Gateway to reproduce a
 result that looks like a join.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -336,14 +365,14 @@ result that looks like a join.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 30, 2008</span>
         </div>
-        <div class="section" id="php-conference-recap-netbeans-ezcomponents-mapreduce">
-<h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
+        <div class="section">
+            <h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
 <p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
 Mainz, Germany was the first php conference I have been to. It ended
 some hours ago and i am quite happy to have been there. I had several
 great discussions which pointed me to new stuff (to follow) and also met
 great people.</p>
-<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc">NetBeans 6.5 with PHP
+<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
 support</a>. It feels much
 more easy to use than Eclipse PDT. Its faster (from the little tests i
 could make) and does not strike when you add several large libraries
@@ -372,18 +401,18 @@ data seems to be a topic that needs lots of thinking.</p>
 <ul class="simple">
 <li>Meet Thomas, the guy that wrote Weaverslave (I use it for years to
 build simple php applications).</li>
-<li>He is working on a cool open source project <a class="reference external" href="http://sourceforge.net/projects/ccg">Carica
+<li>He is working on a cool open source project <a class="reference external" href="http://sourceforge.net/projects/ccg/">Carica
 Cachegrind</a> with Bastian
 Feder that will process xdebug cachegrind files via a webinterface
 (They told me webgrind is actually calculating the numbers wrong).</li>
 <li>Jan Lehnhart and Kore Nordmann had some great things to say about
-<a class="reference external" href="http://incubator.apache.org/couchdb">CouchDB</a>.</li>
+<a class="reference external" href="http://incubator.apache.org/couchdb/">CouchDB</a>.</li>
 <li>Brian Acker talked about <a class="reference external" href="https://launchpad.net/drizzle">Drizzle</a>,
 which is a forked MySQL that throws out lots of legacy stuff from
 MySQL out, to build a micro-kernel database server that suites the
 web.</li>
 <li>Ulf Wendel talked about Mysqli + Mysqlnd.
-<a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd">Mysqlnd</a>
+<a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd/">Mysqlnd</a>
 will be a new internal driver for PHP to access MySQL through Mysqli
 and optimizes processing and memory consumption. Additionally Mysqli
 will be extended to offer asynchronous queries that can be fired at
@@ -392,7 +421,8 @@ the database and polled latter. To be included in PHP 5.3</li>
 <p>Not so good things: There were absolutely to few power lines. People
 using their notebooks were packed on hotspots where power was available.
 Please more power plug possibilities next time!</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -404,8 +434,8 @@ Please more power plug possibilities next time!</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 01, 2008</span>
         </div>
-        <div class="section" id="my-recent-zf-ongoings-jquery-action-controller-couchdb">
-<h1><a href="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html">My recent ZF ongoings: JQuery, Action Controller, CouchDb</a></h1>
+        <div class="section">
+            <h1><a href="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html">My recent ZF ongoings: JQuery, Action Controller, CouchDb</a></h1>
 <p>In the last weeks lots of stuff came up for me regarding the Zend
 Framework. My <a class="reference external" href="http://jquery.com">jQuery</a> component is finished, i
 have even committed the documentation into the SVN already. Do read it
@@ -413,7 +443,7 @@ you have to be either an XML fetishist or compile it using a docbook
 compiler. Lots of questions about ZF and jQuery come up regularly on the
 mailing lists so I really look forward for the first ZF 1.7 release
 candidate which will include the helpers for a broader audience. This
-component comes at a good point, since <a class="reference external" href="http://jquery.com/blog/2008/09/28/jquery-microsoft-nokia">a few days ago the jQuery team
+component comes at a good point, since <a class="reference external" href="http://jquery.com/blog/2008/09/28/jquery-microsoft-nokia/">a few days ago the jQuery team
 announced a deal with Microsoft and
 Nokia</a>.
 Microsoft will include jQuery as the framework to go into its Webbased
@@ -440,7 +470,8 @@ component yesterday and we teamed up to implement two prototypes
 (<a class="reference external" href="http://github.com/weierophinney/phly/tree/beberlei">mine</a> is based
 on <a class="reference external" href="http://github.com/weierophinney/phly/tree/master">Matthews</a> and
 integrates lots of stuff of the Zym component).</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -452,8 +483,8 @@ integrates lots of stuff of the Zym component).</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>April 27, 2008</span>
         </div>
-        <div class="section" id="ox-cross-correlation-coefficients-with-lags">
-<h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
+        <div class="section">
+            <h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
 <p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
 class</a> I
 realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
@@ -509,7 +540,8 @@ ccf(const vVarY, const vVarX, const lags)
 </div>
 </div></blockquote>
 <p>It may prove useful to someone.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -521,14 +553,14 @@ ccf(const vVarY, const vVarX, const lags)
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>September 05, 2008</span>
         </div>
-        <div class="section" id="jquery-component-approved-for-extras-library">
-<h1><a href="2008/09/05/jquery-component-approved-for-extras-library.html">jQuery Component approved for extras library</a></h1>
+        <div class="section">
+            <h1><a href="2008/09/05/jquery-component-approved-for-extras-library.html">jQuery Component approved for extras library</a></h1>
 <p>Yesterday both my jQuery Helper proposals (<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">Core
 Helper</a>,
 <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei?focusedCommentId=7373203#comment-7373203">UI
 Widgets</a>)
 for the Zend Framework have been accepted for development. I have
-already checked my working prototypes <a class="reference external" href="http://framework.zend.com/svn/framework/extras/incubator">into the Zend Framework
+already checked my working prototypes <a class="reference external" href="http://framework.zend.com/svn/framework/extras/incubator/">into the Zend Framework
 SVN</a>. In my
 opinion the usage is quite stable already. There is likely to be no
 argument flip, function renaming or whatsoever. I have renamed the
@@ -546,7 +578,8 @@ release later this year.</p>
 release (which is not released yet), a little waiting time before
 release is still good. I hope this all works out and the jQuery UI 1.6
 release is in the Google CDN, when ZF 1.7 comes out.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -558,14 +591,15 @@ release is in the Google CDN, when ZF 1.7 comes out.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>September 11, 2008</span>
         </div>
-        <div class="section" id="new-calypso-dtl-version-0-2">
-<h1><a href="2008/09/11/new-calypso-dtl-version-0-2.html">New Calypso DTL Version 0.2</a></h1>
+        <div class="section">
+            <h1><a href="2008/09/11/new-calypso-dtl-version-0-2.html">New Calypso DTL Version 0.2</a></h1>
 <p>I have got some hints about bugs and optimized the performance of loops
 a little bit, so that you can now <a class="reference external" href="http://www.beberlei.de/sources/calypso-dtl-0.2.tar.gz">download version
 0.2</a> of the
 <a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template engine</a>. Have
 fun.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -574,99 +608,6 @@ fun.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/09/11/new-calypso-dtl-version-0-2.html#disqus_thread" data-disqus-identifier="2008/09/11/new-calypso-dtl-version-0-2">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>September 20, 2008</span>
-        </div>
-        <div class="section" id="dependency-injection-via-interface-in-php-an-example">
-<h1><a href="2008/09/20/dependency-injection-via-interface-in-php-an-example.html">Dependency Injection via Interface in PHP: An example</a></h1>
-<p>Personal projects and work currently both force me to think about
-application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
-injection</a> the
-other day. Its quite a complex Design Pattern and hard to grasp, even
-with the number of examples you can find in the internet. Basically
-Dependency Injection means you register components that might be a
-dependency for other components and when loading new classes via the
-dependency injection framework, it knows of this relationships and
-assembles the object in need and all its dependencies and returns them
-fully initialized. This pattern leads to completely encapsulated objects
-where any class in the object graph can be exchanged for a new
-implementation without breaking all its dependencies. It also makes
-testing complex components and object relationships very easy.</p>
-<p>As far as I could find out, three different types of Dependency Injection
-implementations exist: Via Constructor, via Setter and via Interfaces.
-There exist implementations of Dependency Injection for Java (Spring)
-that are configured via XML config files and seem very complex. They are
-also hard to read in code I presume, since you always have to be aware
-of the current application configuration. There are also some more
-lightweight implementations (PicoContainer) that assemble their
-relationships in the application and work with config methods that act
-as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
-implementation via
-interfaces</a>,
-which seems most accessible for me.</p>
-<p>All PHP clones of any dependency injection framework seem to go the
-complex way via configuration though. With traits and multiple class
-inheritance on the horizon, some kind of interface injection seems
-mighty powerful though. So I implemented a really lightweight
-implementation of Interface Dependency Injection for PHP. The Container
-works with static method only, is therefore in the global scope, such
-that configuration is reduced to a minimum. Generally you have to write
-interfaces for object injection, for example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">interface InjectDbAdapter</span>
-<span class="x">{</span>
-<span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>Other potential examples include “InjectLogger”, “InjectSoapClient”, or
-“InjectAppConfig”. You then have to register a component for usage with
-this interface:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</span>
-</pre></div>
-</div>
-<p>Now any class that implements the InjectDbAdapter interface can be
-instantiated via:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class');</span>
-</pre></div>
-</div>
-<p>and the loader takes care of calling the ‘Class’ implementation of
-injectDbAdapter with the given Database Adapter. A negative consequence
-of this approach is that you have to implement the inject methods for
-all interfaces in your concrete class implementations. With Traits
-(multiple class inheritance) being a new feature in PHP soon, injection
-via parent classes seems to become a very powerful approach though,
-which can handle the concrete implementations.</p>
-<p>The Container takes care of all the dependency building, so when testing
-your components you can register lots of mock objects. You can also
-exchange dependencies for only a subset of objects very easily. I
-implemented a method “Whitewashing_Container::registerClassComponent”,
-which registers a dependency component that is used with higher priority
-in construction of the given class. You can also specify a third
-parameter $localInterfaceOverride for the highest priority:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
-</pre></div>
-</div>
-<p>Speedwise the usage of the Container reduces class instantiation by about
-50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
-on my machine. But naturally only classes with dependencies and lots of
-them should be using this mechanism and with good application design,
-this shouldn’t be to many. You can download
-<a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
-and <a class="reference external" href="http://www.beberlei.de/sources/di.phps">Example</a> sourcecode, to
-take a look. Currently this Container is not really creating new
-dependencies for each new class generation but rather inverts the usage
-of a registry. It should be an easy task to extend the registering
-method to decide between new class generation and using the globally
-registered class instance.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/09/20/dependency-injection-via-interface-in-php-an-example.html#disqus_thread" data-disqus-identifier="2008/09/20/dependency-injection-via-interface-in-php-an-example">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -691,6 +632,8 @@ registered class instance.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
         </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
@@ -708,8 +651,6 @@ registered class instance.</p>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
-        </li><li>
-            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li></ul>
 </div>
 </section>
@@ -717,7 +658,7 @@ registered class instance.</p>
 </div>
 </div> <!-- #main-container -->
 
-        <div class="footer-container">
+        <div class="footer-container" role="contentinfo">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">

@@ -24,7 +24,7 @@
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/default.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -35,13 +35,13 @@
         <link rel="next" title="Older" href="page7.html" /><link rel="prev" title="Newer" href="page5.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.0',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
-    <body>
+    <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" role="main">
 <div class="container">
     <div class="span-24 content">
       <div>
@@ -76,10 +76,161 @@
           <div id="page6">
             
             <div class="timestamp postmeta">
+            <span>January 10, 2010</span>
+        </div>
+        <div class="section">
+            <h1><a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></a></h1>
+<p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
+article</a> on using PEAR
+and PHAR for application lifecycle management and deployment. Since then
+I have gotten some feedback through comments, but also discussed the
+topic with colleagues. I have also optimized the approach quite
+considerably and even <a class="reference external" href="http://github.com/beberlei/pearanha">made an open-source project out of parts of
+it</a> and I want to share all that
+is new with you. First of all, yes the presented solution was somewhat
+complex, partly because it is still a proposed idea and definitely up
+for optimizations. However I am still very convinced of my approach,
+something I should discuss in more detail.</p>
+<p>The only other two languages I have ever programmed something in with
+more than 50 lines of code are Java and C#. In both languages you can
+explicitly import different dependencies like libraries and frameworks
+by adding them to your application, i.e. in java you would add for
+example Spring as an MVC Web layer, Hibernate as an ORM and several
+other things to your project and directly bundle them in your
+executable. This is very easy to configure and maintain in IDEs like
+Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
+libraries to your project). It also makes for a much more
+straightforward deployment.</p>
+<p>In the PHP world this situation was quite different (up to PHP 5.3) for
+several reasons:</p>
+<ul class="simple">
+<li>You could not package a library into a single distributable file.</li>
+<li>The PEAR installer as the only tool for updating and managing
+dependencies of your application by default installs into a
+system/global directory. This means dependencies your application
+uses are located in a completely different location than your
+application code.</li>
+<li>You can’t manage multiple versions of the same package with PEAR in
+this system directory, making it very hard to control servers with
+different applications.</li>
+<li>The global directory with your application dependencies is most often
+not under version control, which makes deployment of applications
+with PEAR dependencies somewhat difficult.</li>
+</ul>
+<p>There are some solutions to this problems:</p>
+<ul class="simple">
+<li>Don’t use PEAR, but put all dependencies in your version control
+system.</li>
+<li>Don’t use PEAR, and bundle dependencies to your code in the
+build/deployment process.</li>
+<li>Use PEAR like in the article described, on a per project basis.</li>
+</ul>
+<p>The solutions that don’t use PEAR suffer from the disadvantage that you
+need to keep track of all the library and framework dependencies
+yourself and upgrade them yourself. This might not be such a huge
+problem from a first glance, but in my opinion many PHP applications and
+projects suffer from using either no framework/library or just exactly
+one. There is no real cherry-picking going on the PHP world, for example
+I would really like to use Zend Framework for the general application
+layout, but still use Doctrine for the Modelling and HTML Purifier for
+the Output Escaping. Certain tasks might then only be solvable with the
+help of eZ Components, all of which are then to some extend dependencies
+of my application. With <a class="reference external" href="http://pearhub.org/">PEARHUB</a> and
+<a class="reference external" href="http://pearfarm.org/">PEARFARM</a> on the horizon (<a class="reference external" href="http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html">Read Padraic on this
+topic</a>)
+even more PHP code will be distributed using PEAR channels in the near
+future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
+DateTime</a> code for
+example makes for a great little open source library that could be
+distributed via PEAR, as well as
+<a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
+container I am using extensively.</p>
+<p>Question: Are you really going to manage all these dependencies
+correctly manually? Is everything up to date all the time, and
+upgradeable with ease?</p>
+<p>The PEAR driven solution then begins to look very desirable in this
+light, however it has a considerable disadvantage: The PEAR installer
+itself works on a system-wide/user-centric basis, making it impossible
+to manage dependencies of several applications using only one linux
+user. My little <a class="reference external" href="http://github.com/beberlei/pearanha">Pearanha</a> to the
+rescue: I have taken the PEAR installer code (which is distributed with
+all PHP installations across all systems) and put a new CLI tool on top
+of it. Its a very simple code-generator that allows to generate a
+re-configured PEAR installer script which only manages a single
+application in a given directory. This approach is also used by the
+symfony plugin mechanism, which internally uses the PEAR installer (did
+you know?).</p>
+<p>Lets revisit my blog application example <a class="reference external" href="%3Ca%20href=">from my previous PEAR
+post</a>, first install from
+<a class="reference external" href="http://github.com/beberlei/pearanha">Github</a> and make the “pearanha”
+file executable and put it in your PATH (A PEAR Server Channel will
+follow any time soon).</p>
+<p>Now we need to have an existing application directory somewhere, for
+example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
+with:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>benny@desktop: pearanha generate-project
+</pre></div>
+</div>
+</div></blockquote>
+<p>You then need to specify the project base dir and then the project
+style (for example Zend Framework or Manual) which prompts your for the
+directory that should be used for as the vendor/library directory that
+PEAR will install all the code in. You will also be prompted for a
+binary/scripts directory which will then hold a new PHP file for you,
+the file <strong>my_phpiranha</strong>.</p>
+<p><strong>Pro Argument:</strong> Switching to Pearanha can be done at any point in your
+application lifecycle. Just define an additional vendor directory for
+all the dependencies to go in and generate the applications pear
+installer and you are good to go.</p>
+<p>The generated script is your new application specific PEAR installer and
+you can begin to install all the required dependencies of your
+application:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>benny@desktop:~$ cd /var/www/blog
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.zfcampus.org
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install zfcampus/zf-alpha
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover htmlpurifier.org
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install hp/HTMLPurifier
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.phpdoctrine.org
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install pear.phpdoctrine.org/DoctrineORM-2.0.0
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover components.ez.no
+benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install ezc/ezcGraph
+</pre></div>
+</div>
+</div></blockquote>
+<p>All this stuff is now located in <strong>/var/www/blog/vendor</strong>. Again you can
+use PEARs complete upgrade, remove and install functionality for your
+application, now without the hazzle of having to create a linux user for
+each project you want to manage this way, which in my opinion is a
+considerable simplification. The complete application (including its
+dependencies) can then be put under version control and be readily
+packaged as a single executable PHAR file by your build process.</p>
+<p>As a side node, I did try Pyrus instead of PEAR for the same discussed
+purpose, however most of the current PEAR channels don’t validate
+against Pyrus strict standards for the package.xml file. In the future
+this might change and a Pyrus based application installer will then be
+integrated into Pearanha.</p>
+<p><strong>UPDATE:</strong> I renamed PHPiranha to Pearanha as its more appropriate.
+Also after apinsteins comment on “pear config-create” I rewrote the
+generate-project parts to use the config-create functionality
+internally, which allowed me to throw away half of the self-written
+code. Thanks!</p>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html#disqus_thread" data-disqus-identifier="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>April 27, 2010</span>
         </div>
-        <div class="section" id="doctrine-2-beta-1-released">
-<h1><a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a></h1>
+        <div class="section">
+            <h1><a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a></h1>
 <p>Today we are happy to announce that the first beta of <a class="reference external" href="http://www.doctrine-project.org/blog/doctrine-2-0-0-beta1-released">Doctrine
 2</a>
 has been released and we fixed 165 issues kindly reported by several
@@ -170,7 +321,8 @@ feedback in our <a class="reference external" href="http://www.doctrine-project.
 Tracker</a>,
 the <a class="reference external" href="http://groups.google.com/group/doctrine-user">Mailing-List</a> or
 come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -182,9 +334,9 @@ come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>April 18, 2010</span>
         </div>
-        <div class="section" id="new-netbeans-php-codesniffer-plugin-version">
-<h1><a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a></h1>
-<p>This morning I took the time to merge several changes by <a class="reference external" href="http://manuel-pichler.de">Manuel
+        <div class="section">
+            <h1><a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a></h1>
+<p>This morning I took the time to merge several changes by <a class="reference external" href="http://manuel-pichler.de/">Manuel
 Piechler</a> into <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">my Github
 branch</a> of the
 CodeSniffer Plugin and released a new NBM file for you to
@@ -198,7 +350,8 @@ Here are the changes done by Manuel:</p>
 <p>The only open TODO for this project is the possibility to specify
 different standards on a per project basis, currently you can only
 choose a global standard.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -210,20 +363,20 @@ choose a global standard.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>December 18, 2010</span>
         </div>
-        <div class="section" id="generate-proxy-code-using-a-stream-wrapper">
-<h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
+        <div class="section">
+            <h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
 <p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
 <p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
 <p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <span class="docutils literal"><span class="pre">include()</span></span>. The client code looks like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">stream_wrapper_register</span><span class="p">(</span><span class="s2">&quot;dc2proxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Doctrine\ORM\Proxy\ProxyStreamWrapper&quot;</span><span class="p">);</span>
+<span class="nb">stream_wrapper_register</span><span class="p">(</span><span class="s2">"dc2proxy"</span><span class="p">,</span> <span class="s2">"Doctrine\ORM\Proxy\ProxyStreamWrapper"</span><span class="p">);</span>
 
-<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">&quot;dc2proxy:///proxies&quot;</span><span class="p">;</span>
+<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">"dc2proxy:///proxies"</span><span class="p">;</span>
 <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$em</span><span class="p">;</span>
 <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$className</span><span class="p">;</span>
 <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$proxyClass</span><span class="p">;</span>
 
-<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;.php&quot;</span><span class="p">;</span>
+<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">"/"</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">".php"</span><span class="p">;</span>
 
 <span class="nb">unset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
 </pre></div>
@@ -252,7 +405,7 @@ The stream wrapper to make this work looks like this:</p>
         <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
         <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
         <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">"ino"</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
         <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
     <span class="p">}</span>
 
@@ -261,21 +414,21 @@ The stream wrapper to make this work looks like this:</p>
         <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
         <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
         <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="s2">&quot;ino&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">"ino"</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
         <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="k">function</span> <span class="nf">stream_read</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$ret</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
+        <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$ret</span><span class="p">);</span>
         <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="k">function</span> <span class="nf">stream_write</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$left</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
-        <span class="nv">$right</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
+        <span class="nv">$left</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
+        <span class="nv">$right</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$left</span> <span class="o">.</span> <span class="nv">$data</span> <span class="o">.</span> <span class="nv">$right</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
         <span class="k">return</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
@@ -329,7 +482,8 @@ The stream wrapper to make this work looks like this:</p>
 </pre></div>
 </div>
 <p>What do you think about this approach? Are there any potential problems I am not seeing?</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -341,15 +495,15 @@ The stream wrapper to make this work looks like this:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>December 07, 2010</span>
         </div>
-        <div class="section" id="blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">
-<h1><a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a></h1>
+        <div class="section">
+            <h1><a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a></h1>
 <p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
-<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
+<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">echo</span> <span class="s2">&quot;hello world with ReST and Zeta Components!&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s2">"hello world with ReST and Zeta Components!"</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
+<p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home/">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
 <p>My next plans for the blog bundle are:</p>
 <ul class="simple">
 <li>WebDav support for authoring. All articles will be named “slug.inputformat”, for example “blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst”. For this I plan to write a custom backend for ezcWebdav.</li>
@@ -358,7 +512,8 @@ The stream wrapper to make this work looks like this:</p>
 <li>Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.</li>
 </ul>
 <p>Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -370,8 +525,8 @@ The stream wrapper to make this work looks like this:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 25, 2009</span>
         </div>
-        <div class="section" id="git-is-great-helping-out-with-mutateme">
-<h1><a href="2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a></h1>
+        <div class="section">
+            <h1><a href="2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a></h1>
 <p>These last days I had fun with <a class="reference external" href="https://github.com/padraic/mutateme/tree">Padraic Bradys
 MutateMe</a> project. It
 dynamically changes your code (using PECL Runkit extension) and checks
@@ -394,7 +549,8 @@ beginning to write a complete Runner now that calls all three components
 <a class="reference external" href="http://www.phpunit.de">PHPUnit</a>, <a class="reference external" href="http://www.pdepend.org">PDepend</a>
 and CodeSniffer at once and directly processes the results. When this is
 done, I will pack it all up as a PEAR package for anyone to test out.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -406,10 +562,10 @@ done, I will pack it all up as a PEAR package for anyone to test out.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 08, 2009</span>
         </div>
-        <div class="section" id="unittest-and-metrics-aggregator-tool-for-php">
-<h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
+        <div class="section">
+            <h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
 <p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
-<a class="reference external" href="http://www.pdepend.org">PDepend</a> offer export functionality in XML or
+<a class="reference external" href="http:/www.pdepend.org">PDepend</a> offer export functionality in XML or
 in a Test-database that is not quite readable for any user from the
 start. Over the last month I have gradually written <a class="reference external" href="http://wiki.github.com/beberlei/puma">a nice webbased
 tool</a>, that aggregates this data
@@ -432,7 +588,8 @@ Github</a>. Its written with
 <a class="reference external" href="http://www.ezcomponents.org">ezcMvcTools</a>, so you need this to work
 too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
 page</a>.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -444,8 +601,8 @@ page</a>.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 13, 2009</span>
         </div>
-        <div class="section" id="update-on-unittest-and-metrics-tool">
-<h1><a href="2009/02/13/update-on-unittest-and-metrics-tool.html">Update on Unittest and Metrics Tool</a></h1>
+        <div class="section">
+            <h1><a href="2009/02/13/update-on-unittest-and-metrics-tool.html">Update on Unittest and Metrics Tool</a></h1>
 <p>Some days ago i posted about the <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PHP Unittest and Metrics
 Aggregator</a> tool that i
 have written on (and which I have dubbed PUMA). Discussing it with
@@ -470,7 +627,8 @@ interesting details on your application.</p>
 <p><a class="reference external" href="http://github.com/beberlei/puma/tree/master">Have a look at the tool on
 Github</a> and play with it.
 I would really like to hear your thoughts.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -482,9 +640,9 @@ I would really like to hear your thoughts.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>May 01, 2009</span>
         </div>
-        <div class="section" id="explicit-code-requires-no-comments-only-bad-code-does">
-<h1><a href="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html">Explicit Code requires no comments - Only bad code does</a></h1>
-<p>Following the recent discussion on commenting source code by <a class="reference external" href="http://www.brandonsavage.net/on-code-commenting-and-technical-debt">Brandon
+        <div class="section">
+            <h1><a href="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html">Explicit Code requires no comments - Only bad code does</a></h1>
+<p>Following the recent discussion on commenting source code by <a class="reference external" href="http://www.brandonsavage.net/on-code-commenting-and-technical-debt/">Brandon
 Savage</a>
 and <a class="reference external" href="http://mtabini.blogspot.com/2009/04/myth-of-myth-of-self-commenting-code.html">Marco
 Tabini</a>,
@@ -645,7 +803,8 @@ NetBeans please?</p>
 for pointing out. Moved methods around a bit to be more reading
 friendly.</p>
 </div></blockquote>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -657,8 +816,8 @@ friendly.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>June 16, 2009</span>
         </div>
-        <div class="section" id="using-a-dependency-injection-container-with-zend-application">
-<h1><a href="2009/06/16/using-a-dependency-injection-container-with-zend-application.html">Using a Dependency Injection Container with Zend_Application</a></h1>
+        <div class="section">
+            <h1><a href="2009/06/16/using-a-dependency-injection-container-with-zend-application.html">Using a Dependency Injection Container with Zend_Application</a></h1>
 <p>Much has been written on Dependency Injection lately, mostly by Padraic
 Brady
 (<a class="reference external" href="http://blog.astrumfutura.com/archives/394-The-Case-For-Dependency-Injection-Part-1.html">1</a>,
@@ -671,7 +830,7 @@ and Fabien Potencier
 <a class="reference external" href="http://github.com/fabpot/Pimple/tree/master">5</a>). My subjective
 feeling tells me there are now more PHP DI containers out there than CMS
 or ORMs implemented in PHP, including two written by myself (an
-<a class="reference external" href="http://www.beberlei.de/sphicy">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
+<a class="reference external" href="http://www.beberlei.de/sphicy/">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
 one</a>). Its an awesome
 pattern if used on a larger scale and can (re-) wire a complex business
 application according to a clients needs without having to change much
@@ -726,7 +885,7 @@ can be used as dependencies for objects that are lazy-loaded from the
 container. Skipping the tech-talk, here is an example. First we have to
 replace the default Container with Yadif:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH.&quot;/config/objects.xml&quot;);
+<div><div class="highlight-python"><div class="highlight"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
 $container = new Yadif_Container($objects);
 
 $application = new Zend_Application(
@@ -747,11 +906,11 @@ first time from the container. We can merge these two worlds and make
 use of the Application resources inside the Yadif Configuration
 “objects.xml”, which looks like:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>&lt;?xml version=&quot;1.0&quot; ?&gt;
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;?xml version="1.0" ?&gt;
 &lt;objects&gt;
     &lt;myModel&gt;
         &lt;class&gt;MyModel&lt;/class&gt;
-        &lt;arguments arg1=&quot;db&quot; arg2=&quot;cache&quot; /&gt;
+        &lt;arguments arg1="db" arg2="cache" /&gt;
     &lt;/myModel&gt;
 &lt;/objects&gt;
 </pre></div>
@@ -775,7 +934,8 @@ make use of Zend_Applications resource system. Furthermore any
 other dependency injection container, simple or complex, can also be
 integrated easily.</p>
 </div></blockquote>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -784,37 +944,6 @@ integrated easily.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2009/06/16/using-a-dependency-injection-container-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/06/16/using-a-dependency-injection-container-with-zend-application">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 14, 2009</span>
-        </div>
-        <div class="section" id="netbeans-php-codesniffer-plugin-now-with-options-dialog">
-<h1><a href="2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html">Netbeans PHP CodeSniffer Plugin: Now with Options Dialog</a></h1>
-<p>Just two days before the <a class="reference external" href="http://www.phpconference.de">International PHP Conference
-09</a> will start I got an email from
-<a class="reference external" href="http://github.com/alexandrehaguiar">alexandrehaguiar</a> that he forked
-my Netbeans PHP CodeSniffer plugin and added the long awaited Options
-screen. This is just awesome! This way I don’t have to ask the Netbeans
-guys at IPC all the questions about how to implement it. I merged the
-changes back into my branch and released a new version which also fixed
-another small bug. For me it works with both Netbeans 6.7.1 and 6.8
-Beta. I want to thank alexandre very much for this awesome contribution.</p>
-<p>What you can do now is chose the Coding Standard you want to use in an
-Options Dialog under the “Miscellaneous” button. You can choose from a
-list of pre-defined standards, or even enter your own if you use one.
-Additionally you can disable that warning are shown, so that with any
-given coding standard you only see the errors.</p>
-<p><a class="reference external" href="http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/phpcsoptions.png">|image0|</a></p>
-<p>You can download the new version from the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">Github Project Downloads
-page</a>.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html#disqus_thread" data-disqus-identifier="2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -839,6 +968,8 @@ page</a>.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
         </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
@@ -856,8 +987,6 @@ page</a>.</p>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
-        </li><li>
-            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li></ul>
 </div>
 </section>
@@ -865,7 +994,7 @@ page</a>.</p>
 </div>
 </div> <!-- #main-container -->
 
-        <div class="footer-container">
+        <div class="footer-container" role="contentinfo">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">

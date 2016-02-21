@@ -1,0 +1,372 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>How I use Wordpress with Git and Composer &mdash; Whitewashing</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/default.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/font-awesome.min.css" type="text/css">
+
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="../../../_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="next" title="Monolithic Repositories with Composer and Relative Autoloading" href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script><script type="text/javascript" src="../../../_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<div class="container">
+    <div id="header" class="span-8">
+        <a href="../../../index.html"><img src="../../../_static/logo.jpg" alt="Whitewashing.de" /></a>
+    </div>
+    <div class="span-11" id="about">
+        <p>
+            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
+            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
+            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
+            and you can book him for consulting and trainings.
+        </p>
+    </div>
+    <div class="span-5 last">
+        <p class="buttons" style="text-align: right">
+            <a href="https://twitter.com/beberlei"><img src="../../../_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
+            <a href="http://www.whitewashing.de/rss.xml"><img src="../../../_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
+            <a href="https://github.com/beberlei"><img src="../../../_static/github-logo.png" alt="My Github Profile" height="50" /></a>
+        </p>
+    </div>
+</div>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="span-24 content">
+      <div>
+        <div>
+          <div id="2016-02-21-how_i_use_wordpress_with_git_and_composer">
+            
+            
+    <div class="timestamp postmeta">
+            <span>February 21, 2016</span>
+        </div>
+
+    <div class="section" id="how-i-use-wordpress-with-git-and-composer">
+<h1>How I use Wordpress with Git and Composer</h1>
+<p>I maintain two Wordpress blogs for my wife and wanted to find a workflow to
+develop, update, version-contol and maintain them with Git and Composer, like I
+am used to with everything else that I am working on.</p>
+<p>The resulting process is a combination of several blog posts and my own
+additions, worthy of writing about for the next person interested in this
+topic.</p>
+<p>It turns out this is quite simple if you re-arrange the Wordpress directory
+layout a little bit and use some fantastic open-source projects to combine
+Wordpress and Composer.</p>
+<div class="section" id="initialize-repository">
+<h2>Initialize Repository</h2>
+<p>As a first step, create a new directory and git repository for your blog:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir myblog
+$ cd myblog
+$ git init
+</pre></div>
+</div>
+<p>Create a docroot directory that is publicly available for the webserver:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir htdocs
+</pre></div>
+</div>
+<p>Place the index.php file in it that delegates to Wordpress (installed later):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// htdocs/index.php</span>
+<span class="c1">// Front to the WordPress application. This file doesn&#39;t do anything, but loads</span>
+<span class="c1">// wp-blog-header.php which does and tells WordPress to load the theme.</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_USE_THEMES&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="k">require</span><span class="p">(</span> <span class="nb">dirname</span><span class="p">(</span> <span class="k">__FILE__</span> <span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/wordpress/wp-blog-header.php&#39;</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Create the wp-content directory inside the docroot, it will be configured to
+live <em>outside</em> the Wordpress installation.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir htdocs/wp-content -p
+</pre></div>
+</div>
+<p>And then create a <cite>.gitignore</cite> file with the following ignore paths:</p>
+<div class="highlight-python"><div class="highlight"><pre>/htdocs/wordpress/
+/htdocs/wp-content/uploads
+/htdocs/wp-content/plugins
+/htdocs/wp-content/themes
+</pre></div>
+</div>
+<p>If you want to add a custom theme or plugin you need to use <cite>git add -f</cite> to
+force the ignored path into Git.</p>
+<p>Don&#8217;t forget to include the uploads directory in your backup, when deploying
+this blog to production.</p>
+<p>You directory tree should now look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>.
+├── .git
+├── .gitignore
+└── htdocs
+    ├── index.php
+    └── wp-content
+</pre></div>
+</div>
+<p>In the next step we will use Composer to install Wordpress and plugins.</p>
+</div>
+<div class="section" id="setup-composer">
+<h2>Setup Composer</h2>
+<p>Several people have done amazing work to make Wordpress and all the plugins and
+themes on Wordpress.org available through Composer. To utilize this work we
+create a composer.json file inside our repository root. There the file is
+outside of the webservers reach, users of your blog cannot download the
+composer.json.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;ext-gd&quot;</span><span class="p">:</span> <span class="s">&quot;*&quot;</span><span class="p">,</span>
+        <span class="s">&quot;wpackagist-plugin/easy-media-gallery&quot;</span><span class="p">:</span> <span class="s">&quot;1.3.*&quot;</span><span class="p">,</span>
+        <span class="s">&quot;johnpbloch/wordpress-core-installer&quot;</span><span class="p">:</span> <span class="s">&quot;^0.2.1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;johnpbloch/wordpress&quot;</span><span class="p">:</span> <span class="s">&quot;^4.4&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;installer-paths&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;htdocs/wp-content/plugins/{$name}/&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;type:wordpress-plugin&quot;</span><span class="p">],</span>
+            <span class="s">&quot;htdocs/wp-content/themes/{$name}/&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;type:wordpress-theme&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s">&quot;wordpress-install-dir&quot;</span><span class="p">:</span> <span class="s">&quot;htdocs/wordpress&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;repositories&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;composer&quot;</span><span class="p">,</span>
+            <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://wpackagist.org&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This Composer.json is using the execellent <a class="reference external" href="https://github.com/johnpbloch/wordpress-core-installer">Wordpress Core Installer</a> by <a class="reference external" href="https://johnpbloch.com/">John P. Bloch</a> and the <a class="reference external" href="http://wpackagist.org/">WPackagist</a>
+project by <a class="reference external" href="http://outlandish.com/">Outlandish</a>.</p>
+<p>The <span class="docutils literal"><span class="pre">extra</span></span> configuration in the file configures Composer for placing
+Wordpress Core and all plugins in the correct directories. As you can see we
+put core into <cite>htdocs/wordpress</cite> and plugins into <cite>htdocs/wp-content/plugins</cite>.</p>
+<p>Now run the Composer install command to see the intallation output similar
+to the next excerpt:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ composer install
+Loading composer repositories with package information
+Installing dependencies (including require-dev)
+  - Installing composer/installers (v1.0.23)
+    Loading from cache
+
+  - Installing johnpbloch/wordpress-core-installer (0.2.1)
+    Loading from cache
+
+  - Installing wpackagist-plugin/easy-media-gallery (1.3.93)
+    Loading from cache
+
+  - Installing johnpbloch/wordpress (4.4.2)
+    Loading from cache
+
+Writing lock file
+Generating autoload files
+</pre></div>
+</div>
+<p>The next step is to get Wordpress running using the Setup Wizard.</p>
+</div>
+<div class="section" id="setup-wordpress">
+<h2>Setup Wordpress</h2>
+<p>Follow the Wordpress documentation to setup your Wordpress blog now, it
+will create the neccessary database tables and give you <cite>wp-config.php</cite> file
+to download. Copy this file to <cite>htdocs/wp-config.php</cite> and modify it slightly,
+it is necessary to adjust the <span class="docutils literal"><span class="pre">WP_CONTENT_DIR</span></span>, <span class="docutils literal"><span class="pre">WP_CONTENT_URL</span></span> and
+<span class="docutils literal"><span class="pre">ABSPATH</span></span> constants:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="c1">// generated contents of wp-config.php, salts, database and so on</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_CONTENT_DIR&#39;</span><span class="p">,</span>    <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/wp-content&#39;</span><span class="p">);</span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_CONTENT_URL&#39;</span><span class="p">,</span>    <span class="nx">WP_HOME</span> <span class="o">.</span> <span class="s1">&#39;/wp-content&#39;</span><span class="p">);</span>
+
+<span class="sd">/** Absolute path to the WordPress directory. */</span>
+<span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;ABSPATH&#39;</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;ABSPATH&#39;</span><span class="p">,</span> <span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/wordpress&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="sd">/** Sets up WordPress vars and included files. */</span>
+<span class="k">require_once</span><span class="p">(</span><span class="nx">ABSPATH</span> <span class="o">.</span> <span class="s1">&#39;wp-settings.php&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Voila. You have Wordpress running from a Git repository and maintain
+the Wordpress Core and Plugins through Composer.</p>
+</div>
+<div class="section" id="different-development-and-production-environments">
+<h2>Different Development and Production Environments</h2>
+<p>The next step is introducing different environments, to allow using
+the same codebase in production and development, where the base urls are
+different, without having to change <span class="docutils literal"><span class="pre">wp-config.php</span></span> or the database.</p>
+<p>Wordpress relies on the
+<span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> configuration variables from the
+<span class="docutils literal"><span class="pre">wp_options</span></span> database table by default, this means its not easily possible to
+use the blog under <span class="docutils literal"><span class="pre">http://myblog.local</span></span> (development) and
+<cite>https://myblog.com`</cite> (production).</p>
+<p>But working on the blog I want to copy the database from production and have
+this running on my local development machine without anything more than
+exporting and importing a MySQL dump.</p>
+<p>Luckily there is an easy workaround that allows this: You can overwrite the
+<span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> variables using constants in <span class="docutils literal"><span class="pre">wp-config.php</span></span>.</p>
+<p>For development I rely on the built-in PHP Webserver that is available since
+PHP 5.4 with a custom router-script (I found this on a blog a long time ago,
+but cannot find the source anymore):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">//htdocs/router.php</span>
+
+<span class="nv">$root</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;DOCUMENT_ROOT&#39;</span><span class="p">];</span>
+<span class="nb">chdir</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
+<span class="nv">$path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nb">ltrim</span><span class="p">(</span><span class="nb">parse_url</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">])[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">get_include_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="nx">__DIR__</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!==</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="nb">rtrim</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="s1">&#39;/index.php&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="s1">&#39;.php&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nb">chdir</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">));</span>
+        <span class="k">require_once</span> <span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">include_once</span> <span class="s1">&#39;index.php&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To make your blog run flawlessly on your dev machine, open up
+<span class="docutils literal"><span class="pre">htdocs/wp-config.php</span></span> and add the following if statement to rewrite
+<span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> config variables:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// htdocs/wp-config.php</span>
+
+<span class="c1">// ... salts, DB user, password etc.</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nb">php_sapi_name</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;cli-server&#39;</span> <span class="o">||</span> <span class="nb">php_sapi_name</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;srv&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_ENV&#39;</span><span class="p">,</span>        <span class="s1">&#39;development&#39;</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_SITEURL&#39;</span><span class="p">,</span>    <span class="s1">&#39;http://localhost:8000/wordpress&#39;</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_HOME&#39;</span><span class="p">,</span>       <span class="s1">&#39;http://localhost:8000&#39;</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_ENV&#39;</span><span class="p">,</span>        <span class="s1">&#39;production&#39;</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_SITEURL&#39;</span><span class="p">,</span>    <span class="s1">&#39;http://&#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SERVER_NAME&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s1">&#39;/wordpress&#39;</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_HOME&#39;</span><span class="p">,</span>       <span class="s1">&#39;http://&#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SERVER_NAME&#39;</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_DEBUG&#39;</span><span class="p">,</span> <span class="nx">WP_ENV</span> <span class="o">===</span> <span class="s1">&#39;development&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can now run your Wordpress blog locally using the following command-line
+arguments:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 -t htdocs/ htdocs/router.php
+</pre></div>
+</div>
+<p>Keep this command running and visit <cite>localhost:8000</cite>.</p>
+</div>
+</div>
+
+
+    <div id="donation">
+        <script data-gittip-username="beberlei" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+        <script id='fbe2w33'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=beberlei&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbe2w33');</script>
+    </div>
+
+    <div id="disqus_thread"></div><script type="text/javascript">    var disqus_shortname = "whitewashing";    var disqus_identifier = "2016/02/21/how_i_use_wordpress_with_git_and_composer";    disqus_thread();</script><noscript>Please enable JavaScript to view the    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'whitewashing';
+                var disqus_url = 'http://www.whitewashing.de/2016/02/21/how_i_use_wordpress_with_git_and_composer.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+          </div>         
+        </div>
+      </div>
+    </div>
+
+    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="#">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="../../../2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="../../../2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="../../../2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="../../../2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="../../../2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="../../../2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li><li>
+            <a href="../../../2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
+        </li><li>
+            <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
+        </li></ul>
+</div>
+</section>
+          </aside></div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="span-24 content">
+        <div class="footer">
+            &copy; Copyright 2008-2015, Benjamin Eberlei.
+            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+
+        
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

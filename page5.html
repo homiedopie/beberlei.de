@@ -24,7 +24,7 @@
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/default.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -35,13 +35,13 @@
         <link rel="next" title="Older" href="page6.html" /><link rel="prev" title="Newer" href="page4.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.0',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
-    <body>
+    <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" role="main">
 <div class="container">
     <div class="span-24 content">
       <div>
@@ -76,10 +76,227 @@
           <div id="page5">
             
             <div class="timestamp postmeta">
+            <span>August 16, 2012</span>
+        </div>
+        <div class="section">
+            <h1><a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a></h1>
+<p>Other posts in this series:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
+mess</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
+</ul>
+<p>The next design pattern for technical system design is called “Data, Context,
+Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
+paradigm, in the context of PHPs language constraints it can be classified as
+architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
+through the book on DCI and trying to understand this pattern with me.</p>
+<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
+in use-cases (Context). Data objects are never directly involved in these
+use-cases, but are “casted” to their respective roles that they are taking in
+the use-case. This can be implemented with aggregation or traits in PHP.</p>
+<p>One goal of DCI is to get object-oriented programming to a place, where you
+can look at a use-case and its roles and be very sure that the program is
+running correctly, because you can guarantee that there are no unexpected side
+effects. It also aims at keeping the amount of code required to keep in mind
+for a given use-case as small as possible, allowing developers to reason about
+the code with more confidence.</p>
+<div class="section" id="terminology">
+<h2>Terminology</h2>
+<p>In DCI, <strong>data</strong> are objects that encapsulate the state of the application.
+As in EBI, they only contain logic that is true for all the possible use-cases.
+These classes represent <em>what the system is</em>.</p>
+<p><strong>Roles</strong> and <strong>Context</strong> represent <em>what the system does</em> and are supposed to
+capture the End User’s Mental Model as close as possible.</p>
+<p><strong>Roles</strong> add behavior to the data objects by either wrapping them or
+acting as traits for the data objects.</p>
+<p><strong>Context</strong> is the use-case and fulfils its role by making roles <strong>interact</strong> with
+each other. These roles then modify the underlying data.</p>
+</div>
+<div class="section" id="example">
+<h2>Example</h2>
+<p>Starting from the bank account example of the EBI post, we can introduce DCI
+quite easily by adding the missing concept of roles. In the use case of
+transferring money that would be:</p>
+<ul class="simple">
+<li>TransferMoneySource</li>
+<li>TransferMoneySink (Destination)</li>
+</ul>
+<p>We can do this by either introducing two interfaces and two concrete
+implementations that accept the <span class="docutils literal"><span class="pre">BankAccount</span></span> as object to work on
+or by building two traits. I will go down the route with traits, to show
+one possible use-case for this new PHP 5.4 feature. The idea here is to
+implement all the behavior necessary on a trait and then have simple dummy
+objects using them in the tests for this use-case.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySource</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">transferFrom</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySink</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Any checks for balances, credit limits or other things would also happen
+here. The <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>  on the data objects should be as
+dumb as possible, so that their implementation does not cause any side-effects
+on the execution of this use-case.</p>
+<p>The bank account would then be modified to look:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">BankAccount</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">TransferMoneySource</span><span class="p">,</span> <span class="nx">TransferMoneySink</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The use-case <span class="docutils literal"><span class="pre">TransferMoney</span></span> would then be modified to create Roles instead
+of Data objects from the DAO. This can be a bit tricky when you have multiple
+data objects implementing the same role and you have no way of knowing which
+underlying data object to pick. The binding of data objects to roles happens
+in the use-case. The use-case needs a means to retrieve objects with certain
+roles, which then access underlying data sources. To avoid that your use-cases
+have to know about how to bind roles to data, you could use GUIDs in your
+application and fetch all objects from one data store. Another way would be to
+implement data access objects for roles, that then know how to retrieve their
+corresponding data.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span><span class="o">-&gt;</span><span class="na">transferTo</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The simplicity of this is appealing, however don’t forget that we have
+abstracted I/O completely here. There has to be code that deals with that part
+of the system somewhere. However this again is not at the heart of all the DCI
+examples out there, making it difficult to reason about the actual practical
+implications.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">One drawback with this example is, that PHP does not support typehinting for
+traits.</p>
+</div>
+<p>Here is an example of how the bank application service could look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$destinationId</span><span class="p">);</span>
+
+        <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$destination</span><span class="p">);</span>
+
+        <span class="nv">$conn</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">conn</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$amount</span><span class="p">);</span>
+            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
+persistent data object by a global ID. This is necessary, because it
+doesn’t actually matter what data object uses the necessary traits
+for this use-case.</p>
+<p>Again as in EBI, in a bigger system you would need to find some abstraction
+layer that does this in a more generic way.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>When Gordon started showing me this pattern we were both puzzled as how
+to actually implement this in the real world. Especially the concept
+of binding roles to data objects still confuses us. Most notably why the use
+of traits or aggregates should actually constitute a new programming paradigm
+instead of just another way to do OOP.</p>
+<p>In Scala casting data objects to roles is actually possible by binding traits
+to objects at runtime. This is not possible in PHP however and has to be done
+statically.</p>
+<p>Compared to EBI, DCI focuses drastically on transaction script domain logic, by
+suggesting to implement roles for every use-case for the sake of avoiding
+side-effects. This is actually is very valuable lesson from this pattern.
+Finding means to decrease the complexity of software is always a good thing.
+And the explicit definition of this concept as <strong>roles</strong> is actually easy to
+explain to other programmers.</p>
+<p>One thing that is lacking in DCI is that there is no concrete mechanism to deal
+with the boundary to other parts of the system. This is actually a step back
+from EBI and I suggest using EBI pattern in combination with DCI to solve this.</p>
+<p>The largest benefit from DCI (and its self proclaimed goal) is the mapping from
+the users/customers mental model directly into the code by using Use-Cases and
+Roles. The communication with the customer about behavior can exclusively focus
+on the current context and its use-case. Mapping this behavior to actual data
+can then be done in a different step.</p>
+<p>This simplification of use-cases and reduction of side-effects between
+different parts of the system has other benefits: It can lead to easier to test
+code and makes it much easier for developers to develop on small and isolated
+parts of the system.</p>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html#disqus_thread" data-disqus-identifier="2012/08/16/oop_business_applications__data__context__interaction">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 13, 2012</span>
         </div>
-        <div class="section" id="oop-business-applications-entity-boundary-interactor">
-<h1><a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
@@ -87,7 +304,7 @@ mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
 an architectural design pattern. I first heard about it in a keynote video of
-<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc">Uncle Bob</a> on Ruby
+<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc/">Uncle Bob</a> on Ruby
 Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
 This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
 by Alistair Cockburn.</p>
@@ -336,7 +553,8 @@ by using some code-generation for example to do parts of this job for you. The
 worst outcome with this pattern is, when you manually code layers for HTTP
 Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -352,8 +570,8 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 11, 2012</span>
         </div>
-        <div class="section" id="oop-business-applications-trying-to-escape-the-mess">
-<h1><a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a></h1>
+        <div class="section">
+            <h1><a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">tl;dr Version: I present a list of problems with OOP business applications from
@@ -461,7 +679,7 @@ architecture or “Ports and adapters”. Gained popularity after <a class="refe
 at Ruby Midwest</a>
 last year.</li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
-<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
 day video class</a> by Greg Young.</li>
 </ul>
 <p>They are not new and have all been around for several years already. I would
@@ -474,12 +692,13 @@ different ways.</p>
 some examples and then wrap up my thoughts about all of them.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home">Free and Open Source
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
 Conference</a> in Sankt Augustin Germany on
 25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
 </div>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -495,10 +714,10 @@ Conference</a> in Sankt Augustin Germany on
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>June 03, 2012</span>
         </div>
-        <div class="section" id="setting-up-development-machines-with-puppet">
-<h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
+        <div class="section">
+            <h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
 <p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
-mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet">Puppet</a> in the future. Before I will
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
 dive into Puppet in combination with Vagrant I want to share my general
 experiences with Puppet (beginners level, I just played with this today).</p>
 <p>Puppet is a configuration management tool. It uses a declarative language to
@@ -521,7 +740,7 @@ and a bunch of development tools such as tree, ack-grep.</li>
 <li>Git with Author Information and global ignore file</li>
 <li>A bunch of .bashrc initializations</li>
 <li>Some open source projects I always have around (Doctrine, ...)</li>
-<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com">Strato Hidrive</a> - they support rsync)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
 <li>and I probably forgot a bunch of tools just thinking about this today.</li>
 </ul>
 <p>I realized not only virtual machines, but also their hosts (my development
@@ -543,14 +762,14 @@ examples of my puppet file to get the message across:</p>
 
 # VIM Dot Files
 vcsrepo { 'vim-dotfiles':
-    path     =&gt; &quot;/home/$id/.vim&quot;,
+    path     =&gt; "/home/$id/.vim",
     ensure   =&gt; present,
     provider =&gt; git,
     source   =&gt; 'https://...'
 }
 
 file { 'vim-dotfiles-symlink':
-    path   =&gt; &quot;/home/$id/.vimrc&quot;,
+    path   =&gt; "/home/$id/.vimrc",
     ensure =&gt; link,
     target =&gt; '.vim/vimrc',
     require =&gt; Vcsrepo['vim-dotfiles']
@@ -558,8 +777,8 @@ file { 'vim-dotfiles-symlink':
 
 exec { 'vim-make-command-t':
     command =&gt; 'rake make',
-    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
-    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'&quot;,
+    cwd     =&gt; "/home/$id/.vim/bundle/Command-T",
+    unless  =&gt; "ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'",
     require =&gt; Vcsrepo['vim-dotfiles']
 }
 </pre></div>
@@ -580,25 +799,25 @@ were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
 <div class="highlight-python"><div class="highlight"><pre># Configure Git
-exec { &quot;git-author-name&quot;:
-    command =&gt; 'git config --global user.name &quot;Benjamin Eberlei&quot;',
-    unless =&gt; &quot;git config --global --get user.name|grep 'Benjamin Eberlei'&quot;
+exec { "git-author-name":
+    command =&gt; 'git config --global user.name "Benjamin Eberlei"',
+    unless =&gt; "git config --global --get user.name|grep 'Benjamin Eberlei'"
 }
 
-exec { &quot;git-author-email&quot;:
-    command =&gt; 'git config --global user.email &quot;kontakt@beberlei.de&quot;',
-    unless =&gt; &quot;git config --global --get user.email|grep 'kontakt@beberlei.de'&quot;
+exec { "git-author-email":
+    command =&gt; 'git config --global user.email "kontakt@beberlei.de"',
+    unless =&gt; "git config --global --get user.email|grep 'kontakt@beberlei.de'"
 }
 
-exec { &quot;git-global-ignore&quot;:
-    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
+exec { "git-global-ignore":
+    command =&gt; "git config --global core.excludesfile /home/$id/.gitignore",
     unless  =&gt; 'git config -l --global|grep excludesfile'
 }
 
-file { &quot;git-global-ignorefile&quot;:
-    path =&gt; &quot;/home/$id/.gitignore&quot;,
+file { "git-global-ignorefile":
+    path =&gt; "/home/$id/.gitignore",
     ensure =&gt; present,
-    content =&gt; &quot;*.swo\n*.swp\n&quot;
+    content =&gt; "*.swo\n*.swp\n"
 }
 </pre></div>
 </div>
@@ -618,7 +837,8 @@ all the machines I work with.</p>
 <li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
 <li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
 </ul>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -630,8 +850,8 @@ all the machines I work with.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>May 31, 2012</span>
         </div>
-        <div class="section" id="virtual-machines-with-vagrant-veewee-and-puppet">
-<h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
+        <div class="section">
+            <h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
 <p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
 VM management very efficiently. Being always late to new technologies
 investigating Vagrant now felt about right. I am using Virtualbox for
@@ -663,7 +883,7 @@ all the latest VM templates:</p>
 <span class="nv">$ </span><span class="nb">cd </span>veewee
 <span class="nv">$ </span>sudo gem install bundler
 <span class="nv">$ </span>sudo bundle install
-<span class="nv">$ </span><span class="nb">alias </span><span class="nv">vagrant</span><span class="o">=</span><span class="s2">&quot;bundle exec vagrant&quot;</span>
+<span class="nv">$ </span><span class="nb">alias </span><span class="nv">vagrant</span><span class="o">=</span><span class="s2">"bundle exec vagrant"</span>
 </pre></div>
 </div>
 <p>You need Ruby and Gems installed for this to work. Veewee can be installed
@@ -679,7 +899,7 @@ that Veewee provides:</p>
 in there to adjust the build process of the virtual machine image. For me its
 important to modify the definitions.rb and add the following, otherwise
 building the VMs fails:</p>
-<div class="highlight-bash"><div class="highlight"><pre>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">&quot;pae&quot;</span> <span class="o">=</span>&gt; <span class="s2">&quot;on&quot;</span><span class="o">]}</span>,
+<div class="highlight-bash"><div class="highlight"><pre>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
 </pre></div>
 </div>
 <p>You can then open up the postinstall.sh and install more packages that you need
@@ -713,7 +933,8 @@ that we want to use with vagrant, do:</p>
 </div>
 <p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
 point. The use of puppet with Vagrant will be part of a next blog post.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -725,8 +946,8 @@ point. The use of puppet with Vagrant will be part of a next blog post.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>May 26, 2012</span>
         </div>
-        <div class="section" id="doctrine-switches-from-lgpl-to-mit">
-<h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
+        <div class="section">
+            <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
 successfully in roughly 4 weeks. For that we used a small web-based tool to
@@ -736,7 +957,7 @@ licensed since it was started in 2006. When I first started contributing in the
 project late in 2009 we were constantly asked about changing the license to a
 permissive license such as <a class="reference external" href="http://en.wikipedia.org/wiki/MIT_License">MIT</a> or
 New-BSD.  My subjective feeling is that there are much more libraries with
-permissive licenses than 10 years ago. And there are others that <a class="reference external" href="http://news.cnet.com/8301-13556_3-20071811-61/the-open-source-license-landscape-is-changing">back my
+permissive licenses than 10 years ago. And there are others that <a class="reference external" href="http://news.cnet.com/8301-13556_3-20071811-61/the-open-source-license-landscape-is-changing/">back my
 feeling up with facts</a>.
 The fear of getting screwed when using a permissive license has probably
 declined in favor of the benefits. <a class="reference external" href="http://pooteeweet.org/blog/2084">As Lukas puts it</a>:</p>
@@ -775,7 +996,8 @@ of the 16 people left we’re luckily not part of the code base anymore when we
 completely rewrote Doctrine 2 or trivial one-line changes.</p>
 <p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -787,8 +1009,8 @@ fun with it.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 25, 2012</span>
         </div>
-        <div class="section" id="symfony2-controller-testing-without-application">
-<h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
+        <div class="section">
+            <h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
 <p>Controller testing using the WebTestCase requires a Symfony Kernel and with
 that a complete application. However you can just ship your own simple kernel
 with just the dependencies necessary to test your application. This way you can
@@ -838,7 +1060,7 @@ framework:
     secret:          secret
     charset:         UTF-8
     test: ~
-    router:          { resource: &quot;%kernel.root_dir%/routing.yml&quot; }
+    router:          { resource: "%kernel.root_dir%/routing.yml" }
     form:            true
     csrf_protection: true
     validation:      { enable_annotations: true }
@@ -864,7 +1086,7 @@ monolog:
 <h2>Creating the routing.yml</h2>
 <div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># Tests/Controller/App/routing.yml</span>
 <span class="l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">resource</span><span class="p-Indicator">:</span> <span class="s">&quot;@BeberleiWorkflowBundle/Controller/&quot;</span>
+    <span class="l-Scalar-Plain">resource</span><span class="p-Indicator">:</span> <span class="s">"@BeberleiWorkflowBundle/Controller/"</span>
     <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">annotation</span>
     <span class="l-Scalar-Plain">prefix</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">/</span>
 </pre></div>
@@ -872,7 +1094,7 @@ monolog:
 </div>
 <div class="section" id="adding-a-phpunit-bootstrap">
 <h2>Adding a PHPUnit bootstrap</h2>
-<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree">Travis &amp; Composer sitting in a
+<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree/">Travis &amp; Composer sitting in a
 Tree K-I-S-S-I-N-G” blog post</a>.</p>
 <p>His setup is missing the spl_autoload_register() call in the bootstrap file
 though.</p>
@@ -908,9 +1130,9 @@ dependencies.</p>
 <h2>Modifying the phpunit.xml.dist</h2>
 <p>We have to tell the WebTestCase base class where to find this kernel:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
-<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Tests/bootstrap.php&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">"Tests/bootstrap.php"</span><span class="nt">&gt;</span>
     <span class="nt">&lt;php&gt;</span>
-        <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">&quot;KERNEL_DIR&quot;</span> <span class="na">value=</span><span class="s">&quot;Tests/Controller/App&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">"KERNEL_DIR"</span> <span class="na">value=</span><span class="s">"Tests/Controller/App"</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;/php&gt;</span>
 <span class="nt">&lt;/phpunit&gt;</span>
 </pre></div>
@@ -921,7 +1143,8 @@ the Monolog lines to get the log-messages printed to the screen.</p>
 <p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
 control ignore files.</p>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -933,8 +1156,8 @@ control ignore files.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 07, 2010</span>
         </div>
-        <div class="section" id="resources-for-a-php-and-hudson-ci-integration">
-<h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
+        <div class="section">
+            <h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
 <p>Yesterday I finally had the time to setup my first continuous
 integration environment. Possible solutions for CI are
 <a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
@@ -963,11 +1186,11 @@ PHPUnit.</p>
 <p>There are already some awesome sources how to get Hudson and PHP
 working. I’ll list them here:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849">Sebastian Bergmann’s Howto in
+<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
 Screenshots</a></li>
 <li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
 Hudson</a></li>
-<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson">Justin Palmers Guide to install PHP and Hudson (With
+<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
 Screenshots)</a></li>
 </ul>
 <p>All those guides are already awesome and I would recommend choosing one
@@ -1000,7 +1223,8 @@ instance. See this tutorial by one of the <a class="reference external" href="ht
 Developers</a>.
 You can then start all the builds from inside Netbeans and be notified
 of the success or failure.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -1012,8 +1236,8 @@ of the success or failure.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>May 02, 2010</span>
         </div>
-        <div class="section" id="testing-database-locks-with-phpunit-and-gearman">
-<h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
+        <div class="section">
+            <h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
 <p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
 2</a> we plan to integrate pessimistic
 Database-level locks across all the supported vendors (MySQL, Oracle,
@@ -1043,7 +1267,7 @@ from time to time just to be 99% sure that locking works.</p>
 example for the Job-Server that I wanted to share. This blog post
 contains a stripped down code-example from the Doctrine 2 testsuite. If
 you are interested, you can see the complete Gearman Locking Tests in
-<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking">on
+<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
 GitHub</a>.</p>
 <p>Gearman allows to register worker processes with the job-server and
 offers clients to execute jobs on those workers in parallel. After
@@ -1079,7 +1303,7 @@ worker method with the job-server and a simple infinite loop:</p>
 
 <span class="x">$worker = new \GearmanWorker();</span>
 <span class="x">$worker-&gt;addServer();</span>
-<span class="x">$worker-&gt;addFunction(&quot;findWithLock&quot;, array($lockAgent, &quot;findWithLock&quot;));</span>
+<span class="x">$worker-&gt;addFunction("findWithLock", array($lockAgent, "findWithLock"));</span>
 
 <span class="x">while($worker-&gt;work()) {</span>
 <span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
@@ -1117,11 +1341,11 @@ worker sleeps 1 second)</li>
 
 <span class="x">        $gearman = new \GearmanClient();</span>
 <span class="x">        $gearman-&gt;addServer();</span>
-<span class="x">        $gearman-&gt;setCompleteCallback(array($this, &quot;gearmanTaskCompleted&quot;));</span>
+<span class="x">        $gearman-&gt;setCompleteCallback(array($this, "gearmanTaskCompleted"));</span>
 
 <span class="x">        $workload = array(); // necessary workload data to configure workers</span>
-<span class="x">        $gearman-&gt;addTask(&quot;findWithLock&quot;, serialize($workload));</span>
-<span class="x">        $gearman-&gt;addTask(&quot;findWithLock&quot;, serialize($workload));</span>
+<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
+<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
 
 <span class="x">        $gearman-&gt;runTasks();</span>
 
@@ -1137,7 +1361,8 @@ worker sleeps 1 second)</li>
 </div>
 <p>Now if both workers are waiting for processing the task we can run this
 test and get a green bar for a working lock support.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -1149,8 +1374,8 @@ test and get a green bar for a working lock support.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>January 08, 2010</span>
         </div>
-        <div class="section" id="immutable-datetime-objects">
-<h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
+        <div class="section">
+            <h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
 <p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
 extension</a> is the mutability of its
 instances. It can lead to serious bugs if a DateTime instance is passed
@@ -1233,7 +1458,7 @@ current instance, apply the operation and return the new instance.</p>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">&quot;Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!&quot;</span><span class="p">);</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">"Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1263,13 +1488,13 @@ be quite a powerful optimization depending on your use-case:</p>
 
 <span class="x">    static public function createFromMysqlDate($mysqlDate)</span>
 <span class="x">    {</span>
-<span class="x">        list($date, $time) = explode(&quot; &quot;, $mysqlDate);</span>
+<span class="x">        list($date, $time) = explode(" ", $mysqlDate);</span>
 <span class="x">        if($time == null) {</span>
 <span class="x">            $hour = $minute = $second = 0;</span>
 <span class="x">        } else {</span>
-<span class="x">            list($hour, $minute, $second) = explode(&quot;:&quot;, $time);</span>
+<span class="x">            list($hour, $minute, $second) = explode(":", $time);</span>
 <span class="x">        }</span>
-<span class="x">        list($year, $month, $day) = explode(&quot;-&quot;, $mysqlDate);</span>
+<span class="x">        list($year, $month, $day) = explode("-", $mysqlDate);</span>
 <span class="x">        return self::create($hour, $minute, $second, $month, $day, $year);</span>
 <span class="x">    }</span>
 <span class="x">}</span>
@@ -1281,7 +1506,8 @@ Otherwise the sharing of instances could not be implemented. If you need
 to create shareable instances from other formats you could just create
 another creation method for it and convert the format for create() to be
 used.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by beberlei <kontakt@beberlei.de></span>
@@ -1290,156 +1516,6 @@ used.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2010/01/08/immutable-datetime-objects.html#disqus_thread" data-disqus-identifier="2010/01/08/immutable-datetime-objects">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 10, 2010</span>
-        </div>
-        <div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
-<h1><a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></a></h1>
-<p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
-article</a> on using PEAR
-and PHAR for application lifecycle management and deployment. Since then
-I have gotten some feedback through comments, but also discussed the
-topic with colleagues. I have also optimized the approach quite
-considerably and even <a class="reference external" href="http://github.com/beberlei/pearanha">made an open-source project out of parts of
-it</a> and I want to share all that
-is new with you. First of all, yes the presented solution was somewhat
-complex, partly because it is still a proposed idea and definitely up
-for optimizations. However I am still very convinced of my approach,
-something I should discuss in more detail.</p>
-<p>The only other two languages I have ever programmed something in with
-more than 50 lines of code are Java and C#. In both languages you can
-explicitly import different dependencies like libraries and frameworks
-by adding them to your application, i.e. in java you would add for
-example Spring as an MVC Web layer, Hibernate as an ORM and several
-other things to your project and directly bundle them in your
-executable. This is very easy to configure and maintain in IDEs like
-Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
-libraries to your project). It also makes for a much more
-straightforward deployment.</p>
-<p>In the PHP world this situation was quite different (up to PHP 5.3) for
-several reasons:</p>
-<ul class="simple">
-<li>You could not package a library into a single distributable file.</li>
-<li>The PEAR installer as the only tool for updating and managing
-dependencies of your application by default installs into a
-system/global directory. This means dependencies your application
-uses are located in a completely different location than your
-application code.</li>
-<li>You can’t manage multiple versions of the same package with PEAR in
-this system directory, making it very hard to control servers with
-different applications.</li>
-<li>The global directory with your application dependencies is most often
-not under version control, which makes deployment of applications
-with PEAR dependencies somewhat difficult.</li>
-</ul>
-<p>There are some solutions to this problems:</p>
-<ul class="simple">
-<li>Don’t use PEAR, but put all dependencies in your version control
-system.</li>
-<li>Don’t use PEAR, and bundle dependencies to your code in the
-build/deployment process.</li>
-<li>Use PEAR like in the article described, on a per project basis.</li>
-</ul>
-<p>The solutions that don’t use PEAR suffer from the disadvantage that you
-need to keep track of all the library and framework dependencies
-yourself and upgrade them yourself. This might not be such a huge
-problem from a first glance, but in my opinion many PHP applications and
-projects suffer from using either no framework/library or just exactly
-one. There is no real cherry-picking going on the PHP world, for example
-I would really like to use Zend Framework for the general application
-layout, but still use Doctrine for the Modelling and HTML Purifier for
-the Output Escaping. Certain tasks might then only be solvable with the
-help of eZ Components, all of which are then to some extend dependencies
-of my application. With <a class="reference external" href="http://pearhub.org">PEARHUB</a> and
-<a class="reference external" href="http://pearfarm.org">PEARFARM</a> on the horizon (<a class="reference external" href="http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html">Read Padraic on this
-topic</a>)
-even more PHP code will be distributed using PEAR channels in the near
-future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
-DateTime</a> code for
-example makes for a great little open source library that could be
-distributed via PEAR, as well as
-<a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
-container I am using extensively.</p>
-<p>Question: Are you really going to manage all these dependencies
-correctly manually? Is everything up to date all the time, and
-upgradeable with ease?</p>
-<p>The PEAR driven solution then begins to look very desirable in this
-light, however it has a considerable disadvantage: The PEAR installer
-itself works on a system-wide/user-centric basis, making it impossible
-to manage dependencies of several applications using only one linux
-user. My little <a class="reference external" href="http://github.com/beberlei/pearanha">Pearanha</a> to the
-rescue: I have taken the PEAR installer code (which is distributed with
-all PHP installations across all systems) and put a new CLI tool on top
-of it. Its a very simple code-generator that allows to generate a
-re-configured PEAR installer script which only manages a single
-application in a given directory. This approach is also used by the
-symfony plugin mechanism, which internally uses the PEAR installer (did
-you know?).</p>
-<p>Lets revisit my blog application example <a class="reference external" href="%3Ca%20href=">from my previous PEAR
-post</a>, first install from
-<a class="reference external" href="http://github.com/beberlei/pearanha">Github</a> and make the “pearanha”
-file executable and put it in your PATH (A PEAR Server Channel will
-follow any time soon).</p>
-<p>Now we need to have an existing application directory somewhere, for
-example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
-with:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>benny@desktop: pearanha generate-project
-</pre></div>
-</div>
-</div></blockquote>
-<p>You then need to specify the project base dir and then the project
-style (for example Zend Framework or Manual) which prompts your for the
-directory that should be used for as the vendor/library directory that
-PEAR will install all the code in. You will also be prompted for a
-binary/scripts directory which will then hold a new PHP file for you,
-the file <strong>my_phpiranha</strong>.</p>
-<p><strong>Pro Argument:</strong> Switching to Pearanha can be done at any point in your
-application lifecycle. Just define an additional vendor directory for
-all the dependencies to go in and generate the applications pear
-installer and you are good to go.</p>
-<p>The generated script is your new application specific PEAR installer and
-you can begin to install all the required dependencies of your
-application:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>benny@desktop:~$ cd /var/www/blog
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.zfcampus.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install zfcampus/zf-alpha
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover htmlpurifier.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install hp/HTMLPurifier
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.phpdoctrine.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install pear.phpdoctrine.org/DoctrineORM-2.0.0
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover components.ez.no
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install ezc/ezcGraph
-</pre></div>
-</div>
-</div></blockquote>
-<p>All this stuff is now located in <strong>/var/www/blog/vendor</strong>. Again you can
-use PEARs complete upgrade, remove and install functionality for your
-application, now without the hazzle of having to create a linux user for
-each project you want to manage this way, which in my opinion is a
-considerable simplification. The complete application (including its
-dependencies) can then be put under version control and be readily
-packaged as a single executable PHAR file by your build process.</p>
-<p>As a side node, I did try Pyrus instead of PEAR for the same discussed
-purpose, however most of the current PEAR channels don’t validate
-against Pyrus strict standards for the package.xml file. In the future
-this might change and a Pyrus based application installer will then be
-integrated into Pearanha.</p>
-<p><strong>UPDATE:</strong> I renamed PHPiranha to Pearanha as its more appropriate.
-Also after apinsteins comment on “pear config-create” I rewrote the
-generate-project parts to use the config-create functionality
-internally, which allowed me to throw away half of the self-written
-code. Thanks!</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html#disqus_thread" data-disqus-identifier="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1464,6 +1540,8 @@ code. Thanks!</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
         </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
@@ -1481,8 +1559,6 @@ code. Thanks!</p>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
-        </li><li>
-            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li></ul>
 </div>
 </section>
@@ -1490,7 +1566,7 @@ code. Thanks!</p>
 </div>
 </div> <!-- #main-container -->
 
-        <div class="footer-container">
+        <div class="footer-container" role="contentinfo">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">

@@ -24,7 +24,7 @@
             <link rel="stylesheet" href="_static/main.css" type="text/css">
             <link rel="stylesheet" href="_static/default.css" type="text/css">
             <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/webfont.css" type="text/css">
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -35,13 +35,13 @@
         <link rel="next" title="Older" href="page2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.0',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
-    <body>
+    <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" role="main">
 <div class="container">
     <div class="span-24 content">
       <div>
@@ -76,10 +76,241 @@
           <div id="index">
             
             <div class="timestamp postmeta">
+            <span>February 21, 2016</span>
+        </div>
+        <div class="section">
+            <h1><a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a></h1>
+<p>I maintain two Wordpress blogs for my wife and wanted to find a workflow to
+develop, update, version-contol and maintain them with Git and Composer, like I
+am used to with everything else that I am working on.</p>
+<p>The resulting process is a combination of several blog posts and my own
+additions, worthy of writing about for the next person interested in this
+topic.</p>
+<p>It turns out this is quite simple if you re-arrange the Wordpress directory
+layout a little bit and use some fantastic open-source projects to combine
+Wordpress and Composer.</p>
+<div class="section" id="initialize-repository">
+<h2>Initialize Repository</h2>
+<p>As a first step, create a new directory and git repository for your blog:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir myblog
+$ cd myblog
+$ git init
+</pre></div>
+</div>
+<p>Create a docroot directory that is publicly available for the webserver:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir htdocs
+</pre></div>
+</div>
+<p>Place the index.php file in it that delegates to Wordpress (installed later):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// htdocs/index.php</span>
+<span class="c1">// Front to the WordPress application. This file doesn't do anything, but loads</span>
+<span class="c1">// wp-blog-header.php which does and tells WordPress to load the theme.</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s1">'WP_USE_THEMES'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="k">require</span><span class="p">(</span> <span class="nb">dirname</span><span class="p">(</span> <span class="k">__FILE__</span> <span class="p">)</span> <span class="o">.</span> <span class="s1">'/wordpress/wp-blog-header.php'</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Create the wp-content directory inside the docroot, it will be configured to
+live <em>outside</em> the Wordpress installation.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir htdocs/wp-content -p
+</pre></div>
+</div>
+<p>And then create a <cite>.gitignore</cite> file with the following ignore paths:</p>
+<div class="highlight-python"><div class="highlight"><pre>/htdocs/wordpress/
+/htdocs/wp-content/uploads
+/htdocs/wp-content/plugins
+/htdocs/wp-content/themes
+</pre></div>
+</div>
+<p>If you want to add a custom theme or plugin you need to use <cite>git add -f</cite> to
+force the ignored path into Git.</p>
+<p>Don’t forget to include the uploads directory in your backup, when deploying
+this blog to production.</p>
+<p>You directory tree should now look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>.
+├── .git
+├── .gitignore
+└── htdocs
+    ├── index.php
+    └── wp-content
+</pre></div>
+</div>
+<p>In the next step we will use Composer to install Wordpress and plugins.</p>
+</div>
+<div class="section" id="setup-composer">
+<h2>Setup Composer</h2>
+<p>Several people have done amazing work to make Wordpress and all the plugins and
+themes on Wordpress.org available through Composer. To utilize this work we
+create a composer.json file inside our repository root. There the file is
+outside of the webservers reach, users of your blog cannot download the
+composer.json.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"ext-gd"</span><span class="p">:</span> <span class="s">"*"</span><span class="p">,</span>
+        <span class="s">"wpackagist-plugin/easy-media-gallery"</span><span class="p">:</span> <span class="s">"1.3.*"</span><span class="p">,</span>
+        <span class="s">"johnpbloch/wordpress-core-installer"</span><span class="p">:</span> <span class="s">"^0.2.1"</span><span class="p">,</span>
+        <span class="s">"johnpbloch/wordpress"</span><span class="p">:</span> <span class="s">"^4.4"</span>
+    <span class="p">},</span>
+    <span class="s">"extra"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"installer-paths"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">"htdocs/wp-content/plugins/{$name}/"</span><span class="p">:</span> <span class="p">[</span><span class="s">"type:wordpress-plugin"</span><span class="p">],</span>
+            <span class="s">"htdocs/wp-content/themes/{$name}/"</span><span class="p">:</span> <span class="p">[</span><span class="s">"type:wordpress-theme"</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s">"wordpress-install-dir"</span><span class="p">:</span> <span class="s">"htdocs/wordpress"</span>
+    <span class="p">},</span>
+    <span class="s">"repositories"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">"type"</span><span class="p">:</span> <span class="s">"composer"</span><span class="p">,</span>
+            <span class="s">"url"</span><span class="p">:</span> <span class="s">"http://wpackagist.org"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This Composer.json is using the execellent <a class="reference external" href="https://github.com/johnpbloch/wordpress-core-installer">Wordpress Core Installer</a> by <a class="reference external" href="https://johnpbloch.com/">John P. Bloch</a> and the <a class="reference external" href="http://wpackagist.org/">WPackagist</a>
+project by <a class="reference external" href="http://outlandish.com/">Outlandish</a>.</p>
+<p>The <span class="docutils literal"><span class="pre">extra</span></span> configuration in the file configures Composer for placing
+Wordpress Core and all plugins in the correct directories. As you can see we
+put core into <cite>htdocs/wordpress</cite> and plugins into <cite>htdocs/wp-content/plugins</cite>.</p>
+<p>Now run the Composer install command to see the intallation output similar
+to the next excerpt:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ composer install
+Loading composer repositories with package information
+Installing dependencies (including require-dev)
+  - Installing composer/installers (v1.0.23)
+    Loading from cache
+
+  - Installing johnpbloch/wordpress-core-installer (0.2.1)
+    Loading from cache
+
+  - Installing wpackagist-plugin/easy-media-gallery (1.3.93)
+    Loading from cache
+
+  - Installing johnpbloch/wordpress (4.4.2)
+    Loading from cache
+
+Writing lock file
+Generating autoload files
+</pre></div>
+</div>
+<p>The next step is to get Wordpress running using the Setup Wizard.</p>
+</div>
+<div class="section" id="setup-wordpress">
+<h2>Setup Wordpress</h2>
+<p>Follow the Wordpress documentation to setup your Wordpress blog now, it
+will create the neccessary database tables and give you <cite>wp-config.php</cite> file
+to download. Copy this file to <cite>htdocs/wp-config.php</cite> and modify it slightly,
+it is necessary to adjust the <span class="docutils literal"><span class="pre">WP_CONTENT_DIR</span></span>, <span class="docutils literal"><span class="pre">WP_CONTENT_URL</span></span> and
+<span class="docutils literal"><span class="pre">ABSPATH</span></span> constants:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="c1">// generated contents of wp-config.php, salts, database and so on</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s1">'WP_CONTENT_DIR'</span><span class="p">,</span>    <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/wp-content'</span><span class="p">);</span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">'WP_CONTENT_URL'</span><span class="p">,</span>    <span class="nx">WP_HOME</span> <span class="o">.</span> <span class="s1">'/wp-content'</span><span class="p">);</span>
+
+<span class="sd">/** Absolute path to the WordPress directory. */</span>
+<span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="s1">'ABSPATH'</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'ABSPATH'</span><span class="p">,</span> <span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'/wordpress'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="sd">/** Sets up WordPress vars and included files. */</span>
+<span class="k">require_once</span><span class="p">(</span><span class="nx">ABSPATH</span> <span class="o">.</span> <span class="s1">'wp-settings.php'</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Voila. You have Wordpress running from a Git repository and maintain
+the Wordpress Core and Plugins through Composer.</p>
+</div>
+<div class="section" id="different-development-and-production-environments">
+<h2>Different Development and Production Environments</h2>
+<p>The next step is introducing different environments, to allow using
+the same codebase in production and development, where the base urls are
+different, without having to change <span class="docutils literal"><span class="pre">wp-config.php</span></span> or the database.</p>
+<p>Wordpress relies on the
+<span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> configuration variables from the
+<span class="docutils literal"><span class="pre">wp_options</span></span> database table by default, this means its not easily possible to
+use the blog under <span class="docutils literal"><span class="pre">http://myblog.local</span></span> (development) and
+<cite>https://myblog.com`</cite> (production).</p>
+<p>But working on the blog I want to copy the database from production and have
+this running on my local development machine without anything more than
+exporting and importing a MySQL dump.</p>
+<p>Luckily there is an easy workaround that allows this: You can overwrite the
+<span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> variables using constants in <span class="docutils literal"><span class="pre">wp-config.php</span></span>.</p>
+<p>For development I rely on the built-in PHP Webserver that is available since
+PHP 5.4 with a custom router-script (I found this on a blog a long time ago,
+but cannot find the source anymore):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">//htdocs/router.php</span>
+
+<span class="nv">$root</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DOCUMENT_ROOT'</span><span class="p">];</span>
+<span class="nb">chdir</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
+<span class="nv">$path</span> <span class="o">=</span> <span class="s1">'/'</span><span class="o">.</span><span class="nb">ltrim</span><span class="p">(</span><span class="nb">parse_url</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_URI'</span><span class="p">])[</span><span class="s1">'path'</span><span class="p">],</span><span class="s1">'/'</span><span class="p">);</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">get_include_path</span><span class="p">()</span><span class="o">.</span><span class="s1">':'</span><span class="o">.</span><span class="nx">__DIR__</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!==</span> <span class="s1">'/'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="nb">rtrim</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="s1">'/'</span><span class="p">)</span><span class="o">.</span><span class="s1">'/index.php'</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="s1">'.php'</span><span class="p">)</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nb">chdir</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">));</span>
+        <span class="k">require_once</span> <span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">include_once</span> <span class="s1">'index.php'</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To make your blog run flawlessly on your dev machine, open up
+<span class="docutils literal"><span class="pre">htdocs/wp-config.php</span></span> and add the following if statement to rewrite
+<span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> config variables:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// htdocs/wp-config.php</span>
+
+<span class="c1">// ... salts, DB user, password etc.</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nb">php_sapi_name</span><span class="p">()</span> <span class="o">===</span> <span class="s1">'cli-server'</span> <span class="o">||</span> <span class="nb">php_sapi_name</span><span class="p">()</span> <span class="o">===</span> <span class="s1">'srv'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_ENV'</span><span class="p">,</span>        <span class="s1">'development'</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_SITEURL'</span><span class="p">,</span>    <span class="s1">'http://localhost:8000/wordpress'</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_HOME'</span><span class="p">,</span>       <span class="s1">'http://localhost:8000'</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_ENV'</span><span class="p">,</span>        <span class="s1">'production'</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_SITEURL'</span><span class="p">,</span>    <span class="s1">'http://'</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SERVER_NAME'</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'/wordpress'</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_HOME'</span><span class="p">,</span>       <span class="s1">'http://'</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SERVER_NAME'</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s1">'WP_DEBUG'</span><span class="p">,</span> <span class="nx">WP_ENV</span> <span class="o">===</span> <span class="s1">'development'</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can now run your Wordpress blog locally using the following command-line
+arguments:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 -t htdocs/ htdocs/router.php
+</pre></div>
+</div>
+<p>Keep this command running and visit <cite>localhost:8000</cite>.</p>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/wordpress.html">Wordpress</a></span>
+        </div>
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2016/02/21/how_i_use_wordpress_with_git_and_composer.html#disqus_thread" data-disqus-identifier="2016/02/21/how_i_use_wordpress_with_git_and_composer">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>August 08, 2015</span>
         </div>
-        <div class="section" id="monolithic-repositories-with-composer-and-relative-autoloading">
-<h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
+        <div class="section">
+            <h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
 <p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
 is a way for monolithic PHP repositories with multiple components
 that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
@@ -89,9 +320,9 @@ the autoloading capabilities of Composer in a hackish way.</p>
 <span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
 its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;Foo&quot;</span><span class="p">:</span> <span class="s">&quot;../foo/src/&quot;</span>
+    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">"Foo"</span><span class="p">:</span> <span class="s">"../foo/src/"</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -115,7 +346,8 @@ code.</li>
 components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
 problems by forcing to rely on the same dependencies in a project globally and
 only once.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -127,8 +359,8 @@ only once.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>June 12, 2015</span>
         </div>
-        <div class="section" id="the-containertest">
-<h1><a href="2015/06/12/the_containertest.html">The ContainerTest</a></h1>
+        <div class="section">
+            <h1><a href="2015/06/12/the_containertest.html">The ContainerTest</a></h1>
 <p>This is a short post before the weekend about testing in applications with
 dependency injection container (DIC). This solution helps me with a problem
 that I occasionally trip over in environments with large amounts of services
@@ -174,7 +406,8 @@ easy as that.</p>
 <p>The <span class="docutils literal"><span class="pre">SymfonySetup</span></span> trait provides access to the Symfony DIC using
 <span class="docutils literal"><span class="pre">getContainer()</span></span> as you can see in the test method. See <a class="reference external" href="http://www.whitewashing.de/2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">my blog post</a>
 on traits in tests for more information.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -186,8 +419,8 @@ on traits in tests for more information.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>April 11, 2015</span>
         </div>
-        <div class="section" id="monolithic-repositories-with-php-and-composer">
-<h1><a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a></h1>
+        <div class="section">
+            <h1><a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a></h1>
 <blockquote>
 <div>tl;dr Monolithic repositories can bring a lot of benefits. I prototyped
 <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> that complements Composer
@@ -222,7 +455,7 @@ and Android into a single big repository over the course of 2015.</li>
 chunk of their codebase managed in a single Perforce repository with over 20 million
 commits (<a class="reference external" href="http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf">Reference</a>).</li>
 <li>Twitter, Foursquare and Square are working on their clone of Google’s Bazel
-build system called <a class="reference external" href="https://pantsbuild.github.io">Pants</a>. It is also
+build system called <a class="reference external" href="https://pantsbuild.github.io/">Pants</a>. It is also
 designed for monolithic repositories.</li>
 </ul>
 <p>All three companies cite huge developer productivity benefits,
@@ -327,22 +560,22 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;Library1</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span><span class="p">}},</span>
-    <span class="s">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;vendor/symfony/dependency-injection&quot;</span><span class="p">]</span>
+    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s">"Library1</span><span class="se">\\</span><span class="s">"</span><span class="p">:</span> <span class="s">"src/"</span><span class="p">}},</span>
+    <span class="s">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;ProjectA</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span><span class="p">}},</span>
-    <span class="s">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;components/Library_1&quot;</span><span class="p">]</span>
+    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s">"ProjectA</span><span class="se">\\</span><span class="s">"</span><span class="p">:</span> <span class="s">"src/"</span><span class="p">}},</span>
+    <span class="s">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s">"components/Library_1"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;symfony/dependency-injection&quot;</span><span class="p">:</span> <span class="s">&quot;~2.6&quot;</span>
+    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s">"~2.6"</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -361,12 +594,12 @@ Building fiddler.json projects.
  [Build] components/Project_B
 </pre></div>
 </div>
-<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">&quot;vendor/autoload.php&quot;;</span></span> and it loads an
+<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">"vendor/autoload.php";</span></span> and it loads an
 autoloader with all the dependencies specified for each component, for example
 in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">require_once</span> <span class="s2">&quot;vendor/autoload.php&quot;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
 
 <span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Component\DependencyInjection\ContainerBuilder</span><span class="p">;</span>
 </pre></div>
@@ -378,7 +611,8 @@ and implementation details.</p>
 some bugs, please <a class="reference external" href="https://github.com/beberlei/fiddler/issues">report them</a>.
 It is stable enough so that we could actually port <a class="reference external" href="https://tideways.io">Tideways</a> to it already which is a multi package repository.</p>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -398,8 +632,8 @@ It is stable enough so that we could actually port <a class="reference external"
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 26, 2015</span>
         </div>
-        <div class="section" id="integrate-symfony-and-webpack">
-<h1><a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a></h1>
+        <div class="section">
+            <h1><a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a></h1>
 <p>Asset Management in Symfony2 is handled with the PHP based library Assetic by
 default, however I have never really connected to this library and at least for
 me it usually wastes more time than it saves.</p>
@@ -411,7 +645,7 @@ technology stack.</p>
 <p>Frontend development is really not my strong suit, so these first steps
 I document here may seem obvious to some readers.</p>
 <p>While researching about <a class="reference external" href="https://github.com/facebook/react">React.JS</a> I came across
-a tool called <a class="reference external" href="http://webpack.github.io">Webpack</a> which you could compare
+a tool called <a class="reference external" href="http://webpack.github.io/">Webpack</a> which you could compare
 to Symfony’s Assetic. It is primarily focussing on bundling Javascript modules,
 but you can also ship CSS assets with it.</p>
 <p>The real benefits for Webpack however are:</p>
@@ -440,7 +674,7 @@ to resolve the dependencies in our code:</p>
 <div class="highlight-js"><div class="highlight"><pre><span class="c1">// app.js</span>
 <span class="nx">define</span><span class="p">([</span><span class="s1">'./vendor/jquery.js'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#content&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;Webpack Hello World!&quot;</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s2">"#content"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">"Webpack Hello World!"</span><span class="p">);</span>
     <span class="p">});</span>
 <span class="p">});</span>
 </pre></div>
@@ -456,9 +690,9 @@ by including a web-server that does the translation for you in the background
 all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span></p>
 <div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">&quot;./web/js/app.js&quot;</span><span class="p">,</span>
+    <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">"./web/js/app.js"</span><span class="p">,</span>
     <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">filename</span><span class="o">:</span> <span class="s2">&quot;bundle.js&quot;</span><span class="p">,</span>
+        <span class="nx">filename</span><span class="o">:</span> <span class="s2">"bundle.js"</span><span class="p">,</span>
         <span class="nx">path</span> <span class="o">:</span> <span class="s1">'web/assets/'</span><span class="p">,</span>
         <span class="nx">publicPath</span> <span class="o">:</span> <span class="s1">'/assets/'</span><span class="p">,</span>
     <span class="p">}</span>
@@ -485,11 +719,11 @@ change the base path used for the <span class="docutils literal"><span class="pr
 <div class="highlight-python"><div class="highlight"><pre># app/config/config.yml
 framework:
   templating:
-    assets_base_url: &quot;%assets_base_url%&quot;
+    assets_base_url: "%assets_base_url%"
 
 # app/config/parameters.yml
 parameters:
-  assets_base_url: &quot;http://localhost:8090&quot;
+  assets_base_url: "http://localhost:8090"
 </pre></div>
 </div>
 <p>This adds a base path in front of all your assets pointing to the Webpack dev
@@ -498,12 +732,12 @@ server.</p>
 twig layout file:</p>
 <div class="highlight-jinja"><div class="highlight"><pre><span class="x">&lt;html&gt;</span>
 <span class="x">    &lt;body&gt;</span>
-<span class="x">        &lt;div id=&quot;content&quot;&gt;&lt;/div&gt;</span>
+<span class="x">        &lt;div id="content"&gt;&lt;/div&gt;</span>
 
-<span class="x">        </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">app.environment</span> <span class="o">==</span> <span class="s2">&quot;dev&quot;</span> <span class="cp">%}</span><span class="x"/>
-<span class="x">        &lt;script src=&quot;</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'webpack-dev-server.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">&quot;&gt;&lt;/script&gt;</span>
+<span class="x">        </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">app.environment</span> <span class="o">==</span> <span class="s2">"dev"</span> <span class="cp">%}</span><span class="x"/>
+<span class="x">        &lt;script src="</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'webpack-dev-server.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">"&gt;&lt;/script&gt;</span>
 <span class="x">        </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="x"/>
-<span class="x">        &lt;script type=&quot;text/javascript&quot; src=&quot;</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'assets/bundle.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">&quot;&gt;&lt;/script&gt;</span>
+<span class="x">        &lt;script type="text/javascript" src="</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'assets/bundle.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">"&gt;&lt;/script&gt;</span>
 <span class="x">    &lt;/body&gt;</span>
 <span class="x">&lt;/html&gt;</span>
 </pre></div>
@@ -572,7 +806,8 @@ transformer before serving it as plain javascript. The only requirement is that
 you have to install the NPM package <span class="docutils literal"><span class="pre">jsx-loader</span></span>.</p>
 <p>So far I have used webpack only for two playground projects, but I am very
 confident integrating it into some of my production projects now.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -584,8 +819,8 @@ confident integrating it into some of my production projects now.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 19, 2015</span>
         </div>
-        <div class="section" id="vagrant-nfs-and-npm">
-<h1><a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a></h1>
+        <div class="section">
+            <h1><a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a></h1>
 <p>I have ranted about Node.JS and NPM on Twitter before, costing me lots of time,
 so I have to make up for this now and offer some solutions.</p>
 <p>One problem I regularly have is the following: I have a Vagrant/Virtualbox
@@ -603,9 +838,9 @@ moves the <span class="docutils literal"><span class="pre">package.json</span></
 
 BASE_DIR=${TMPDIR:-/var/tmp}
 ORIG_DIR=$PWD
-HASH_CMD=&quot;md5sum&quot;
+HASH_CMD="md5sum"
 
-DIR_NAME=`echo $PWD | $HASH_CMD | cut -f1 -d &quot; &quot;`
+DIR_NAME=`echo $PWD | $HASH_CMD | cut -f1 -d " "`
 
 TMP_DIR=$BASE_DIR/$DIR_NAME
 mkdir -p $TMP_DIR
@@ -624,18 +859,18 @@ popd
 <p>Integrating this into my Ansible setup of the machine it looked like this:</p>
 <div class="highlight-python"><div class="highlight"><pre># roles/nodejs/tasks/main.yml
 # More tasks here before this...
-- name: &quot;Install npm workaround&quot;
+- name: "Install npm workaround"
   copy: &gt;
       src=tmpnpm.sh
       dest=/usr/local/bin/tmpnpm
-      mode=&quot;0755&quot;
+      mode="0755"
 
-- name: &quot;Install Global Dependencies&quot;
+- name: "Install Global Dependencies"
   command: &gt;
       /usr/local/bin/tmpnpm install -g {{ item }}
   with_items: global_packages
 
-- name: &quot;Install Package Dependencies&quot;
+- name: "Install Package Dependencies"
   command: &gt;
       /usr/local/bin/tmpnpm install
       chdir={{ item }}
@@ -652,11 +887,12 @@ outside when invoking the role:</p>
       global_packages:
         - grunt-cli
       package_dirs:
-        - &quot;/var/www/project&quot;
+        - "/var/www/project"
 </pre></div>
 </div>
 <p>This way the Ansible Node.JS role is reusable in different projects.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -676,8 +912,8 @@ outside when invoking the role:</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 14, 2015</span>
         </div>
-        <div class="section" id="phpunit-before-annotations-and-traits-for-code-reuse">
-<h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
+        <div class="section">
+            <h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
 <p>I have written about why I think <a class="reference external" href="http://www.whitewashing.de/2013/04/12/traits_are_static_access.html">traits should be avoided</a>. There
 is a practical use-case that serves me well however: Extending PHPUnit tests.</p>
 <p>The PHPUnit TestCase is not very extendable except through inheritance. This
@@ -697,7 +933,7 @@ features for our test cases.</p>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">assertIsNotANumber</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nx">is_nan</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nb">is_nan</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -823,7 +1059,8 @@ without clashing with the traditional PHPUnit <span class="docutils literal"><sp
 so we cannot access the Symfony container here already. Maybe it would be more
 practical to have it work the other way around. I have <a class="reference external" href="https://github.com/sebastianbergmann/phpunit/issues/1616">opened an issue on
 PHPUnit</a> for that.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -835,8 +1072,8 @@ PHPUnit</a> for that.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 10, 2015</span>
         </div>
-        <div class="section" id="a-case-for-weak-type-hints-only-in-php7">
-<h1><a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a></h1>
+        <div class="section">
+            <h1><a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a></h1>
 <p>TL;DR: I was one voice for having strict type hints until I tried the current
 patch. From both a library and application developer POV they don’t bring much
 to the table. I think PHP would be more consistent with weak type hints only.</p>
@@ -956,7 +1193,7 @@ gained, one additional check of something we already know is true!</p>
 <p>Strict mode is useless for library developers, because I always have to assume
 weak mode anyways.</p>
 <p><strong>EDIT:</strong> I argued before that you have to check for casting strings to 0 when
-using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount(&quot;foo&quot;)</span></span>
+using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount("foo")</span></span>
 will throw a catchable fatal error in weak mode already!</p>
 </div>
 <div class="section" id="do-we-need-strict-mode">
@@ -1035,7 +1272,8 @@ a big change for the language and would prove to be valuable for everyone.</p>
 language, the winner is the one with the highest percentage of strict mode
 code.</p>
 </div>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -1051,8 +1289,8 @@ code.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>February 01, 2015</span>
         </div>
-        <div class="section" id="running-hhvm-with-a-webserver">
-<h1><a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a></h1>
+        <div class="section">
+            <h1><a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a></h1>
 <p>I haven’t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
 alternative PHP runtime didn’t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
 Profiler</a> would run out of the box with HHVM using the
@@ -1096,7 +1334,7 @@ Ubuntu:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get install golang
 $ GOPATH=~/go
 $ mkdir -p ~/go/{src,bin,pkg}
-$ PATH=&quot;$GOPATH/bin:$PATH&quot;
+$ PATH="$GOPATH/bin:$PATH"
 </pre></div>
 </div>
 <p>You should put the <span class="docutils literal"><span class="pre">$GOPATH</span></span> and <span class="docutils literal"><span class="pre">$PATH</span></span> changes into your bashrc to make this
@@ -1106,7 +1344,8 @@ check on, as I knew from HHVM team blog posts that Wordpress works. Using a
 simple siege based benchmark I was able to trigger the JIT compiler and the
 Profiler charts showed a nice performance boost minute after minute as HHVM
 replaces dynamic PHP with optimized (assembler?) code.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -1122,8 +1361,8 @@ replaces dynamic PHP with optimized (assembler?) code.</p>
         </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>October 26, 2014</span>
         </div>
-        <div class="section" id="symfony-all-the-things-web">
-<h1><a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a></h1>
+        <div class="section">
+            <h1><a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a></h1>
 <p>My <a class="reference external" href="http://www.whitewashing.de/2014/04/24/symfony_hello_world.html">Symfony Hello World post</a> introduced
 the smallest possible example of a Symfony application. Using this in trainings
 helps the participants understand of just how few parts a Symfony application
@@ -1139,7 +1378,7 @@ web application.</p>
 reasons for this decision:</p>
 <ul>
 <li><p class="first">I always want to use a technology that is based on Symfony HttpKernel,
-because of the built-in caching, ESI and the <a class="reference external" href="http://stackphp.com">Stack-PHP</a> project. I usually don’t need this at the beginning
+because of the built-in caching, ESI and the <a class="reference external" href="http://stackphp.com/">Stack-PHP</a> project. I usually don’t need this at the beginning
 of a project, but at some point the simplicity of extending the Kernel
 through aggregation is incredible.</p>
 <p>This leaves three solutions: Silex, Symfony Framework and Plain Components.</p>
@@ -1197,13 +1436,13 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 <p>You can find <a class="reference external" href="https://github.com/beberlei/symfony-minimal-distribution">all the code on Github</a>.</p>
 <p>Start with the composer.json:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;symfony/symfony&quot;</span><span class="p">:</span> <span class="s">&quot;@stable&quot;</span><span class="p">,</span>
-        <span class="s">&quot;symfony/monolog-bundle&quot;</span><span class="p">:</span> <span class="s">&quot;@stable&quot;</span><span class="p">,</span>
-        <span class="s">&quot;vlucas/phpdotenv&quot;</span><span class="p">:</span> <span class="s">&quot;@stable&quot;</span>
+    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"symfony/symfony"</span><span class="p">:</span> <span class="s">"@stable"</span><span class="p">,</span>
+        <span class="s">"symfony/monolog-bundle"</span><span class="p">:</span> <span class="s">"@stable"</span><span class="p">,</span>
+        <span class="s">"vlucas/phpdotenv"</span><span class="p">:</span> <span class="s">"@stable"</span>
     <span class="p">},</span>
-    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;Acme&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span> <span class="p">}</span>
+    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span> <span class="s">"Acme"</span><span class="p">:</span> <span class="s">"src/"</span> <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1212,8 +1451,8 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 <span class="c1">// web/index.php</span>
 
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../vendor/autoload.php&quot;</span><span class="p">;</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../app/AppKernel.php&quot;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
 
@@ -1226,7 +1465,7 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 <span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">terminate</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$response</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>We are using the package <a class="reference external" href="https://github.com/vlucas/phpdotenv">vlucas/phpdotenv</a> to add <a class="reference external" href="http://12factor.net">Twelve Factor app</a> compatibility, simplyfing configuration. This allows us to get rid of
+<p>We are using the package <a class="reference external" href="https://github.com/vlucas/phpdotenv">vlucas/phpdotenv</a> to add <a class="reference external" href="http://12factor.net/">Twelve Factor app</a> compatibility, simplyfing configuration. This allows us to get rid of
 the different front controller files based on environment. We need a file
 called <span class="docutils literal"><span class="pre">.env</span></span> in our application root containing key-value pairs of
 environment variables:</p>
@@ -1287,7 +1526,7 @@ and load everything from just a single file:</p>
 framework:
     secret: %secret%
     router:
-        resource: &quot;%kernel.root_dir%/config/routing_%kernel.environment%.yml&quot;
+        resource: "%kernel.root_dir%/config/routing_%kernel.environment%.yml"
         strict_requirements: %kernel.debug%
     templating:
         engines: ['twig']
@@ -1302,7 +1541,7 @@ monolog:
             handler:      nested
         nested:
             type:  stream
-            path:  &quot;%kernel.logs_dir%/%kernel.environment%.log&quot;
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
 </pre></div>
 </div>
@@ -1322,18 +1561,18 @@ in Symfony.</p>
 hello_world:
     pattern: /hello/{name}
     defaults:
-        _controller: &quot;AcmeHelloBundle:Default:hello&quot;
+        _controller: "AcmeHelloBundle:Default:hello"
 </pre></div>
 </div>
 <p>And because our routes are dependent on the environment in <span class="docutils literal"><span class="pre">config.yml</span></span> also a
 <span class="docutils literal"><span class="pre">routing_dev.yml</span></span> containing the WebDebug toolbar and profiler routes:</p>
 <div class="highlight-python"><div class="highlight"><pre># app/config/routing_dev.yml
 _wdt:
-    resource: &quot;@WebProfilerBundle/Resources/config/routing/wdt.xml&quot;
+    resource: "@WebProfilerBundle/Resources/config/routing/wdt.xml"
     prefix:   /_wdt
 
 _profiler:
-    resource: &quot;@WebProfilerBundle/Resources/config/routing/profiler.xml&quot;
+    resource: "@WebProfilerBundle/Resources/config/routing/profiler.xml"
     prefix:   /_profiler
 
 _main:
@@ -1431,7 +1670,8 @@ and the building blocks are always the same.</p>
 about two weeks ago</a>.
 Not only will the Symfony be lightweight also your controllers. You can built
 anything on top this foundation from simple CRUD, APIs, hexagonal- or CQRS-architextures.</p>
-</div>
+
+        </div>
         <div class="postmeta">
         <div class="author">
             <span>Posted by Benjamin Eberlei</span>
@@ -1440,149 +1680,6 @@ anything on top this foundation from simple CRUD, APIs, hexagonal- or CQRS-archi
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2014/10/26/symfony_all_the_things_web.html#disqus_thread" data-disqus-identifier="2014/10/26/symfony_all_the_things_web">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>October 14, 2014</span>
-        </div>
-        <div class="section" id="lightweight-symfony2-controllers">
-<h1><a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a></h1>
-<p>For quite some time I have been experimenting how to best implement Symfony 2
-controllers to avoid depending on the framework. I have discussed many of these
-insights here in my blog.</p>
-<p>There are three reasons for my quest:</p>
-<p>Simplicity: Solutions to avoid the dependencies between framework
-and your model typically introduce layers of abstraction that produce
-complexity. Service layers, CQRS and various design patterns are useful
-tools, but developing every application with this kind of abstraction screams
-over-engineering.</p>
-<p>While the Domain-Driven Design slogan is “Tackling complexity in software”,
-there are many abstractions out there that can better be described as “Causing
-complexity in software”. I have written some of them myself.</p>
-<p>Testability: There is a mantra “Don’t unit-test your controllers” that arose
-because controllers in most frameworks are just not testable. They have many
-dependencies on other framework classes and cannot be created in a test
-environment. This lead many teams to use slow and brittle integration tests instead.</p>
-<p>But what if controllers were testable because they don’t depend on the
-framework anymore. We could avoid testing all the many layers that we
-have removed for the sake of simplicity and also reduce the number of
-slow integration tests.</p>
-<p>Refactorability: I found that when using service layer or CQRS, there is a
-tendency to use them for every use-case, because the abstraction is in place.
-Any use-case that is not written with those patterns is coupled against the
-framework again. Both development approaches are very different and refactoring
-from one to the other typically requires a rewrite.</p>
-<p>A good solution should allow refactoring from a lightweight controller to a
-service layer with a small number of extract method and extract class
-refactorings.</p>
-<p>While working on the <a class="reference external" href="https://qafoolabs.com">Qafoo PHP Profiler</a> product I
-went to work on a solution that allowed for Simplicity, Testability and
-Refactorability and came up with the
-<a class="reference external" href="https://github.com/qafoolabs/QafooLabsNoFrameworkBundle">NoFrameworkBundle</a>.</p>
-<p>The design of the bundle is careful to extend Symfony in a way that is easy
-for Symfony developers to understand. To achieve this it heavily extends
-upon the FrameworkExtraBundle that is bundled with Symfony.</p>
-<p>The design goals are:</p>
-<ul class="simple">
-<li>Favour Controller as Services to decouple them from the Framework.</li>
-<li>Replace every functionality of the Symfony Base controller in a way
-that does not require injecting a service into your controller.</li>
-<li>Never fetch state from services and inject it into the controller instead.</li>
-<li>Avoid annotations</li>
-</ul>
-<p>The concepts are best explained by showing an example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">TaskController</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">TaskRepository</span> <span class="nv">$taskRepository</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span> <span class="o">=</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">isGranted</span><span class="p">(</span><span class="s1">'ROLE_TASK'</span><span class="p">,</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">AccessDeniedHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'task'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This example demos the following features:</p>
-<ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">TokenContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
-used for checking access permissions and retrieving the current User object.
-It is passed to the controller with the help of ParamConverter feature.</p>
-<p><span class="docutils literal"><span class="pre">TokenContext</span></span> here is just an interface and for testing you can
-use a very simple mock implementation to pass an authenticated user to your
-controller.</p>
-</li>
-<li><p class="first">View parameters are returned from the controller as an array, however
-without requiring the <span class="docutils literal"><span class="pre">@Template</span></span> annotation of the
-SensioFrameworkExtraBundle.</p>
-</li>
-</ul>
-<p>The next example demontrates the abstraction for form requests that help writing very
-concise form code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\FormRequest</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">TaskController</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Task</span><span class="p">(</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">());</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TaskType</span><span class="p">(),</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$task</span><span class="p">);</span>
-
-            <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectRouteResponse</span><span class="p">(</span><span class="s1">'Task.show'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()));</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'form'</span> <span class="o">=&gt;</span> <span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">createFormView</span><span class="p">());</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">RedirectRouteResponse</span></span> is used to redirect to a route without
-a need for the <span class="docutils literal"><span class="pre">router</span></span> service.</p>
-</li>
-<li><p class="first">Usage of the <span class="docutils literal"><span class="pre">FormRequest</span></span> object that is a wrapper around FormFactory and
-Request object. It is passed by using a ParamConverter. The method
-<span class="docutils literal"><span class="pre">$formRequest-&gt;handle</span></span> combines binding the request and checking for valid
-data.</p>
-<p>Again there is a set of mock form request that allow you to simulate valid or
-invalid form requests for testing.</p>
-</li>
-</ul>
-<p>Writing controllers in this way addresses my requirements Simplicity,
-Testability and Refactorability. For simple CRUD controllers they only ever
-need access to a repository service. If one of your controllers grows too big,
-just refactor out its business logic into services and inject them.</p>
-<p>Check out the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">repository on Github</a> for some more
-features that we are using the <a class="reference external" href="https://qafoolabs.com">Profiler</a>.</p>
-<p>Update 1: Renamed <span class="docutils literal"><span class="pre">FrameworkContext</span></span> to <span class="docutils literal"><span class="pre">TokenContext</span></span> as done
-in new 2.0 version of the bundle.</p>
-</div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html#disqus_thread" data-disqus-identifier="2014/10/14/lightweight_symfony2_controllers">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -1607,6 +1704,8 @@ in new 2.0 version of the bundle.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
         </li><li>
             <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
@@ -1624,8 +1723,6 @@ in new 2.0 version of the bundle.</p>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
         </li><li>
             <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
-        </li><li>
-            <a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a>
         </li></ul>
 </div>
 </section>
@@ -1633,7 +1730,7 @@ in new 2.0 version of the bundle.</p>
 </div>
 </div> <!-- #main-container -->
 
-        <div class="footer-container">
+        <div class="footer-container" role="contentinfo">
 <div class="container">
     <div class="span-24 content">
         <div class="footer">

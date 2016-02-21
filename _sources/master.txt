@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2016/02/21/how_i_use_wordpress_with_git_and_composer
    2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading
    2015/06/12/the_containertest
    2015/04/11/monolithic_repositories_with_php_and_composer

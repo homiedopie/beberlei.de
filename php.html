@@ -11,7 +11,7 @@
             <link>http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html</link>
             <guid>http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html</guid>
             <title><![CDATA[Monolithic Repositories with PHP and Composer]]></title>
-            <description><![CDATA[<div class="section" id="monolithic-repositories-with-php-and-composer">
+            <description><![CDATA[
 <h1>Monolithic Repositories with PHP and Composer</h1>
 <blockquote>
 <div>tl;dr Monolithic repositories can bring a lot of benefits. I prototyped
@@ -47,7 +47,7 @@ and Android into a single big repository over the course of 2015.</li>
 chunk of their codebase managed in a single Perforce repository with over 20 million
 commits (<a class="reference external" href="http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf">Reference</a>).</li>
 <li>Twitter, Foursquare and Square are working on their clone of Google’s Bazel
-build system called <a class="reference external" href="https://pantsbuild.github.io">Pants</a>. It is also
+build system called <a class="reference external" href="https://pantsbuild.github.io/">Pants</a>. It is also
 designed for monolithic repositories.</li>
 </ul>
 <p>All three companies cite huge developer productivity benefits,
@@ -152,22 +152,22 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;Library1</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span><span class="p">}},</span>
-    <span class="s">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;vendor/symfony/dependency-injection&quot;</span><span class="p">]</span>
+    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s">"Library1</span><span class="se">\\</span><span class="s">"</span><span class="p">:</span> <span class="s">"src/"</span><span class="p">}},</span>
+    <span class="s">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;ProjectA</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span> <span class="s">&quot;src/&quot;</span><span class="p">}},</span>
-    <span class="s">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;components/Library_1&quot;</span><span class="p">]</span>
+    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s">"ProjectA</span><span class="se">\\</span><span class="s">"</span><span class="p">:</span> <span class="s">"src/"</span><span class="p">}},</span>
+    <span class="s">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s">"components/Library_1"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;symfony/dependency-injection&quot;</span><span class="p">:</span> <span class="s">&quot;~2.6&quot;</span>
+    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s">"~2.6"</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -186,12 +186,12 @@ Building fiddler.json projects.
  [Build] components/Project_B
 </pre></div>
 </div>
-<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">&quot;vendor/autoload.php&quot;;</span></span> and it loads an
+<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">"vendor/autoload.php";</span></span> and it loads an
 autoloader with all the dependencies specified for each component, for example
 in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">require_once</span> <span class="s2">&quot;vendor/autoload.php&quot;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
 
 <span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Component\DependencyInjection\ContainerBuilder</span><span class="p">;</span>
 </pre></div>
@@ -203,7 +203,7 @@ and implementation details.</p>
 some bugs, please <a class="reference external" href="https://github.com/beberlei/fiddler/issues">report them</a>.
 It is stable enough so that we could actually port <a class="reference external" href="https://tideways.io">Tideways</a> to it already which is a multi package repository.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Sat, 11 Apr 2015 00:00:00 +0200</pubDate>
         </item>
@@ -212,7 +212,7 @@ It is stable enough so that we could actually port <a class="reference external"
             <link>http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</link>
             <guid>http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</guid>
             <title><![CDATA[A case for weak type hints only in PHP7]]></title>
-            <description><![CDATA[<div class="section" id="a-case-for-weak-type-hints-only-in-php7">
+            <description><![CDATA[
 <h1>A case for weak type hints only in PHP7</h1>
 <p>TL;DR: I was one voice for having strict type hints until I tried the current
 patch. From both a library and application developer POV they don’t bring much
@@ -333,7 +333,7 @@ gained, one additional check of something we already know is true!</p>
 <p>Strict mode is useless for library developers, because I always have to assume
 weak mode anyways.</p>
 <p><strong>EDIT:</strong> I argued before that you have to check for casting strings to 0 when
-using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount(&quot;foo&quot;)</span></span>
+using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount("foo")</span></span>
 will throw a catchable fatal error in weak mode already!</p>
 </div>
 <div class="section" id="do-we-need-strict-mode">
@@ -412,7 +412,7 @@ a big change for the language and would prove to be valuable for everyone.</p>
 language, the winner is the one with the highest percentage of strict mode
 code.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Tue, 10 Feb 2015 00:00:00 +0100</pubDate>
         </item>
@@ -421,7 +421,7 @@ code.</p>
             <link>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</link>
             <guid>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</guid>
             <title><![CDATA[SOAP and PHP in 2014]]></title>
-            <description><![CDATA[<div class="section" id="soap-and-php-in-2014">
+            <description><![CDATA[
 <h1>SOAP and PHP in 2014</h1>
 <blockquote>
 <div>“The SOAP stack is generally regarded as an embarrassing failure these days.”
@@ -599,7 +599,7 @@ the correct WSDL for a service:</p>
              <span class="o">-&gt;</span><span class="na">setLocation</span><span class="p">(</span><span class="s1">'http://server/soap.php'</span><span class="p">)</span> <span class="c1">// same as server 'location'</span>
              <span class="o">-&gt;</span><span class="na">setServiceName</span><span class="p">(</span><span class="s1">'MyService'</span><span class="p">);</span>
 <span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
-<span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">dump</span><span class="p">(</span><span class="s2">&quot;/path/to/file.wsdl&quot;</span><span class="p">);</span>
+<span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">dump</span><span class="p">(</span><span class="s2">"/path/to/file.wsdl"</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>You can now place that WSDL file in any public location and then point both
@@ -691,7 +691,7 @@ and non-WSDL modes. Once you want to talk to Java or C# you need solve some
 more problems.</p>
 <p>The first thing to understand is that SOAP can actually talk in 4 different
 modes. You can use ‘document’ or ‘rpc’ style, ‘literal’ or ‘encoded’  use.
-This post on the <a class="reference external" href="http://www.ibm.com/developerworks/library/ws-whichwsdl">IBM website</a> describes all the
+This post on the <a class="reference external" href="http://www.ibm.com/developerworks/library/ws-whichwsdl/">IBM website</a> describes all the
 different modes in much detail and I recommend everybody having to work with
 SOAP to read it.</p>
 <p>The essence from that article is, that you will always want to use
@@ -775,7 +775,7 @@ easily. If you don’t need to expose your API to the webbrowser via REST/JSON,
 then using SOAP is a very good alternative to most of the handcrafting that is
 necessary for REST APIs.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Fri, 31 Jan 2014 00:00:00 +0100</pubDate>
         </item>
@@ -784,7 +784,7 @@ necessary for REST APIs.</p>
             <link>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</link>
             <guid>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</guid>
             <title><![CDATA[Assert v2.0: Fluent API and Lazy Assertions]]></title>
-            <description><![CDATA[<div class="section" id="assert-v2-0-fluent-api-and-lazy-assertions">
+            <description><![CDATA[
 <h1>Assert v2.0: Fluent API and Lazy Assertions</h1>
 <p>Almost two years ago I started developing a small library <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> (<a class="reference external" href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html">blog post</a>)
 which contained a set of assertion methods to use in production code. With
@@ -795,7 +795,7 @@ of contributors and I know several companies using the library in production.</p
 made it impossible to collect multiple errors and also made the code
 more verbose than necessary when validating the same value with multiple
 assertions.</p>
-<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj">AssertJ</a> that gave me the idea how to fix
+<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
 these problems. The last two days I had some time to implement those new
 functionalities and I am releasing a new version 2.0 of Assert today.</p>
 <div class="section" id="fluent-api">
@@ -834,9 +834,9 @@ that you know how to differentiate the errors afterwards.</p>
 <span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
 <span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
 <div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
-1) foo: Value &quot;10&quot; expected to be string, type integer given.
-2) bar: Value &quot;&lt;NULL&gt;&quot; is empty, but non empty value was expected.
-3) baz: Value &quot;string&quot; is not an array.
+1) foo: Value "10" expected to be string, type integer given.
+2) bar: Value "&lt;NULL&gt;" is empty, but non empty value was expected.
+3) baz: Value "string" is not an array.
 </pre></div>
 </div>
 <p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
@@ -855,7 +855,7 @@ message, as well as access to the value and constraints of an exception:</p>
 <span class="k">try</span> <span class="p">{</span>
     <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">AssertionFailedException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value &quot;10&quot; is not between 100 and 1000.</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value "10" is not between 100 and 1000.</span>
     <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span> <span class="c1">// 10</span>
     <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getConstraints</span><span class="p">();</span> <span class="c1">// array('min' =&gt; 100, 'max' =&gt; 1000)</span>
 <span class="p">}</span>
@@ -866,7 +866,7 @@ allows to provide error messages to the user, by using the exception code and
 the value and constraint data for translating into human readable messages.</p>
 <p>You can find more information in the <a class="reference external" href="https://github.com/beberlei/assert#assert">README of Assert</a>.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Sun, 26 Jan 2014 00:00:00 +0100</pubDate>
         </item>
@@ -875,9 +875,9 @@ the value and constraint data for translating into human readable messages.</p>
             <link>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</link>
             <guid>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</guid>
             <title><![CDATA[Feature Flags and Doctrine Entities]]></title>
-            <description><![CDATA[<div class="section" id="feature-flags-and-doctrine-entities">
+            <description><![CDATA[
 <h1>Feature Flags and Doctrine Entities</h1>
-<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com">EasyBib developers</a> this week about how to use feature flags with
+<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
 Doctrine Entities, Metadata Mapping and their database.</p>
 <p>The problem of feature flags with Doctrine is easily explained: If you add
 properties for a new feature that is disabled in the Doctrine metadata, then you
@@ -907,14 +907,14 @@ easily:</p>
 
         <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User"</span><span class="p">)</span> <span class="p">{</span>
                 <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
                     <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
                     <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
                 <span class="p">));</span>
             <span class="p">}</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">&quot;MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something"</span><span class="p">)</span> <span class="p">{</span>
                 <span class="c1">// more mapping</span>
             <span class="p">}</span>
         <span class="p">}</span>
@@ -927,7 +927,7 @@ easily:</p>
 <p>Then if the feature is enabled fore some time and accepted into the pool of
 permanent features, you can remove the listener and move the mapping onto the
 Entities metadata.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Thu, 05 Dec 2013 00:00:00 +0100</pubDate>
         </item>
@@ -936,7 +936,7 @@ Entities metadata.</p>
             <link>http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</link>
             <guid>http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</guid>
             <title><![CDATA[Decoupling from Symfony Security and FOSUserBundle]]></title>
-            <description><![CDATA[<div class="section" id="decoupling-from-symfony-security-and-fosuserbundle">
+            <description><![CDATA[
 <h1>Decoupling from Symfony Security and FOSUserBundle</h1>
 <p>In this blog post I will show how to decouple your core application
 from the Symfony Security component and User bundles such as the FOSUserBundle.</p>
@@ -949,9 +949,9 @@ as Service</a>,
 and other pieces I still need to write about, I would classify Symfony2 as a
 good framework.</p>
 <p>A number of other authors have written blog posts on decoupling Symfony and your model
-code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first">on project structure</a>
-, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure">on project structure as well</a>
-and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities">Decoupling Forms from Entities</a>.</p>
+code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first/">on project structure</a>
+, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure/">on project structure as well</a>
+and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities/">Decoupling Forms from Entities</a>.</p>
 <p>User management breaks the isolation of your business model open,
 by introducing the <span class="docutils literal"><span class="pre">UserInterface</span></span> from the Security component into your
 code base. In combination with the <em>FOSUserBundle</em> this can cause a dependency
@@ -983,14 +983,14 @@ In this example we could create two entities <span class="docutils literal"><spa
 
 <span class="sd">/**</span>
 <span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\Table(name=&quot;fos_user&quot;)</span>
+<span class="sd"> * @ORM\Table(name="fos_user")</span>
 <span class="sd"> */</span>
 <span class="k">class</span> <span class="nc">User</span> <span class="k">extends</span> <span class="nx">BaseUser</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
 <span class="sd">     * @ORM\Id</span>
-<span class="sd">     * @ORM\Column(type=&quot;integer&quot;)</span>
-<span class="sd">     * @ORM\GeneratedValue(strategy=&quot;AUTO&quot;)</span>
+<span class="sd">     * @ORM\Column(type="integer")</span>
+<span class="sd">     * @ORM\GeneratedValue(strategy="AUTO")</span>
 <span class="sd">     */</span>
     <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
 <span class="p">}</span>
@@ -1009,19 +1009,19 @@ correlation ID in the <span class="docutils literal"><span class="pre">Customer<
 
 <span class="sd">/**</span>
 <span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\Table(name=&quot;customer&quot;)</span>
+<span class="sd"> * @ORM\Table(name="customer")</span>
 <span class="sd"> */</span>
 <span class="k">class</span> <span class="nc">Customer</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
 <span class="sd">     * @ORM\Id</span>
-<span class="sd">     * @ORM\Column(type=&quot;integer&quot;)</span>
-<span class="sd">     * @ORM\GeneratedValue(strategy=&quot;NONE&quot;)</span>
+<span class="sd">     * @ORM\Column(type="integer")</span>
+<span class="sd">     * @ORM\GeneratedValue(strategy="NONE")</span>
 <span class="sd">     */</span>
     <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
 
     <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type=&quot;string&quot;)</span>
+<span class="sd">     * @ORM\Column(type="string")</span>
 <span class="sd">     */</span>
     <span class="k">protected</span> <span class="nv">$username</span><span class="p">;</span>
 <span class="p">}</span>
@@ -1033,7 +1033,7 @@ achieve this relatively easy by overwriting the <span class="docutils literal"><
 supported by <em>FOSUserBundle</em> listening to events.  Your own code can
 exclusively work with <span class="docutils literal"><span class="pre">Customer</span></span> objects now, void of any reference to
 the Symfony Security component or the huge FOSUserBundle dependency.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
             <category><![CDATA[ Symfony2 ]]></category>
              <pubDate>Wed, 04 Sep 2013 00:00:00 +0200</pubDate>
@@ -1043,7 +1043,7 @@ the Symfony Security component or the huge FOSUserBundle dependency.</p>
             <link>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</link>
             <guid>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</guid>
             <title><![CDATA[Speedup Symfony2 on Vagrant boxes]]></title>
-            <description><![CDATA[<div class="section" id="speedup-symfony2-on-vagrant-boxes">
+            <description><![CDATA[
 <h1>Speedup Symfony2 on Vagrant boxes</h1>
 <ul class="simple">
 <li><strong>Update:</strong> Added requirements to configure Vagrant and Virtualbox before
@@ -1123,7 +1123,7 @@ is quite normal for the development environment even outside a virtual machine.<
 <p>This tip obviously works for any kind of application that has a I/O intensive
 development environment: Don’t perform this operations on the NFS share unless
 you wan’t to suffer.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
             <category><![CDATA[ Symfony ]]></category>
              <pubDate>Mon, 19 Aug 2013 00:00:00 +0200</pubDate>
@@ -1133,7 +1133,7 @@ you wan’t to suffer.</p>
             <link>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</link>
             <guid>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</guid>
             <title><![CDATA[Doctrine and Domain Events]]></title>
-            <description><![CDATA[<div class="section" id="doctrine-and-domain-events">
+            <description><![CDATA[
 <h1>Doctrine and Domain Events</h1>
 <p>I have written about the <a class="reference external" href="/2012/08/25/decoupling_applications_with_domain_events.html">Domain Event Pattern</a> before and want
 to focus on this pattern again by explaining its integration into the Doctrine
@@ -1170,7 +1170,7 @@ we have this item in stock:</p>
 <span class="k">class</span> <span class="nc">InventoryItem</span> <span class="k">extends</span> <span class="nx">AggregateRoot</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
-<span class="sd">     * @Id @GeneratedValue @Column(type=&quot;integer&quot;)</span>
+<span class="sd">     * @Id @GeneratedValue @Column(type="integer")</span>
 <span class="sd">     */</span>
     <span class="k">private</span> <span class="nv">$id</span><span class="p">;</span>
     <span class="sd">/**</span>
@@ -1178,7 +1178,7 @@ we have this item in stock:</p>
 <span class="sd">     */</span>
     <span class="k">private</span> <span class="nv">$name</span><span class="p">;</span>
     <span class="sd">/**</span>
-<span class="sd">     * @Column(type=&quot;integer&quot;)</span>
+<span class="sd">     * @Column(type="integer")</span>
 <span class="sd">     */</span>
     <span class="k">private</span> <span class="nv">$counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
@@ -1212,12 +1212,12 @@ we have this item in stock:</p>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">onInventoryItemCreated</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;New item created with name %s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">);</span>
+        <span class="nb">printf</span><span class="p">(</span><span class="s2">"New item created with name %s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">onItemsCheckedIntoInventory</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;There were %d new items checked into inventory</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">);</span>
+        <span class="nb">printf</span><span class="p">(</span><span class="s2">"There were %d new items checked into inventory</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1290,7 +1290,7 @@ the <span class="docutils literal"><span class="pre">postFlush</span></span>, <s
 
             <span class="k">foreach</span> <span class="p">(</span><span class="nv">$entity</span><span class="o">-&gt;</span><span class="na">popEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
                 <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">setAggregate</span><span class="p">(</span><span class="nv">$class</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">,</span> <span class="nv">$class</span><span class="o">-&gt;</span><span class="na">getSingleIdReflectionProperty</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">(</span><span class="nv">$entity</span><span class="p">));</span>
-                <span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">dispatchEvent</span><span class="p">(</span><span class="s2">&quot;on&quot;</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">(),</span> <span class="nv">$event</span><span class="p">);</span>
+                <span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">dispatchEvent</span><span class="p">(</span><span class="s2">"on"</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">(),</span> <span class="nv">$event</span><span class="p">);</span>
             <span class="p">}</span>
         <span class="p">}</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entities</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
@@ -1342,7 +1342,7 @@ in the background.</li>
 </ul>
 <p>I hope this blog post helps you when considering to use Domain Events Pattern with
 Doctrine. Again, <a class="reference external" href="https://gist.github.com/beberlei/53cd6580d87b1f5cd9ca">see the code on this Gist</a> for a working example.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Wed, 24 Jul 2013 00:00:00 +0200</pubDate>
         </item>
@@ -1351,7 +1351,7 @@ Doctrine. Again, <a class="reference external" href="https://gist.github.com/beb
             <link>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</link>
             <guid>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</guid>
             <title><![CDATA[Symfony2 on Windows Azure Websites]]></title>
-            <description><![CDATA[<div class="section" id="symfony2-on-windows-azure-websites">
+            <description><![CDATA[
 <h1>Symfony2 on Windows Azure Websites</h1>
 <p>With the Windows Azure Websites platform-as-a-service (PaaS), which was
 released as a preview to a general audiance in June last year, PHP applications
@@ -1383,13 +1383,13 @@ For the Demo application call:</p>
 to your Azure websites account.</p>
 <p>The bundle can be installed using the following <span class="docutils literal"><span class="pre">composer.json</span></span>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;beberlei/azure-distribution-bundle&quot;</span><span class="p">:</span> <span class="s">&quot;*&quot;</span>
+    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"beberlei/azure-distribution-bundle"</span><span class="p">:</span> <span class="s">"*"</span>
     <span class="p">},</span>
-    <span class="s">&quot;repositories&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s">"repositories"</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;pear&quot;</span><span class="p">,</span>
-            <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://pear.php.net&quot;</span>
+            <span class="s">"type"</span><span class="p">:</span> <span class="s">"pear"</span><span class="p">,</span>
+            <span class="s">"url"</span><span class="p">:</span> <span class="s">"http://pear.php.net"</span>
         <span class="p">}</span>
     <span class="p">],</span>
 <span class="p">}</span>
@@ -1397,7 +1397,7 @@ to your Azure websites account.</p>
 </div>
 <p>Registering PEAR is necessary, because the Azure PHP SDK depends on some PEAR
 components.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Thu, 23 May 2013 00:00:00 +0200</pubDate>
         </item>
@@ -1406,7 +1406,7 @@ components.</p>
             <link>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</link>
             <guid>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</guid>
             <title><![CDATA[Traits are Static Access]]></title>
-            <description><![CDATA[<div class="section" id="traits-are-static-access">
+            <description><![CDATA[
 <h1>Traits are Static Access</h1>
 <p>In a Twitter discussion yesterday I formulated my negative opinion
 about traits and Matthew asked me to clarify it:</p>
@@ -1448,7 +1448,7 @@ controller code through traits:</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">(</span><span class="s2">&quot;route_xyz&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">(</span><span class="s2">"route_xyz"</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -1526,7 +1526,7 @@ into “pseudo” static code:</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="s2">&quot;route_xyz&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="s2">"route_xyz"</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -1565,7 +1565,7 @@ will work on 5.5, requires changes to the visibility of properties though:</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s2">&quot;route_xyz&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s2">"route_xyz"</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -1597,7 +1597,7 @@ problem with aggregation.</p>
 <p>If you want to read more about problems with traits,
 <a class="reference external" href="http://blog.ircmaxell.com/2011/07/are-traits-new-eval.html">Anthony</a> wrote
 about them quite a while ago.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Fri, 12 Apr 2013 00:00:00 +0200</pubDate>
         </item>
@@ -1606,7 +1606,7 @@ about them quite a while ago.</p>
             <link>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</link>
             <guid>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</guid>
             <title><![CDATA[On Taming Repository Classes in Doctrine]]></title>
-            <description><![CDATA[<div class="section" id="on-taming-repository-classes-in-doctrine">
+            <description><![CDATA[
 <h1>On Taming Repository Classes in Doctrine</h1>
 <p>Over at the <a class="reference external" href="http://drafts.easybib.com/post/44139111915/taiming-repository-classes-in-doctrine-with-the">easybib/dev</a>
 Blog Anne posted an entry about their usage of Doctrine Repositories with a
@@ -1765,7 +1765,7 @@ code to use expressions that can be composed.</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$expr</span> <span class="o">=</span> <span class="s2">&quot;1=1&quot;</span><span class="p">;</span>
+        <span class="nv">$expr</span> <span class="o">=</span> <span class="s2">"1=1"</span><span class="p">;</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
             <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
@@ -1818,7 +1818,7 @@ and puts the result into the <span class="docutils literal"><span class="pre">wh
 </div>
 <p>Strictly speaking, the <span class="docutils literal"><span class="pre">UserSpecification</span></span> violates the single responsibility
 principle, which prevents the composability of specifications and reuse in
-different repositories. This is apparent by the <span class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">&quot;1=1&quot;;</span></span> line that is
+different repositories. This is apparent by the <span class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">"1=1";</span></span> line that is
 required to make the combination of conditions possible.
 Lets factor away the violation of the single
 responsibility principle by introducing three specifications:</p>
@@ -1971,7 +1971,7 @@ specification in its match method:</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$specification</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">supports</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEntityName</span><span class="p">()))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentException</span><span class="p">(</span><span class="s2">&quot;Specification not supported by this repository.&quot;</span><span class="p">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentException</span><span class="p">(</span><span class="s2">"Specification not supported by this repository."</span><span class="p">);</span>
         <span class="p">}</span>
 
         <span class="nv">$qb</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">(</span><span class="s1">'r'</span><span class="p">);</span>
@@ -2059,7 +2059,7 @@ EntityManager, Query + QueryBuilder dependencies.  Now We can inject the
 repositories into our controllers and services and then use mock objects in the
 tests.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Mon, 04 Mar 2013 00:00:00 +0100</pubDate>
         </item>
@@ -2068,7 +2068,7 @@ tests.</p>
             <link>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</link>
             <guid>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</guid>
             <title><![CDATA[Doctrine and SOLID]]></title>
-            <description><![CDATA[<div class="section" id="doctrine-and-solid">
+            <description><![CDATA[
 <h1>Doctrine and SOLID</h1>
 <p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
 time. It bugs me having to reply: It is not really possible.  Because Doctrine2
@@ -2098,18 +2098,18 @@ groups of concepts.</p>
 <span class="k">class</span> <span class="nc">Person</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type=&quot;datetime&quot;)</span>
+<span class="sd">     * @ORM\Column(type="datetime")</span>
 <span class="sd">     **/</span>
     <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
     <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type=&quot;datetime&quot;)</span>
+<span class="sd">     * @ORM\Column(type="datetime")</span>
 <span class="sd">     **/</span>
     <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="sd">/**</span>
@@ -2117,7 +2117,7 @@ groups of concepts.</p>
 <span class="sd">     **/</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -2137,13 +2137,13 @@ all the logic:</p>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -2225,7 +2225,7 @@ refactoring.</p>
 for technical reasons. In the future I hope to support value objects in
 Doctrine to make this possible.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Mon, 04 Feb 2013 00:00:00 +0100</pubDate>
         </item>
@@ -2234,16 +2234,16 @@ Doctrine to make this possible.</p>
             <link>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</link>
             <guid>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</guid>
             <title><![CDATA[Composer and Azure Websites Git Deployment]]></title>
-            <description><![CDATA[<div class="section" id="composer-and-azure-websites-git-deployment">
+            <description><![CDATA[
 <h1>Composer and Azure Websites Git Deployment</h1>
-<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com">Fortrabbit</a>), I turn to Microsoft Azure today. After some
+<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
 Composer and allows you to configure environment variables from the Management
 console.</p>
-<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites">Azure Websites</a> in June this
+<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites/">Azure Websites</a> in June this
 year.  It is a platform as a service solution where you can deploy your
 websites via FTP or Git. With Azure Websites you can avoid having to deal with
-the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services">Azure Hosted Cloud
+the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services/">Azure Hosted Cloud
 Services</a>.
 As long as your website only requires an SQLServer, MySQL or external APIs you
 can actually achieve quite a lot already.</p>
@@ -2263,7 +2263,7 @@ currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
+<span class="na">command</span> <span class="o">=</span> <span class="s">"D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php</span>
 </pre></div>
 </div>
 <p>If you are using PHP 5.4, then you probably have to change the command version
@@ -2272,15 +2272,15 @@ name to “v5.4”, but I haven’t tested this.</p>
 deployment command. The actual implementation is up to you, my version is
 the most simple one:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">))</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">))</span> <span class="p">{</span>
     <span class="nv">$url</span> <span class="o">=</span> <span class="s1">'https://getcomposer.org/composer.phar'</span><span class="p">;</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;--prefer-dist&quot;</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-v&quot;</span><span class="p">;</span>
-<span class="k">require</span> <span class="s2">&quot;composer.phar&quot;</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"update"</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"--prefer-dist"</span><span class="p">;</span>
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"-v"</span><span class="p">;</span>
+<span class="k">require</span> <span class="s2">"composer.phar"</span><span class="p">;</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -2292,7 +2292,7 @@ You can check out <a class="reference external" href="https://github.com/beberle
 </div>
 <p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
 You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Mon, 19 Nov 2012 00:00:00 +0100</pubDate>
         </item>
@@ -2301,7 +2301,7 @@ You can of course execute additional steps in the <span class="docutils literal"
             <link>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</link>
             <guid>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</guid>
             <title><![CDATA[Using Assertions for validation]]></title>
-            <description><![CDATA[<div class="section" id="using-assertions-for-validation">
+            <description><![CDATA[
 <h1>Using Assertions for validation</h1>
 <p>We all know PHP is weakly typed and has some weird type-conversion rules.
 This can often complicate our code checking for invalid or illegal data.
@@ -2377,7 +2377,7 @@ allows you to overwrite the exception class:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Tue, 04 Sep 2012 00:00:00 +0200</pubDate>
         </item>
@@ -2386,7 +2386,7 @@ allows you to overwrite the exception class:</p>
             <link>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</link>
             <guid>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</guid>
             <title><![CDATA[Building an Object Model: No setters allowed]]></title>
-            <description><![CDATA[<div class="section" id="building-an-object-model-no-setters-allowed">
+            <description><![CDATA[
 <h1>Building an Object Model: No setters allowed</h1>
 <p>If you are using an object relational mapper or any other database
 abstraction technology that converts rows to objects, then you will probably
@@ -2436,8 +2436,8 @@ blog example the <span class="docutils literal"><span class="pre">Post</span></s
     <span class="p">{</span>
         <span class="c1">// check invariants, business logic, filters</span>
 
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">state</span>       <span class="o">=</span> <span class="s2">&quot;published&quot;</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$onDate</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">state</span>       <span class="o">=</span> <span class="s2">"published"</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$onDate</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -2590,7 +2590,7 @@ is one building block towards clean object oriented code and domain driven desig
 <p>I am very interested in your opinions on this topic and my attempt to avoid them,
 please leave comments when leaving this website :-)</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Wed, 22 Aug 2012 00:00:00 +0200</pubDate>
         </item>
@@ -2599,7 +2599,7 @@ please leave comments when leaving this website :-)</p>
             <link>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</link>
             <guid>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</guid>
             <title><![CDATA[OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)]]></title>
-            <description><![CDATA[<div class="section" id="oop-business-applications-command-query-responsibility-segregation-cqrs">
+            <description><![CDATA[
 <h1>OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</h1>
 <p>Other posts in this series about OOP Business Applications:</p>
 <ul class="simple">
@@ -2788,7 +2788,7 @@ testing. This might be more difficult for developers to use and understand.
 This problem goes away however, if you combine CQRS with Event Sourcing. A
 topic that I will discuss in the next blog post.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Sat, 18 Aug 2012 00:00:00 +0200</pubDate>
         </item>
@@ -2797,7 +2797,7 @@ topic that I will discuss in the next blog post.</p>
             <link>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</link>
             <guid>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</guid>
             <title><![CDATA[OOP Business Applications: Data, Context, Interaction]]></title>
-            <description><![CDATA[<div class="section" id="oop-business-applications-data-context-interaction">
+            <description><![CDATA[
 <h1>OOP Business Applications: Data, Context, Interaction</h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
@@ -2997,7 +2997,7 @@ different parts of the system has other benefits: It can lead to easier to test
 code and makes it much easier for developers to develop on small and isolated
 parts of the system.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Thu, 16 Aug 2012 00:00:00 +0200</pubDate>
         </item>
@@ -3006,7 +3006,7 @@ parts of the system.</p>
             <link>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</link>
             <guid>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</guid>
             <title><![CDATA[OOP Business Applications: Entity, Boundary, Interactor]]></title>
-            <description><![CDATA[<div class="section" id="oop-business-applications-entity-boundary-interactor">
+            <description><![CDATA[
 <h1>OOP Business Applications: Entity, Boundary, Interactor</h1>
 <p>Other posts in this series:</p>
 <ul class="simple">
@@ -3015,7 +3015,7 @@ mess</a></li>
 </ul>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
 an architectural design pattern. I first heard about it in a keynote video of
-<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc">Uncle Bob</a> on Ruby
+<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc/">Uncle Bob</a> on Ruby
 Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
 This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
 by Alistair Cockburn.</p>
@@ -3264,7 +3264,7 @@ by using some code-generation for example to do parts of this job for you. The
 worst outcome with this pattern is, when you manually code layers for HTTP
 Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Mon, 13 Aug 2012 00:00:00 +0200</pubDate>
         </item>
@@ -3273,7 +3273,7 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
             <link>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</link>
             <guid>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</guid>
             <title><![CDATA[OOP Business Applications: Trying to escape the mess]]></title>
-            <description><![CDATA[<div class="section" id="oop-business-applications-trying-to-escape-the-mess">
+            <description><![CDATA[
 <h1>OOP Business Applications: Trying to escape the mess</h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -3382,7 +3382,7 @@ architecture or “Ports and adapters”. Gained popularity after <a class="refe
 at Ruby Midwest</a>
 last year.</li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
-<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
 day video class</a> by Greg Young.</li>
 </ul>
 <p>They are not new and have all been around for several years already. I would
@@ -3395,12 +3395,12 @@ different ways.</p>
 some examples and then wrap up my thoughts about all of them.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home">Free and Open Source
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
 Conference</a> in Sankt Augustin Germany on
 25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
 </div>
 </div>
-</div>]]></description>
+]]></description>
             <category><![CDATA[ PHP ]]></category>
              <pubDate>Sat, 11 Aug 2012 00:00:00 +0200</pubDate>
         </item>
