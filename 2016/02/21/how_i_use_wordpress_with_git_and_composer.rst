@@ -51,6 +51,8 @@ live *outside* the Wordpress installation.
 
 And then create a `.gitignore` file with the following ignore paths:
 
+::
+
     /htdocs/wordpress/
     /htdocs/wp-content/uploads
     /htdocs/wp-content/plugins
