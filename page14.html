@@ -76,6 +76,51 @@
           <div id="page14">
             
             <div class="timestamp postmeta">
+            <span>July 22, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
+<p>Per default any implementation of ArrayObject does not allow to use the
+object as multidimensional array. This snippet here implements the
+support:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class ArrayMultiObject extends ArrayObject</span>
+<span class="x">{</span>
+<span class="x">    function __construct($array, $flags = 0, $iterator_class = "ArrayIterator")</span>
+<span class="x">    {</span>
+<span class="x">        $objects = array();</span>
+<span class="x">        foreach($array AS $key =&gt; $value) {</span>
+<span class="x">            if(is_array($value)) {</span>
+<span class="x">                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);</span>
+<span class="x">            } else {</span>
+<span class="x">                $objects[$key] = $value;</span>
+<span class="x">            }</span>
+<span class="x">        }</span>
+
+<span class="x">        parent::__construct($objects, $flags, $iterator_class);</span>
+<span class="x">    }</span>
+
+<span class="x">    public function offsetSet($name, $value)</span>
+<span class="x">    {</span>
+<span class="x">        if(is_array($value)) {</span>
+<span class="x">            $value = new ArrayMultiObject($value);</span>
+<span class="x">        }</span>
+
+<span class="x">        return parent::offsetSet($name, $value);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/07/22/multidimensional-array-via-spl.html#disqus_thread" data-disqus-identifier="2008/07/22/multidimensional-array-via-spl">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>July 17, 2008</span>
         </div>
         <div class="section">
@@ -271,6 +316,8 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
             <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
         </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
@@ -288,8 +335,6 @@ my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repos
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li><li>
-            <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li></ul>
 </div>
 </section>

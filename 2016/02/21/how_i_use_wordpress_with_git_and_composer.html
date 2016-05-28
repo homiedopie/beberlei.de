@@ -32,7 +32,7 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Monolithic Repositories with Composer and Relative Autoloading" href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="next" title="Monolithic Repositories with Composer and Relative Autoloading" href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html" /><link rel="prev" title="Composer Monorepo Plugin (previously called Fiddler)" href="../../05/28/composer_monorepo_plugin_previously_called_fiddler.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
         VERSION:     '1.5',
@@ -148,23 +148,23 @@ create a composer.json file inside our repository root. There the file is
 outside of the webservers reach, users of your blog cannot download the
 composer.json.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;ext-gd&quot;</span><span class="p">:</span> <span class="s">&quot;*&quot;</span><span class="p">,</span>
-        <span class="s">&quot;wpackagist-plugin/easy-media-gallery&quot;</span><span class="p">:</span> <span class="s">&quot;1.3.*&quot;</span><span class="p">,</span>
-        <span class="s">&quot;johnpbloch/wordpress-core-installer&quot;</span><span class="p">:</span> <span class="s">&quot;^0.2.1&quot;</span><span class="p">,</span>
-        <span class="s">&quot;johnpbloch/wordpress&quot;</span><span class="p">:</span> <span class="s">&quot;^4.4&quot;</span>
+    <span class="s2">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ext-gd&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wpackagist-plugin/easy-media-gallery&quot;</span><span class="p">:</span> <span class="s2">&quot;1.3.*&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;johnpbloch/wordpress-core-installer&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.2.1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;johnpbloch/wordpress&quot;</span><span class="p">:</span> <span class="s2">&quot;^4.4&quot;</span>
     <span class="p">},</span>
-    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;installer-paths&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;htdocs/wp-content/plugins/{$name}/&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;type:wordpress-plugin&quot;</span><span class="p">],</span>
-            <span class="s">&quot;htdocs/wp-content/themes/{$name}/&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;type:wordpress-theme&quot;</span><span class="p">]</span>
+    <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;installer-paths&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;htdocs/wp-content/plugins/{$name}/&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;type:wordpress-plugin&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;htdocs/wp-content/themes/{$name}/&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;type:wordpress-theme&quot;</span><span class="p">]</span>
         <span class="p">},</span>
-        <span class="s">&quot;wordpress-install-dir&quot;</span><span class="p">:</span> <span class="s">&quot;htdocs/wordpress&quot;</span>
+        <span class="s2">&quot;wordpress-install-dir&quot;</span><span class="p">:</span> <span class="s2">&quot;htdocs/wordpress&quot;</span>
     <span class="p">},</span>
-    <span class="s">&quot;repositories&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;repositories&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;composer&quot;</span><span class="p">,</span>
-            <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://wpackagist.org&quot;</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;composer&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://wpackagist.org&quot;</span>
         <span class="p">}</span>
     <span class="p">]</span>
 <span class="p">}</span>
@@ -325,6 +325,8 @@ arguments:</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="../../05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
             <a href="#">How I use Wordpress with Git and Composer</a>
         </li><li>
             <a href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
@@ -342,8 +344,6 @@ arguments:</p>
             <a href="../../../2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="../../../2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li><li>
-            <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li></ul>
 </div>
 </section>

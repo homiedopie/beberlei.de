@@ -5,8 +5,57 @@
         <link>http://www.whitewashing.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Sun, 21 Feb 2016 00:00:00 +0100</pubDate>
+        <pubDate>Sat, 28 May 2016 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>http://www.whitewashing.de/2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html</link>
+            <guid>http://www.whitewashing.de/2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html</guid>
+            <title><![CDATA[Composer Monorepo Plugin (previously called Fiddler)]]></title>
+            <description><![CDATA[<h1>Composer Monorepo Plugin (previously called Fiddler)</h1>
+<p>I have <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">written about monorepos</a>
+in this blog before, <a class="reference external" href="https://qafoo.com/resources/presentations/symfony_live_berlin_2015/monorepos.html">presented a talk</a>
+about this topic and released a standalone tool called “Fiddler” that helps
+integrating Composer with a monolithic repository.</p>
+<p>At the beginning of the year, somebody in <span class="docutils literal"><span class="pre">#composer-dev</span></span> IRC channel on
+Freenode pointed me in the direction of Composer plugins to use with Fiddler
+and it was an easy change to do so.</p>
+<p>With the help of a new Composer v1.1 feature to add custom commands from a
+plugin, Fiddler is now “gone” and I renamed the repository to the practical
+<strong>beberlei/composer-monorepo-plugin</strong> package name on <a class="reference external" href="https://github.com/beberlei/composer-monorepo-plugin">Github</a>. After you install
+this plugin, you have the possibility to maintain subpackages and their
+dependencies in a single repository.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ composer require beberlei/composer-monorepo-plugin
+</pre></div>
+</div>
+<p>To use the plugin add <strong>monorepo.json</strong> files into each directory of a
+subpackage and use a format similar to the <strong>composer.json</strong> to add
+dependencies to a.) external composer packages that you have listed in your
+global Composer file b.) other subpackages in the current monorepo.
+See this example for a demonstration:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"vendor/symfony/http-foundation"</span><span class="p">,</span>
+        <span class="s2">"components/Foo"</span>
+    <span class="p">],</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Bar"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This subpackage here defined in a hypothetical file
+<strong>components/Bar/monorepo.json</strong> has dependencies to Symfony HTTP foundation
+and another subpackage Foo with its own <strong>components/Foo/monnorepo.json</strong>.
+Notice how we don’t need to specify versions (they are implicit) and import
+other dependencies using the relative path from the global composer.json.</p>
+<p>The monorepo plugin is integrated with Composer, so every time you perform install,
+update or dump-autoload commands, the subpackages will be updated as well and
+each get their own autoloader that can be included from <span class="docutils literal"><span class="pre">vendor/autoload.php</span></span>
+relative to the subpackages root directory as usual.</p>
+]]></description>
+             <pubDate>Sat, 28 May 2016 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>http://www.whitewashing.de/2016/02/21/how_i_use_wordpress_with_git_and_composer.html</link>
             <guid>http://www.whitewashing.de/2016/02/21/how_i_use_wordpress_with_git_and_composer.html</guid>
@@ -78,23 +127,23 @@ create a composer.json file inside our repository root. There the file is
 outside of the webservers reach, users of your blog cannot download the
 composer.json.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"ext-gd"</span><span class="p">:</span> <span class="s">"*"</span><span class="p">,</span>
-        <span class="s">"wpackagist-plugin/easy-media-gallery"</span><span class="p">:</span> <span class="s">"1.3.*"</span><span class="p">,</span>
-        <span class="s">"johnpbloch/wordpress-core-installer"</span><span class="p">:</span> <span class="s">"^0.2.1"</span><span class="p">,</span>
-        <span class="s">"johnpbloch/wordpress"</span><span class="p">:</span> <span class="s">"^4.4"</span>
+    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"ext-gd"</span><span class="p">:</span> <span class="s2">"*"</span><span class="p">,</span>
+        <span class="s2">"wpackagist-plugin/easy-media-gallery"</span><span class="p">:</span> <span class="s2">"1.3.*"</span><span class="p">,</span>
+        <span class="s2">"johnpbloch/wordpress-core-installer"</span><span class="p">:</span> <span class="s2">"^0.2.1"</span><span class="p">,</span>
+        <span class="s2">"johnpbloch/wordpress"</span><span class="p">:</span> <span class="s2">"^4.4"</span>
     <span class="p">},</span>
-    <span class="s">"extra"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"installer-paths"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">"htdocs/wp-content/plugins/{$name}/"</span><span class="p">:</span> <span class="p">[</span><span class="s">"type:wordpress-plugin"</span><span class="p">],</span>
-            <span class="s">"htdocs/wp-content/themes/{$name}/"</span><span class="p">:</span> <span class="p">[</span><span class="s">"type:wordpress-theme"</span><span class="p">]</span>
+    <span class="s2">"extra"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"installer-paths"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"htdocs/wp-content/plugins/{$name}/"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"type:wordpress-plugin"</span><span class="p">],</span>
+            <span class="s2">"htdocs/wp-content/themes/{$name}/"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"type:wordpress-theme"</span><span class="p">]</span>
         <span class="p">},</span>
-        <span class="s">"wordpress-install-dir"</span><span class="p">:</span> <span class="s">"htdocs/wordpress"</span>
+        <span class="s2">"wordpress-install-dir"</span><span class="p">:</span> <span class="s2">"htdocs/wordpress"</span>
     <span class="p">},</span>
-    <span class="s">"repositories"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"repositories"</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="s">"type"</span><span class="p">:</span> <span class="s">"composer"</span><span class="p">,</span>
-            <span class="s">"url"</span><span class="p">:</span> <span class="s">"http://wpackagist.org"</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"composer"</span><span class="p">,</span>
+            <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"http://wpackagist.org"</span>
         <span class="p">}</span>
     <span class="p">]</span>
 <span class="p">}</span>
@@ -242,9 +291,9 @@ the autoloading capabilities of Composer in a hackish way.</p>
 <span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
 its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">"Foo"</span><span class="p">:</span> <span class="s">"../foo/src/"</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"Foo"</span><span class="p">:</span> <span class="s2">"../foo/src/"</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -470,22 +519,22 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s">"Library1</span><span class="se">\\</span><span class="s">"</span><span class="p">:</span> <span class="s">"src/"</span><span class="p">}},</span>
-    <span class="s">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Library1</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
+    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s">"ProjectA</span><span class="se">\\</span><span class="s">"</span><span class="p">:</span> <span class="s">"src/"</span><span class="p">}},</span>
-    <span class="s">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s">"components/Library_1"</span><span class="p">]</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ProjectA</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
+    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"components/Library_1"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s">"~2.6"</span>
+    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s2">"~2.6"</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1290,13 +1339,13 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 <p>You can find <a class="reference external" href="https://github.com/beberlei/symfony-minimal-distribution">all the code on Github</a>.</p>
 <p>Start with the composer.json:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"symfony/symfony"</span><span class="p">:</span> <span class="s">"@stable"</span><span class="p">,</span>
-        <span class="s">"symfony/monolog-bundle"</span><span class="p">:</span> <span class="s">"@stable"</span><span class="p">,</span>
-        <span class="s">"vlucas/phpdotenv"</span><span class="p">:</span> <span class="s">"@stable"</span>
+    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"symfony/symfony"</span><span class="p">:</span> <span class="s2">"@stable"</span><span class="p">,</span>
+        <span class="s2">"symfony/monolog-bundle"</span><span class="p">:</span> <span class="s2">"@stable"</span><span class="p">,</span>
+        <span class="s2">"vlucas/phpdotenv"</span><span class="p">:</span> <span class="s2">"@stable"</span>
     <span class="p">},</span>
-    <span class="s">"autoload"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"psr-0"</span><span class="p">:</span> <span class="p">{</span> <span class="s">"Acme"</span><span class="p">:</span> <span class="s">"src/"</span> <span class="p">}</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"Acme"</span><span class="p">:</span> <span class="s2">"src/"</span> <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1323,7 +1372,7 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 the different front controller files based on environment. We need a file
 called <span class="docutils literal"><span class="pre">.env</span></span> in our application root containing key-value pairs of
 environment variables:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># .env</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c1"># .env</span>
 <span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
 <span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
 </pre></div>
@@ -1403,7 +1452,7 @@ monolog:
 by adding new lines to <span class="docutils literal"><span class="pre">.env</span></span> file, making use of the excellent <a class="reference external" href="http://symfony.com/doc/current/cookbook/configuration/external_parameters.html">external
 configuration parameter support</a>
 in Symfony.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># .env</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c1"># .env</span>
 <span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
 <span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
 <span class="n">SYMFONY__SECRET</span><span class="o">=</span><span class="n">abcdefg</span>
@@ -3448,13 +3497,13 @@ For the Demo application call:</p>
 to your Azure websites account.</p>
 <p>The bundle can be installed using the following <span class="docutils literal"><span class="pre">composer.json</span></span>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">"beberlei/azure-distribution-bundle"</span><span class="p">:</span> <span class="s">"*"</span>
+    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"beberlei/azure-distribution-bundle"</span><span class="p">:</span> <span class="s2">"*"</span>
     <span class="p">},</span>
-    <span class="s">"repositories"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"repositories"</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="s">"type"</span><span class="p">:</span> <span class="s">"pear"</span><span class="p">,</span>
-            <span class="s">"url"</span><span class="p">:</span> <span class="s">"http://pear.php.net"</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"pear"</span><span class="p">,</span>
+            <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"http://pear.php.net"</span>
         <span class="p">}</span>
     <span class="p">],</span>
 <span class="p">}</span>
@@ -6239,11 +6288,11 @@ Guest Additions. To be able to use vagrant, you need a basebox with the
 virtualbox and guest additions versions matching correctly.</p>
 <p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
 all the latest VM templates:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/jedi4ever/veewee.git
-<span class="nv">$ </span><span class="nb">cd </span>veewee
-<span class="nv">$ </span>sudo gem install bundler
-<span class="nv">$ </span>sudo bundle install
-<span class="nv">$ </span><span class="nb">alias </span><span class="nv">vagrant</span><span class="o">=</span><span class="s2">"bundle exec vagrant"</span>
+<div class="highlight-bash"><div class="highlight"><pre>$ git clone https://github.com/jedi4ever/veewee.git
+$ <span class="nb">cd</span> veewee
+$ sudo gem install bundler
+$ sudo bundle install
+$ <span class="nb">alias</span> <span class="nv">vagrant</span><span class="o">=</span><span class="s2">"bundle exec vagrant"</span>
 </pre></div>
 </div>
 <p>You need Ruby and Gems installed for this to work. Veewee can be installed
@@ -6251,7 +6300,7 @@ using Gems, but this not necessarily gives you the version with the most recent
 templates that match your own operating system version.</p>
 <p>Now lets define our own basebox definition and copy from an existing template
 that Veewee provides:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
+<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
 </pre></div>
 </div>
 <p>This creates a copy from the default ubuntu server template into a folder
@@ -6265,12 +6314,12 @@ building the VMs fails:</p>
 <p>You can then open up the postinstall.sh and install more packages that you need
 in your personal basebox. For example a LAMP stack. Do this right after the
 lines that do <cite>apt-get install -y</cite>:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
 apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
 </pre></div>
 </div>
 <p>If you are done you can start building a virtualbox image with:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>vagrant basebox build
+<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox build
 </pre></div>
 </div>
 <p>Make sure not to start typing in the console window that open ups. It is
@@ -6278,17 +6327,17 @@ automatically controlled from a ruby script and every change to the keysequence
 breaks the building. This step takes a while. (Enough to write a blog post
 while watching a boring football game for example).</p>
 <p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
-<span class="nv">$ </span>vagrant basebox <span class="nb">export</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
-<span class="nv">$ </span>vagrant box add <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php.box'</span>
+<div class="highlight-bash"><div class="highlight"><pre>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant basebox <span class="nb">export</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant box add <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php.box'</span>
 </pre></div>
 </div>
 <p>Now this box is also available as Vagrant base box. For example in a project
 that we want to use with vagrant, do:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>myproject/
-<span class="nv">$ </span>vagrant init <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
-<span class="nv">$ </span>vagrant up
-<span class="nv">$ </span>vagrant ssh
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> myproject/
+$ vagrant init <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant up
+$ vagrant ssh
 </pre></div>
 </div>
 <p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
@@ -6433,10 +6482,10 @@ monolog:
 <div class="section" id="creating-the-routing-yml">
 <h2>Creating the routing.yml</h2>
 <div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># Tests/Controller/App/routing.yml</span>
-<span class="l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">resource</span><span class="p-Indicator">:</span> <span class="s">"@BeberleiWorkflowBundle/Controller/"</span>
-    <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">annotation</span>
-    <span class="l-Scalar-Plain">prefix</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">/</span>
+<span class="l l-Scalar l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="s">"@BeberleiWorkflowBundle/Controller/"</span>
+    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
+    <span class="l l-Scalar l-Scalar-Plain">prefix</span><span class="p p-Indicator">:</span>   <span class="l l-Scalar l-Scalar-Plain">/</span>
 </pre></div>
 </div>
 </div>

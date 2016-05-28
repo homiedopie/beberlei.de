@@ -76,6 +76,50 @@
           <div id="page9">
             
             <div class="timestamp postmeta">
+            <span>May 17, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/05/17/using-zend-http-client-to-ping-technorati.html">Using Zend_Http_Client to Ping Technorati</a></h1>
+<p>Send a ping to Technorati manually is a pain in the ass. Writing a
+little Method that handles this functionality for your own blog software
+is quite easy. Call the following method after you created or updated a
+post of yours:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>private function _pingTechnorati()
+{
+    $xml = $this-&gt;view-&gt;render('ping_technorati.phtml');
+
+    $httpclient = new Zend_Http_Client('http://rpc.technorati.com/rpc/ping');
+            $httpclient-&gt;setHeaders('User-Agent', 'PHP/Zend Framework/Zend_Http');
+
+    $httpclient-&gt;setRawData($xml, 'text/xml')-&gt;request('POST');
+
+    $response = $httpclient-&gt;request();
+
+    if($response-&gt;isSuccessful() === true) {
+        return true;
+    } else {
+        return false;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You also need a little view in XML format like it is described in the
+<a class="reference external" href="http://technorati.com/developers/ping/">Technorati Ping Configuration
+Guide</a> and ready to go you
+are!</p>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        
+        <div class="comments">
+            <a href="http://www.whitewashing.de/2008/05/17/using-zend-http-client-to-ping-technorati.html#disqus_thread" data-disqus-identifier="2008/05/17/using-zend-http-client-to-ping-technorati">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
             <span>May 07, 2008</span>
         </div>
         <div class="section">
@@ -743,30 +787,6 @@ of work you have to cope with in the current standard setup.</p>
         
         <div class="comments">
             <a href="http://www.whitewashing.de/2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html#disqus_thread" data-disqus-identifier="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 25, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/25/next-zf-mini-release-1-7-1.html">Next ZF Mini Release: 1.7.1</a></h1>
-<p>In the next days the next mini release of the Zend Framework will be
-released and I want to keep you up to date of my progress on it.
-I got lots of feedback on the jQuery component and also had the
-possibility to fix some bugs and documentation issues. I also fixed some
-minor bugs that have been in the Zend_Soap_Wsdl stuff i added for the
-1.7 release.
-And a question for the 1.8 release that is due around February 2009:
-What do you think is missing in the jQuery support to ZF? Any widgets or
-stuff that you want to have included?</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/25/next-zf-mini-release-1-7-1.html#disqus_thread" data-disqus-identifier="2008/11/25/next-zf-mini-release-1-7-1">Leave a comment</a>
         </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
@@ -791,6 +811,8 @@ stuff that you want to have included?</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
             <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
         </li><li>
             <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
@@ -808,8 +830,6 @@ stuff that you want to have included?</p>
             <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li><li>
-            <a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li></ul>
 </div>
 </section>

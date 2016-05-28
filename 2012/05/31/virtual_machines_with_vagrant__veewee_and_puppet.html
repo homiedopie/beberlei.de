@@ -109,11 +109,11 @@ Guest Additions. To be able to use vagrant, you need a basebox with the
 virtualbox and guest additions versions matching correctly.</p>
 <p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
 all the latest VM templates:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/jedi4ever/veewee.git
-<span class="nv">$ </span><span class="nb">cd </span>veewee
-<span class="nv">$ </span>sudo gem install bundler
-<span class="nv">$ </span>sudo bundle install
-<span class="nv">$ </span><span class="nb">alias </span><span class="nv">vagrant</span><span class="o">=</span><span class="s2">&quot;bundle exec vagrant&quot;</span>
+<div class="highlight-bash"><div class="highlight"><pre>$ git clone https://github.com/jedi4ever/veewee.git
+$ <span class="nb">cd</span> veewee
+$ sudo gem install bundler
+$ sudo bundle install
+$ <span class="nb">alias</span> <span class="nv">vagrant</span><span class="o">=</span><span class="s2">&quot;bundle exec vagrant&quot;</span>
 </pre></div>
 </div>
 <p>You need Ruby and Gems installed for this to work. Veewee can be installed
@@ -121,7 +121,7 @@ using Gems, but this not necessarily gives you the version with the most recent
 templates that match your own operating system version.</p>
 <p>Now lets define our own basebox definition and copy from an existing template
 that Veewee provides:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>vagrant basebox define <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span> <span class="s1">&#39;ubuntu-server-12.04-i386&#39;</span>
+<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox define <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span> <span class="s1">&#39;ubuntu-server-12.04-i386&#39;</span>
 </pre></div>
 </div>
 <p>This creates a copy from the default ubuntu server template into a folder
@@ -135,12 +135,12 @@ building the VMs fails:</p>
 <p>You can then open up the postinstall.sh and install more packages that you need
 in your personal basebox. For example a LAMP stack. Do this right after the
 lines that do <cite>apt-get install -y</cite>:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
 apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
 </pre></div>
 </div>
 <p>If you are done you can start building a virtualbox image with:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>vagrant basebox build
+<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox build
 </pre></div>
 </div>
 <p>Make sure not to start typing in the console window that open ups. It is
@@ -148,17 +148,17 @@ automatically controlled from a ruby script and every change to the keysequence
 breaks the building. This step takes a while. (Enough to write a blog post
 while watching a boring football game for example).</p>
 <p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>veewee vbox validate <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
-<span class="nv">$ </span>vagrant basebox <span class="nb">export</span> <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
-<span class="nv">$ </span>vagrant box add <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span> <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php.box&#39;</span>
+<div class="highlight-bash"><div class="highlight"><pre>$ veewee vbox validate <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
+$ vagrant basebox <span class="nb">export</span> <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
+$ vagrant box add <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span> <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php.box&#39;</span>
 </pre></div>
 </div>
 <p>Now this box is also available as Vagrant base box. For example in a project
 that we want to use with vagrant, do:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>myproject/
-<span class="nv">$ </span>vagrant init <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
-<span class="nv">$ </span>vagrant up
-<span class="nv">$ </span>vagrant ssh
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> myproject/
+$ vagrant init <span class="s1">&#39;beberlei-ubuntu-12.04-i386-php&#39;</span>
+$ vagrant up
+$ vagrant ssh
 </pre></div>
 </div>
 <p>Although the blog-title suggests it, Puppet hasn&#8217;t been used much up to this
@@ -194,6 +194,8 @@ point. The use of puppet with Vagrant will be part of a next blog post.</p>
     <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
     <h1>Recent Posts</h1>
     <ul><li>
+            <a href="../../../2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
             <a href="../../../2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
         </li><li>
             <a href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
@@ -211,8 +213,6 @@ point. The use of puppet with Vagrant will be part of a next blog post.</p>
             <a href="../../../2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
         </li><li>
             <a href="../../../2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li><li>
-            <a href="../../../2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a>
         </li></ul>
 </div>
 </section>
