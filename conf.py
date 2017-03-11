@@ -9,7 +9,7 @@ import sys, os
 # **************************************************************
 
 # Change this to the name of your blog
-project = 'Whitewashing'
+project = 'beberlei.de'
 
 # Change this to the tagline of your blog
 tagline = ''
@@ -18,7 +18,7 @@ tagline = ''
 author = 'Benjamin Eberlei'
 
 # Change this to your copyright string
-copyright = '2008-2016, ' + author
+copyright = '2008-2017, ' + author
 
 # Change this to your blog root URL (required for RSS feed)
 website = 'https://www.beberlei.de'
@@ -71,6 +71,8 @@ html_sidebars = {
 rss_for_categories = True
 rss_categories_to_build = ["PHP", "php"]
 
+posts_per_page=5
+
 
 # **************************************************************
 # Do not modify below lines as the values are required by
@@ -85,3 +87,4 @@ html_title = project
 html_use_index = False
 html_show_sourcelink = False
 html_add_permalinks = None
+
