@@ -40,6 +40,5 @@ Zend\_Controller\_Action you have to do something like this:
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

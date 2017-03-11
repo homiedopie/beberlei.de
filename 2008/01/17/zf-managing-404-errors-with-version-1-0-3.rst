@@ -63,6 +63,6 @@ renamed, my current snippet is:
 I hope someone needs this as much as me.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

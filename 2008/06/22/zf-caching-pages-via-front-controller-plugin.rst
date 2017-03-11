@@ -74,6 +74,5 @@ authentication or the caching plugin somehow. This will probably be the
 topic another time.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

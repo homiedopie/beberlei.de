@@ -272,5 +272,5 @@ dispatcher, because the benefits outweigh the downsides.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

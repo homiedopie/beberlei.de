@@ -22,6 +22,5 @@ idea <http://code.google.com/soc/>`_ for the Eclipse Foundation (since
 Zend is not taking part).
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -149,5 +149,5 @@ in new 2.0 version of the bundle.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony
 .. comments::

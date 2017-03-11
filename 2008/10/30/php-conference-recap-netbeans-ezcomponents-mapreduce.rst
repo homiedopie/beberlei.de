@@ -61,6 +61,5 @@ using their notebooks were packed on hotspots where power was available.
 Please more power plug possibilities next time!
 
 .. categories:: none
-.. tags:: none
+.. tags:: Conferences
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -27,6 +27,5 @@ issue <http://framework.zend.com/issues/browse/ZF-1688>`_ if a lengthy
 subject with non-ASCII chars is displayed correctly.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

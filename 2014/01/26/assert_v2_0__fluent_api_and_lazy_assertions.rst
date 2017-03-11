@@ -104,5 +104,5 @@ You can find more information in the `README of Assert
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP
+.. tags:: AssertLibrary
 .. comments::

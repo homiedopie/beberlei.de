@@ -18,6 +18,5 @@ version <http://www.beberlei.de/dev/svn/ZendX_JQuery>`_ at my SVN
 repository.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

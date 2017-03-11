@@ -20,6 +20,5 @@ problem set.
 - `Presentation Knights Tour (German Language) <http://www.zaik.uni-koeln.de/AFS/teachings/ss07/InfoSeminar/handout/leonid_torgovitski_nknighttours.pdf>`_
 
 .. categories:: none
-.. tags:: none
+.. tags:: Algorithms
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -93,6 +93,5 @@ method to decide between new class generation and using the globally
 registered class instance.
 
 .. categories:: none
-.. tags:: none
+.. tags:: DependencyInjection
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

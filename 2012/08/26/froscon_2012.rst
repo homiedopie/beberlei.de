@@ -42,5 +42,5 @@ to the next FrOSCon 2013.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Conferences
 .. comments::

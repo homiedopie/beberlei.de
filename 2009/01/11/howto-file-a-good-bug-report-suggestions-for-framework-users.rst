@@ -54,6 +54,5 @@ lead to missing information on part of the developer that he has to
 it should.
 
 .. categories:: none
-.. tags:: none
+.. tags:: OpenSourceCitizen
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

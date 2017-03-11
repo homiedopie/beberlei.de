@@ -32,6 +32,6 @@ file .netbeans/6.7/config/Preferences.properties setting
 inline highlighting that did not refresh when lines in the file changed.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Netbeans
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

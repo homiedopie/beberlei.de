@@ -41,6 +41,5 @@ integrates lots of stuff of the Zym component).
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, CouchDB
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -33,6 +33,5 @@ about the problem a little longer leads to powerful reusable solutions,
 that save time on integration after the first initial setup.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, Javascript
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

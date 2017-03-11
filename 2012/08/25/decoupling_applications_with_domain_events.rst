@@ -163,5 +163,5 @@ best parts for your own.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

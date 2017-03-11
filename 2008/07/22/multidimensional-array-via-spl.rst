@@ -35,6 +35,5 @@ support:
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: PHP
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

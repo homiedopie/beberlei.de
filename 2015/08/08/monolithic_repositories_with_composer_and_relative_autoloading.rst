@@ -49,5 +49,5 @@ only once.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Monorepos
 .. comments::

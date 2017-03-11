@@ -30,6 +30,5 @@ Github <http://github.com/beberlei/puma/tree/master>`_ and play with it.
 I would really like to hear your thoughts.
 
 .. categories:: none
-.. tags:: none
+.. tags:: PUMA, Testing, Metrics
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

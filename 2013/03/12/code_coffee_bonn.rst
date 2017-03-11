@@ -22,5 +22,5 @@ Looking forward to seeing you there!
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Community
 .. comments::

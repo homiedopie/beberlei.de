@@ -16,6 +16,5 @@ goodie <http://www.beberlei.de/sources/wiipylib-0.1.tar.gz>`_ and have a
 look at it.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Python, HackingWii
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

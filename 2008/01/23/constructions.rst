@@ -9,6 +9,5 @@ experience. It will take some more time than if I would do it in "the
 old ways".
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

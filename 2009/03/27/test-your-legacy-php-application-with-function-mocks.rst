@@ -79,6 +79,5 @@ Runkit.
     the **runkit\_function\_redefine**.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Testing
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

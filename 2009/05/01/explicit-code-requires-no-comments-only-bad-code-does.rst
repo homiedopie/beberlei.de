@@ -169,6 +169,5 @@ go.
     friendly.
 
 .. categories:: none
-.. tags:: none
+.. tags:: CodeQuality
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

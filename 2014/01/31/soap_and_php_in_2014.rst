@@ -409,5 +409,5 @@ necessary for REST APIs.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP
+.. tags:: PHP, SOAP
 .. comments::

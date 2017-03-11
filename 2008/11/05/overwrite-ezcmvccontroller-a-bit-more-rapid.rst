@@ -19,77 +19,78 @@ that hopefully serves you quite some time. You can append variables to
 the ezcMvcResult object by calling the magic \_\_get and \_\_set on the
 controller. Plus it offers a method to use the ezcMvcInternalRedirect
 instead of the result. See for yourself:
-    ::
 
-        class myController extends ezcMvcController
+::
+
+    class myController extends ezcMvcController
+    {
+        protected $result;
+
+        public function createResult()
         {
-            protected $result;
+            $actionMethod = $this->createActionMethodName();
 
-            public function createResult()
-            {
-                $actionMethod = $this->createActionMethodName();
-
-                if ( method_exists( $this, $actionMethod ) ) {
-                    $status = $this->$actionMethod();
-                    if($status != 0) {
-                        $this->getResult()->status = $status;
-                    }
-                    return $this->getResult();
-                } else {
-                    throw new ezcMvcActionNotFoundException( $this->action );
+            if ( method_exists( $this, $actionMethod ) ) {
+                $status = $this->$actionMethod();
+                if($status != 0) {
+                    $this->getResult()->status = $status;
                 }
-            }
-
-            protected function _redirect($uri)
-            {
-                $request = clone $this->request;
-                $request->uri = $uri;
-                $this->result = new ezcMvcInternalRedirect($request);
-            }
-
-            public function __get($name)
-            {
-                if(isset($this->getResult()->variables[$name])) {
-                    return $this->getResult()->variables[$name];
-                }
-                return null;
-            }
-
-            public function __set($name, $value)
-            {
-                $this->getResult()->variables[$name] = $value;
-            }
-
-            public function __isset($name)
-            {
-                return isset($this->getResult()->variables[$name]);
-            }
-
-            protected function getResult()
-            {
-                if($this->result === null) {
-                    $this->result = new ezcMvcResult();
-                }
-                return $this->result;
+                return $this->getResult();
+            } else {
+                throw new ezcMvcActionNotFoundException( $this->action );
             }
         }
+
+        protected function _redirect($uri)
+        {
+            $request = clone $this->request;
+            $request->uri = $uri;
+            $this->result = new ezcMvcInternalRedirect($request);
+        }
+
+        public function __get($name)
+        {
+            if(isset($this->getResult()->variables[$name])) {
+                return $this->getResult()->variables[$name];
+            }
+            return null;
+        }
+
+        public function __set($name, $value)
+        {
+            $this->getResult()->variables[$name] = $value;
+        }
+
+        public function __isset($name)
+        {
+            return isset($this->getResult()->variables[$name]);
+        }
+
+        protected function getResult()
+        {
+            if($this->result === null) {
+                $this->result = new ezcMvcResult();
+            }
+            return $this->result;
+        }
+    }
 
 You can now use a controller in the following way:
 
-    ::
+::
 
-        class dashboardController extends myController
+    class dashboardController extends myController
+    {
+        public function doIndex()
         {
-            public function doIndex()
-            {
-                $this->cookie = "Cookie!"; // Proxy to $ezcMvcResult->variables['cookie']
-            }
-
-            public function doRedirect()
-            {
-                $this->_redirect("/");
-            }
+            $this->cookie = "Cookie!"; // Proxy to $ezcMvcResult->variables['cookie']
         }
+
+        public function doRedirect()
+        {
+            $this->_redirect("/");
+        }
+    }
 
 Very nice! The next thing I have to extend in ezcMvc is automagical
 matching of controller and action names to view output names with a
@@ -97,6 +98,5 @@ special View Handler that takes care of this. This saves another bunch
 of work you have to cope with in the current standard setup.
 
 .. categories:: none
-.. tags:: none
+.. tags:: eZComponents
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

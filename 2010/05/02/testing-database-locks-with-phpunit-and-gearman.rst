@@ -138,6 +138,5 @@ Now if both workers are waiting for processing the task we can run this
 test and get a green bar for a working lock support.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Testing
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -97,6 +97,6 @@ the `Mailing-List <http://groups.google.com/group/doctrine-user>`_ or
 come discuss with us on Doctrine 2 on Freenode #doctrine-dev.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Doctrine
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

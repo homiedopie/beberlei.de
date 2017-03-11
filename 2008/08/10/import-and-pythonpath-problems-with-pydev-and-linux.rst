@@ -26,6 +26,5 @@ last used external tool again" as keyboard shortcut in the Eclipse
 preferences. This simplifies the execution even more.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Python
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

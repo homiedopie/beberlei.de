@@ -19,6 +19,5 @@ SVN <http://www.beberlei.de/dev/svn/ZendX_JQuery>`_ so you can already
 check them if you want.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -364,5 +364,5 @@ anything on top this foundation from simple CRUD, APIs, hexagonal- or CQRS-archi
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony
 .. comments::

@@ -36,6 +36,6 @@ small plans (10€/month) to bigger ones (80€/month).
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Clouds
 .. comments::
 

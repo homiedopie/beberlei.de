@@ -177,6 +177,5 @@ you could build an Action Helper for it and use the direct call
 mechanism to save some lines of code.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

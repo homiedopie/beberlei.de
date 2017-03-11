@@ -17,6 +17,6 @@ different standards on a per project basis, currently you can only
 choose a global standard.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Netbeans
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

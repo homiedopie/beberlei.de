@@ -140,6 +140,5 @@ another creation method for it and convert the format for create() to be
 used.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

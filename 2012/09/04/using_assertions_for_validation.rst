@@ -90,5 +90,5 @@ allows you to overwrite the exception class:
 
 .. author:: default
 .. categories:: PHP
-.. tags:: none
+.. tags:: AssertLibrary
 .. comments::

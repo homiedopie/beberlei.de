@@ -42,6 +42,5 @@ highlight, as well as the drinks and snacks in between. All in all I can
 highly recommend the Multimediatreff for the next time.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Conferences
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

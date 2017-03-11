@@ -20,6 +20,5 @@ worked well, the only problem being that it is no longer under active
 development. At least it has all the features I need for now.
 
 .. categories:: none
-.. tags:: none
+.. tags:: IDE
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

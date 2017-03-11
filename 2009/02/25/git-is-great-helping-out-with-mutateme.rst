@@ -27,6 +27,6 @@ and CodeSniffer at once and directly processes the results. When this is
 done, I will pack it all up as a PEAR package for anyone to test out.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Testing
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

@@ -47,6 +47,5 @@ $this->variable. I haven't tested this though.
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

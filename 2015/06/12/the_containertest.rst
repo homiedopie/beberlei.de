@@ -55,5 +55,5 @@ on traits in tests for more information.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony, Testing
 .. comments::

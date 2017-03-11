@@ -181,3 +181,8 @@ the static syntax we don't need it.
 
 This is a very good starting point to start exploring more features of Symfony
 and gradually add the required configuration and files for this.
+
+.. author:: default
+.. categories:: PHP
+.. tags:: Symfony
+.. comments::

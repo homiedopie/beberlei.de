@@ -143,6 +143,6 @@ You can find more detailed resources on the PuppetLabs website:
 - `Type Cheat Sheet <docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf>`_
 
 .. author:: default
-.. categories:: none
+.. categories:: Automation
 .. tags:: none
 .. comments::

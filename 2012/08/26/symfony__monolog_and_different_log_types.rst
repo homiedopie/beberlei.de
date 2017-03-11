@@ -52,5 +52,5 @@ Request.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony
 .. comments::

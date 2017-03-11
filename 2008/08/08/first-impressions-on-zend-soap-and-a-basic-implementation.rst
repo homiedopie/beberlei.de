@@ -100,6 +100,5 @@ this simple lines:
     comparisons.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, SOAP
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

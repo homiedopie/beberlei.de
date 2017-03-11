@@ -76,6 +76,6 @@ issues that generally come with webservices, without loosing flexibility
 at all.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

@@ -74,5 +74,5 @@ You can of course execute additional steps in the ``build_azure.php``, for examp
 
 .. author:: default
 .. categories:: PHP
-.. tags:: Azure
+.. tags:: Azure, Composer
 .. comments::

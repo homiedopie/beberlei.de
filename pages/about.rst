@@ -6,8 +6,11 @@ since 2005. Not all posts survived migrating through different blog engines
 since then, only those starting in 2008 and older. I
 am a `programmer <https://github.com/beberlei>`_, `trainer and consultant
 <https://qafoo.com>`_ and since recently also a `founder of the company
-Tideways <https://tideways.io>`_. On this blog I write about programming,
-software and other computer science related topics.
+Tideways <https://tideways.io>`_. 
 
-You can follow me on `Twitter <https://twitter.com>`_, subscribe to my `RSS
-feed <http://beberlei.de/rss.xml>`_. 
+I have blogged about a wide range of topics including programming, software
+architecture and craftsmanship, Symfony, Doctrine, Ansible, Zend Framework 1,
+Vagrant, Side Projects.
+
+You can follow me on `Twitter <https://twitter.com>`_ or subscribe to the `RSS
+feed <http://beberlei.de/rss.xml>`_ of this blog. 

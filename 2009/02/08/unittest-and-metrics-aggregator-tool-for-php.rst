@@ -30,6 +30,5 @@ too. A list of `some screenshots is at the Github Wiki
 page <http://wiki.github.com/beberlei/puma>`_.
 
 .. categories:: none
-.. tags:: none
+.. tags:: PUMA, Testing, Metrics
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

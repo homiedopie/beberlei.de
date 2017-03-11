@@ -61,6 +61,6 @@ I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.
 
 .. author:: default
-.. categories:: none
+.. categories:: Doctrine
 .. tags:: none
 .. comments::

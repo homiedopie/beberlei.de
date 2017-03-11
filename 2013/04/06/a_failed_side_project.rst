@@ -99,5 +99,5 @@ hear other stories.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: SideProjects
 .. comments::

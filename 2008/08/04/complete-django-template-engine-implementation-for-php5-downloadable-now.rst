@@ -29,6 +29,6 @@ put up a little tutorial how to get the Template Engine running with
 Zend Framework and as a standalone component.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, CalypsoLibrary
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

@@ -10,6 +10,5 @@ can view my source code
 `here <http://www.beberlei.de/sources/knightstour.txt>`_.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Algorithms
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

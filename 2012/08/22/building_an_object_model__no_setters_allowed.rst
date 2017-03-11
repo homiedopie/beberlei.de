@@ -229,5 +229,5 @@ please leave comments when leaving this website :-)
 
 .. author:: default
 .. categories:: PHP
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

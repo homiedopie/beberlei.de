@@ -225,5 +225,5 @@ It is stable enough so that we could actually port `Tideways
 
 .. author:: default
 .. categories:: PHP
-.. tags:: Fiddler, BuildTools, Composer
+.. tags:: Monorepos, Composer
 .. comments::

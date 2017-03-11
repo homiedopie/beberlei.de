@@ -69,6 +69,5 @@ tags. As a next task I will implement the helper for DojoX DTL and will
 report back on my efforts.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>
