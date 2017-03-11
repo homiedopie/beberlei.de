@@ -87,6 +87,5 @@ AutoFill and Tooltip extensions will be topic of the next installments
 of this series, so be aware of new content soonish.
 
 .. categories:: none
-.. tags:: none
+.. tags:: jQuery, ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

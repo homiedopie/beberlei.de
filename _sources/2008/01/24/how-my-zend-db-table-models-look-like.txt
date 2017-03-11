@@ -36,6 +36,5 @@ compromise after another for getting the Table Gateway to reproduce a
 result that looks like a join.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

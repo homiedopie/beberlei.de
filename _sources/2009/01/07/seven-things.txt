@@ -54,6 +54,5 @@ else, still for the head count:
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: InternetMemes
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

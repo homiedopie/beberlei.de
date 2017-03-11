@@ -149,6 +149,5 @@ internally, which allowed me to throw away half of the self-written
 code. Thanks!
 
 .. categories:: none
-.. tags:: none
+.. tags:: Deployment
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

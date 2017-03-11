@@ -22,6 +22,5 @@ Additionally I went on another bug killing spree and fixed around 20-30
 old bugs in a wide range of different components.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

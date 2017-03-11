@@ -114,5 +114,5 @@ the Symfony Security component or the huge FOSUserBundle dependency.
 
 .. author:: default
 .. categories:: PHP, Symfony2
-.. tags:: PHP, Symfony2
+.. tags:: Symfony
 .. comments::

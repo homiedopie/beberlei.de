@@ -256,5 +256,5 @@ Keep this command running and visit `localhost:8000`.
 
 .. author:: default
 .. categories:: none
-.. tags:: Wordpress
+.. tags:: Wordpress, Deployment
 .. comments::

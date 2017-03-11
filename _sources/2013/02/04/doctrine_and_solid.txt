@@ -183,5 +183,5 @@ Doctrine to make this possible.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP
+.. tags:: Doctrine, CodeQuality
 .. comments::

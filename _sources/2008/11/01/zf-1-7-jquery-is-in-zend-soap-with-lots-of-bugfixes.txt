@@ -14,7 +14,7 @@ subjective, but still different opportunities are always great.
 Additionally I have been fixing quite some bugs on the Zend Soap
 component and will manage to fix further stuff until the 1.7 release I
 hope. This will make especially Wsdl and AutoDiscover produce valid WSDL
-XML plus adds setObject() support to Zend\_Soap\_Server.
+XML plus adds setObject() support to ``Zend_Soap_Server``.
 
 You can now choose between several strategies to evaluate complex types
 in WSDL Autodiscovering. Array of Datatypes (simple or complex) via
@@ -22,6 +22,5 @@ type[] syntax and complex objects can be parsed differently now based on
 settings.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, SOAP
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -50,6 +50,5 @@ information not on the controller. And views can be tested separately
 from the controller result. Testability is very high.
 
 .. categories:: none
-.. tags:: none
+.. tags:: eZComponents
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

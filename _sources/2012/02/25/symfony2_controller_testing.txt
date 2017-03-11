@@ -149,6 +149,5 @@ You have to add the `Tests/App/cache` and `Tests/App/logs` to your version
 control ignore files.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

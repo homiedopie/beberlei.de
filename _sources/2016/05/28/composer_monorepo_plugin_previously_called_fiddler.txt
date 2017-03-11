@@ -55,5 +55,5 @@ relative to the subpackages root directory as usual.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Monorepos, Composer
 .. comments::

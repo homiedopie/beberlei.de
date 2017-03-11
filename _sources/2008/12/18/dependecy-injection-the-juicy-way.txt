@@ -72,6 +72,5 @@ refrain from releasing the source code yet. I have to provide some
 useful documentation for it to be of use to anyone.
 
 .. categories:: none
-.. tags:: none
+.. tags:: DependencyInjection, SphicyLibrary
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

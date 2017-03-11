@@ -70,5 +70,5 @@ that Facebook and other social networks provides:
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Tentio
 .. comments::

@@ -165,5 +165,5 @@ PHPUnit <https://github.com/sebastianbergmann/phpunit/issues/1616>`_ for that.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Testing
 .. comments::

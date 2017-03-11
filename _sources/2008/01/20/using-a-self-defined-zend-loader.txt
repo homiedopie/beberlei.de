@@ -80,6 +80,6 @@ initialize the following at the beginning of my bootstrap file:
 After that, its just Objects.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

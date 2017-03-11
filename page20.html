@@ -1,0 +1,429 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 20 &mdash; beberlei.de</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="next" title="Older" href="page21.html" /><link rel="prev" title="Newer" href="page19.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+          <div id="page20">
+            
+            <div class="section">
+            <h1><a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html">DojoX Django Template Language Example with Data from PHP/JSON</a></h1>
+<p>This is a simple example how you would use DojoX Django Template
+Language component filled with data from a JSON GET Response:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;script type="text/javascript" src="/development/dojo-release-1.1.1/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;
+
+&lt;script language="javascript" type="text/javascript"&gt;&lt;!--
+dojo.require("dojox.dtl");
+dojo.require("dojox.dtl.Context");
+dojo.require("dojox.dtl.ext-dojo.NodeList");
+dojo.addOnLoad(
+    dojo.xhrGet({url: "dojotest.php", handleAs: "json", handle: function(data,ioArgs){
+        if(typeof data == "error"){
+            console.log("error?",data);
+        } else {
+            dojo.query("#test").dtl("I am eating {{food.fruit}} and {{food.meat}}", data);
+        }
+    }
+}));
+--&gt;&lt;/script&gt;
+
+::
+
+    &lt;?php
+    header('Content-type: text/json');
+    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
+    echo json_encode($food);
+    ?&gt;
+</pre></div>
+</div>
+</div></blockquote>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/javascript.html">Javascript</a>
+                 / 
+            <a href="tags/dojo.html">Dojo</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 02, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/08/02/wrestling-with-dojo.html">Wrestling with Dojo</a></h1>
+<p>I have to complain about the <a class="reference external" href="http://www.dojotoolkit.org">Dojo
+Toolkit</a> (Considering the <a class="reference external" href="http://www.whitewashing.de/blog/articles/50">project I am
+using this for</a>). It has
+the worst documentation and API guides I have ever seen. The
+documentation (called the Dojo Book) has an unnecessary complex
+structure to click through and its contents are wrapped around examples
+that are so overly complex that you click away the pages when they get
+smashed at your head.</p>
+<p>The API too, has no clear structure and hides its contents behind
+cryptic names such as “dnd”, “fx”, “rpc”. Descriptions of the functions
+sum to very small sentences and additional options are listed without
+any description at all other than a link to where they are defined in
+the project. There are no short examples given to any function like
+<a class="reference external" href="http://www.jquery.com">jQuery</a> does.</p>
+<p>In general I think the Dojos Site is too complex and hard to navigate.
+The layout seems to change massively on each click and you it is hard
+recognize common patterns. Dear Dojo Team, please make your project more
+accessible!</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/dojo.html">Dojo</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 02, 2008 by beberlei <kontakt@beberlei.de></small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html">First impressions on Zend_Soap and a basic implementation</a></h1>
+<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> release candidate for
+version 1.6 includes a new component for SOAP operations.
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.html">Zend_Soap_Server/Client</a>
+extend the PHP functionality of the SOAPClient and SOAPServer objects,
+which by itself is trivial. The more important functionality it ads to
+the package is the <a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.autodiscovery.introduction.html">AutoDiscovery
+Component</a>.</p>
+<p>Generally you can use <a class="reference external" href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> in the
+so called “non-wsdl” mode, that is if you specify the correct options
+like the soap service location and uri, you don’t need any description
+of the service for the clients. This is only useful if you’re using the
+SOAP Service internally since you then know about all the available
+functions and methods. If you want to offer the Service for external
+users you want to use the WSDL-mode: Generate a
+<a class="reference external" href="http://en.wikipedia.org/wiki/Web_Services_Description_Language">WSDL</a>
+that describes the services available methods, their parameters and
+return types is an important task.</p>
+<p>Using Zend_Soap_AutoDiscover you can generate your WSDL file
+automatically by reflecting on the given Service Class methods. This
+works as follows. We setup a simple service:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class HelloWorldService
+{
+    /**
+     * @return string
+     */
+    public function helloWorld()
+    {
+        return "Hello World!";
+    }
+
+    /**
+     * @return array
+     */
+    public function getFruits()
+    {
+        return array('apple', 'orange', 'banana');
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>It is important that you specify the Doc Comments @param and @return
+otherwise the AutoDiscovery of the correct parameter and return types
+cannot be resolved. We will now setup a simple SOAP Server access point,
+that will also generate our WSDL file for description of this HelloWorld
+service:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>require_once "HelloWorldService.php";
+require_once "Zend/Soap/Server.php";
+require_once "Zend/Soap/AutoDiscover.php";
+
+if(isset($_GET['wsdl'])) {
+    $autodiscover = new Zend_Soap_AutoDiscover();
+    $autodiscover-&gt;setClass('HelloWorldService');
+    $autodiscover-&gt;handle();
+} else {
+
+    $soap = new Zend_Soap_Server("http://localhost/soapserver.php?wsdl"); // this current file here
+    $soap-&gt;setClass('HelloWorldService');
+    $soap-&gt;handle();
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now we have our SOAP Service up and running and any client can access
+the HelloWorldService class from a remote or local location with just
+this simple lines:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>require_once "Zend/Exception.php";
+require_once "Zend/Soap/Client.php";
+
+try {
+    $client = new Zend_Soap_Client("http://localhost/soapserver.php?wsdl"); // Servers WSDL Location
+    $string =  $client-&gt;helloWorld();
+    $fruits = $client-&gt;getFruits();
+
+    var_dump($string);
+    var_dump($fruits);
+} catch(Zend_Exception $e) {
+    echo $e-&gt;getMessage();
+}
+</pre></div>
+</div>
+<p>This is easy. Additionally Zend_Soap offers a WSDL class to
+generate your own WSDL file based on your special preferences, which
+is a nice feature. I guess only some people can write a correct WSDL
+XML specification file on their own from scratch, so using a
+powerful helper is reasonable.</p>
+<p>The usage of Zend_Soap is quite simple and straightforward as is
+PHP5’s internal SOAP Service and might therefore gain widespread
+use. I have never tested PEAR’s WSDL Autodiscovery, so i cannot draw
+comparisons.</p>
+</div></blockquote>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+            <a href="tags/soap.html">SOAP</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 08, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/08/22/zend-helper-for-jquery-ui-widgets-demo.html">Zend Helper for jQuery UI Widgets Demo</a></h1>
+<p>I finished <a class="reference external" href="http://www.beberlei.de/jquery/demo">a pretty demo</a> for all
+the <a class="reference external" href="http://ui.jquery.com">jQuery UI widgets</a> view helpers for my
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei">Zend Framework
+proposal</a>.
+It utilizes the <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">jQuery View
+helper</a>
+which is <a class="reference external" href="http://www.whitewashing.de/blog/articles/67">further down the proposal
+road</a>. You can have a
+look at how nicely the Javascript is generated for the different jQuery
+UI Widgets. A further demo showing functionality of the form decorators
+and elements will follow when I finished these components.</p>
+<p><strong>Update:</strong> I also added a demo showing the form elements usage I have
+just finished in their first versions. I committed the classes to <a class="reference external" href="http://www.beberlei.de/dev/svn/ZendX_JQuery">the
+SVN</a> so you can already
+check them if you want.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+            <a href="tags/jquery.html">jQuery</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 22, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/08/28/benchmark-and-optimize-zend-framework-performance.html">Benchmark and Optimize Zend Framework Performance</a></h1>
+<p>In the fall of <a class="reference external" href="http://talks.php.net/show/froscon08">Rasmus presentation (Simple is
+Hard)</a> on
+<a class="reference external" href="http://www.froscon.org">FrOSCon</a> I tried to optimize <a class="reference external" href="http://framework.zend.com">Zend
+Frameworks</a> performance a little bit. There
+has also been a little discussion on the Zend Framework Mailing List on
+this topic.</p>
+<p>I haven’t changed great parts of the code or anything, I just
+benchmarked how different global include strategies affect the overall
+performance of my blog software written with help of the ZF. The
+following include strategies were tested (I’ve used the Zend Framework
+1.6 RC2 package for all of them):</p>
+<ol class="arabic simple">
+<li>Zend_Loader Autoload, Default PHP Include Path</li>
+<li>Zend_Loader Autoload, Swapped Include Path</li>
+<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies,
+Zend_Loader Autoload, Swapped Include Path</li>
+<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies, no
+autoload, used <a class="reference external" href="http://pecl.php.net/package/inclued">inclued</a> to
+find file dependencies and require (not _once) them all on startup.</li>
+</ol>
+<p>To strip all the require_once from the Zend Framework source code, i
+built a little script to do that for me. For the last test I wrote a
+little script that used the <strong>inclued_get_data()</strong> function to built a
+correct dependency tree for all includes. I have put each configuration
+of my Zend Framework install 30 seconds under siege with 5 concurrent
+requests. I have rerun all tests with APC and without APC.</p>
+<div class="section" id="results-without-apc">
+<h2>Results without APC</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%"/>
+<col width="21%"/>
+<col width="16%"/>
+<col width="21%"/>
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Include Strategy</td>
+<td>Response time</td>
+<td>Trans/sec</td>
+<td>Performance %</td>
+</tr>
+<tr class="row-even"><td>Autoload, default include path</td>
+<td>0.20</td>
+<td>24.65</td>
+<td>100%</td>
+</tr>
+<tr class="row-odd"><td>Autoload, swapped include path</td>
+<td>0.19</td>
+<td>26.83</td>
+<td>95%</td>
+</tr>
+<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
+<td>0.17</td>
+<td>29.27</td>
+<td>85%</td>
+</tr>
+<tr class="row-odd"><td>No-Autoload, require up front</td>
+<td>0.16</td>
+<td>31.82</td>
+<td>80%</td>
+</tr>
+</tbody>
+</table>
+<p>You can see that each step makes a ZF application run faster and that
+the full optimization with requiring all scripts up front is about 20%
+faster than the default configuration.</p>
+</div>
+<div class="section" id="results-with-apc">
+<h2>Results with APC</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%"/>
+<col width="21%"/>
+<col width="16%"/>
+<col width="21%"/>
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Include Strategy</td>
+<td>Response time</td>
+<td>Trans/sec</td>
+<td>Performance %</td>
+</tr>
+<tr class="row-even"><td>Autoload, default include path</td>
+<td>0.11</td>
+<td>45.76</td>
+<td>100%</td>
+</tr>
+<tr class="row-odd"><td>Autoload, swapped include path</td>
+<td>0.09</td>
+<td>53.05</td>
+<td>81,81%</td>
+</tr>
+<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
+<td>0.08</td>
+<td>60.90</td>
+<td>72,72%</td>
+</tr>
+<tr class="row-odd"><td>No-Autoload, require up front</td>
+<td>0.07</td>
+<td>73.99</td>
+<td>63,63%</td>
+</tr>
+</tbody>
+</table>
+<p>Turning APC on gives a boost of about 50% to your application no matter
+what include strategy you are following (so there is excuse not using
+APC). But switching between different include strategies still makes a
+huge difference in performance. Percentage-wise this is a larger
+difference than without APC. Requiring all dependent scripts up front
+takes only about 63% of the default configuration time, which can make a
+major difference on any production server.</p>
+<p>In an application knowing which includes of the Zend Framework will be
+needed on each request is difficult, since different helpers and classes
+might be needed based on which url is requested. It maybe a good
+practice to just include all the classes that might be needed. If this
+is a job to hard to do you can still get lots of performance gain out of
+your application by fixing the include path, using Zend Loaders Autoload
+and stripping all require_once calls from all of the Zend Framework
+files.</p>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 28, 2008</small></p>
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+          </div>         
+        </div>
+    </div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="footer">
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
+
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

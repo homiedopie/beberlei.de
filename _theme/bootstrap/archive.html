@@ -1,0 +1,57 @@
+{%- extends "page.html" -%}
+
+{%- block body -%}
+<div class="row">
+    <div class="col-lg-12">
+        {% if title == "Blog Archive" %}
+        <h1>Archive</h1>
+        <p>
+            I have written over 130 posts in the last 9 years and hope to increase this in the future.
+            Of course my interests have changed over the years, so if you want to dig into a topic use
+            the tag list on the right.
+        </p>
+        {% else %}
+        <h1>{{ title }}</h1>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-7">
+        <div class="archive">
+
+            {%- for year in years|sort(reverse=True) -%}
+            <div class="year">
+                <h3>{{ year }}</h3>
+                <ul>
+                    {%- for metadata in years[year] -%}
+                    <li>
+                        <strong><a href="{{ pathto(metadata.link) }}">{{ metadata.title }}</a></strong>
+                        <p class="metadata"><small>Posted on {{ metadata.formatted_date }}{% if metadata.author %} by {{ metadata.author }}{% endif %}</small></p>
+                    </li>
+                    {%- if not loop.last -%}
+                 </ul>
+                        <div class="separator summary_separator"></div>
+                 <ul>
+                    {%- endif -%}
+                    {%- endfor -%}
+                </ul>
+            </div>
+            {%- if not loop.last -%}<div class="separator year_separator"></div>{%- endif -%}
+            {%- endfor -%}
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="widget">
+            <h3>Tags</h3>
+            {%- set count_min = 1 %}
+            {%- set count_max = tags.values()|sort|last %}
+            {%- for tag, x in tags|dictsort %}
+              {%- set size = (32-14)*(x-count_min)/(count_max-count_min or 1) + 14 %}
+              <a href="{{ pathto('tags/' + taglinks[tag]) }}" style="font-size: {{ size|int }}pt">{{ tag }}</a>
+              {%- if not loop.last %}&nbsp;&nbsp;{%- endif %}
+            {%- endfor %}
+        </div>
+    </div>
+</div>
+{%- endblock -%}
+

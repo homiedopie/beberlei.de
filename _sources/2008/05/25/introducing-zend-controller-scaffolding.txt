@@ -90,6 +90,5 @@ Please report any bugs and feature requests or recommendations to
 **kontakt at beberlei dot de**.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

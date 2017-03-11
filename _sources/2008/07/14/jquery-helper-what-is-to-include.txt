@@ -31,6 +31,5 @@ My proposal is currently in the workings and will be on the ZF Wiki in
 the next couple of hours.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

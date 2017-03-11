@@ -84,5 +84,5 @@ This way the Ansible Node.JS role is reusable in different projects.
 
 .. author:: default
 .. categories:: NodeJS
-.. tags:: NPM, Ansible
+.. tags:: Vagrant, Ansible, Javascript
 .. comments::

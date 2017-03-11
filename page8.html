@@ -15,16 +15,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Page 8 &mdash; Whitewashing</title>
+        <title>Page 8 &mdash; beberlei.de</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 <meta content="width=device-width" />
-
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/default.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -47,821 +44,577 @@
         <![endif]-->
 
       <div id="container">
-<div class="container">
-    <div id="header" class="span-8">
-        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
-    </div>
-    <div class="span-11" id="about">
-        <p>
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </p>
-    </div>
-    <div class="span-5 last">
-        <p class="buttons" style="text-align: right">
-            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
-            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
-        </p>
-    </div>
-</div>
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
 
 <div class="main-container" role="main">
 <div class="container">
-    <div class="span-24 content">
-      <div>
-        <div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
           <div id="page8">
             
-            <div class="timestamp postmeta">
-            <span>March 27, 2009</span>
-        </div>
-        <div class="section">
-            <h1><a href="2009/03/27/test-your-legacy-php-application-with-function-mocks.html">Test your Legacy PHP Application with Function Mocks!</a></h1>
-<p>Much talking is going on about Unittesting, Mocks and TDD in the PHP
-world. For the most this discussions surround object-oriented PHP code,
-frameworks and applications.</p>
-<p>Yet I would assert that the reality for PHP developers (me included) is
-dealing with PHP 4, PHP 5 migrated, or non-object oriented legacy
-applications which are near to impossible to bring under test. Still
-this code works, is in production and needs maintenance and possibly
-extension for new features.</p>
-<p>For example many applications may still use <strong>mysql_*</strong> functions at
-length inside their model or have multiple nested function levels
-(Example: Wordpress). <a class="reference external" href="http://pecl.php.net/package/runkit">Runkit</a> to
-the rescue: A PECL extension that can hack your running PHP code, such
-that method or functions are repointed to execute new implementations.
-Using this extension you can actually mock out internal PHP functions,
-which is great to bring legacy code under test.</p>
-<p>Consider this following proof of concept, <a class="reference external" href="http://github.com/padraic/runkit/tree/master">using the Runkit extension
-build by Padraic Brady</a>
-(the one from pecl.php.net does not compile on PHP 5.2), which replaces
-the functionality of <strong>mysql_query()</strong>. You have to set the following
-option in your php.ini: <strong>runkit.internal_override = On</strong> for this to
-work. By default only user-defined functions may be overwritten by
-Runkit.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class FunctionMocker
-{
-    protected $_mockedFuncBehaviourMap = array();
-
-    public function mock($funcName, $return=null)
-    {
-        $newFuncCode = 'return "'.$return.'";';
-
-        $renamedName = "__".$funcName."_mockOriginalCopy";
-        runkit_function_copy($funcName, $renamedName);
-        runkit_function_redefine($funcName, '', $newFuncCode);
-
-        $this-&gt;_mockedFuncBehaviourMap[$funcName] = $renamedName;
-    }
-
-    public function reset()
-    {
-        foreach($this-&gt;_mockedFuncBehaviourMap AS $funcName =&gt; $renamedName) {
-            runkit_function_remove($funcName);
-            runkit_function_copy($renamedName, $funcName);
-            runkit_function_remove($renamedName);
-        }
-        $this-&gt;_mockedFuncBehaviourMap = array();
-    }
-}
-
-$mocker = new FunctionMocker();
-$mocker-&gt;mock('mysql_query', 'hello world!');
-
-echo mysql_query(); // hello world
-
-$mocker-&gt;reset();
-
-mysql_query(); // error
+            <div class="section">
+            <h1><a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a></h1>
+<p>We all know PHP is weakly typed and has some weird type-conversion rules.
+This can often complicate our code checking for invalid or illegal data.
+Using if/else clauses we can do all sorts of validation, but with standard
+coding styles (PSR, Zend, PEAR) we end up with at least 3 lines per check,
+cluttering the whole code-base.</p>
+<p>Take <a class="reference external" href="http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935">this example</a> from
+the old deprecated Windows Azure SDK, a method for putting a binary file into
+Azures blob storage:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Container name is not specified.'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">self</span><span class="o">::</span><span class="na">isValidContainerName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Container name does not adhere to container naming conventions. See http://msdn.microsoft.com/en-us/library/dd135715.aspx for more information.'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$blobName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Blob name is not specified.'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$localFileName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Local file name is not specified.'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Local file not found.'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">'$root'</span> <span class="o">&amp;&amp;</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$blobName</span><span class="p">,</span> <span class="s1">'/'</span><span class="p">)</span> <span class="o">!==</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Blobs stored in the root container can not have a name containing a forward slash (/).'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// rest of the code here</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>This example, only allows for string return values of the mock and
-has no support for replacing the arguments of the mocked function.
-Also chaining of different return values based on input or call
-number might be interesting. Some kind of Code Generator Tool would
-have to be implemented to support this functionality. Additionally
-Assertions and Verifying should be implemented for the function
-arguments. All in all this would allow to mock functions as you
-would mock interfaces/classes, which would be a great addition for
-all those legacy applications that use procedural PHP.</p>
-<p>Additionally what the real killer for runkit would be: The
-possibility to insert PHP callbacks instead of real PHP code into
-the <strong>runkit_function_redefine</strong>.</p>
-</div></blockquote>
+<p>The rest of this components public API methods look about the same. It is a
+very complete validation of the input data, however its not very readable.
+Instead you have 6 if branches, which increase the complexity of the method
+and almost take up half the screen without even getting to the actual code.</p>
+<p>The assertion pattern is really helpful here to reduce the complexity of this
+code and hide the <span class="docutils literal"><span class="pre">if/throw</span></span> conditions into little helper methods. Have a
+look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="s1">'Container name is not specified'</span><span class="p">);</span>
+    <span class="nx">self</span><span class="o">::</span><span class="na">assertValidContainerName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">);</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$blobName</span><span class="p">,</span> <span class="s1">'Blob name is not specified.'</span><span class="p">);</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">,</span> <span class="s1">'Local file name is not specified.'</span><span class="p">);</span>
+    <span class="nx">Assertion</span><span class="o">::</span><span class="na">file</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">,</span> <span class="s1">'Local file name is not specified.'</span><span class="p">);</span>
+    <span class="nx">self</span><span class="o">::</span><span class="na">assertValidRootContainerBlobName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="nv">$blobName</span><span class="p">);</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/03/27/test-your-legacy-php-application-with-function-mocks.html#disqus_thread" data-disqus-identifier="2009/03/27/test-your-legacy-php-application-with-function-mocks">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>March 10, 2009</span>
-        </div>
-        <div class="section">
-            <h1><a href="2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09.html">Speaking about Framework Quality on the IPC Spring 09</a></h1>
-<p>Just a short notice, my thesis is taking its last breath, I will be
-speaking on the <a class="reference external" href="http://www.phpconference.com">IPC Spring 09
-conference</a> in Berlin end of may this
-year on Framework Quality and Unittests:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt><strong>Framework Quality: Unit-Tests as silent witness</strong></dt>
-<dd>Unit-Tests are often overlooked in framework discussions that focus</dd>
-</dl>
-<p>on features, performance, tools or database abstraction. However
-they are a silent witness on how poor or well frameworks are
-designed. In this presentation we will look at the testsuites of the
-big players in the PHP framework business - Zend Framework,
-ezComponents, Symfony and CakePHP - and reveal their hidden secrets.</p>
-</div></blockquote>
-<p>This talk will make heavy use of the <a class="reference external" href="https://github.com/beberlei/puma/tree">PHP Unittest and Metrics
-Aggregator tool</a>, which i haven
-written on several times. For both CakePHP and Symfony extensions for
-their testtools may have to be written.</p>
-<p>I am really excited for my first time being speaker on a conference and
-looking forward to see you at IPC.</p>
+    <span class="c1">// rest of the code</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is much more readable, using two custom assertions and some general
+assertions.</p>
+<p>There is one risk here though, you introduce additional coupling to another
+library/namespace. Especially when you start using this pattern on a large
+scale, you have to make sure this assertions are <strong>VERY</strong> stable and
+unit-tested.</p>
+<p>That is why you should extend from <span class="docutils literal"><span class="pre">Assertion</span></span> and use your own class when
+using the Assert library. This returns some control in your hands and even
+allows you to overwrite the exception class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Util</span><span class="p">;</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09.html#disqus_thread" data-disqus-identifier="2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>October 05, 2009</span>
-        </div>
-        <div class="section">
-            <h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
-<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/">PHP CodeSniffer for
-Netbeans
-plugin</a>.
-Previously the plugin used an unnecessary API which restricted the use
-to Netbeans 6.7.0 only. This API was removed so that the plugin should
-now work with all Netbeans Versions &gt;= 6.7.0.</p>
-<p>Additionally when working the previous version would scan every PHP
-script on a file per file basis when the all projects or main projects
-filters were activated. This rendered made the plugin almost useless. In
-the current version scans of filters that contain more than one file are
-blocked. That means you will only see Coding Violations when you enable
-the “Current File” filter. Using any other filter will just do nothing
-and won’t put your Netbeans in permanent hibernation mode (aka useless
-mode).</p>
-<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
-<strong>`NbPreferences
-API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
-which allows to configure the coding standard. [STRIKEOUT:However this
-feature was contributed by <a class="reference external" href="http://manuel-pichler.de/">Manuel
-Piechler</a> and I don’t yet understand how I
-can manipulate it. Maybe someone knows how (*Looking in Mapis general
-direction*)?] By default the Zend Coding Standard is used.</p>
-<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
-file .netbeans/6.7/config/Preferences.properties setting
-“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
-inline highlighting that did not refresh when lines in the file changed.</p>
+<span class="k">use</span> <span class="nx">Assert\Assertion</span> <span class="k">as</span> <span class="nx">BaseAssertion</span><span class="p">;</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/10/05/php-codesniffer-for-netbeans-v0-2.html#disqus_thread" data-disqus-identifier="2009/10/05/php-codesniffer-for-netbeans-v0-2">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>December 19, 2009</span>
-        </div>
-        <div class="section">
-            <h1><a href="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html">Trying a Two Step PEAR/PHAR approach to develop and deploy</a></h1>
-<p>With PHP 5.3 the PHAR extension is a pretty powerful concept for all
-your deployment needs, however it does not tell the complete story.
-Frameworks, Libraries and many different of them are used throughout
-applications and in recent times people even began to chery-pick the
-best components from each of the frameworks and package them together.
-With Pirum being a simple PEAR channel server there is also momentum for
-projects to distribute their code via PEAR.</p>
-<p>However PEAR is mostly used in the server-wide configuration use-case,
-which is not very useful if you plan to distribute your complete
-application in one PHAR file. I just recently had the idea for this
-scenario, so please bear with me and add all the feedback and comments
-you can come up with. I tested this with the ongoing rewrite of my blog
-software.</p>
-<p>First we’ll add a new user that we develop our application with:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo useradd -m -g www-data whitewashing
-sudo passwd whitewashing
-su - whitewashing
+<span class="k">class</span> <span class="nc">Assertion</span> <span class="k">extends</span> <span class="nx">BaseAssertion</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">protected</span> <span class="nv">$exceptionClass</span> <span class="o">=</span> <span class="s1">'MyProject\Util\AssertionFailedException'</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>Now there is the possibility that with this user PHP and PEAR is not in
-your $PATH environment, so you might have to add it. In my case on Ubuntu
-i also had to switch the console from /bin/sh to /bin/bash for this
-user. Then we need to setup our application, I am going to use the Zend
-Framework project style here but with a little twist. We will add a
-distinction between vendor and project libraries by adding a <em>vendor</em>
-directory into the main folder.</p>
-<p>But first we create a folder for our application, and create a Zend
-Framework project in the subfolder “trunk”, which will be the focus of
-our development.</p>
-<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ mkdir whitewashing
-whitewashing@desktop:~$ zf create project whitewashing/trunk
-Creating project at /home/whitewashing/whitewashing/trunk
-whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/assertlibrary.html">AssertLibrary</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on September 04, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a></h1>
+<p>Symfony uses the excellent Monolog library for logging everything related
+to the symfony application stack. But sometimes you need a different logger
+that responds differently to the log error levels. Ideally you don’t want
+to reuse the application log mechanism to avoid messing with the
+fingers crossed listener of Monolog, that keeps the application log files small
+in case no errors occur.</p>
+<p>This can be easily done with Symfonys MonologBundle with a feature called
+channel. Every log handler, such as file, syslog, mail or
+fingers crossed is attached to the default logger called “app”. This is
+referenced by the dependency injection service called <span class="docutils literal"><span class="pre">monolog.logger</span></span>.</p>
+<p>If you want to create a different logger service that is responsible for a
+different type of your application stack, just define it using the <span class="docutils literal"><span class="pre">channels</span></span>
+option:</p>
+<div class="highlight-yaml"><div class="highlight"><pre>monolog:
+    handlers:
+        myfile:
+            type: stream
+            path: %kernel.logs_dir%/myfile.log
+            channels: mychannel
 </pre></div>
 </div>
-<p>Now we can configure an Apache virtual host to point to our
-/home/whitewashing/whitewashing/public directory, i call this
-“whitewashing-dev” add it to my /etc/hosts and can visit the dummy
-project page.</p>
-<p>We then configure our PEAR installation for the specific application
-user and re-configure the bin and php library paths:</p>
-<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
-whitewashing@desktop:~$ pear config-set php_dir /home/whitewashing/whitewashing/trunk/vendor
-whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/trunk/bin
+<p>To actually write to <span class="docutils literal"><span class="pre">mychannel</span></span> you have to tag all the services that use
+<span class="docutils literal"><span class="pre">mychannel</span></span> with the following tag:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_service"</span> <span class="na">class=</span><span class="s">"MyService"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">"monolog.logger"</span> <span class="na">channel=</span><span class="s">"mychannel"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">"service"</span> <span class="na">id=</span><span class="s">"logger"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/service&gt;</span>
 </pre></div>
 </div>
-<p>This configuration assumes that we will install all our stuff into our
-development trunk. From there also the PEAR installed libraries might be
-copied into branches or tags. PEAR Project tests, configuration and
-web-files will still be put by default under $HOME/pear/*. We don’t
-need them for our applications.</p>
-<p>Now we install all the dependencies our project needs, in this case Zend
-Framework, Doctrine 2, HTML Purifier:</p>
-<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
-whitewashing@desktop:~$ pear install zfcampus/zf-alpha
-whitewashing@desktop:~$ pear channel-discover htmlpurifier.org
-whitewashing@desktop:~$ pear install hp/HTMLPurifier
-whitewashing@desktop:~$ pear channel-discover pear.phpdoctrine.org
-whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0
-</pre></div>
-</div>
-<p>Now we have all three of the packages installed in our project folder
-<cite>whitewashing/trunk/vendor</cite>, see:</p>
-<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
-total 680
-drwxr-xr-x  7 whitewashing www-data   4096 2009-12-13 14:45 ./
-drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:36 ../
-drwxr-xr-x  3 whitewashing www-data   4096 2009-12-13 14:43 .channels/
--rw-r--r--  1 whitewashing www-data     57 2009-12-13 14:45 .depdb
--rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .depdblock
-drwxr-xr-x  5 whitewashing www-data   4096 2009-12-13 14:45 Doctrine/
--rw-r--r--  1 whitewashing www-data 582208 2009-12-13 14:45 .filemap
-drwxr-xr-x 20 whitewashing www-data   4096 2009-12-13 14:39 HTMLPurifier/
--rw-r--r--  1 whitewashing www-data    629 2009-12-13 14:39 HTMLPurifier.autoload.php
--rw-r--r--  1 whitewashing www-data    274 2009-12-13 14:39 HTMLPurifier.auto.php
--rw-r--r--  1 whitewashing www-data    545 2009-12-13 14:39 HTMLPurifier.func.php
--rw-r--r--  1 whitewashing www-data   9299 2009-12-13 14:39 HTMLPurifier.includes.php
--rw-r--r--  1 whitewashing www-data    955 2009-12-13 14:39 HTMLPurifier.kses.php
--rw-r--r--  1 whitewashing www-data   8831 2009-12-13 14:39 HTMLPurifier.php
--rw-r--r--  1 whitewashing www-data  11901 2009-12-13 14:39 HTMLPurifier.safe-includes.php
--rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .lock
-drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:43 .registry/
-drwxr-xr-x 59 whitewashing www-data   4096 2009-12-13 14:36 Zend/
--rw-r--r--  1 whitewashing www-data  19537 2009-12-13 14:36 zf.php
-</pre></div>
-</div>
-<p>And both Doctrine and ZF registered their binary CLi tools inside the
-<cite>whitewashing/trunk/bin/</cite> folder:</p>
-<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ ls -aFl bin/
-total 20
-drwxr-xr-x 2 whitewashing www-data 4096 2009-12-13 14:45 ./
-drwxr-xr-x 8 whitewashing www-data 4096 2009-12-13 14:36 ../
--rwxr-xr-x 1 whitewashing www-data   50 2009-12-13 14:45 doctrine*
--rwxr-xr-x 1 whitewashing www-data  169 2009-12-13 14:45 doctrine.php*
--rwxr-xr-x 1 whitewashing www-data 1511 2009-12-13 14:36 zf*
-</pre></div>
-</div>
-<p>We now have the full control over the versions of our dependencies, we
-can call “pear upgrade ” whenever we want to update one of the ZF,
-Doctrine or HtmlPurifier libraries inside our application.</p>
-<p>Now some magic is gonna happen, we start to develop our application and
-such which is all not really interesting for this topic. At some point
-we want to package it all up into a PHAR file and distribute it. We want
-to package our application in one big phar file. We also want to make
-sure that the configuration files in
-<cite>whitewashing/trunk/application/configs/</cite> are not distributed, but have
-to be created on the server and are kept that way. We could write an
-installer script for this configuration management.</p>
-<p>The reference for PHAR files is the PHP Manual for the Basics and Cal
-Evans’ two posts
-(<a class="reference external" href="http://blog.calevans.com/2009/07/19/lessons-in-phar/">1</a>,
-<a class="reference external" href="http://blog.calevans.com/2009/07/26/packaging-zend-framework-as-a-phar-revisited/">2</a>)
-on this topic, aswell as <a class="reference external" href="http://geekmonkey.org/articles/PHP_Archives">a post on
-Geekmonkey</a>. Contrary to
-most other PHP extensions, PHAR has an extensive documentation, however
-its not organized terribly well. Also there are no real use-cases and
-scenarios discussed, methods are only looked at in isolation. Cals posts
-are very good on understanding how to package up different libraries,
-but there is no word on distributing web applications. That is where the
-Geekmonkey post comes in to wire it all together.</p>
-<p>For a Zend Framework application that should have both a web and a cli
-(cronjobs) entry point into the application we need a specific stub file
-for the PHAR bootstrapping. A stub is a little PHP script that is
-executed whenever your PHAR file is included into your php script. It is
-essentially a front-controller for your PHAR application. It also has
-mount capabilities that allow to import files or directories from
-outside into the PHAR context. This is a powerful feature that is
-required to distribute configurable applications like our blog.</p>
-<p>This screenshot shows how the application is currently structured in
-development mode. In production its structure should look like:</p>
-<div class="highlight-python"><div class="highlight"><pre>whitewashing
-|--application
-|  |--configs
-|     |-- my application config files are all here...
-|--bin
-|  |--whitewashing.php
-|--public
-|  |--index.php
-|  |--.htaccess
-|--whitewashing.phar
-</pre></div>
-</div>
-<p>The whitewashing.php and index.php files are the application entry
-points that only include the phar file and trigger the application
-bootstrapping that will be included in the Stub file. They both look
-like:</p>
-<div class="highlight-python"><div class="highlight"><pre>&lt;?php
-define('EXTERNAL_APPLICATION_ROOT', __DIR__."/../");
-include EXTERNAL_APPLICATION_ROOT."/whitewashing.phar";
-</pre></div>
-</div>
-<p>Including a PHAR file essentially has two consequences:</p>
+<p>With this approach you are now as flexible as with the default channel <span class="docutils literal"><span class="pre">app</span></span>
+regarding to logging in development, testing and production environments for
+example. Once there is a channel created through the DIC tag, you can actually
+fetch it from the DIC with <span class="docutils literal"><span class="pre">monolog.logger.mychannel</span></span> in our example.
+I don’t like this approach too much, because it misuses tags for modifying
+arguments, where tags are actually for the services themselves. However it is
+usable and works.</p>
+<p>This feature is included starting with Symfony 2.1. It is <a class="reference external" href="http://symfony.com/doc/master/cookbook/logging/channels_handlers.html">documented in a
+cookbook entry</a>,
+however some insights of this blog post are still inside a pending Pull
+Request.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/symfony.html">Symfony</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 26, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a></h1>
+<p>This years <a class="reference external" href="http://www.froscon.org">Free and Open Source Conference (FrOSCon)</a> took place this weekend in Bonn, St.  Augustin.
+Because I live in Bonn, visiting the conference is a given for very many years
+now. This year I also did a talk on “Architecture Design Patterns” with <a class="reference external" href="http://twitter.com/go_oh">Gordon</a> so there was an incentive to show up besides
+meeting friends, all the Club Mate and <a class="reference external" href="http://www.quijote-kaffee.de">good open source coffee</a>.</p>
+<p>The most interesting topic in this years conference for me has been the <a class="reference external" href="http://graylog2.org/">Graylog2</a> talk by Lennart Koopmann. Graylog is a logging server
+that uses Elastic Search for persistence and searching. It is sponsored by
+Xing, a pretty big german based Linkedin clone.</p>
+<p>The talk <a class="reference external" href="http://programm.froscon.de/2012/events/954.html">The State of PHPUnit</a> by <a class="reference external" href="http://twitter.com/__edorian/">Volker</a> was interesting to see all the new stuff in
+PHPUnit 3.7 and that it fixes a bunch of annoyances that I stumbled on myself.
+I actually realized that they are so deeply rooted in my brain already, that
+they constitute features for me, not something that could actually be
+optimized. Well done to Volker and Sebastian to the new version.</p>
+<p>Igors talk about building an HTTP server in PHP was interesting to see the
+stream/socket server APIs of PHP at work. Ever since I took part in <a class="reference external" href="https://github.com/conradmueller/maexchen">the
+SoCraTes 2012 Conference Maexchen UDP Bot</a> challenge I think network
+programming is an interesting topic for learning about languages and
+programming itself.</p>
+<p>Volker did a second talk on sunday about Clean Code that was both entertaining
+and interesting. He was reminding the audience that shipping the code is what
+actually creates the value in our profession. Hence clean code is not about
+the beauty of code itself, but its ability to be shippable, changeable and
+adaptable to the business.</p>
+<p>Again FrOSCon 2012 was awesome. Thank you very much especially to all the
+volunteers that organized this event. It really good event to bring together
+people from many different open-source communities and I already look forward
+to the next FrOSCon 2013.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/conferences.html">Conferences</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 26, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
+<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
+I have described 3 architectural patterns for business applications. Applying
+them to your software helps you decouple the business logic from the
+application/framework/UI. However given sufficient complexity, you will want to
+decouple different parts of your business model from each other as well.</p>
+<p>As an example, lets think of a batch process in your application that updates
+orders from a CRM or logistics system:</p>
 <ul class="simple">
-<li>The PHAR path will be added to your include path.</li>
-<li>The stub file will be executed.</li>
+<li>You receive an XML with full users and order representations</li>
+<li>You need to update certain user fields</li>
+<li>You need to update certain order fields</li>
+<li>Some orders require creating accounts in different remote systems</li>
+<li>If the user has not confirmed his email yet he should receive an opt-in
+mail instead.</li>
+<li>If the user confirms his opt-in mail, all outstanding remote accounts are
+created.</li>
 </ul>
-<p>Our application stub looks like this:</p>
-<div class="highlight-python"><div class="highlight"><pre>&lt;?php
-
-if(defined('EXTERNAL_APPLICATION_ROOT')) {
-    // Mount the external application/configs directory as config if it exists.
-    if (file_exists(EXTERNAL_APPLICATION_ROOT."/application/configs")) {
-        Phar::mount("application/configs", EXTERNAL_APPLICATION_ROOT."/application/configs");
-    }
-}
-
-/** Zend_Loader_Autoloader */
-require_once 'Zend/Loader/Autoloader.php';
-$autoloader = Zend_Loader_Autoloader::getInstance();
-
-if (php_sapi_name() == "cli") {
-    require_once 'bin/whitewashing.php';
-} else {
-    require_once 'public/index.php';
-}
-
-__HALT_COMPILER();
-</pre></div>
-</div>
-<p>The first bit of the stub mounts the external application configs
-directory into the stub and hides possible directories that are present
-at this location in the PHAR file. This allows us to distribute our
-application with a default configuration, but allows any user to replace
-the configuration files to fit the application to his need.</p>
-<p>The second bit loads Zend Framework Autoloader that is required by the
-bootstrapping mechanism. The third bit decides whether this request is
-executed from the CLI- or the Web-Entry point of the application. The
-fourth bit, <span class="docutils literal"><span class="pre">__HALT_COMPILER();</span></span> is a technically required call inside
-your stub-file.</p>
-<p>Now that we have a stub-file for our application, we can package it and
-distribute it. I am using a modified version of Cal Evans example for
-this. I have extracted his directory traversal to find all the relevant
-into a re-usable FilterIterator implementation. I <a class="reference external" href="https://gist.github.com/3b20264b857dbdabf526">pasted my package.php
-a Gist</a> on Github. Now
-this should probably be put into the build context of your application,
-possibly as a phing or ant task or something alike.</p>
-<p>Now what this build process does not manage is the creation of the
-application entry point php and .htaccess files, but since they won’t
-ever change its easy to add them to the build directory for now. An even
-more sophisticated version of the build script would lead to the
-creation of an additional tar.gz of the complete application folder. Our
-deployment process would then be as easy as:</p>
+<p>You can build all the steps into a single batch processing service. This will
+be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
+principle</a>.</p>
+<p>the part with updating of users and fields has nothing to with the sending of
+mails and creation of remote accounts.  We want to decouple them from each
+other.</p>
+<p>The first obvious choice is to decouple them into distinct services:</p>
 <ul class="simple">
-<li>If the application is not installed yet, unpack the tarball into its
-location.</li>
-<li>If the application should be updated, just replace the PHAR file.</li>
+<li>Import Service</li>
+<li>Authentication Service</li>
+<li>Account Generation Service</li>
 </ul>
-<p>If you need the ability to go back to any version of your application
-you could make use of symlinks.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html#disqus_thread" data-disqus-identifier="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 30, 2009</span>
-        </div>
-        <div class="section">
-            <h1><a href="2009/07/30/php-codesniffer-support-for-netbeans.html">PHP CodeSniffer Support for Netbeans</a></h1>
-<p>I dived into the code of my new favorite IDE
-<a class="reference external" href="http://www.netbeans.org">Netbeans</a> these last days and came up with
-an <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/tree/master">extension
-module</a>,
-which adds PHP CodeSniffer Support on a per file basis to make my life
-much easier. It shows warnings and errors as annotations to the Editor
-and marks the affected lines in yellow and red.</p>
-<p><a class="reference external" href="http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/netbeans_cs_support.png">|image0|</a></p>
-<p>[STRIKEOUT:My Java skills being very bad, it will only work on Linux
-currently, since the PHP Code Sniffer “binary” is hardcoded into the
-Java Source code. You have to create a “/usr/bin/phpcs2” executable,
-which is a wrapper that looks like:]</p>
-<p>With Manuals extensions (see the comments) the module now works without
-the wrapper script. It might even work under Windows now. Yet now the
-Zend Coding standard is enforced though. I am working on making that one
-configurable next.</p>
-<p>You can install the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">NBM module install
-file</a>
-from the GitHub repository into Netbeans and it “should” work then.</p>
-<p>I hope to get more familiar with Netbeans in the future to add some more
-PHP tools and enhance Code Sniffer support.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/07/30/php-codesniffer-support-for-netbeans.html#disqus_thread" data-disqus-identifier="2009/07/30/php-codesniffer-support-for-netbeans">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 04, 2009</span>
-        </div>
-        <div class="section">
-            <h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
-<p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
-post</a> on Dependency
-Injection containers and Zend_Application I was eager to find out if
-its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
-Container</a>
-into the Zend Framework. To my surprise it’s possible without having to
-make any changes to one of the two components. An example use-case would
-look like:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$container = new sfServiceContainerBuilder();
-
-$loader = new sfServiceContainerLoaderFileXml($container);
-$loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
-
-$application = new Zend_Application(
-    APPLICATION_ENV,
-    APPLICATION_PATH . '/config/application.xml'
-);
-$application-&gt;getBootstrap()-&gt;setContainer($container);
-$application-&gt;bootstrap()
-            -&gt;run();
+<p>All these services have dependencies on infrastructure objects, database,
+mailer and so on. We could inject the authentication and account generation
+services into the Import Service, but with rising complexity this will lead to
+a lasagna of services and the execution path will dig deep into this and this
+is not nearly as tasty as eating real lasagna.</p>
+<div class="highlight-python"><div class="highlight"><pre>ImportService
+|_AuthenticationService
+| |_Mailer
+| |_Database
+|_AccountGenerationService
+| |_Database
+| \_RemoteFacade
+\_Database
 </pre></div>
 </div>
-</div></blockquote>
-<p>Resources instantiated by Zend_Application are then injected into the
-container by the name of the resource and are given the resource
-instance. Any object from the Symfony container can then use these
-dependencies in their object setup. The only drawback of the integration
-is the fact that the Symfony Container is case-sensitive in regards to
-the service names but Zend_Application lower-cases all service before
-injecting them into the container. The following code is a restatement
-of my previous example of a <strong>MyModel</strong> class which requires a
-<strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$container-&gt;register('myModel', 'MyModel')
-          -&gt;addArgument(new sfServiceReference('db'))
-          -&gt;addArgument(new sfServiceReference('cache'));
+<p>This becomes more complicated when transaction semantics need to be taken care
+of. For example dependencies between mailer and database services. Also you
+have to take into account that the code in entities and value objects
+participating in this use-case.</p>
+<p>What we want instead is a sequential execution of those nested services, but
+only if the parent service executed successfully:</p>
+<div class="highlight-python"><div class="highlight"><pre>ImportService
+\_Database
+
+AuthenticationService
+|_Mailer
+\_Database
+
+AccountGenerationService
+|_Database
+\_RemoteFacade
 </pre></div>
 </div>
-</div></blockquote>
-<p>Access to a MyModel instance with its dependencies is then granted
-through the call <strong>$container-&gt;myModel</strong> throughout the application.
-Make sure to call this after running Zend_Application::bootstrap, so
-that the Resource dependencies are injected first.</p>
+<p>We could use an event dispatcher in all of the services to notify each other,
+but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
+cleaner way:</p>
+<p>Every entity is an event provider and can emit events. Whenever a transaction
+is committed and an hence an operation is completed successfully, we take all
+the events emitted from all entities (looking at the identity map for example)
+and trigger observing event handlers. However if the operation fails, we do not
+trigger these event handlers.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2009/07/04/using-symfony-dependency-injection-with-zend-application.html#disqus_thread" data-disqus-identifier="2009/07/04/using-symfony-dependency-injection-with-zend-application">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 12, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/02/12/pdt-back-to-easyeclipse-with-php-extension.html">PDT: Back to easyeclipse with PHP extension</a></h1>
-<p>I am disappointed by <a class="reference external" href="http://www.eclipse.org/pdt/">PDT</a> for Eclipse.
-The current version strikes my rather old machine with “just” 512mb to
-death. Building projects is not possible even when assigning eclipse all
-my available memory, because of an Java Heap Error (<a class="reference external" href="http://blog.wolff-hamburg.de/archives/20-Migrating-to-PDT.html">See this blog
-post</a>).
-This effectively hinders you to use all the completion and hint features,
-because PDT does not know about any functions, classes and their phpdoc
-descriptions.</p>
-<p>PDT is also missing some very important features. Marking all occurrences
-of a function, class, constant or variable on click for example. PHP
-Errors and Warnings are display in a way so that you won’t find them and
-if you do, you won’t understand what they mean.</p>
-<p>So I am going back to my easyeclipse with php combination, which always
-worked well, the only problem being that it is no longer under active
-development. At least it has all the features I need for now.</p>
+<span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/02/12/pdt-back-to-easyeclipse-with-php-extension.html#disqus_thread" data-disqus-identifier="2008/02/12/pdt-back-to-easyeclipse-with-php-extension">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 25, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/05/25/introducing-zend-controller-scaffolding.html">Introducing: Zend Controller Scaffolding</a></h1>
-<p>In the last couple of weeks I <a class="reference external" href="http://codecaine.co.za/posts/form-generation-with-zend-form-part-2/">came across the
-idea</a>
-of building a little component for scaffolding in Zend Framework. After
-playing around with this idea a little I came up with an
-Zend_Controller_Scaffolding object, which extends the
-Zend_Controller_Action object.</p>
-<p>It takes any Zend_Db_Table_Abstract object and generates create and
-update forms using Zend_Form and displays them in the Controller. The
-component is very easy to use, as this example shows:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class SomeController extends WW_Controller_Scaffolding {
-    public function init() {
-        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
-    }
-}
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// 1. do something with $data</span>
+
+        <span class="c1">// 2. raise event</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+            <span class="s2">"data"</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+        <span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="nx">EventProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-</div></blockquote>
-<p>You now have access to the following actions of the controller:
-some/create some/edit some/delete and some/index (some/list). They
-handle all your model editing dreams.</p>
-<p>All you have to own is the WW_Controller_Scaffolding Library Class and
-a folder of scaffolding view templates both of which are <a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">bundled in an
-archive you can
-download</a>.</p>
-<p><strong>Download</strong></p>
+<p>The Event provider trait aggregates all the events, and offers
+and API for external services to pull them from the entity:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">trait</span> <span class="nx">EventProvider</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Our infrastructure must then trigger event handlers, based
+on the event names. It will use <span class="docutils literal"><span class="pre">dequeueEmittedEvents</span></span> and making
+sure the events are not emitted multiple times.</p>
+<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">Download Version
-0.5.5</a></li>
+<li>Command executes</li>
+<li>Entities emit events</li>
+<li>Command transaction succeeds</li>
+<li>Events trigger event handlers</li>
+<li>Event handlers execute more commands</li>
+<li>Restart from 1.</li>
 </ul>
-<p><strong>Changes</strong></p>
+<p>With this approach we can decouple all services from each other and avoid
+deep nesting in each other. Yet we still have transactional dependencies,
+by dropping all events when the parent command fails. Transactions over
+multiple commands will not have ACID properties though, instead you will have
+to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
+that are important in systems with eventual consistency. This is one downside
+that you need to take into account.</p>
+<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
+implementation of DomainEvent and EventProvider classes and integration into
+Symfony and Doctrine ORM. Generally this pattern is very easy to implement
+though, so that you can just have a look at the implementation and take the
+best parts for your own.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 25, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a></h1>
+<p>If you are using an object relational mapper or any other database
+abstraction technology that converts rows to objects, then you will probably
+use getter/setter methods or properties (C#) to encapsulate object properties.</p>
+<p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
+at the default <span class="docutils literal"><span class="pre">User</span></span> entity from the Symfony2 FOSUserBundle plugin for
+example: A colossus of getter/setter methods with nearly no real business
+logic. This is how most of our persistence related objects look like in PHP.
+A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
+the explicit getter/setters, however generates accessors magically for you.
+Nevertheless you have to add considerable amount of code to configure all the
+properties. And code using these active records becomes ambiguous as well.</p>
+<p>Why do we use getters/setters so much?</p>
 <ul class="simple">
-<li>0.5.5: Put Component into own Namespace (WW = Whitewashing). Make it
-possible to hide fields in the list via the options. Allow to specify
-scaffolding view scripts folder via options.</li>
+<li>Tools generate objects from a database, adding getters and setters
+automatically.</li>
+<li>Frameworks make them automatically available for database records/rows.</li>
+<li>IDEs can magically create getter/setter pairs for fields.</li>
+<li>We want the flexibility to change every field whenever we want.</li>
+<li>It became natural in OOP to have write access to every field.</li>
 </ul>
-<p><strong>Install &amp; Usage</strong></p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>Untar the two folders include/ and views/ into your
-Zend Framework project application directory.
+<p>However Getters/setters <a class="reference external" href="http://en.wikipedia.org/wiki/Open/closed_principle">violate the open/closed principle</a>, prevent information
+hiding and <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
+(<a class="reference external" href="http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html">Long version</a>). Using
+getters and setters allows to <em>decouples</em> the business logic for setting values from the
+actual storage. Something that object-orientation was suppose to avoid.</p>
+<div class="section" id="getting-rid-of-setters">
+<h2>Getting rid of setters</h2>
+<p>Avoiding setters is much simpler than getters, so lets start with them.</p>
+<p>One way to avoid writing setters is a task based approach to the model. Think
+of every task that is performed in an application and add a method that
+changes all the affected fields at once, to perform this task. In the famous
+blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Post</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">compose</span><span class="p">(</span><span class="nv">$headline</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$tags</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// check invariants, business logic, filters</span>
 
-Make sure the include folder is in your Zend_Loader
-include path or move the Scaffolding.php so that it
-is placed in your library include path.
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headline</span> <span class="o">=</span> <span class="nv">$headline</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">text</span>     <span class="o">=</span> <span class="nv">$text</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span>     <span class="o">=</span> <span class="nv">$tags</span><span class="p">;</span>
+    <span class="p">}</span>
 
-Define each Controller that should be a Scaffolding Interface
-as:
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">publish</span><span class="p">(</span><span class="nx">\DateTime</span> <span class="nv">$onDate</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// check invariants, business logic, filters</span>
 
-class SomeController extends WW_Controller_Scaffolding {
-    public function init() {
-        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
-    }
-}
-
-Where $options is an array or Zend_Config object with any of the following keys:
-
-  'allow_edit_primary_key' True/false - Whether the form allows you to set the
-                          Primary Key fields or not
-
- 'field_names' an Array of the Database Tables field names mapped to Label Names
-
- 'hide_list_fields' Array of database table field names that should not be displayed in the list overview.
-
- 'checkbox' an Array of Database Table field names that should be represented
-            as Checkbox. Useful for TINYINT(1) fields that represent boolean decisions.
-
- 'view_folder' Sometimes you want to use different views for scaffolding in one project. Use
-               this variable and copy the scaffolding folder for each component you want to
-               change the view basics for.
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">state</span>       <span class="o">=</span> <span class="s2">"published"</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$onDate</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-</div></blockquote>
-<p><strong>Todos &amp; Problems:</strong></p>
+<p>The <span class="docutils literal"><span class="pre">Post</span></span> class is now much more protected from the outside and
+is actually much better to read and understand. You can clearly see
+the behaviors that exist on this object. In the future you might even
+be able to change the state of this object without breaking client code.</p>
+<p>You could even call this code domain driven, but actually its just applying
+the SOLID principles to entities.</p>
+</div>
+<div class="section" id="tackling-getters">
+<h2>Tackling getters</h2>
+<p>Avoiding getters is a bit more cumbersome and given no setters, maybe
+not worth the trouble anymore.</p>
+<p>You still need getters to access the object state, either if you display
+models directly in the view or for testing purposes. There is another way
+to get rid of all the getters that you don’t need explicitly in a domain
+model, using the visitor pattern in combination with view models:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">Post</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nx">PostView</span> <span class="nv">$view</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">id</span>          <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span><span class="p">;</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">headline</span>    <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">;</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">text</span>        <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">;</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">author</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">author</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="k">new</span> <span class="nx">AuthorView</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">PostView</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+    <span class="c1">//... more public properties</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are drawbacks with this approach though:</p>
 <ul class="simple">
-<li>Many To Many Relationships are not implemented yet (Using
-MultiSelec).</li>
-<li>Compound Keys are probably not working correctly</li>
-<li>Relationships on non-primary key fields probably don’t work as
-expected</li>
-<li>Relationships with lots of data are not scaled down for easy
-administration.</li>
+<li>Why use the Post model in memory, when you are only passing <span class="docutils literal"><span class="pre">PostView</span></span>
+instances to the controllers and views only anyways? Its much more efficient
+to have the database map to the view objects directly. This is what CQRS
+postulates as separation of read- and write model.</li>
+<li>You have to write additional classes for every entity (Data transfer objects)
+instead of passing the entities directly to the view. But if you want to
+cleanly separate the model from the application/framework, you don’t get
+around view model/data transfer objects anyways.</li>
+<li>It looks awkward in tests at first, but you can write some custom assertions
+to get your sanity back for this task.</li>
 </ul>
-<p>Please report any bugs and feature requests or recommendations to
-<strong>kontakt at beberlei dot de</strong>.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/25/introducing-zend-controller-scaffolding.html#disqus_thread" data-disqus-identifier="2008/05/25/introducing-zend-controller-scaffolding">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 18, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a></h1>
-<p><a class="reference external" href="http://framework.zend.com">Zend_Search_Lucene</a> (or Lucene in
-general) does not support an update statement, therefore we must check
-via find() if a specific article that should be updated already exists.</p>
-<p>Numerous solutions exist for this problem (<a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">for example this PDF
-Tutorial by a Zend
-Programmer</a>).
-Mine looks as follows. The first thing is to Set an Analyzer other from
-the default one. The Default Analyzer only looks at letters, not at
-numbers.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
-    Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
-);
-$index = Zend_Search_Lucene::open('/path/to/index/directory');
+</div>
+<div class="section" id="what-about-the-automagic-form-mapping">
+<h2>What about the automagic form mapping?</h2>
+<p>Some form frameworks like the <a class="reference external" href="http://www.symfony.com">Symfony2</a> or <a class="reference external" href="http://framework.zend.com">Zend
+Framework 2</a> ones map forms directly to objects
+and back. Without getters/setters this is obviously not possible anymore.
+However if you are decoupling the model from the framework, then using this
+kind of form framework on entities is a huge no go anyways.</p>
+<p>Think back to the tasks we are performing on our <span class="docutils literal"><span class="pre">Post</span></span> entity:</p>
+<ul class="simple">
+<li>Edit (title, body, tags)</li>
+<li>Publish (publishDate)</li>
+</ul>
+<p>Both tasks allow only a subset of the properties to be modified. For each of
+these tasks we need a custom form “model”. Think of these models as command
+objects:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">EditPostCommand</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$headline</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$text</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$tags</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-</div></blockquote>
-<p>We can now save an identifier containing letters and numbers, for
-example the md5 string of the Article Database ID.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$doc = new Zend_Search_Lucene_Document();
-$field = Zend_Search_Lucene_Field::Keyword('id', md5($data['id']));
-$doc-&gt;addField($field);
-$index-&gt;addDocument($doc);
+<p>In our application we could attach these form models to our form framework and
+then pass these as commands into our “real model” through a service layer,
+<a class="reference external" href="http://www.eaipatterns.com/MessageBus.html">message bus</a> or something equivalent:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">PostController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$post</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">findPostViewModel</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">));</span>
+
+        <span class="c1">// This could need some more automation/generic code</span>
+        <span class="nv">$editPostCommand</span>           <span class="o">=</span> <span class="k">new</span> <span class="nx">EditPostCommand</span><span class="p">();</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">id</span>       <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">headline</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">;</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">text</span>     <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">;</span>
+        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">tags</span>     <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">;</span>
+
+        <span class="c1">// here be the form framework handling...</span>
+        <span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="k">new</span> <span class="nx">EditPostType</span><span class="p">(),</span> <span class="nv">$editPostCommand</span><span class="p">);</span>
+        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">bind</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+            <span class="c1">// invalid, show errors</span>
+        <span class="p">}</span>
+
+        <span class="c1">// here we invoke the model, finally, through the service layer</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">postService</span><span class="o">-&gt;</span><span class="na">edit</span><span class="p">(</span><span class="nv">$editPostCommand</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">PostService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditPostCommand</span> <span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$post</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">postRepository</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
+        <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">compose</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">,</span> <span class="nv">$command</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">,</span> <span class="nv">$command</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-</div></blockquote>
-<p>Before updating an entry you have to delete any entry that has been
-indexed before:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$hits = $index-&gt;find('id:'.md5($articleID));
-foreach($hits AS $hit) {
-    $index-&gt;delete($hit-&gt;id);
-}
-</pre></div>
+<p>This way we separated the business model from the application framework.</p>
 </div>
-</div></blockquote>
-<p>The <a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">Tutorial Talk on Search
-Lucene</a>
-(given above) uses an extended version of this delete routine snippet
-that also checks if an article is up to date and does not have to be
-reindexed and deletes multiple entries of one article.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html#disqus_thread" data-disqus-identifier="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 17, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/05/17/integrated-zend-layout-into-this-blog.html">Integrated Zend_Layout into this blog</a></h1>
-<p>I finished with integrating Zend_Layout into this blog software today.
-At first I thought it is quite hard to use especially if you want to
-integrate dynamic navigational contents depending on the current
-module/controller/action setup. But I came up with a combination of
-actionStack and Named Response Sections as <a class="reference external" href="http://framework.zend.com/manual/en/zend.layout.quickstart.html#zend.layout.quickstart.mvc">described in the ZF
-Documentation of the Layout
-component</a>,
-which is quite easy to understand, use and extend.</p>
-<p>At each of the major Controllers I put different actions from a specific
-Navigation Controller on the
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.controller.actionhelpers.html#zend.controller.actionhelpers.actionstack">ActionStack</a>
-(mostly global per Controller using the init() class method).</p>
-<p>A typical controller looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class BlogController extends Zend_Controller_Action
-{
-    public function init()
-    {
-        $this-&gt;_helper-&gt;actionStack('tagcloud', 'Navigation');
-        $this-&gt;_helper-&gt;actionStack('userinfo', 'Navigation');
-    }
-}
-</pre></div>
+<div class="section" id="a-word-about-rad">
+<h2>A word about RAD</h2>
+<p>Rapid-application development or rapid prototyping is a wide-spread approach in web
+development. My explicit approach seems to be completely against this kind of
+development and much slower as well. But I think you don’t loose much time
+in the long run:</p>
+<ul class="simple">
+<li>Simple command objects can be code-generated or generated by IDEs
+in a matter of seconds. Or you could even extend ORMs code generation
+capabilities to generate these dummy objects for you. Since you don’t need
+ORM mapping information for these objects or think about performance
+implications in context with the ORM, you don’t need to spend much
+thinking about their creation.</li>
+<li>Explicit models are much simpler to unit-test and those tests run much faster
+than tests through the UI that RAD prototypes need.</li>
+<li>Generated Rapid prototypes can get hard to maintain quickly. That does not mean they
+are unmaintainable, but they seem to favour reimplementation instead of
+refactoring, something that leads to problems given the low code coverage
+that these prototypes normally have.</li>
+</ul>
 </div>
-</div></blockquote>
-<p>The NavigationController looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class NavigationController extends Zend_Controller_Action
-{
-    public function tagcloudAction()
-    {
-        // Do not render the content of this action to the default output.
-        $this-&gt;getHelper("ViewRenderer")-&gt;setNoRender();
-
-        [...]
-
-        // Append content to secondaryNavigation named response section
-        $this-&gt;getResponse()-&gt;append('secondaryNavigation', $this-&gt;view-&gt;render('navigation/tagcloud.phtml'));
-    }
-}
-</pre></div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>If we take a step back from all our tools suggesting to generate getter/setters
+we find that there is a simple way to avoid using setters when focusing on the
+tasks that objects perform. This actually makes our code much more readable and
+is one building block towards clean object oriented code and domain driven design.</p>
+<p>I am very interested in your opinions on this topic and my attempt to avoid them,
+please leave comments when leaving this website :-)</p>
 </div>
-</div></blockquote>
-<p>The layout.pthml then just calls certain named sections, for example &lt;=?
-$this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/17/integrated-zend-layout-into-this-blog.html#disqus_thread" data-disqus-identifier="2008/05/17/integrated-zend-layout-into-this-blog">Leave a comment</a>
-        </div></div><div class="archive_link">
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 22, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
-
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/page8.html';
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
           </div>         
         </div>
-      </div>
     </div>
-
-    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li><li>
-            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li></ul>
-</div>
-</section>
-          </aside></div>
 </div>
 </div> <!-- #main-container -->
 
         <div class="footer-container" role="contentinfo">
 <div class="container">
-    <div class="span-24 content">
+    <div class="col-md-8 col-md-offset-2">
         <div class="footer">
-            &copy; Copyright 2008-2015, Benjamin Eberlei.
-            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
 
-        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
         </div>
     </div>
 </div>

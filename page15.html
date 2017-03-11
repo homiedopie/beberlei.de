@@ -1,0 +1,497 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 15 &mdash; beberlei.de</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="next" title="Older" href="page16.html" /><link rel="prev" title="Newer" href="page14.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+          <div id="page15">
+            
+            <div class="section">
+            <h1><a href="2009/03/27/test-your-legacy-php-application-with-function-mocks.html">Test your Legacy PHP Application with Function Mocks!</a></h1>
+<p>Much talking is going on about Unittesting, Mocks and TDD in the PHP
+world. For the most this discussions surround object-oriented PHP code,
+frameworks and applications.</p>
+<p>Yet I would assert that the reality for PHP developers (me included) is
+dealing with PHP 4, PHP 5 migrated, or non-object oriented legacy
+applications which are near to impossible to bring under test. Still
+this code works, is in production and needs maintenance and possibly
+extension for new features.</p>
+<p>For example many applications may still use <strong>mysql_*</strong> functions at
+length inside their model or have multiple nested function levels
+(Example: Wordpress). <a class="reference external" href="http://pecl.php.net/package/runkit">Runkit</a> to
+the rescue: A PECL extension that can hack your running PHP code, such
+that method or functions are repointed to execute new implementations.
+Using this extension you can actually mock out internal PHP functions,
+which is great to bring legacy code under test.</p>
+<p>Consider this following proof of concept, <a class="reference external" href="http://github.com/padraic/runkit/tree/master">using the Runkit extension
+build by Padraic Brady</a>
+(the one from pecl.php.net does not compile on PHP 5.2), which replaces
+the functionality of <strong>mysql_query()</strong>. You have to set the following
+option in your php.ini: <strong>runkit.internal_override = On</strong> for this to
+work. By default only user-defined functions may be overwritten by
+Runkit.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class FunctionMocker
+{
+    protected $_mockedFuncBehaviourMap = array();
+
+    public function mock($funcName, $return=null)
+    {
+        $newFuncCode = 'return "'.$return.'";';
+
+        $renamedName = "__".$funcName."_mockOriginalCopy";
+        runkit_function_copy($funcName, $renamedName);
+        runkit_function_redefine($funcName, '', $newFuncCode);
+
+        $this-&gt;_mockedFuncBehaviourMap[$funcName] = $renamedName;
+    }
+
+    public function reset()
+    {
+        foreach($this-&gt;_mockedFuncBehaviourMap AS $funcName =&gt; $renamedName) {
+            runkit_function_remove($funcName);
+            runkit_function_copy($renamedName, $funcName);
+            runkit_function_remove($renamedName);
+        }
+        $this-&gt;_mockedFuncBehaviourMap = array();
+    }
+}
+
+$mocker = new FunctionMocker();
+$mocker-&gt;mock('mysql_query', 'hello world!');
+
+echo mysql_query(); // hello world
+
+$mocker-&gt;reset();
+
+mysql_query(); // error
+</pre></div>
+</div>
+<p>This example, only allows for string return values of the mock and
+has no support for replacing the arguments of the mocked function.
+Also chaining of different return values based on input or call
+number might be interesting. Some kind of Code Generator Tool would
+have to be implemented to support this functionality. Additionally
+Assertions and Verifying should be implemented for the function
+arguments. All in all this would allow to mock functions as you
+would mock interfaces/classes, which would be a great addition for
+all those legacy applications that use procedural PHP.</p>
+<p>Additionally what the real killer for runkit would be: The
+possibility to insert PHP callbacks instead of real PHP code into
+the <strong>runkit_function_redefine</strong>.</p>
+</div></blockquote>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/testing.html">Testing</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on March 27, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09.html">Speaking about Framework Quality on the IPC Spring 09</a></h1>
+<p>Just a short notice, my thesis is taking its last breath, I will be
+speaking on the <a class="reference external" href="http://www.phpconference.com">IPC Spring 09
+conference</a> in Berlin end of may this
+year on Framework Quality and Unittests:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><strong>Framework Quality: Unit-Tests as silent witness</strong></dt>
+<dd>Unit-Tests are often overlooked in framework discussions that focus</dd>
+</dl>
+<p>on features, performance, tools or database abstraction. However
+they are a silent witness on how poor or well frameworks are
+designed. In this presentation we will look at the testsuites of the
+big players in the PHP framework business - Zend Framework,
+ezComponents, Symfony and CakePHP - and reveal their hidden secrets.</p>
+</div></blockquote>
+<p>This talk will make heavy use of the <a class="reference external" href="https://github.com/beberlei/puma/tree">PHP Unittest and Metrics
+Aggregator tool</a>, which i haven
+written on several times. For both CakePHP and Symfony extensions for
+their testtools may have to be written.</p>
+<p>I am really excited for my first time being speaker on a conference and
+looking forward to see you at IPC.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/conferences.html">Conferences</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on March 10, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
+<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/">PHP CodeSniffer for
+Netbeans
+plugin</a>.
+Previously the plugin used an unnecessary API which restricted the use
+to Netbeans 6.7.0 only. This API was removed so that the plugin should
+now work with all Netbeans Versions &gt;= 6.7.0.</p>
+<p>Additionally when working the previous version would scan every PHP
+script on a file per file basis when the all projects or main projects
+filters were activated. This rendered made the plugin almost useless. In
+the current version scans of filters that contain more than one file are
+blocked. That means you will only see Coding Violations when you enable
+the “Current File” filter. Using any other filter will just do nothing
+and won’t put your Netbeans in permanent hibernation mode (aka useless
+mode).</p>
+<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
+<strong>`NbPreferences
+API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
+which allows to configure the coding standard. [STRIKEOUT:However this
+feature was contributed by <a class="reference external" href="http://manuel-pichler.de/">Manuel
+Piechler</a> and I don’t yet understand how I
+can manipulate it. Maybe someone knows how (*Looking in Mapis general
+direction*)?] By default the Zend Coding Standard is used.</p>
+<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
+file .netbeans/6.7/config/Preferences.properties setting
+“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
+inline highlighting that did not refresh when lines in the file changed.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/netbeans.html">Netbeans</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on October 05, 2009 by beberlei <kontakt@beberlei.de></small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html">Trying a Two Step PEAR/PHAR approach to develop and deploy</a></h1>
+<p>With PHP 5.3 the PHAR extension is a pretty powerful concept for all
+your deployment needs, however it does not tell the complete story.
+Frameworks, Libraries and many different of them are used throughout
+applications and in recent times people even began to chery-pick the
+best components from each of the frameworks and package them together.
+With Pirum being a simple PEAR channel server there is also momentum for
+projects to distribute their code via PEAR.</p>
+<p>However PEAR is mostly used in the server-wide configuration use-case,
+which is not very useful if you plan to distribute your complete
+application in one PHAR file. I just recently had the idea for this
+scenario, so please bear with me and add all the feedback and comments
+you can come up with. I tested this with the ongoing rewrite of my blog
+software.</p>
+<p>First we’ll add a new user that we develop our application with:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo useradd -m -g www-data whitewashing
+sudo passwd whitewashing
+su - whitewashing
+</pre></div>
+</div>
+<p>Now there is the possibility that with this user PHP and PEAR is not in
+your $PATH environment, so you might have to add it. In my case on Ubuntu
+i also had to switch the console from /bin/sh to /bin/bash for this
+user. Then we need to setup our application, I am going to use the Zend
+Framework project style here but with a little twist. We will add a
+distinction between vendor and project libraries by adding a <em>vendor</em>
+directory into the main folder.</p>
+<p>But first we create a folder for our application, and create a Zend
+Framework project in the subfolder “trunk”, which will be the focus of
+our development.</p>
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ mkdir whitewashing
+whitewashing@desktop:~$ zf create project whitewashing/trunk
+Creating project at /home/whitewashing/whitewashing/trunk
+whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor
+</pre></div>
+</div>
+<p>Now we can configure an Apache virtual host to point to our
+/home/whitewashing/whitewashing/public directory, i call this
+“whitewashing-dev” add it to my /etc/hosts and can visit the dummy
+project page.</p>
+<p>We then configure our PEAR installation for the specific application
+user and re-configure the bin and php library paths:</p>
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
+whitewashing@desktop:~$ pear config-set php_dir /home/whitewashing/whitewashing/trunk/vendor
+whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/trunk/bin
+</pre></div>
+</div>
+<p>This configuration assumes that we will install all our stuff into our
+development trunk. From there also the PEAR installed libraries might be
+copied into branches or tags. PEAR Project tests, configuration and
+web-files will still be put by default under $HOME/pear/*. We don’t
+need them for our applications.</p>
+<p>Now we install all the dependencies our project needs, in this case Zend
+Framework, Doctrine 2, HTML Purifier:</p>
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
+whitewashing@desktop:~$ pear install zfcampus/zf-alpha
+whitewashing@desktop:~$ pear channel-discover htmlpurifier.org
+whitewashing@desktop:~$ pear install hp/HTMLPurifier
+whitewashing@desktop:~$ pear channel-discover pear.phpdoctrine.org
+whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0
+</pre></div>
+</div>
+<p>Now we have all three of the packages installed in our project folder
+<cite>whitewashing/trunk/vendor</cite>, see:</p>
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
+total 680
+drwxr-xr-x  7 whitewashing www-data   4096 2009-12-13 14:45 ./
+drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:36 ../
+drwxr-xr-x  3 whitewashing www-data   4096 2009-12-13 14:43 .channels/
+-rw-r--r--  1 whitewashing www-data     57 2009-12-13 14:45 .depdb
+-rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .depdblock
+drwxr-xr-x  5 whitewashing www-data   4096 2009-12-13 14:45 Doctrine/
+-rw-r--r--  1 whitewashing www-data 582208 2009-12-13 14:45 .filemap
+drwxr-xr-x 20 whitewashing www-data   4096 2009-12-13 14:39 HTMLPurifier/
+-rw-r--r--  1 whitewashing www-data    629 2009-12-13 14:39 HTMLPurifier.autoload.php
+-rw-r--r--  1 whitewashing www-data    274 2009-12-13 14:39 HTMLPurifier.auto.php
+-rw-r--r--  1 whitewashing www-data    545 2009-12-13 14:39 HTMLPurifier.func.php
+-rw-r--r--  1 whitewashing www-data   9299 2009-12-13 14:39 HTMLPurifier.includes.php
+-rw-r--r--  1 whitewashing www-data    955 2009-12-13 14:39 HTMLPurifier.kses.php
+-rw-r--r--  1 whitewashing www-data   8831 2009-12-13 14:39 HTMLPurifier.php
+-rw-r--r--  1 whitewashing www-data  11901 2009-12-13 14:39 HTMLPurifier.safe-includes.php
+-rw-r--r--  1 whitewashing www-data      0 2009-12-13 14:45 .lock
+drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:43 .registry/
+drwxr-xr-x 59 whitewashing www-data   4096 2009-12-13 14:36 Zend/
+-rw-r--r--  1 whitewashing www-data  19537 2009-12-13 14:36 zf.php
+</pre></div>
+</div>
+<p>And both Doctrine and ZF registered their binary CLi tools inside the
+<cite>whitewashing/trunk/bin/</cite> folder:</p>
+<div class="highlight-python"><div class="highlight"><pre>whitewashing@desktop:~$ ls -aFl bin/
+total 20
+drwxr-xr-x 2 whitewashing www-data 4096 2009-12-13 14:45 ./
+drwxr-xr-x 8 whitewashing www-data 4096 2009-12-13 14:36 ../
+-rwxr-xr-x 1 whitewashing www-data   50 2009-12-13 14:45 doctrine*
+-rwxr-xr-x 1 whitewashing www-data  169 2009-12-13 14:45 doctrine.php*
+-rwxr-xr-x 1 whitewashing www-data 1511 2009-12-13 14:36 zf*
+</pre></div>
+</div>
+<p>We now have the full control over the versions of our dependencies, we
+can call “pear upgrade ” whenever we want to update one of the ZF,
+Doctrine or HtmlPurifier libraries inside our application.</p>
+<p>Now some magic is gonna happen, we start to develop our application and
+such which is all not really interesting for this topic. At some point
+we want to package it all up into a PHAR file and distribute it. We want
+to package our application in one big phar file. We also want to make
+sure that the configuration files in
+<cite>whitewashing/trunk/application/configs/</cite> are not distributed, but have
+to be created on the server and are kept that way. We could write an
+installer script for this configuration management.</p>
+<p>The reference for PHAR files is the PHP Manual for the Basics and Cal
+Evans’ two posts
+(<a class="reference external" href="http://blog.calevans.com/2009/07/19/lessons-in-phar/">1</a>,
+<a class="reference external" href="http://blog.calevans.com/2009/07/26/packaging-zend-framework-as-a-phar-revisited/">2</a>)
+on this topic, aswell as <a class="reference external" href="http://geekmonkey.org/articles/PHP_Archives">a post on
+Geekmonkey</a>. Contrary to
+most other PHP extensions, PHAR has an extensive documentation, however
+its not organized terribly well. Also there are no real use-cases and
+scenarios discussed, methods are only looked at in isolation. Cals posts
+are very good on understanding how to package up different libraries,
+but there is no word on distributing web applications. That is where the
+Geekmonkey post comes in to wire it all together.</p>
+<p>For a Zend Framework application that should have both a web and a cli
+(cronjobs) entry point into the application we need a specific stub file
+for the PHAR bootstrapping. A stub is a little PHP script that is
+executed whenever your PHAR file is included into your php script. It is
+essentially a front-controller for your PHAR application. It also has
+mount capabilities that allow to import files or directories from
+outside into the PHAR context. This is a powerful feature that is
+required to distribute configurable applications like our blog.</p>
+<p>This screenshot shows how the application is currently structured in
+development mode. In production its structure should look like:</p>
+<div class="highlight-python"><div class="highlight"><pre>whitewashing
+|--application
+|  |--configs
+|     |-- my application config files are all here...
+|--bin
+|  |--whitewashing.php
+|--public
+|  |--index.php
+|  |--.htaccess
+|--whitewashing.phar
+</pre></div>
+</div>
+<p>The whitewashing.php and index.php files are the application entry
+points that only include the phar file and trigger the application
+bootstrapping that will be included in the Stub file. They both look
+like:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+define('EXTERNAL_APPLICATION_ROOT', __DIR__."/../");
+include EXTERNAL_APPLICATION_ROOT."/whitewashing.phar";
+</pre></div>
+</div>
+<p>Including a PHAR file essentially has two consequences:</p>
+<ul class="simple">
+<li>The PHAR path will be added to your include path.</li>
+<li>The stub file will be executed.</li>
+</ul>
+<p>Our application stub looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+
+if(defined('EXTERNAL_APPLICATION_ROOT')) {
+    // Mount the external application/configs directory as config if it exists.
+    if (file_exists(EXTERNAL_APPLICATION_ROOT."/application/configs")) {
+        Phar::mount("application/configs", EXTERNAL_APPLICATION_ROOT."/application/configs");
+    }
+}
+
+/** Zend_Loader_Autoloader */
+require_once 'Zend/Loader/Autoloader.php';
+$autoloader = Zend_Loader_Autoloader::getInstance();
+
+if (php_sapi_name() == "cli") {
+    require_once 'bin/whitewashing.php';
+} else {
+    require_once 'public/index.php';
+}
+
+__HALT_COMPILER();
+</pre></div>
+</div>
+<p>The first bit of the stub mounts the external application configs
+directory into the stub and hides possible directories that are present
+at this location in the PHAR file. This allows us to distribute our
+application with a default configuration, but allows any user to replace
+the configuration files to fit the application to his need.</p>
+<p>The second bit loads Zend Framework Autoloader that is required by the
+bootstrapping mechanism. The third bit decides whether this request is
+executed from the CLI- or the Web-Entry point of the application. The
+fourth bit, <span class="docutils literal"><span class="pre">__HALT_COMPILER();</span></span> is a technically required call inside
+your stub-file.</p>
+<p>Now that we have a stub-file for our application, we can package it and
+distribute it. I am using a modified version of Cal Evans example for
+this. I have extracted his directory traversal to find all the relevant
+into a re-usable FilterIterator implementation. I <a class="reference external" href="https://gist.github.com/3b20264b857dbdabf526">pasted my package.php
+a Gist</a> on Github. Now
+this should probably be put into the build context of your application,
+possibly as a phing or ant task or something alike.</p>
+<p>Now what this build process does not manage is the creation of the
+application entry point php and .htaccess files, but since they won’t
+ever change its easy to add them to the build directory for now. An even
+more sophisticated version of the build script would lead to the
+creation of an additional tar.gz of the complete application folder. Our
+deployment process would then be as easy as:</p>
+<ul class="simple">
+<li>If the application is not installed yet, unpack the tarball into its
+location.</li>
+<li>If the application should be updated, just replace the PHAR file.</li>
+</ul>
+<p>If you need the ability to go back to any version of your application
+you could make use of symlinks.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/deployment.html">Deployment</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on December 19, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/07/30/php-codesniffer-support-for-netbeans.html">PHP CodeSniffer Support for Netbeans</a></h1>
+<p>I dived into the code of my new favorite IDE
+<a class="reference external" href="http://www.netbeans.org">Netbeans</a> these last days and came up with
+an <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/tree/master">extension
+module</a>,
+which adds PHP CodeSniffer Support on a per file basis to make my life
+much easier. It shows warnings and errors as annotations to the Editor
+and marks the affected lines in yellow and red.</p>
+<p><a class="reference external" href="http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/netbeans_cs_support.png">|image0|</a></p>
+<p>[STRIKEOUT:My Java skills being very bad, it will only work on Linux
+currently, since the PHP Code Sniffer “binary” is hardcoded into the
+Java Source code. You have to create a “/usr/bin/phpcs2” executable,
+which is a wrapper that looks like:]</p>
+<p>With Manuals extensions (see the comments) the module now works without
+the wrapper script. It might even work under Windows now. Yet now the
+Zend Coding standard is enforced though. I am working on making that one
+configurable next.</p>
+<p>You can install the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">NBM module install
+file</a>
+from the GitHub repository into Netbeans and it “should” work then.</p>
+<p>I hope to get more familiar with Netbeans in the future to add some more
+PHP tools and enhance Code Sniffer support.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/codequality.html">CodeQuality</a>
+                 / 
+            <a href="tags/netbeans.html">Netbeans</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on July 30, 2009</small></p>
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+          </div>         
+        </div>
+    </div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="footer">
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
+
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

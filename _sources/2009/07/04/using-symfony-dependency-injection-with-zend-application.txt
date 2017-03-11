@@ -47,6 +47,5 @@ Make sure to call this after running Zend\_Application::bootstrap, so
 that the Resource dependencies are injected first.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, Symfony, DependencyInjection
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

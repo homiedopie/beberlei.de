@@ -8,6 +8,5 @@ a little bit, so that you can now `download version
 fun.
 
 .. categories:: none
-.. tags:: none
+.. tags:: CalypsoLibrary
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

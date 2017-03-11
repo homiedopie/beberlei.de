@@ -121,6 +121,5 @@ use of the Application resources inside the Yadif Configuration
     integrated easily.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, DependencyInjection, YadifLibrary
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

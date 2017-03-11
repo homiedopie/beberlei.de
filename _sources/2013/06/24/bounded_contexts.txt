@@ -83,5 +83,5 @@ problem.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

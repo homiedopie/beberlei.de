@@ -28,6 +28,5 @@ semesters final exams in the first place.
 playing. I will elaborate on that soon.
 
 .. categories:: none
-.. tags:: none
+.. tags:: KDE4
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

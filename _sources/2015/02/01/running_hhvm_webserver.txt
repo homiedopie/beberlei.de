@@ -71,5 +71,5 @@ replaces dynamic PHP with optimized (assembler?) code.
 
 .. author:: default
 .. categories:: Go
-.. tags:: none
+.. tags:: Go, HHVM
 .. comments::

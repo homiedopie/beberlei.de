@@ -46,6 +46,5 @@ that also checks if an article is up to date and does not have to be
 reindexed and deletes multiple entries of one article.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -62,5 +62,5 @@ Entities metadata.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP, Doctrine
+.. tags:: Doctrine, ApplicationDesign
 .. comments::

@@ -81,6 +81,5 @@ and stripping all require\_once calls from all of the Zend Framework
 files.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

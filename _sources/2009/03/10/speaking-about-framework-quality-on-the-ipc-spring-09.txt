@@ -23,6 +23,5 @@ I am really excited for my first time being speaker on a conference and
 looking forward to see you at IPC.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Conferences
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

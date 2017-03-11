@@ -150,5 +150,5 @@ some examples and then wrap up my thoughts about all of them.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

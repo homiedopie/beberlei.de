@@ -23,6 +23,6 @@ recognize common patterns. Dear Dojo Team, please make your project more
 accessible!
 
 .. categories:: none
-.. tags:: none
+.. tags:: Dojo
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

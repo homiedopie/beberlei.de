@@ -25,6 +25,6 @@ page <http://github.com/beberlei/netbeans-php-enhancements/downloads/>`_.
 .. |image0| image:: http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/phpcsoptions.png
 
 .. categories:: none
-.. tags:: none
+.. tags:: Netbeans
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

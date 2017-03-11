@@ -111,5 +111,5 @@ the future.
 
 .. author:: default
 .. categories:: Devops
-.. tags:: Ansible
+.. tags:: Ansible, Automation
 .. comments::

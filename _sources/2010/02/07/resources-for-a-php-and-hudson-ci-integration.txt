@@ -75,6 +75,5 @@ You can then start all the builds from inside Netbeans and be notified
 of the success or failure.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ContinouosIntegration
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -88,5 +88,5 @@ approach to find improvements.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: CodeQuality
 .. comments::

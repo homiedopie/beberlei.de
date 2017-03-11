@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">
     <channel>
-        <title>Whitewashing</title>
-        <link>http://www.whitewashing.de/</link>
+        <title>beberlei.de</title>
+        <link>https://www.beberlei.de/</link>
         <description></description>
         <language>en-us</language>
         <pubDate>Sat, 11 Apr 2015 00:00:00 +0200</pubDate>
         
         <item>
-            <link>http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html</link>
-            <guid>http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html</guid>
+            <link>https://www.beberlei.de/2015/04/11/monolithic_repositories_with_php_and_composer.html</link>
+            <guid>https://www.beberlei.de/2015/04/11/monolithic_repositories_with_php_and_composer.html</guid>
             <title><![CDATA[Monolithic Repositories with PHP and Composer]]></title>
             <description><![CDATA[
 <h1>Monolithic Repositories with PHP and Composer</h1>
@@ -209,8 +209,8 @@ It is stable enough so that we could actually port <a class="reference external"
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</link>
-            <guid>http://www.whitewashing.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</guid>
+            <link>https://www.beberlei.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</link>
+            <guid>https://www.beberlei.de/2015/02/10/a_case_for_weak_type_hints_only_in_php7.html</guid>
             <title><![CDATA[A case for weak type hints only in PHP7]]></title>
             <description><![CDATA[
 <h1>A case for weak type hints only in PHP7</h1>
@@ -418,8 +418,176 @@ code.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</link>
-            <guid>http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html</guid>
+            <link>https://www.beberlei.de/2014/04/24/symfony_hello_world.html</link>
+            <guid>https://www.beberlei.de/2014/04/24/symfony_hello_world.html</guid>
+            <title><![CDATA[Symfony2: A Simple Hello World]]></title>
+            <description><![CDATA[
+<h1>Symfony2: A Simple Hello World</h1>
+<p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
+I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
+to start with a very simple “Hello World” example.</p>
+<p>The Symfony2 Standard Edition already contains a huge burden of concepts,
+assumptions and conventions that can be confusing for a beginner.</p>
+<ul class="simple">
+<li>YAML</li>
+<li>Twig</li>
+<li>Environments and Dependency Injection Container</li>
+<li>Various weird and magic syntaxes for bundles, <span class="docutils literal"><span class="pre">_controller</span></span> and template names</li>
+<li>Various files to open and poke around in</li>
+<li>Composer</li>
+<li>Maybe even Doctrine</li>
+</ul>
+<p>As a trainer it is very hard to explain all this at the same time.
+It makes a lot of sense to avoid as many of them as possible.</p>
+<p>That is why the Standard Edition is not the best way to start teaching Symfony,
+but one should actually consider a much lighter version of the framework and
+then gradually add more and more features until you end up with the standard
+edition.</p>
+<p>Fabien discussed the simplification of the Symfony Standard Edition from
+another angle before, considering the minimum necessary code to use when
+reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">“Packing a Symfony Full-Stack Application in
+one file”</a>.</p>
+<p>This blog post is about a truely minimal Symfony edition to start learning
+about the framework.  The first thing I like to show is a really simple Hello
+World controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Response</span><span class="p">(</span><span class="s1">'Hello World!'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What is the necessary framework glue code to support this Hello World? Lets start
+from the index file <cite>web/index.php</cite>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
+<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
+at them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">{</span>
+<span class="x">    "require": {</span>
+<span class="x">        "symfony/symfony": "@stable"</span>
+<span class="x">    },</span>
+<span class="x">    "autoload": {</span>
+<span class="x">        "psr-0": { "Acme": "src/" }</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The <cite>composer.json</cite> file installs the latest stable Symfony release and
+adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
+<p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
+and the minimal version of this looks like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'framework'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">'secret'</span> <span class="o">=&gt;</span> <span class="s1">'some secret here'</span><span class="p">,</span>
+                <span class="s1">'router'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">'resource'</span> <span class="o">=&gt;</span> <span class="s1">'%kernel.root_dir%/config/routing.yml'</span>
+                <span class="p">),</span>
+                <span class="s1">'templating'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'engines'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'twig'</span><span class="p">))</span>
+            <span class="p">));</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In trainings we are starting with a single <span class="docutils literal"><span class="pre">config.yml</span></span> file but that is
+technically not necessary by using the <span class="docutils literal"><span class="pre">ClosureLoader</span></span>. The routing
+component has no such closure loader, so its not possible to avoid
+YAML in the first minutes of Symfony2 exposure and we reference
+the <cite>app/config/routing.yml</cite>:</p>
+<div class="highlight-yaml"><div class="highlight"><pre>hello:
+  pattern: /
+  defaults:
+    _controller: "Acme\TrainingBundle\Controller\HelloController::helloAction"
+</pre></div>
+</div>
+<p>Did you know that you can specify controllers in Symfony by using the static callback
+syntax? It has disadvantages when considering bundle inheritance, but why
+bother a beginner with this feature and confuse him with the convention of
+<span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello"</span></span>.</p>
+<p>There are still lots of trip wires to stumble upon in this simple piece of <span class="docutils literal"><span class="pre">routing.yml</span></span>:</p>
+<ul class="simple">
+<li>Tabs are not allowed in YAML, in every training at least one person gets
+bitten by that.</li>
+<li>2 vs 4 spaces ambiguity.</li>
+<li>What is this magic <span class="docutils literal"><span class="pre">_controller</span></span> key?</li>
+<li>I carefully avoid the <span class="docutils literal"><span class="pre">{}</span></span> inline syntax of YAML here as well as it
+introduces yet another ambiguity.</li>
+</ul>
+<p>Run this application with the build in webserver:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 web/index.php
+</pre></div>
+</div>
+<p>Hello World!</p>
+<p>The next step for a beginner is his first twig template to print the Hello
+World. To avoid another confusing convention at the beginning, the <span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello.html.twig"</span></span>
+template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
+that is automatically registered in the Twig Bundle. Just create
+a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'hello.html.twig'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The total number of files is 5 (6 with template) for this example. Note that we
+haven’t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
+the static syntax we don’t need it.</p>
+<p>This is a very good starting point to start exploring more features of Symfony
+and gradually add the required configuration and files for this.</p>
+]]></description>
+            <category><![CDATA[ PHP ]]></category>
+             <pubDate>Thu, 24 Apr 2014 00:00:00 +0200</pubDate>
+        </item>
+    
+        <item>
+            <link>https://www.beberlei.de/2014/01/31/soap_and_php_in_2014.html</link>
+            <guid>https://www.beberlei.de/2014/01/31/soap_and_php_in_2014.html</guid>
             <title><![CDATA[SOAP and PHP in 2014]]></title>
             <description><![CDATA[
 <h1>SOAP and PHP in 2014</h1>
@@ -781,8 +949,8 @@ necessary for REST APIs.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</link>
-            <guid>http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</guid>
+            <link>https://www.beberlei.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</link>
+            <guid>https://www.beberlei.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html</guid>
             <title><![CDATA[Assert v2.0: Fluent API and Lazy Assertions]]></title>
             <description><![CDATA[
 <h1>Assert v2.0: Fluent API and Lazy Assertions</h1>
@@ -872,8 +1040,8 @@ the value and constraint data for translating into human readable messages.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</link>
-            <guid>http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html</guid>
+            <link>https://www.beberlei.de/2013/12/05/feature_flags_and_doctrine_entities.html</link>
+            <guid>https://www.beberlei.de/2013/12/05/feature_flags_and_doctrine_entities.html</guid>
             <title><![CDATA[Feature Flags and Doctrine Entities]]></title>
             <description><![CDATA[
 <h1>Feature Flags and Doctrine Entities</h1>
@@ -933,8 +1101,8 @@ Entities metadata.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</link>
-            <guid>http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</guid>
+            <link>https://www.beberlei.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</link>
+            <guid>https://www.beberlei.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html</guid>
             <title><![CDATA[Decoupling from Symfony Security and FOSUserBundle]]></title>
             <description><![CDATA[
 <h1>Decoupling from Symfony Security and FOSUserBundle</h1>
@@ -1040,8 +1208,8 @@ the Symfony Security component or the huge FOSUserBundle dependency.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</link>
-            <guid>http://www.whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</guid>
+            <link>https://www.beberlei.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</link>
+            <guid>https://www.beberlei.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html</guid>
             <title><![CDATA[Speedup Symfony2 on Vagrant boxes]]></title>
             <description><![CDATA[
 <h1>Speedup Symfony2 on Vagrant boxes</h1>
@@ -1130,8 +1298,8 @@ you wan’t to suffer.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</link>
-            <guid>http://www.whitewashing.de/2013/07/24/doctrine_and_domainevents.html</guid>
+            <link>https://www.beberlei.de/2013/07/24/doctrine_and_domainevents.html</link>
+            <guid>https://www.beberlei.de/2013/07/24/doctrine_and_domainevents.html</guid>
             <title><![CDATA[Doctrine and Domain Events]]></title>
             <description><![CDATA[
 <h1>Doctrine and Domain Events</h1>
@@ -1348,8 +1516,8 @@ Doctrine. Again, <a class="reference external" href="https://gist.github.com/beb
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</link>
-            <guid>http://www.whitewashing.de/2013/05/23/symfony2_on_windows_azure_websites.html</guid>
+            <link>https://www.beberlei.de/2013/05/23/symfony2_on_windows_azure_websites.html</link>
+            <guid>https://www.beberlei.de/2013/05/23/symfony2_on_windows_azure_websites.html</guid>
             <title><![CDATA[Symfony2 on Windows Azure Websites]]></title>
             <description><![CDATA[
 <h1>Symfony2 on Windows Azure Websites</h1>
@@ -1403,8 +1571,8 @@ components.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</link>
-            <guid>http://www.whitewashing.de/2013/04/12/traits_are_static_access.html</guid>
+            <link>https://www.beberlei.de/2013/04/12/traits_are_static_access.html</link>
+            <guid>https://www.beberlei.de/2013/04/12/traits_are_static_access.html</guid>
             <title><![CDATA[Traits are Static Access]]></title>
             <description><![CDATA[
 <h1>Traits are Static Access</h1>
@@ -1603,8 +1771,8 @@ about them quite a while ago.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</link>
-            <guid>http://www.whitewashing.de/2013/03/04/doctrine_repositories.html</guid>
+            <link>https://www.beberlei.de/2013/03/04/doctrine_repositories.html</link>
+            <guid>https://www.beberlei.de/2013/03/04/doctrine_repositories.html</guid>
             <title><![CDATA[On Taming Repository Classes in Doctrine]]></title>
             <description><![CDATA[
 <h1>On Taming Repository Classes in Doctrine</h1>
@@ -2065,8 +2233,8 @@ tests.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</link>
-            <guid>http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html</guid>
+            <link>https://www.beberlei.de/2013/02/04/doctrine_and_solid.html</link>
+            <guid>https://www.beberlei.de/2013/02/04/doctrine_and_solid.html</guid>
             <title><![CDATA[Doctrine and SOLID]]></title>
             <description><![CDATA[
 <h1>Doctrine and SOLID</h1>
@@ -2231,8 +2399,8 @@ Doctrine to make this possible.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</link>
-            <guid>http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html</guid>
+            <link>https://www.beberlei.de/2012/11/19/composer_and_azure_websites_git_deployment.html</link>
+            <guid>https://www.beberlei.de/2012/11/19/composer_and_azure_websites_git_deployment.html</guid>
             <title><![CDATA[Composer and Azure Websites Git Deployment]]></title>
             <description><![CDATA[
 <h1>Composer and Azure Websites Git Deployment</h1>
@@ -2298,8 +2466,8 @@ You can of course execute additional steps in the <span class="docutils literal"
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</link>
-            <guid>http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html</guid>
+            <link>https://www.beberlei.de/2012/09/04/using_assertions_for_validation.html</link>
+            <guid>https://www.beberlei.de/2012/09/04/using_assertions_for_validation.html</guid>
             <title><![CDATA[Using Assertions for validation]]></title>
             <description><![CDATA[
 <h1>Using Assertions for validation</h1>
@@ -2383,8 +2551,8 @@ allows you to overwrite the exception class:</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</link>
-            <guid>http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html</guid>
+            <link>https://www.beberlei.de/2012/08/22/building_an_object_model__no_setters_allowed.html</link>
+            <guid>https://www.beberlei.de/2012/08/22/building_an_object_model__no_setters_allowed.html</guid>
             <title><![CDATA[Building an Object Model: No setters allowed]]></title>
             <description><![CDATA[
 <h1>Building an Object Model: No setters allowed</h1>
@@ -2596,8 +2764,8 @@ please leave comments when leaving this website :-)</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</link>
-            <guid>http://www.whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</guid>
+            <link>https://www.beberlei.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</link>
+            <guid>https://www.beberlei.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html</guid>
             <title><![CDATA[OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)]]></title>
             <description><![CDATA[
 <h1>OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</h1>
@@ -2794,8 +2962,8 @@ topic that I will discuss in the next blog post.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</link>
-            <guid>http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html</guid>
+            <link>https://www.beberlei.de/2012/08/16/oop_business_applications__data__context__interaction.html</link>
+            <guid>https://www.beberlei.de/2012/08/16/oop_business_applications__data__context__interaction.html</guid>
             <title><![CDATA[OOP Business Applications: Data, Context, Interaction]]></title>
             <description><![CDATA[
 <h1>OOP Business Applications: Data, Context, Interaction</h1>
@@ -3003,8 +3171,8 @@ parts of the system.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</link>
-            <guid>http://www.whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</guid>
+            <link>https://www.beberlei.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</link>
+            <guid>https://www.beberlei.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html</guid>
             <title><![CDATA[OOP Business Applications: Entity, Boundary, Interactor]]></title>
             <description><![CDATA[
 <h1>OOP Business Applications: Entity, Boundary, Interactor</h1>
@@ -3270,8 +3438,8 @@ Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
         </item>
     
         <item>
-            <link>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</link>
-            <guid>http://www.whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</guid>
+            <link>https://www.beberlei.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</link>
+            <guid>https://www.beberlei.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html</guid>
             <title><![CDATA[OOP Business Applications: Trying to escape the mess]]></title>
             <description><![CDATA[
 <h1>OOP Business Applications: Trying to escape the mess</h1>

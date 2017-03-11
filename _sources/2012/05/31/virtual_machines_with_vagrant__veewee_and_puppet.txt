@@ -109,5 +109,5 @@ point. The use of puppet with Vagrant will be part of a next blog post.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Vagrant, Automation
 .. comments::

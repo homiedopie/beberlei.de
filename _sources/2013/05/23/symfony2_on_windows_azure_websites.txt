@@ -55,5 +55,5 @@ components.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: Azure
+.. tags:: Azure, Symfony
 .. comments::

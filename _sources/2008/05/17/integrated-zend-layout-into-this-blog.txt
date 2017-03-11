@@ -50,6 +50,5 @@ The layout.pthml then just calls certain named sections, for example <=?
 $this->layout()->secondaryNavigation; ?>
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

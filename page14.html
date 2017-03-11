@@ -15,16 +15,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Page 14 &mdash; Whitewashing</title>
+        <title>Page 14 &mdash; beberlei.de</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 <meta content="width=device-width" />
-
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/default.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -32,7 +29,7 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="prev" title="Newer" href="page13.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="next" title="Older" href="page15.html" /><link rel="prev" title="Newer" href="page13.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
         VERSION:     '1.5',
@@ -47,309 +44,325 @@
         <![endif]-->
 
       <div id="container">
-<div class="container">
-    <div id="header" class="span-8">
-        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
-    </div>
-    <div class="span-11" id="about">
-        <p>
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </p>
-    </div>
-    <div class="span-5 last">
-        <p class="buttons" style="text-align: right">
-            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
-            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
-        </p>
-    </div>
-</div>
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
 
 <div class="main-container" role="main">
 <div class="container">
-    <div class="span-24 content">
-      <div>
-        <div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
           <div id="page14">
             
-            <div class="timestamp postmeta">
-            <span>July 22, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
-<p>Per default any implementation of ArrayObject does not allow to use the
-object as multidimensional array. This snippet here implements the
-support:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class ArrayMultiObject extends ArrayObject</span>
-<span class="x">{</span>
-<span class="x">    function __construct($array, $flags = 0, $iterator_class = "ArrayIterator")</span>
-<span class="x">    {</span>
-<span class="x">        $objects = array();</span>
-<span class="x">        foreach($array AS $key =&gt; $value) {</span>
-<span class="x">            if(is_array($value)) {</span>
-<span class="x">                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);</span>
-<span class="x">            } else {</span>
-<span class="x">                $objects[$key] = $value;</span>
-<span class="x">            }</span>
-<span class="x">        }</span>
+            <div class="section">
+            <h1><a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html">Howto file a good bug report: Suggestions for framework users</a></h1>
+<p>I have fixed quite a number of bugs for the ZF lately, which lead me to
+this post about how to file a good bug report. There are many annoying
+bug reports out there, where the reporter of the bug withholds important
+information to the bugfixer unintended. This advice applies bug reports
+in general of course.</p>
+<p>What are the benefits of a good bug report? The bug generally gets fixed
+faster, when the developer has more information at hand. Additionally
+other developers might come to rescue since they can understand the
+issue faster. These benefits are good for both parties. If you take no
+time for a good bug report, your issue might risk to end up getting old
+or closed unfixed.</p>
+<ul class="simple">
+<li><strong>Post the whole Exception Stack Trace</strong>: If the library throws an
+Exception into your application that is unexpected and may indicate
+an bug: Do not post the Message or Exception name only. The exception
+may be thrown in many different places or due to different reasons.
+The PHP exception class offers the method <strong>getTraceAsString()</strong>,
+which offers many information to the developer what the cause of the
+exception might be. Please use it!</li>
+<li><strong>Post codefixes in a patch format</strong>: When you find a bug in the
+framework, it is quite possible that you can offer a fix directly.
+Writing “Replace x in line y with z” does not help very often. The
+component might be in flux and the line positions change more often
+than you think. Please create a diff file of this changes that
+indicate the precise position of the change. This diff also includes
+2 lines above and below the patched code for direction of the
+developer. SVN Diffs are even more useful since they include the
+revision where you fixed the bug in.</li>
+<li><strong>Post reproducible cases as PHPUnit Test</strong>: If you find a bug and
+can show how to reproduce it: Write a unittest to prove it. It is ZF
+policy to create a unittest for each bugfix showing that the bug was
+indeed fixed and previous functionality remains the same, so this
+unit-test has to be written anyways. Many show-offs rely on massive
+<strong>echo</strong> statements or <strong>var_dump</strong>, which render them almost
+useless for the developer.</li>
+<li><strong>Attach a unit-test to a submitted patch</strong>: This is related to the
+previous point. If you add a unit test your patch will get more
+attention. It will prove that you have thought about the patch, its
+consequences and that you might have checked it does not break
+backwards compatibility. This is worth a lot.</li>
+<li><strong>Run the test suite with your patch</strong>: If you want to provide a
+patch. Run the testsuite of the Zend Framework. It might break
+expected behaviour. When you post a patch that will break BC, it will
+be recognized. Your bug report might be closed, which helps nobody.</li>
+</ul>
+<p>When you find a bug you have probably thought about it and how to fix
+it. This is valuable information. Disregarding one of this points will
+lead to missing information on part of the developer that he has to
+“learn” again. This takes time, which may make your bug last longer than
+it should.</p>
 
-<span class="x">        parent::__construct($objects, $flags, $iterator_class);</span>
-<span class="x">    }</span>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/opensourcecitizen.html">OpenSourceCitizen</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 11, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/01/11/what-will-be-new-in-zf-1-8.html">What will be new in ZF 1.8</a></h1>
+<p>In February or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
+Framework</a> is scheduled to be released. I
+have contributed some stuff already regarding ZendX_JQuery and
+Zend_Soap.</p>
+<p>Both components have seen numerous bugfixes and I managed to get the
+JQuery helper down to zero open issues. I have also taken over the
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_Json_Expr+to+allow+Javascript+Expressions+(functions)+to+be+encoded+using+Zend_Json">Zend_Json_Expr
+proposal</a>,
+which will be a huge benefit to everything JSON that can be done with
+ZF. Foremost it is an integral part for the jQuery component which
+heavily relies on javascript callbacks.</p>
+<p>The Soap Autodiscover and WSDL classes compatibility with Java and .NET
+has been optimized due to great user feedback, as well as some bugfixes
+to the newly added WSDL type detection strategies.</p>
+<p>Additionally I went on another bug killing spree and fixed around 20-30
+old bugs in a wide range of different components.</p>
 
-<span class="x">    public function offsetSet($name, $value)</span>
-<span class="x">    {</span>
-<span class="x">        if(is_array($value)) {</span>
-<span class="x">            $value = new ArrayMultiObject($value);</span>
-<span class="x">        }</span>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 11, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/01/12/on-publishing-webservices-within-mvc-frameworks.html">On Publishing Webservices within MVC Frameworks</a></h1>
+<p>Webservices are a very important part in today’s enterprise applications.
+They tie applications of different age or programming languages together
+or allow applications of different subcontracters to speak to each
+other. Because they use HTTP, a stateless network protocol, considerable
+overhead floods the pipes when you use them, which should be minimized.</p>
+<p><a class="reference external" href="http://martinfowler.com">Martin Fowler</a> writes in his <a class="reference external" href="http://martinfowler.com/eaaCatalog/">PEAA
+book</a>, that if you have the
+option not to use distributed objects (which are implemented via
+webservice) you should not distribute them. Considerable effort has to
+be brought into keeping complex webservices performant.</p>
+<p>Still people make mistakes about webservices all the time (me included
+for example proposing a dispatcher for the ZF that could be used for
+webservices).</p>
+<p>When people report problems with the Zend Soap component they often post
+a stripped down example that involes their webservice being instantiated
+within a controller. This is a very bad decision based on different
+arguments:</p>
+<ul class="simple">
+<li><strong>Dispatching overhead</strong>: Dispatching, Routing, Pre- and
+Postfiltering is costly in all frameworks. You give up the
+performance of having numerous PHP scripts that act as controller on
+their own. You get centralized filtering, authentication and other
+benefits. But those benefits generally do not aply to XML, JSON or
+SOAP requests, because you cannot parse them or access their
+properties. You give up the performance of a page controller for
+webservices to gain mostly nothing.</li>
+<li><strong>HTTP Request uselessness</strong>: Web frameworks work with HTTP request
+objects. The request of webservices facilitates HTTP to act as a far
+more complex request. No framework I know off, allows to work with
+the webservice requests outside the Webservice handler. What a SOAP
+or XML-RPC request does in your MVC is only get passed through
+numerous costly stages that offer no benefit, before it hits the
+target. Only the parsing of HTTP-Headers might offer additional
+benefit, but the gain is low, since they are available to PHP scripts
+at no cost.</li>
+<li><strong>Webservices already seperate concerns</strong>: Take the PHP SOAPServer as
+an example. It is an MVC application on its own, the controlling
+aspect of the SOAPServer parses the SOAP Request and sends it to the
+model, a class given by the user, which in turn works and returns the
+result as an SOAP Response View. You have to decouple model and view
+for a webservice handler otherwise it would generate invalid
+responses. Why nest a perfectly separated operation into another one?
+You gain no more of this additional separation, except performance
+decrease.</li>
+</ul>
+<p>So what are good practices to implement webservices?</p>
+<ul class="simple">
+<li>Use a page controller that generates no MVC overhead. In context of
+the Zend Framework: Add a new php script to your web root and add a
+new route into your .htaccess file that redirectes the desired
+location of the webservice to the script that overwrites the standard
+catch-all incoming requests to the front controller script.</li>
+<li>Use the proxy pattern and the invaluable __call() method to
+implement wrapper objects for authentication and session management
+of the webservice. These classes can easily be reused by all
+webservice page controllers of your site. If you do your homework you
+can even share parts of these objects inside your Web-MVC application
+to keep the code DRY. Those proxies keep authentication logic out of
+your service class.</li>
+<li>Use the remote facade pattern to implement a few, powerful methods
+that delegate the service request to underlying domain objects. Never
+ever publish direct access to domain objects with your webservices.
+As a rule of thumb, talking to a webservice during a logical
+operation should never involve more than one or two calls. The first
+call is for data fetching, the second for data saving. Authentication
+should be handled via HTTP Authentication to save an additional call.</li>
+</ul>
+<p>If you follow these simple rules, you should get around the performance
+issues that generally come with webservices, without loosing flexibility
+at all.</p>
 
-<span class="x">        return parent::offsetSet($name, $value);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 12, 2009 by beberlei <kontakt@beberlei.de></small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/01/07/seven-things.html">Seven Things</a></h1>
+<p>I have been tagged by
+<a class="reference external" href="http://dolfschimmel.freeaqingme.com/?p=78">Freeaqingme</a> and the blog
+letter machinery. So read on for seven things you probably may not know
+about me.</p>
+<ul class="simple">
+<li>I will get my degree in some weeks, currently intensively writting on
+my thesis. My major is economics though. I probably won’t get a job
+with that sooner or later. I actually don’t want to, I have a job as
+programmer already.</li>
+<li>One christmas many years ago (Pentium PCs to 200Mhz were the coolest
+thing around) i wished and wished for a computer for playing Command
+and Conquer and stuff. What i got was a 3/86 i could only run crap
+with. So i had to start programming.</li>
+<li>In 11th grade (7 years ago) I took part in the german computer
+science olympics (<a class="reference external" href="http://www.bwinf.de/uploads/media/bwi20/runde1/20bwinf.pdf">exercise still
+online</a>)
+using PHP and writing thousands of lines of nested aray and for loop
+code and print the solution to the browser. No need to say I utterly
+failed, because I didn’t know a bit about algorithms, pointers and
+objects at all.</li>
+<li>I have only learned about what good programming practices are (OO,
+functional, whatever) really means in the last two years, spending
+almost every free minute of those many i had on projects to test
+around with patterns and programming styles.</li>
+<li>I went to my first conference last year september, the IPC in Mainz,
+getting to know lots of great people in the community.</li>
+<li>I don’t have a license at all (<a class="reference external" href="http://blog.libssh2.org/index.php?/archives/122-Seven-Things.html">Reference to
+Sara</a>).
+I am afraid of driving cars, although I drive my bike through the
+biggest crossroads in town like nuts.</li>
+<li>I am a timeline oriented reader, having made me masterplans to read
+both all the Discworld and Ian Rankin novels in the correct order to
+not miss a single reference.</li>
+</ul>
+<p>Its sad that everyone I would want to tag was already tagged by someone
+else, still for the head count:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weierophinney</a>, because
+he helped me understand Zend Framework alot.</li>
+<li><a class="reference external" href="http://www.dasprids.de/">Ben Scholzen</a>, because he is a fun guy to
+be around <strong>#zftalk.dev</strong>.</li>
+<li><a class="reference external" href="http://www.thomasweidner.com/flatpress/">Thomas Weidner</a>, because
+I like his dedication towards his ZF components.</li>
+<li><a class="reference external" href="http://kore-nordmann.de/blog.html">Kore Nordmann</a>, Bastian Feder
+and Thomas Weinert, because I had great discussions with him on IPC.</li>
+<li><a class="reference external" href="http://codeutopia.net/blog/">zomg aka Jani</a> because of his skills
+to be referenced by PHPDeveloper.org (joke) and the good IRC
+discussions.</li>
+<li><a class="reference external" href="http://blogs.sun.com/netbeansphp/">Petr Pisl</a> because of the
+awesome NetBeans PHP support.</li>
+</ul>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/22/multidimensional-array-via-spl.html#disqus_thread" data-disqus-identifier="2008/07/22/multidimensional-array-via-spl">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 17, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/07/17/zf-jquery-helper-first-prototype-ready.html">ZF jQuery Helper - First Prototype Ready</a></h1>
-<p>I checked in the first implementation of my jQuery Helper into my <a class="reference external" href="http://www.beberlei.de/dev/svn">dev
-svn</a>. It follows my suggested
-<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">proposal in the Zend Framework Dev
-Wiki</a>
-and implements all the advertised features. I also implemented 2 demos
-that nicely present the functionality.</p>
-<p>Please test and comment!</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/17/zf-jquery-helper-first-prototype-ready.html#disqus_thread" data-disqus-identifier="2008/07/17/zf-jquery-helper-first-prototype-ready">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 21, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/07/21/zend-dojo-and-the-django-template-language.html">Zend, Dojo and the Django Template Language</a></h1>
-<p>With the Zend Framework <a class="reference external" href="http://www.nabble.com/1.6-RC1-Schedule-tp18538148p18538148.html">nearing its 1.6
-release</a>
-and full <a class="reference external" href="http://www.dojotoolkit.org">Dojo Toolkit</a> support I took
-some time to look up what Dojo is actually capable of. I found the
-<a class="reference external" href="http://dojotoolkit.org/book/dojo-book-0-9/part-5-dojox/dojox-dtl">DojoX Django Template
-Language</a>
-extension and remembered my neighbor talking about why Python + Django
-is so much better than PHP with any other framework. So I digged into
-the <a class="reference external" href="http://www.djangoproject.com/documentation/templates_python/">Django template
-language</a>
-and found that it is quite awesome.</p>
-<p>Variable filtering and evaluation looks almost like Smarty the syntax
-being {{var.key|filter1|filter2:”arg1”:”arg2”}}. The logical syntax is
-quite different though, taking an somehow object oriented view on
-templates you can extend an existing template and override specific
-parts with your more special implementation. Have a look at the
-following two snippets:</p>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/internetmemes.html">InternetMemes</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 07, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html">Using Zend_Soap Server and Autodiscover in a Controller</a></h1>
+<p>I am in a dilemma. I have condemned the usage of Zend_Soap_Server (or
+any other webservice server handler) <a class="reference external" href="http://www.whitewashing.de/blog/articles/106">inside a Model-View-Controller
+application</a> before.
+Still I get questions about <a class="reference external" href="http://www.whitewashing.de/blog/articles/65">my old Zend_Soap_Server and
+Zend_Soap_AutoDiscover
+example</a> not working in
+the MVC scenario. The following example provides you with a working Soap
+server inside a Zend_Controller_Action, although I discourage the use
+of it and would suggest using a dedicated script outside the dispatching
+process to gain multitudes of performance, which webservices often
+require.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>This is an example of Django template inheritance:
+<div><div class="highlight-python"><div class="highlight"><pre>require_once "/path/to/HelloWorldService.php";
 
-{% block helloworld %}Hello World!{% endblock %}
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre>{% extends "base.html" %}
+class MyDiscouragedSoapServerController extends Zend_Controller_Action
+{
+    public function serverAction()
+    {
+        $server = new Zend_Soap_Server("http://example.com/pathto/wsdl");
+        $server-&gt;setClass('HelloWorldService');
+        $server-&gt;handle();
+    }
 
-{%block helloworld %}Hello World for Object Oriented Views!{% endblock %}
+    public function wsdlAction()
+    {
+        $wsdl = new Zend_Soap_AutoDiscover();
+        $wsdl-&gt;setUri('http://example.com/pathto/server');
+        $wsdl-&gt;setClass('HelloWorldService');
+        $wsdl-&gt;handle();
+    }
+}
 </pre></div>
 </div>
 </div></blockquote>
-<p>What does Django do with this second template when rendering? It
-realizes it inherits logic from a parent template and substitutes all
-special blocks for the parent ones. With a little object oriented
-background you can guess the result looks like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>This is an example of Django template inheritance:
+<p>Now all you have to do is create two routes, one that makes
+<strong>http://example.com/pathto/server</strong> point to
+<strong>MyDiscouragedSoapServerController::serverAction</strong> and the other route
+that makes <strong>http://example.com/pathto/wsdl</strong> point to
+<strong>MyDiscouragedSoapServerController::wsdlAction</strong>. The wrong version
+(Version Mismatch) error comes from sending a request for the WSDL file
+to the actual Soap Server, which he doesn’t like.</p>
 
-Hello World for Object Oriented Views!
-</pre></div>
-</div>
-</div></blockquote>
-<p>So what was all the talking about Dojo being able to parse this kind of
-templates? If you envision a helper component that would function like
-this: 1.) make an ajax request to $url 2.) retrieve json object from the
-controller 3.) render json object with $template into container
-$container. The helper would know that the template is needed in this
-HTML response and appends it to the Dojo Helper output. A link would be
-generated performing steps 1 and 2, handing over the json data to the
-template and render the output. What do you get? Templates that can be
-used Client and Server side.</p>
-<p>For example on rendering the view of your blog you can send all the
-comments using a specific comment building Django template script.
-Additionally you can also use the same template to render any new
-comment to the comment list using via an ajax form submit, returning the
-(model or form) filtered data via JSON and appending it to the comment
-list using the DojoX DTL parser. For non-JS browsers you can always use
-a &lt;noscript&gt; variant to render the templates completely server-side.</p>
-<p>This generally being a cool idea since it makes developing applications
-with AJAX technology very easy I began to port the DTL to the Zend
-Framework and the whole weekend later I got a working implementation
-that supports at least the “extends”, “for”, “include”, and “comment”
-tags. As a next task I will implement the helper for DojoX DTL and will
-report back on my efforts.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/21/zend-dojo-and-the-django-template-language.html#disqus_thread" data-disqus-identifier="2008/07/21/zend-dojo-and-the-django-template-language">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 12, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/07/12/discussing-a-jquery-helper-for-zend-framework.html">Discussing a jQuery Helper for Zend Framework</a></h1>
-<p>Yesterday I had some time to test Matthews <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Helper_Dojo">Dojo View
-Helper</a>
-and the Zend_Dojo_Form component. At a first glance the implementation
-looks great and can almost instantly generate you a very nice form with
-all the possible Dijit form extensions that
-<a class="reference external" href="http://dojotoolkit.org/">Dojo</a> has to offer.</p>
-<p>If one were to refactor the Dojo Component to allow for
-<a class="reference external" href="http://www.jquery.com">jQuery</a> elements one bigger problem appears.
-Dojo has a CDN (Content Distribution Network) for all its components,
-that is, the Zend Dojo components can load all javascript and css files
-from a distant server. JQuery can only offer its main library to be
-loaded from a CDN. All additional components, for example the jQuery
-DatePicker, have to be installed locally. This significantly reduces the
-possibility for rapid development of Javascript/Ajax/Form components
-with jQuery and Zend Framework.</p>
-<p>One could offer a complete dependency downloadable archive with all the
-CSS, Javascript and Images inside, but this would be very complex to
-maintain. Looking at the future Zend Tool capabilities one possibility
-would be to offer a download client for all the relevant jQuery plugins,
-but there would have to be a man-middle-server that maintains the most
-up to date locations of all the plugins, which also has to be
-maintained. Does anybody have a better solution to solve this problem?
-Perhaps the jQuery Team needs to be made aware that they need a CDN for
-their most stable plugins.</p>
-<p>Abstracting from the CDN problem, I implemented a simple jQuery View
-Helper (mostly copy paste and simple rewrites from Matthews Dojo
-component) and a HtmlElement Form Helper which constructs a Date-Picker
-from within the template. This is very easy to use and looks great. In
-the next days I will add further helpers for the jQuery plugins I use in
-my day to day work live and hope to present a demo. I might even opting
-for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
-<p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
-list</a>
-stating that a CDN is planned for the jQuery UI library. Sadly this does
-not include plugins for which one might desperately need a View Helper
-except for maybe the Date Picker. I will post further comments on this
-issue in the near future.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/12/discussing-a-jquery-helper-for-zend-framework.html#disqus_thread" data-disqus-identifier="2008/07/12/discussing-a-jquery-helper-for-zend-framework">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>July 24, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/07/24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a></h1>
-<p>Today I finished the first almost complete <a class="reference external" href="http://www.djangoproject.com">Django Template
-Language</a> Clone for PHP implementing the
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a> View Interface. <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Dtl+-+Benjamin+Eberlei">My
-proposal</a>
-is up and running on the ZF Wiki. The source code can be downloaded from
-my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repository</a>.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/07/24/finished-first-django-template-language-port-to-php-zf.html#disqus_thread" data-disqus-identifier="2008/07/24/finished-first-django-template-language-port-to-php-zf">Leave a comment</a>
-        </div></div><div class="archive_link">
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+            <a href="tags/soap.html">SOAP</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on March 11, 2009 by beberlei <kontakt@beberlei.de></small></p>
+        </div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
-
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/page14.html';
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
           </div>         
         </div>
-      </div>
     </div>
-
-    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li><li>
-            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li></ul>
-</div>
-</section>
-          </aside></div>
 </div>
 </div> <!-- #main-container -->
 
         <div class="footer-container" role="contentinfo">
 <div class="container">
-    <div class="span-24 content">
+    <div class="col-md-8 col-md-offset-2">
         <div class="footer">
-            &copy; Copyright 2008-2015, Benjamin Eberlei.
-            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
 
-        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
         </div>
     </div>
 </div>

@@ -31,6 +31,5 @@ PHP tools and enhance Code Sniffer support.
 .. |image0| image:: http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/netbeans_cs_support.png
 
 .. categories:: none
-.. tags:: none
+.. tags:: CodeQuality, Netbeans
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

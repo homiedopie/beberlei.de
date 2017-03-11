@@ -13,6 +13,5 @@ collaborative development is very easy and added general TODOS to the
 README.txt that is on the front page of github project page.
 
 .. categories:: none
-.. tags:: none
+.. tags:: CalypsoLibrary
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

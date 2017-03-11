@@ -44,6 +44,5 @@ except for maybe the Date Picker. I will post further comments on this
 issue in the near future.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

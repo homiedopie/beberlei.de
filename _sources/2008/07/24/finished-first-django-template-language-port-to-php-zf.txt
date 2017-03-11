@@ -9,6 +9,5 @@ is up and running on the ZF Wiki. The source code can be downloaded from
 my `svn repository <http://www.beberlei.de/dev/svn>`_.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -208,5 +208,5 @@ about them quite a while ago.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP
+.. tags:: CodeQuality
 .. comments::

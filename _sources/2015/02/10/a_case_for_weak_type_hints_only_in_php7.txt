@@ -233,5 +233,5 @@ code.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: none
+.. tags:: PHP
 .. comments::

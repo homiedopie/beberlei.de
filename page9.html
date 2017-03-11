@@ -15,16 +15,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Page 9 &mdash; Whitewashing</title>
+        <title>Page 9 &mdash; beberlei.de</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 <meta content="width=device-width" />
-
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/default.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -47,804 +44,977 @@
         <![endif]-->
 
       <div id="container">
-<div class="container">
-    <div id="header" class="span-8">
-        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
-    </div>
-    <div class="span-11" id="about">
-        <p>
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </p>
-    </div>
-    <div class="span-5 last">
-        <p class="buttons" style="text-align: right">
-            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
-            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
-        </p>
-    </div>
-</div>
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
 
 <div class="main-container" role="main">
 <div class="container">
-    <div class="span-24 content">
-      <div>
-        <div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
           <div id="page9">
             
-            <div class="timestamp postmeta">
-            <span>May 17, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/05/17/using-zend-http-client-to-ping-technorati.html">Using Zend_Http_Client to Ping Technorati</a></h1>
-<p>Send a ping to Technorati manually is a pain in the ass. Writing a
-little Method that handles this functionality for your own blog software
-is quite easy. Call the following method after you created or updated a
-post of yours:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>private function _pingTechnorati()
-{
-    $xml = $this-&gt;view-&gt;render('ping_technorati.phtml');
-
-    $httpclient = new Zend_Http_Client('http://rpc.technorati.com/rpc/ping');
-            $httpclient-&gt;setHeaders('User-Agent', 'PHP/Zend Framework/Zend_Http');
-
-    $httpclient-&gt;setRawData($xml, 'text/xml')-&gt;request('POST');
-
-    $response = $httpclient-&gt;request();
-
-    if($response-&gt;isSuccessful() === true) {
-        return true;
-    } else {
-        return false;
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>You also need a little view in XML format like it is described in the
-<a class="reference external" href="http://technorati.com/developers/ping/">Technorati Ping Configuration
-Guide</a> and ready to go you
-are!</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/17/using-zend-http-client-to-ping-technorati.html#disqus_thread" data-disqus-identifier="2008/05/17/using-zend-http-client-to-ping-technorati">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 07, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/05/07/zend-form-rapid-development-plugin-for-eclipse.html">Zend_Form - Rapid Development Plugin for Eclipse?</a></h1>
-<p>I found some time in the last weeks to reconsider <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a>, this time in the 1.5 version,
-for this blog software and rewrote all Forms using the new Zend_Form
-component. I have to say, i love it. Its very easy using the already
-existing Zend_Validate and Zend_Filter components as input for the
-generated form fields. Another plus is the handling of errors in input
-and re-entering/displaying text.</p>
-<p>There is also a neat feature of the Zend_Form component, which allows
-to <a class="reference external" href="http://framework.zend.com/manual/en/zend.form.quickstart.html#zend.form.quickstart.config">generate complete forms by passing an appropriately formatted
-Zend_Config_Ini object to the Zend_Form
-Constructor</a>.
-So my idea was, why not program an Eclipse Plugin allowing to rapidly
-generate and edit forms using a point-and-click plugin window approach,
-which would ultimately generate your Form INI code.</p>
-<p>This might have been a great <a class="reference external" href="http://code.google.com/soc/">Google Summer of Code
-idea</a> for the Eclipse Foundation (since
-Zend is not taking part).</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/05/07/zend-form-rapid-development-plugin-for-eclipse.html#disqus_thread" data-disqus-identifier="2008/05/07/zend-form-rapid-development-plugin-for-eclipse">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 30, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/30/implementing-zend-auth-acl-and-caching.html">Implementing Zend Auth, Acl and Caching</a></h1>
-<p>I managed to work a bit on the blog, enabling me to have new instance in
-the series, How to refactor and extend your own blog software using
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a>. This time: Implementing
-meaningful Auth and ACL mechanisms and <a class="reference external" href="http://www.whitewashing.de/blog/articles/41">fixing view
-caching</a>, which did not
-work in its original implementation due to different users groups
-sharing the same cached views.</p>
-<p>In the last days I came across two in depth tutorials on Zend_Acl and
-Zend_Auth integration to MVC. Most people probably saw the DevZone
-article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
-1)</a>”
-by Aldemar Bernal on the Frameworks Frontpage. Another good article was
-written by Frank Ruske in the latest german <a class="reference external" href="http://www.phpmagazin.de">PHP
-Magazin</a> (<a class="reference external" href="http://it-republik.de/zonen/magazine/ausgaben/psfile/source_file/14/Seite_80__482a98c572a5c.zip">Zipped Source Code of the
-Example</a>).
-I took the best ideas of both articles and merged them into the existing
-components of my blog.</p>
-<p>This now enables me to cache the site depending on the Auth status of
-the page user agent. The blog is now caching all views that are
-generated for guest users. Since there is no “registered” or “member”
-account yet, this means the blogs content is cached and served from
-cache for everyone except me when I am logged in. To get this work I
-added some simple additional check in <a class="reference external" href="http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Framework">Matthews Cache View Controller
-Plugin</a>:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
-{
-    $auth = Zend_Auth::getInstance();
-    if($auth-&gt;hasIdentity()) {
-        self::$doNotCache = true;
-        return;
-    }
-    [..]
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>This prevents caching for registered identities.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/30/implementing-zend-auth-acl-and-caching.html#disqus_thread" data-disqus-identifier="2008/06/30/implementing-zend-auth-acl-and-caching">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 14, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/14/exim4-and-virtual-users-forward-files.html">Exim4 and Virtual Users .forward Files</a></h1>
-<p>Some days ago I began to wonder why some mails in mail account were
-filtered by Exims .forward file why some are not. It took until today
-that I found out what was the problem and how to fix it.</p>
-<p>I implemented a virtual users/domains system for Exim using several
-different documentations and tutorials. Right now some parts of my
-system include the documentation on</p>
-<p><a class="reference external" href="http://www.tty1.net/virtual_domains_en.html">http://www.tty1.net/virtual_domains_en.html</a></p>
-<p>Now the problem is that the userforward router is only working for
-accounts whose $local_part is an existing system user. I came up with
-the following additional router that solves the problem. Its written for
-the MySQL table layout that is specified in the Tutorial above.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>virtualuserforward:
-  debug_print = "R: virtualuserforward for $local_part@$domain"
-  driver = redirect
-  domains = +local_domains
-  file = ${lookup mysql{SELECT CONCAT(home,'.forward') AS forward FROM users \
-        WHERE id='${quote_mysql:$local_part}@${quote_mysql:$domain}'}}
-  no_verify
-  no_expn
-  check_ancestor
-  directory_transport = address_directory
-  file_transport = address_file
-  pipe_transport = address_pipe
-  reply_transport = address_reply
-  allow_filter
-
-  user = ${lookup mysql{SELECT uid FROM users \
-        WHERE id='${quote_mysql:$local_part}@${quote_mysql:$domain}'}}
-  group = ${lookup mysql{SELECT gid FROM users \
-        WHERE id = '${quote_mysql:$local_part}@${quote_mysql:$domain}'}}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now each virtual user is using the .forward file in its actual system
-user account home directory. The next problem was: $home is not defined
-in this case in the .forward file syntax: Its empty. So replacing $home
-with its obvious path leads to the final solution.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/14/exim4-and-virtual-users-forward-files.html#disqus_thread" data-disqus-identifier="2008/06/14/exim4-and-virtual-users-forward-files">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 25, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/25/multimediatreff-on-frameworks.html">Multimediatreff on Frameworks</a></h1>
-<p>My neighbour gladly called my attention to the
-<a class="reference external" href="http://www.multimediatreff.de">Multimediatreff</a>, a relaxed conference
-that is held about three times a year, this last saturday on the topic:
-Frameworks and Content-Management-Systems.</p>
-<p>It was held in a very nice conference center in cologne, and from what I
-heard about 200 people attended. The first two topics were on
-<a class="reference external" href="http://www.joomla.org/">Joomla!</a> and barrier-free
-<a class="reference external" href="http://www.typo3.org">Typo3</a>. Since I am more the framework guy, I
-did not enjoy them too much. At least I got some input on how a
-barrier-free website has to function. The Joomla! presentation supported
-my prejudice, that programming in and for Joomla! produces ugly code.</p>
-<p>I did like the presentations on frameworks, the most interesting being
-the <a class="reference external" href="http://www.cakephp.org">CakePHP</a> presentation by <a class="reference external" href="http://teemow.com/">Timo
-Derstappen</a>, since I haven’t looked into Cake for
-about one and a half years. I have seen that with the new to come
-version 2, the framework became even better, now supporting easy code
-generation and flexible site generation. But its still somehow a Ruby
-clone and forces me too much in my programming style.</p>
-<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> presentation was done
-by Carsten Möhrke, who also wrote the first german ZF Book. He showed
-the creation of a blog using Zend Framework, being the Hello World
-example for frameworks. He specifically showed, that you can use
-anything you want as a model, a Zend_Db_Table object or any other
-object. He also showed something like a Data-Mapper pattern in his
-application. I got some ideas from this I probably will write about some
-later time.</p>
-<p>I also enjoyed the <a class="reference external" href="http://www.rubyonrails.de">Rails</a> presentation,
-because I never got the chance to look the Ruby guys at work of the
-shoulder. But this is even worse than CakePHP was my first observation.
-I am no fan of ActiveRecord being forced upon you as Model
-implementation.</p>
-<p>The pizza battle, mysteriously announced by the host, was another
-highlight, as well as the drinks and snacks in between. All in all I can
-highly recommend the Multimediatreff for the next time.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/25/multimediatreff-on-frameworks.html#disqus_thread" data-disqus-identifier="2008/06/25/multimediatreff-on-frameworks">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 22, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/22/zf-caching-pages-via-front-controller-plugin.html">ZF: Caching Pages via Front Controller Plugin</a></h1>
-<p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
-Matthews post on Zend Devzone</a>)
-into the Whitewashing blog software via Zend_Cache and the Filesystem
-Backend. I ran some superficial Apache Benchmark tests to have a look
-at the gain change in performance.</p>
-<p>First of all i used the complete Plugin from <a class="reference external" href="http://devzone.zend.com/article/3372">Matthews article on Zend
-Devzone</a> and a missing function
-getCache() in the code fragment:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>public function getCache()
-{
-    if( ($response = $this-&gt;cache-&gt;load($this-&gt;key)) != false) {
-        return $response;
-    }
-    return false;
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>I loaded the Plugin into the front controller and initialized it with a
-Zend_Config_Ini object. This all works very smoothly and caching is
-ready to begin.</p>
-<p>Testing came to the result that with 1000 requests, 10 of them concurrent
-(ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
-this blog, the request time dropped by half, from six to three seconds
-(still lot of time, but this isn’t the best webserver).</p>
-<div class="section" id="results-without-caching">
-<h2>Results without caching</h2>
-<div class="highlight-python"><div class="highlight"><pre>Requests per second:    1.49 [#/sec] (mean)
-Time per request:       6695.213 [ms] (mean)
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:       26   30   4.0     30      43
-Processing:  1556 6452 3372.1   5511   14768
-Waiting:     1436 6129 3174.1   5145   14595
-Total:       1583 6483 3373.2   5538   14810
-</pre></div>
-</div>
-</div>
-<div class="section" id="results-with-caching">
-<h2>Results with caching</h2>
-<div class="highlight-python"><div class="highlight"><pre>Requests per second:    3.03 [#/sec] (mean)
-Time per request:       3304.534 [ms] (mean)
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:       26   31   6.3     30      73
-Processing:   781 3214 1757.7   3103    7445
-Waiting:      650 3055 1731.4   2928    7190
-Total:        809 3245 1757.8   3135    7475
-</pre></div>
-</div>
-<p>As said before this testing is superficial, but its gives a broad sense
-of what performance gain is possible with just some lines of code and a
-temporary directory. Using memcache will probably speed up the process
-another good amount.</p>
-<p>Later I realized that complete page caching (rather than block element
-caching) sucks when you inject admin area links into the navigation,
-which would allow non-logged in users to see parts of the admin area so
-I had to disable caching totally. You never know in the first place (you
-should though). I have to rework my admin area or extend my
-authentication or the caching plugin somehow. This will probably be the
-topic another time.</p>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/22/zf-caching-pages-via-front-controller-plugin.html#disqus_thread" data-disqus-identifier="2008/06/22/zf-caching-pages-via-front-controller-plugin">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 21, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/21/on-frameworks-and-javascript-coupling.html">On Frameworks and Javascript Coupling</a></h1>
-<p><a class="reference external" href="http://www.zend.com">Zend</a> announced they work together with the
-<a class="reference external" href="http://www.dojotoolkit.org">Dojo Team</a> to integrate Javascript
-support into the Zend Framework. What this actually means is that you
-can write your Javascript Code in PHP if you’re javascript library of
-choice is Dojo.</p>
-<p>Since Dojo is not my library of choice I would have to write a JQuery
-View Helper on my own or wait until somebody else releases one.</p>
-<p>But why not write javascript? Its very easy with all those libraries and
-addresses most cross browser incompatibilities: <a class="reference external" href="http://www.b-list.org/weblog/2006/jul/02/django-and-ajax/">One
-Django</a>,
-<a class="reference external" href="http://www.builtfromsource.com/2006/12/20/does-ajax-have-a-place-in-the-application-framework/">one Zend Framework
-developer</a>
-argue framework and javascript coupling is not the way to go based on
-the arguments that its breaks the MVC pattern, leads to function calls
-equal to those in javascript in its framework respective language, and
-that javascript is actually something any good webdeveloper should be
-able to program, even when its just using library components.</p>
-<p>Using <a class="reference external" href="http://jquery.com">JQuery</a> without any help from tools for
-about a year now I can say there are still those days where javascript
-drives me mad, but most of the time I its working perfect. Since Ajax
-related calls like GET, POST, and FORM stuff are oneliners I don’t see
-why one would need tighter integration of JS and frameworks.</p>
-<p>Larger Javascript components like Popup Calendars, Autocomplete and the
-like are harder to integrate than in Rails or cakePHP, but thinking
-about the problem a little longer leads to powerful reusable solutions,
-that save time on integration after the first initial setup.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/21/on-frameworks-and-javascript-coupling.html#disqus_thread" data-disqus-identifier="2008/06/21/on-frameworks-and-javascript-coupling">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 21, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html">Simplifying ZF: Scope of Variables in View and Controller</a></h1>
-<p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
-Ass!</a>
-article referenced earlier I came up with some simplifications of the Zend
-View and Controller variable coupling.</p>
-<p>Using some code in the article I created a new Zend_View_Extended
-class which offers the possibility to circumvent the access of variables
-via $this and directly registers each variable key of the Zend_View
-object as an own variable in the script template:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class Zend_View_Extended extends Zend_View_Abstract
-{
-    protected function _run()
-    {
-        while( list( $k, $v ) = each( $this ) ) ${$k} = $v;
-
-        include func_get_arg(0);
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now rather than calling $this-&gt;data you can call $data in a script
-template. Of course this comes with additional overhead of each variable
-being registered twice. I don’t know how this handles performance wise,
-but maybe unsetting $this variables after copying solves this. Also you
-have to overwrite the initView() method of your base Controller Action
-class.</p>
-<p>Another simplification would be to allow for the following direct
-variable settings in any Controller Action, which would shorten the
-$this-&gt;view-&gt;variable call, to derive the same functionality via
-$this-&gt;variable. I haven’t tested this though.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class Zend_Controller_SimpleAction extends Zend_Controller_Action
-{
-    function __set($name, $value)
-    {
-        $this-&gt;view-&gt;{$name} = $value;
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html#disqus_thread" data-disqus-identifier="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 24, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/06/24/teaching-zend-form-some-mvc.html">Teaching Zend_Form some MVC</a></h1>
-<p>Lots of people complain that Zend Form runs counter to the MVC spirit,
-because it handles validation, business logic and view elements all in
-one acting as Model, Controller and View.</p>
-<p>Extending the Zend Form component to handle all this different aspects
-in different layers of the application is rather easy though. What we
-want of a MVC compatible Form object is the following:</p>
+            <div class="section">
+            <h1><a href="2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)</a></h1>
+<p>Other posts in this series about OOP Business Applications:</p>
 <ul class="simple">
-<li>The <strong>model</strong> escapes and validates all the data that is put into the
-form.</li>
-<li>The <strong>view</strong> decides on how the form is displayed.</li>
-<li>The <strong>controller</strong> moves data from the model to the view and back,
-handling the stages of the form request.</li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">Trying to escape the
+mess</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">Entity, Boundary, Interactor</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
 </ul>
-<p>The first step is, <strong>allowing any Model that implements
-Zend_Validator_Interface to hook into the Zend_Form Validation
-process</strong>. We generate a new class, WW_Form_Mvc and allow a function
-setModel() to insert any Model object that implements
-Zend_Validator_Interface into the form. We extend isValid(),
-getMessages() and getErrors() to not only check all the form elements
-validators, but also the models validators. Please note that the
-array_merge() solution is not the correct way of how this snippet
-should work. Any merge operation of the messages and errors has to be on
-a field key level, which is not currently done.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_Form_Mvc extends Zend_Form
-{
-    protected $model = null;
+<p>The last pattern for designing your business logic is called
+“Command-Query-Responsibility-Segregation” or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
+put forward by Bertrand Meyer.</p>
+<p>Wikipedia has a very good summary about what this principle is about:</p>
+<div class="highlight-python"><div class="highlight"><pre>Command-Query-Separation states that every method should either be a
+command that performs an action, or a query that returns data to the
+caller, but not both. In other words, asking a question should not change
+the answer. More formally, methods should return a value only if they are
+referentially transparent and hence possess no side effects.
+</pre></div>
+</div>
+<p>CQRS is an OOP architecture design pattern building on that imperative
+principle.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are many different variations of the CQRS pattern that
+all have their place. This post describes a simple variant that does
+<strong>not</strong>
+use Messaging, DomainEvent or EventSourcing patterns, which are commonly mentioned
+with CQRS.</p>
+</div>
+<p>At its heart is the separation of Read and Write methods. This can be easily
+achieved by just having two different service layer classes instead of one.
+This insight alone is not really helpful, its just moving methods around.
+Coupled to this change however is the notion, that read and write models don’t
+necessarily have to be the same:</p>
+<ul class="simple">
+<li>Getter/Setters: We don’t need setters in the write model, instead we use
+explicit methods for each write operation. Entities are also much simpler
+without bi-directional relationships that read/write models often need.
+Read-only models (ViewModel) don’t need getters/setters. They could just use
+public properties or even be arrays.</li>
+<li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
+mostly need queries by primary key, changing only some objects. In
+read scenarios we need complex queries, joins and aggregations. A separation
+prevents both from affecting each other negatively.</li>
+<li>Mapping Data-Transfer objects becomes simple. Instead of sending the whole
+model back and forth, for the write scenario you define use-case specific
+tasks and updates. This is much simpler than generic mapping of Data Transfer
+objects to complex object graphs.</li>
+<li>Transforming SQL directly to a view model in a highly optimized way.
+Simple concept, but it has huge implications: A pure read-only model is simple to
+maintain and refactor for any performance requirements that come up.</li>
+</ul>
+<p>Furthermore with CQRS our write service methods are not allowed to return data
+anymore (With the exceptions to the rule of course). This may increase the
+complexity at first, but it has benefits for scalability and decoupling.
+Following this principle allows us to turn every command from synchronous to
+asynchronous processing later without much problems. Services are allowed to
+throw exceptions and refuse the execution. Proper validation of input data
+should happen before executing write operations though.</p>
+<p>One drawback of CQRS: A naive implementation doubles the amount of classes and
+services to write. But there are simple shortcuts to avoid having to write a
+full blown read-model if you don’t apply CQRS religiously:</p>
+<ul class="simple">
+<li>Don’t use different data-stores for both models.</li>
+<li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
+very simple. You can easily generalize this to a simple object that gives
+efficient access to all your data.</li>
+<li>Share parts of the write and read models if you don’t have to compromise
+much.</li>
+</ul>
+<p>The important thing to take away from this separation is, that the read part of
+your application is seldom the part where business value lies in. Moving this
+code into a different part of your applications allows you to work with the
+underlying data-source much more directly, without need for much abstractions.</p>
+<p>One thing that CQRS puts forward is the concept of Commands, Command Handlers
+and Command Bus and how they interact. Commands are simple objects that
+contain all the data necessary to execute an operation. Each command is
+processed by exactly one command handler. The Command Bus is responsible to
+route a command to its appropriate command handler.</p>
+<div class="section" id="example">
+<h2>Example</h2>
+<p>Here is the most simple implementation of the Command Bus, just holds a hash map
+mapping command class names to command handlers:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">Handler</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">CommandBus</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$handlers</span><span class="p">;</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">(</span><span class="nv">$commandClassName</span><span class="p">,</span> <span class="nx">Handler</span> <span class="nv">$handler</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handlers</span><span class="p">[</span><span class="nv">$commandClassName</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$handler</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    /**
-     * Extends isValid() method of Zend Form to check for validity of specified model
-     * @param Array $data
-     * @return Boolean
-     */
-    public function isValid($data)
-    {
-        $valid = parent::isValid($data);
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handlers</span><span class="p">[</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$command</span><span class="p">)]</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In your code you would always pass Commands to the bus. That way the command
+bus is a central entry point to any write operation. With this we can rewrite the
+TransferMoney service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">TransferMoneyCommand</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$money</span><span class="p">;</span>
+<span class="p">}</span>
 
-        if($valid == true &amp;&amp; !is_null($model)) {
-            $valid = $this-&gt;model-&gt;isValid($data) &amp;&amp; $valid;
-        }
-        return $valid;
-    }
+<span class="k">class</span> <span class="nc">MoneyTransfer</span> <span class="k">implements</span> <span class="nx">Handler</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
 
-    /**
-     * Extends getMessages() Validator Interface implementation of Zend Form to also
-     * return the messages of the Model validation.
-     * @return Array
-     */
-    public function getMessages($name = null, $suppressArrayNotation = false)
-    {
-        $messages = parent::getMessages($name, $suppressArrayNotation);
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
 
-        if(!is_null($model)) {
-             $form_messages = $this-&gt;model-&gt;getMessages();
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There is also a benefit from the mental model of commands compared to the
+“generic” term of model requests in EBI. Your write model gets task
+oriented.</p>
+<p>Routing everything through the command bus has several benefits as well:</p>
+<ul class="simple">
+<li>Nesting handlers that take care of transactions, logging, 2 phase commits</li>
+<li>Order nested command calls sequentially instead of deep into each other.</li>
+<li>Asynchronous processing with message queue become an option</li>
+</ul>
+<p>The command bus acts as the application boundary as described in the
+Entity-Boundary-Interactor pattern, usage is simple:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$commandBus</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'command_bus'</span><span class="p">);</span>
+        <span class="nv">$commandBus</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TransferMoneyCommand</span><span class="p">(</span>
+            <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'sourceId'</span><span class="p">),</span>
+            <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'destinationId'</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'amount'</span><span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pros-and-cons">
+<h2>Pros and Cons</h2>
+<p>I really like CQRS for multiple reasons. It offers explicit guidance how solve
+tasks by making use of a range of different design patterns. This is very
+helpful, because the code-base is based on conventions that are simple to
+understand by everyone on the team. This structure liberates you from the curse
+of choice and gives you a cookbook of best-practices how to solve problems.
+You want this structure for all your applications, regardless of what
+architectural pattern you have chosen.</p>
+<p>Embracing the difference between read and write models is another plus of CQRS.
+It is very helpful, not to try fitting both read and write into one model.  You
+also don’t run into so many read-related problems with an ORM any more. You
+design the entities to be optimized for the write model only, loose the
+bidirectional associations and avoid all the optimizations here and there for
+read performance.</p>
+<p>Compared to EBI, where we had to maintain a mapping between DTOs and entities,
+CQRS explicitly uses the command based approach to avoid the complexity of
+these mappings. You will still have to map between command and entity, however
+doing so in the context of a use-case simplifies the code considerably compared
+to a generic mapping solution.</p>
+<p>One negative point: Its difficult to work with commands not returning any data
+in some cases. You need to find simple ways to return messages to the
+user. For that you also need to validate commands on the “client” or
+controller side, using the read model, so that you can prevent invalid/illegal
+commands from being sent as often as possible.</p>
+<p>Without return values from your models, you are left to using mocks as means of
+testing. This might be more difficult for developers to use and understand.
+This problem goes away however, if you combine CQRS with Event Sourcing. A
+topic that I will discuss in the next blog post.</p>
+</div>
 
-             $messages = array_merge($messages, $form_messages);
-        }
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 18, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/16/oop_business_applications__data__context__interaction.html">OOP Business Applications: Data, Context, Interaction</a></h1>
+<p>Other posts in this series:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
+mess</a></li>
+<li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
+</ul>
+<p>The next design pattern for technical system design is called “Data, Context,
+Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
+paradigm, in the context of PHPs language constraints it can be classified as
+architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
+through the book on DCI and trying to understand this pattern with me.</p>
+<p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
+in use-cases (Context). Data objects are never directly involved in these
+use-cases, but are “casted” to their respective roles that they are taking in
+the use-case. This can be implemented with aggregation or traits in PHP.</p>
+<p>One goal of DCI is to get object-oriented programming to a place, where you
+can look at a use-case and its roles and be very sure that the program is
+running correctly, because you can guarantee that there are no unexpected side
+effects. It also aims at keeping the amount of code required to keep in mind
+for a given use-case as small as possible, allowing developers to reason about
+the code with more confidence.</p>
+<div class="section" id="terminology">
+<h2>Terminology</h2>
+<p>In DCI, <strong>data</strong> are objects that encapsulate the state of the application.
+As in EBI, they only contain logic that is true for all the possible use-cases.
+These classes represent <em>what the system is</em>.</p>
+<p><strong>Roles</strong> and <strong>Context</strong> represent <em>what the system does</em> and are supposed to
+capture the End User’s Mental Model as close as possible.</p>
+<p><strong>Roles</strong> add behavior to the data objects by either wrapping them or
+acting as traits for the data objects.</p>
+<p><strong>Context</strong> is the use-case and fulfils its role by making roles <strong>interact</strong> with
+each other. These roles then modify the underlying data.</p>
+</div>
+<div class="section" id="example">
+<h2>Example</h2>
+<p>Starting from the bank account example of the EBI post, we can introduce DCI
+quite easily by adding the missing concept of roles. In the use case of
+transferring money that would be:</p>
+<ul class="simple">
+<li>TransferMoneySource</li>
+<li>TransferMoneySink (Destination)</li>
+</ul>
+<p>We can do this by either introducing two interfaces and two concrete
+implementations that accept the <span class="docutils literal"><span class="pre">BankAccount</span></span> as object to work on
+or by building two traits. I will go down the route with traits, to show
+one possible use-case for this new PHP 5.4 feature. The idea here is to
+implement all the behavior necessary on a trait and then have simple dummy
+objects using them in the tests for this use-case.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySource</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">transferFrom</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">trait</span> <span class="nx">TransferMoneySink</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferFrom</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">abstract</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Any checks for balances, credit limits or other things would also happen
+here. The <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>  on the data objects should be as
+dumb as possible, so that their implementation does not cause any side-effects
+on the execution of this use-case.</p>
+<p>The bank account would then be modified to look:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-        return $messages;
-    }
+<span class="k">class</span> <span class="nc">BankAccount</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">TransferMoneySource</span><span class="p">,</span> <span class="nx">TransferMoneySink</span><span class="p">;</span>
 
-    /**
-     * Extends getErrors() Validator Interface implementation of Zend Form to also
-     * return the errors of the Model validation.
-     * @return Array
-     */
-    public function getErrors($name = null)
-    {
-         $messages = parent::getErrors($name);
+    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-        if(!is_null($model)) {
-             $form_messages = $this-&gt;model-&gt;getErrors();
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
 
-             $messages = array_merge($messages, $form_messages);
-        }
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
 
-        return $messages;
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The use-case <span class="docutils literal"><span class="pre">TransferMoney</span></span> would then be modified to create Roles instead
+of Data objects from the DAO. This can be a bit tricky when you have multiple
+data objects implementing the same role and you have no way of knowing which
+underlying data object to pick. The binding of data objects to roles happens
+in the use-case. The use-case needs a means to retrieve objects with certain
+roles, which then access underlying data sources. To avoid that your use-cases
+have to know about how to bind roles to data, you could use GUIDs in your
+application and fetch all objects from one data store. Another way would be to
+implement data access objects for roles, that then know how to retrieve their
+corresponding data.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
 
-    /**
-     * Set a Model object, which has to implement Zend_Validate_Interface
-     * @throws Zend_Exception
-     */
-    public function setModel($model)
-    {
-        if($model instanceof Zend_Validate_Interface) {
-            $this-&gt;model = $model;
-        } else {
-             throw new Zend_Exception('WW_Form_Mvc expects a model of type Zend_Validate_Interface');
-        }
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span><span class="o">-&gt;</span><span class="na">transferTo</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The simplicity of this is appealing, however don’t forget that we have
+abstracted I/O completely here. There has to be code that deals with that part
+of the system somewhere. However this again is not at the heart of all the DCI
+examples out there, making it difficult to reason about the actual practical
+implications.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">One drawback with this example is, that PHP does not support typehinting for
+traits.</p>
+</div>
+<p>Here is an example of how the bank application service could look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">objectStorage</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$destinationId</span><span class="p">);</span>
+
+        <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span> <span class="nv">$destination</span><span class="p">);</span>
+
+        <span class="nv">$conn</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">conn</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$amount</span><span class="p">);</span>
+            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
+persistent data object by a global ID. This is necessary, because it
+doesn’t actually matter what data object uses the necessary traits
+for this use-case.</p>
+<p>Again as in EBI, in a bigger system you would need to find some abstraction
+layer that does this in a more generic way.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>When Gordon started showing me this pattern we were both puzzled as how
+to actually implement this in the real world. Especially the concept
+of binding roles to data objects still confuses us. Most notably why the use
+of traits or aggregates should actually constitute a new programming paradigm
+instead of just another way to do OOP.</p>
+<p>In Scala casting data objects to roles is actually possible by binding traits
+to objects at runtime. This is not possible in PHP however and has to be done
+statically.</p>
+<p>Compared to EBI, DCI focuses drastically on transaction script domain logic, by
+suggesting to implement roles for every use-case for the sake of avoiding
+side-effects. This is actually is very valuable lesson from this pattern.
+Finding means to decrease the complexity of software is always a good thing.
+And the explicit definition of this concept as <strong>roles</strong> is actually easy to
+explain to other programmers.</p>
+<p>One thing that is lacking in DCI is that there is no concrete mechanism to deal
+with the boundary to other parts of the system. This is actually a step back
+from EBI and I suggest using EBI pattern in combination with DCI to solve this.</p>
+<p>The largest benefit from DCI (and its self proclaimed goal) is the mapping from
+the users/customers mental model directly into the code by using Use-Cases and
+Roles. The communication with the customer about behavior can exclusively focus
+on the current context and its use-case. Mapping this behavior to actual data
+can then be done in a different step.</p>
+<p>This simplification of use-cases and reduction of side-effects between
+different parts of the system has other benefits: It can lead to easier to test
+code and makes it much easier for developers to develop on small and isolated
+parts of the system.</p>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 16, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></h1>
+<p>Other posts in this series:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
+mess</a></li>
+</ul>
+<p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
+an architectural design pattern. I first heard about it in a keynote video of
+<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc/">Uncle Bob</a> on Ruby
+Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
+This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
+by Alistair Cockburn.</p>
+<p>In this pattern any client of the system talks to the model using a model
+request object and receives data from the model in form of model responses objects.
+Additionally when your model talks to any kind of persistence or subsystem it
+should go through an adapter that is replaceable. For a model architecture
+designed this way, you can replace any part of the UI oder lower layers by
+writing new adapters and plug them in.</p>
+<div class="section" id="terminology">
+<h2>Terminology</h2>
+<p>To iterate the terminology:</p>
+<p><strong>Entities</strong> are objects that represent the system data of the application. They don’t contain
+much logic except rules that are set in stone and are never going to change
+(based on physic or mathematical laws or something).</p>
+<p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
+in the current use-case and works with entities to fulfil their task.</p>
+<p>The <strong>boundary</strong> is responsible for translating model request/response into a
+format that the UI or actor can understand. They also mediate between model
+and lower levels, for example to manage database transactions.</p>
+</div>
+<div class="section" id="an-example">
+<h2>An example</h2>
+<p>Lets start with an example in PHP code. We will keep using a common example
+throughout all blog posts, the usual Bank Account/Money Transfer. The use case
+is the money transfer from one bank account (source) to another one
+(destination).</p>
+<p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankAccount</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is straightforward to implement the <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>
+functionality. The Money object implementation is omitted here.</p>
+<p>The Interactor handles the use-case of transferring money from the
+source to the destination account:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$amount</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">MoneyTransferResponse</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$transfer</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
+
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">MoneyTransferResponse</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">MoneyTransferRequest</span></span> and <span class="docutils literal"><span class="pre">MoneyTransferResponse</span></span> objects are dumb
+php objects (so called data-transfer objects, DTO).</p>
+<p>You can see in the example that we use a Data Access object to retrieve the
+source and destination account entities from some storage subsystem. To follow the EBI
+design pattern, we have to decouple this data access object from the model,
+by offering a port (Interface):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This way our business logic is storage independent.</p>
+<p>An example for a boundary would be the requirement for a transaction in
+the bank account sample. We need to wrap the whole MoneyTransfer use-case in
+a transaction. Lets say the invocation of our Use-Case is controlled through
+some kind of application boundary object:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$connection</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">applicationFactory</span><span class="o">-&gt;</span><span class="na">createConnection</span><span class="p">();</span>
+        <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createAccountDao</span><span class="p">());</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a very elaborate way to describe that calling the transfer money
+use-case is wrapped in a Transaction, another port for the storage system to
+manage transactions in this case. The code here is very explicit about
+the actual task. In a real application you would probably find a more
+generic approach to getting this job done.</p>
+</div>
+<div class="section" id="boundary-abstraction">
+<h2>Boundary Abstraction</h2>
+<p>Thinking about the boundaries I came up with a library several month ago called
+<a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
+(Reason below).  It allows you to wrap calls to the model by some sort of proxy
+that transforms the request and response and also handles transactions and
+such. Loosely spoken this was actually some kind of AOP library, using the
+limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
+<p>With context you would do something like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
+
+<span class="c1">// 1. direct invocation</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyService</span><span class="p">();</span>
+<span class="nv">$context</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'service'</span> <span class="o">=&gt;</span> <span class="nv">$myService</span><span class="p">,</span> <span class="s1">'method'</span> <span class="o">=&gt;</span> <span class="s1">'doSomething'</span><span class="p">,</span> <span class="s1">'arguments'</span> <span class="o">=&gt;</span> <span class="nv">$args</span><span class="p">));</span>
+
+<span class="c1">// 2. proxy wrapping</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="nv">$context</span><span class="o">-&gt;</span><span class="na">wrap</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">());</span>
+<span class="nv">$myService</span><span class="o">-&gt;</span><span class="na">doSomething</span><span class="p">(</span><span class="nv">$args</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The second way is obviously way more readable, but its also rather magic.</p>
+<p>I deprecated this library because in the end it wasn’t really helpful that
+much. Implementing an application specific proxy for services is done in
+almost no time and then it solves all your specific needs. My main problem with
+the library is that it tries to magically take away the need to design the
+boundary of your application yourself - in a way that is not really coherent to
+other developers.</p>
+<p>In my own current greenfield applications I quickly went away from using it,
+since a custom application proxy as shown in this
+<a class="reference external" href="https://gist.github.com/3272909">Gist</a> is really much simpler to implement and
+use.</p>
+</div>
+<div class="section" id="using-with-symfony2">
+<h2>Using with Symfony2</h2>
+<p>As I am currently exclusively developing Symfony2/Silex applications, applying
+EBI to Symfony2 framework based applications is very important to me. The
+biggest difficulty here is the Form layer, especially the request data-mapping and
+validation concerns, which are normally part of the model. There are two
+approaches I came up with to solve this:</p>
+<ul class="simple">
+<li>Build Forms for arrays or DTOs and send them through to the boundary to the model.
+You have to validate the data again on the model, which is annoying, but in
+this case the clean way. This is not so easy to do with complex forms though
+as you need to map the request objects to your entities.</li>
+<li>Create a Model Request that wraps and hides the form behind a simple data
+mapping API. This way you can make it look as if you would map a DTO onto
+an object, but in this case you are using the Form API as the mapper.</li>
+</ul>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$entity</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dataMapper</span><span class="o">-&gt;</span><span class="na">transform</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The problem with this approach is, that you cant really unit-test these methods
+anymore, because the complexity of the form layer mapping cannot be mocked with
+this API. Instead your tests always need the full form layer (with validation,
+depending services etc.) to allow for real-world testing. Additionally you have
+to make the DataMapper throw an exception that you can catch in the controller,
+rendering the appropriate response. Using exceptions for controlling executions
+paths is not a very good practice though.</p>
+<p>Another thing that actually helped was the SensioFrameworkExtraBundle and
+ParamConverters. In my project I now have the framework building the Model
+Request objects by convention from the HTTP Request, so that I only need to
+pass them on and can skip the actual mapping of HTTP Request to Model Request.</p>
+</div>
+<div class="section" id="pros-and-cons">
+<h2>Pros and Cons</h2>
+<p>This design pattern very closely resembles what Fowler calls <strong>Service Layer</strong>
+pattern in PoEAA. EBI is going a bit more into detail by naming individual
+parts of the pattern more explicit. Without more restrictions however using
+this pattern will drive you towards many of the problems described in my
+previous post.</p>
+<p>Clean separation from frameworks is achieved, depending on the actual usage
+however only at a significant cost.  Never forget stepping back and thinking
+about further abstractions, otherwise applying EBI is leading to lots of code
+being manually written.</p>
+<p>This already shows one particular annoyance are the data-transfer objects. You
+need to invest quite some work to get a mapping working from entities to
+transfer objects and back. In the process you will loose the convenience of
+“Open Entity Manager in the View”, where you can lazy load any
+data you want to access in the view. This is quite a painful step, because you
+are loosing lots of flexibility. Much more annoying is the need to update
+entities from data-transfer objects, requiring sophisticated code for merging
+of partial object graphs.</p>
+<p>What this design pattern improves is the testability of code and also the
+execution of tests is MUCH better, when you don’t have to go through the whole
+application stack to test something.</p>
+<p>Implementing behavior into the use-cases also avoids lots of lasagna code
+compared to a messy domain driven design. You get a very good overview of
+what is actually happening just by looking at the Model Request and Interactor
+classes. However depending on the use-case the classes can get very big
+and might need lots of collaborators, which make the problem complex again.</p>
+<p>It is important to note that aggregating the domain logic in the use-cases
+actually means going to some sort of transaction script processing, away from
+domain driven design. I am pretty sure that this is not necessarily the
+intention of this design pattern from a POV of Uncle Bob. However depending on
+the sophistication of the applications domain logic, transaction script is
+actually a very good pattern for simple to medium complex use-cases and
+I like to have this as a general rule for developers (“Put behavior on the
+use-case”).</p>
+<p>In conclusion I can partially recommend using the EBI pattern. You have to be
+careful to find abstraction layers that keep your code DRY and SOLID however,
+something which does not come naturally with this pattern. If you are not
+careful you end up with all the “messy points” that I mentioned in my previous
+blog post.</p>
+<p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
+by using some code-generation for example to do parts of this job for you. The
+worst outcome with this pattern is, when you manually code layers for HTTP
+Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 13, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">tl;dr Version: I present a list of problems with OOP business applications from
+my personal experience and then introduce 3 approaches that I was put in
+contact with over the last year, DCI, EBI and CQRS. This post is an
+introduction to a series about this approaches.</p>
+</div>
+<p>I mentally divide the world of programming into two large parts:</p>
+<ol class="arabic simple">
+<li>Library and system programming</li>
+<li>business applications</li>
+</ol>
+<p>The first produces code solving technical problems, often in a beautiful and
+dedicated way. The second regularly produces mess, hopefully still
+serving customers by optimizing their business. This differentiation is an
+exaggeration, but from my experience its far easier to run a greenfield business
+project into the ground than a new library.</p>
+<p>There has to be a reason why so many programmers dedicate much free time to
+open source projects. It might be empirical prove, that all our business
+projects don’t make us happy at the end of the day and we have to show
+ourselves that we can do better.</p>
+<p>I enjoy writing business applications more than libraries, but they are also
+much more difficult to get right in both social and technical dimensions.  One
+motivational driver of <a class="reference external" href="https://github.com/beberlei">my open source activities</a> always was to simplify the technical dimension
+of OOP business applications.</p>
+<div class="section" id="my-personal-list-of-annoyances">
+<h2>My Personal List of Annoyances</h2>
+<p>This blog post is not about blaming customers (as the usual suspect), its about
+finding the problems in usual OOP code of business systems from my experience
+with PHP projects. To keep things short, I will list my <em>personal</em> list of
+technical annoyances in business projects in no particular order. These are
+highly subjective points.</p>
+<ul class="simple">
+<li>Getter/Setter Madness of Objects that are used to store data into
+databases. Leading to huge objects that are essentially just meaningless
+stores of data.</li>
+<li>Updating complex object graphs from user input.</li>
+<li>Separation of model, controller and views, especially when dealing with
+forms. This is very complicated to achieve.</li>
+<li>Lazy Loading and Query performance problems when using an ORM. Additionally
+replacing parts of the views with hand-crafted SQL is often difficult and/or
+time intensive, when already using an ORM.</li>
+<li>Inability to decouple code that was written with CRUD (generators and
+utilities) in mind towards more domain driven code, when the requirements
+change.</li>
+<li>Dependency mess leading to hard to test code, generally leading to untested
+applications. Too often frameworks create huge dependencies that
+make your domain model messy and complex to mock in tests.</li>
+<li>Focus on synchronous request/response handling makes later usage of message
+queues very complicated and expensive to refactor towards.</li>
+<li>Tight coupling of model against the framework code.</li>
+<li>Junior developers have too much freedom, when there is not much structure in
+the code, but rather just a big ball of mud. Additionally with the tight
+coupling of so many components, junior developers get easily lost in the code
+and produce unexpected side-effects.</li>
+<li>Use-cases easily span more than 5 classes. To grasp the interaction you have
+to keep lots of code in your head, especially complicated for junior
+developers again. As they cannot really work on a problem in isolation.</li>
+<li>Constant violations of <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29">SOLID</a> principles
+due to framework or persistence requirements.</li>
+<li>Compared to library development, user-facing applications often have much
+higher coupling between classes and namespaces. In libraries its often easy
+to find different concerns, but in applications they seem hard to divide for
+developers.</li>
+<li>In combination with a rich javascript client, requirements to update objects
+through their CRUD API produces concurrency and lost-update hell, that
+dynamic server-side applications could mostly avoid before.</li>
+</ul>
+<p>Essentially if you work in a tight schedule, project based environment where
+the decision makers sell rapid application development and prototyping, then you
+often have only one, maybe one and a half attempts to get the big picture
+right. From that moment on you have to build on that decision and hope for the
+best.</p>
+<p>We have tried not to go the RAD+CRUD tools ways in several projects, to escape
+the problems listed above. But without changes in your mindest you end up with
+hand written mess, compared to getting there with tools.</p>
+<p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
+the problem even worse. It easily leads to lasagna code, where you have layers
+of layers that are very hard to understand. Personally I prefer spaghetti code
+over lasagna code, because its comparatively simpler to understand.</p>
+</div>
+<div class="section" id="finding-new-approaches">
+<h2>Finding new Approaches</h2>
+<p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
+there has to be some solution to organize business models structurally to avoid
+all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a>
+you have a powerful toolbox to avoid many of the problems above, but it is
+still not simple to write clean object oriented applications.</p>
+<p>After years of participation in both open source projects I still feel there is
+a missing puzzle piece, to reach a clean separation of all the model concerns
+from framework and persistence.</p>
+<p>At some point I would really like to close the gap between desired technical
+state of a project and the state it is actually in. I know there is no size
+fits all solution, but I fell a checklist of architectural patterns with pro
+and con arguments allows me to adjust the expectations about how a system looks
+in the end.</p>
+<p>Thanks to <a class="reference external" href="https://twitter.com/go_oh">Gordon</a>, <a class="reference external" href="https://twitter.com/spriebsch">Stefan</a> and <a class="reference external" href="https://twitter.com/tom_noise">Thomas</a>
+I was introduced to several approaches to OO application design that I
+started to explore in the past last months:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
+studied a lot</li>
+<li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
+architecture or “Ports and adapters”. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
+at Ruby Midwest</a>
+last year.</li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+day video class</a> by Greg Young.</li>
+</ul>
+<p>They are not new and have all been around for several years already. I would
+describe all three of them as architectural design patterns, though some people
+might probably disagree with this classification. All three approaches make
+you think about application development beyond just “service layers” in
+radically new ways. All three have helped me rethink business applications in
+different ways.</p>
+<p>In the next weeks I will talk about each of these approaches individually, show
+some examples and then wrap up my thoughts about all of them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
+Conference</a> in Sankt Augustin Germany on
+25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
+</div>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on August 11, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
+<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+describe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
+<li>and I probably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <span class="docutils literal"><span class="pre">.bash_history</span></span> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<span class="docutils literal"><span class="pre">.pp</span></span> file and then invoke <span class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></span>. You can install Puppet
+via <span class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></span> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I separate the installation process into two puppet files, one that has to be
+run with root <span class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></span> and another one that has to be run with
+my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<div class="highlight-python"><div class="highlight"><pre># /home/benny/.puppet/devmachine.pp
+
+# VIM Dot Files
+vcsrepo { 'vim-dotfiles':
+    path     =&gt; "/home/$id/.vim",
+    ensure   =&gt; present,
+    provider =&gt; git,
+    source   =&gt; 'https://...'
+}
+
+file { 'vim-dotfiles-symlink':
+    path   =&gt; "/home/$id/.vimrc",
+    ensure =&gt; link,
+    target =&gt; '.vim/vimrc',
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+
+exec { 'vim-make-command-t':
+    command =&gt; 'rake make',
+    cwd     =&gt; "/home/$id/.vim/bundle/Command-T",
+    unless  =&gt; "ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'",
+    require =&gt; Vcsrepo['vim-dotfiles']
 }
 </pre></div>
 </div>
-<p>We then extend the WW_Form_Mvc class to disable the automatic
-loading of decorators in the Constructor and additionally allow to
-pass a Model to the constructor as second argument:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_Form_Mvc
-{
-    protected $model = null;
+<p>The three keywords <span class="docutils literal"><span class="pre">vcsrepo</span></span>, <span class="docutils literal"><span class="pre">file</span></span> and <span class="docutils literal"><span class="pre">exec</span></span> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<span class="docutils literal"><span class="pre">~/.vim</span></span> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <span class="docutils literal"><span class="pre">~/.vimrc</span></span> points to <span class="docutils literal"><span class="pre">~/.vim/vimrc</span></span>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <span class="docutils literal"><span class="pre">devmachine.pp</span></span> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<div class="highlight-python"><div class="highlight"><pre># Configure Git
+exec { "git-author-name":
+    command =&gt; 'git config --global user.name "Benjamin Eberlei"',
+    unless =&gt; "git config --global --get user.name|grep 'Benjamin Eberlei'"
+}
 
-    /**
-     * this overrides the original Zend_Form Constructor and skips
-     * the decorator initialisation, because this is now being handled
-     * by View Helpers
-     */
-    public function __construct($options=null, $model=null)
-    {
-        if (is_array($options)) {
-            $this-&gt;setOptions($options);
-        } elseif ($options instanceof Zend_Config) {
-            $this-&gt;setConfig($options);
-        }
+exec { "git-author-email":
+    command =&gt; 'git config --global user.email "kontakt@beberlei.de"',
+    unless =&gt; "git config --global --get user.email|grep 'kontakt@beberlei.de'"
+}
 
-        // Extensions...
-        $this-&gt;init();
+exec { "git-global-ignore":
+    command =&gt; "git config --global core.excludesfile /home/$id/.gitignore",
+    unless  =&gt; 'git config -l --global|grep excludesfile'
+}
 
-        if(!is_null($model)) {
-             $this-&gt;setModel($model);
-        }
-    }
-
-    // All the other stuff here
+file { "git-global-ignorefile":
+    path =&gt; "/home/$id/.gitignore",
+    ensure =&gt; present,
+    content =&gt; "*.swo\n*.swp\n"
 }
 </pre></div>
 </div>
-</div></blockquote>
-<p>In our views we want to <strong>use helper methods to manage the
-displaying of the form</strong>. For each different style of form
-displaying, we can generate different helpers. For example a helper
-that would only apply the default decorators would look like this:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_View_Helper_FormDefault
-{
-    /**
-     * Load only default decorators on this Zend_Form object
-     *
-     * @param Zend_Form $form
-     */
-    public function formDefault(Zend_Form $form)
-    {
-        if($form instanceof Zend_Form) {
-            $form-&gt;loadDefaultDecorators();
-            return $form;
-        }
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>We can now use this helper and in any template say: &lt;?=
-$this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
-controller action that implements this form and we will see that it
-does not look different from what we would have done before:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>function formAction()
-{
-    $model = new SomeModel();
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <span class="docutils literal"><span class="pre">~/.puppet/modules</span></span>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
 
-    $form = new WW_Form_Mvc();
-    $form-&gt;setModel($model);
-
-    // generate form here, adding elements and stuff
-
-    if($form-&gt;isValid($_POST)) {
-        $model-&gt;insert($form-&gt;getValues());
-        $this-&gt;view-&gt;form = "Form was submitted!";
-    } else {
-        $this-&gt;view-&gt;form = $form;
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Isnt that nice? Now each part of the equation is doing what its
-supposed to do.</p>
-</div></blockquote>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/06/24/teaching-zend-form-some-mvc.html#disqus_thread" data-disqus-identifier="2008/06/24/teaching-zend-form-some-mvc">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 05, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
-<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
-with the alpha version, since I am currently searching for a good
-framework for a high performance application. My first benchmarks on
-ezcMvc just say: wh000pie! A lot faster as compared to the Zend
-Framework.
-Still ezcMvc is VERY loosely coupled and you have to write lots of lines
-to get where ZF gets you with less (more magic involved). As you can see
-from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
-component</a>
-it is currently a bit unwieldily to work with ezcMvcController since you
-have to create and return result objects everywhere. This is very nice
-since it abstracts from the actual response type (could be www, mail,
-cli, anything).
-I have created a very little extension of the ezcMvcController class
-that hopefully serves you quite some time. You can append variables to
-the ezcMvcResult object by calling the magic __get and __set on the
-controller. Plus it offers a method to use the ezcMvcInternalRedirect
-instead of the result. See for yourself:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myController extends ezcMvcController
-{
-    protected $result;
-
-    public function createResult()
-    {
-        $actionMethod = $this-&gt;createActionMethodName();
-
-        if ( method_exists( $this, $actionMethod ) ) {
-            $status = $this-&gt;$actionMethod();
-            if($status != 0) {
-                $this-&gt;getResult()-&gt;status = $status;
-            }
-            return $this-&gt;getResult();
-        } else {
-            throw new ezcMvcActionNotFoundException( $this-&gt;action );
-        }
-    }
-
-    protected function _redirect($uri)
-    {
-        $request = clone $this-&gt;request;
-        $request-&gt;uri = $uri;
-        $this-&gt;result = new ezcMvcInternalRedirect($request);
-    }
-
-    public function __get($name)
-    {
-        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
-            return $this-&gt;getResult()-&gt;variables[$name];
-        }
-        return null;
-    }
-
-    public function __set($name, $value)
-    {
-        $this-&gt;getResult()-&gt;variables[$name] = $value;
-    }
-
-    public function __isset($name)
-    {
-        return isset($this-&gt;getResult()-&gt;variables[$name]);
-    }
-
-    protected function getResult()
-    {
-        if($this-&gt;result === null) {
-            $this-&gt;result = new ezcMvcResult();
-        }
-        return $this-&gt;result;
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>You can now use a controller in the following way:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class dashboardController extends myController
-{
-    public function doIndex()
-    {
-        $this-&gt;cookie = "Cookie!"; // Proxy to $ezcMvcResult-&gt;variables['cookie']
-    }
-
-    public function doRedirect()
-    {
-        $this-&gt;_redirect("/");
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Very nice! The next thing I have to extend in ezcMvc is automagical
-matching of controller and action names to view output names with a
-special View Handler that takes care of this. This saves another bunch
-of work you have to cope with in the current standard setup.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html#disqus_thread" data-disqus-identifier="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid">Leave a comment</a>
-        </div></div><div class="archive_link">
+        </div><div class="metadata">
+            <p><small>Posted on June 03, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
-
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/page9.html';
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
           </div>         
         </div>
-      </div>
     </div>
-
-    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li><li>
-            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li></ul>
-</div>
-</section>
-          </aside></div>
 </div>
 </div> <!-- #main-container -->
 
         <div class="footer-container" role="contentinfo">
 <div class="container">
-    <div class="span-24 content">
+    <div class="col-md-8 col-md-offset-2">
         <div class="footer">
-            &copy; Copyright 2008-2015, Benjamin Eberlei.
-            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
 
-        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
         </div>
     </div>
 </div>

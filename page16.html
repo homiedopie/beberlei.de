@@ -1,0 +1,380 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 16 &mdash; beberlei.de</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="next" title="Older" href="page17.html" /><link rel="prev" title="Newer" href="page15.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+          <div id="page16">
+            
+            <div class="section">
+            <h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
+<p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
+post</a> on Dependency
+Injection containers and Zend_Application I was eager to find out if
+its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
+Container</a>
+into the Zend Framework. To my surprise it’s possible without having to
+make any changes to one of the two components. An example use-case would
+look like:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$container = new sfServiceContainerBuilder();
+
+$loader = new sfServiceContainerLoaderFileXml($container);
+$loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();
+</pre></div>
+</div>
+</div></blockquote>
+<p>Resources instantiated by Zend_Application are then injected into the
+container by the name of the resource and are given the resource
+instance. Any object from the Symfony container can then use these
+dependencies in their object setup. The only drawback of the integration
+is the fact that the Symfony Container is case-sensitive in regards to
+the service names but Zend_Application lower-cases all service before
+injecting them into the container. The following code is a restatement
+of my previous example of a <strong>MyModel</strong> class which requires a
+<strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$container-&gt;register('myModel', 'MyModel')
+          -&gt;addArgument(new sfServiceReference('db'))
+          -&gt;addArgument(new sfServiceReference('cache'));
+</pre></div>
+</div>
+</div></blockquote>
+<p>Access to a MyModel instance with its dependencies is then granted
+through the call <strong>$container-&gt;myModel</strong> throughout the application.
+Make sure to call this after running Zend_Application::bootstrap, so
+that the Resource dependencies are injected first.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+            <a href="tags/symfony.html">Symfony</a>
+                 / 
+            <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on July 04, 2009</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/02/12/pdt-back-to-easyeclipse-with-php-extension.html">PDT: Back to easyeclipse with PHP extension</a></h1>
+<p>I am disappointed by <a class="reference external" href="http://www.eclipse.org/pdt/">PDT</a> for Eclipse.
+The current version strikes my rather old machine with “just” 512mb to
+death. Building projects is not possible even when assigning eclipse all
+my available memory, because of an Java Heap Error (<a class="reference external" href="http://blog.wolff-hamburg.de/archives/20-Migrating-to-PDT.html">See this blog
+post</a>).
+This effectively hinders you to use all the completion and hint features,
+because PDT does not know about any functions, classes and their phpdoc
+descriptions.</p>
+<p>PDT is also missing some very important features. Marking all occurrences
+of a function, class, constant or variable on click for example. PHP
+Errors and Warnings are display in a way so that you won’t find them and
+if you do, you won’t understand what they mean.</p>
+<p>So I am going back to my easyeclipse with php combination, which always
+worked well, the only problem being that it is no longer under active
+development. At least it has all the features I need for now.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/ide.html">IDE</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 12, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/05/25/introducing-zend-controller-scaffolding.html">Introducing: Zend Controller Scaffolding</a></h1>
+<p>In the last couple of weeks I <a class="reference external" href="http://codecaine.co.za/posts/form-generation-with-zend-form-part-2/">came across the
+idea</a>
+of building a little component for scaffolding in Zend Framework. After
+playing around with this idea a little I came up with an
+Zend_Controller_Scaffolding object, which extends the
+Zend_Controller_Action object.</p>
+<p>It takes any Zend_Db_Table_Abstract object and generates create and
+update forms using Zend_Form and displays them in the Controller. The
+component is very easy to use, as this example shows:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You now have access to the following actions of the controller:
+some/create some/edit some/delete and some/index (some/list). They
+handle all your model editing dreams.</p>
+<p>All you have to own is the WW_Controller_Scaffolding Library Class and
+a folder of scaffolding view templates both of which are <a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">bundled in an
+archive you can
+download</a>.</p>
+<p><strong>Download</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">Download Version
+0.5.5</a></li>
+</ul>
+<p><strong>Changes</strong></p>
+<ul class="simple">
+<li>0.5.5: Put Component into own Namespace (WW = Whitewashing). Make it
+possible to hide fields in the list via the options. Allow to specify
+scaffolding view scripts folder via options.</li>
+</ul>
+<p><strong>Install &amp; Usage</strong></p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>Untar the two folders include/ and views/ into your
+Zend Framework project application directory.
+
+Make sure the include folder is in your Zend_Loader
+include path or move the Scaffolding.php so that it
+is placed in your library include path.
+
+Define each Controller that should be a Scaffolding Interface
+as:
+
+class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}
+
+Where $options is an array or Zend_Config object with any of the following keys:
+
+  'allow_edit_primary_key' True/false - Whether the form allows you to set the
+                          Primary Key fields or not
+
+ 'field_names' an Array of the Database Tables field names mapped to Label Names
+
+ 'hide_list_fields' Array of database table field names that should not be displayed in the list overview.
+
+ 'checkbox' an Array of Database Table field names that should be represented
+            as Checkbox. Useful for TINYINT(1) fields that represent boolean decisions.
+
+ 'view_folder' Sometimes you want to use different views for scaffolding in one project. Use
+               this variable and copy the scaffolding folder for each component you want to
+               change the view basics for.
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Todos &amp; Problems:</strong></p>
+<ul class="simple">
+<li>Many To Many Relationships are not implemented yet (Using
+MultiSelec).</li>
+<li>Compound Keys are probably not working correctly</li>
+<li>Relationships on non-primary key fields probably don’t work as
+expected</li>
+<li>Relationships with lots of data are not scaled down for easy
+administration.</li>
+</ul>
+<p>Please report any bugs and feature requests or recommendations to
+<strong>kontakt at beberlei dot de</strong>.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on May 25, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a></h1>
+<p><a class="reference external" href="http://framework.zend.com">Zend_Search_Lucene</a> (or Lucene in
+general) does not support an update statement, therefore we must check
+via find() if a specific article that should be updated already exists.</p>
+<p>Numerous solutions exist for this problem (<a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">for example this PDF
+Tutorial by a Zend
+Programmer</a>).
+Mine looks as follows. The first thing is to Set an Analyzer other from
+the default one. The Default Analyzer only looks at letters, not at
+numbers.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
+    Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
+);
+$index = Zend_Search_Lucene::open('/path/to/index/directory');
+</pre></div>
+</div>
+</div></blockquote>
+<p>We can now save an identifier containing letters and numbers, for
+example the md5 string of the Article Database ID.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$doc = new Zend_Search_Lucene_Document();
+$field = Zend_Search_Lucene_Field::Keyword('id', md5($data['id']));
+$doc-&gt;addField($field);
+$index-&gt;addDocument($doc);
+</pre></div>
+</div>
+</div></blockquote>
+<p>Before updating an entry you have to delete any entry that has been
+indexed before:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$hits = $index-&gt;find('id:'.md5($articleID));
+foreach($hits AS $hit) {
+    $index-&gt;delete($hit-&gt;id);
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>The <a class="reference external" href="http://devzone.zend.com/content/zendcon_07_slides/Evron_Shahar_Indexing_With_Zend_Search_Lucene-ZendCon07.pdf">Tutorial Talk on Search
+Lucene</a>
+(given above) uses an extended version of this delete routine snippet
+that also checks if an article is up to date and does not have to be
+reindexed and deletes multiple entries of one article.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on May 18, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/05/17/integrated-zend-layout-into-this-blog.html">Integrated Zend_Layout into this blog</a></h1>
+<p>I finished with integrating Zend_Layout into this blog software today.
+At first I thought it is quite hard to use especially if you want to
+integrate dynamic navigational contents depending on the current
+module/controller/action setup. But I came up with a combination of
+actionStack and Named Response Sections as <a class="reference external" href="http://framework.zend.com/manual/en/zend.layout.quickstart.html#zend.layout.quickstart.mvc">described in the ZF
+Documentation of the Layout
+component</a>,
+which is quite easy to understand, use and extend.</p>
+<p>At each of the major Controllers I put different actions from a specific
+Navigation Controller on the
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.controller.actionhelpers.html#zend.controller.actionhelpers.actionstack">ActionStack</a>
+(mostly global per Controller using the init() class method).</p>
+<p>A typical controller looks like this:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class BlogController extends Zend_Controller_Action
+{
+    public function init()
+    {
+        $this-&gt;_helper-&gt;actionStack('tagcloud', 'Navigation');
+        $this-&gt;_helper-&gt;actionStack('userinfo', 'Navigation');
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>The NavigationController looks like this:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class NavigationController extends Zend_Controller_Action
+{
+    public function tagcloudAction()
+    {
+        // Do not render the content of this action to the default output.
+        $this-&gt;getHelper("ViewRenderer")-&gt;setNoRender();
+
+        [...]
+
+        // Append content to secondaryNavigation named response section
+        $this-&gt;getResponse()-&gt;append('secondaryNavigation', $this-&gt;view-&gt;render('navigation/tagcloud.phtml'));
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>The layout.pthml then just calls certain named sections, for example &lt;=?
+$this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on May 17, 2008</small></p>
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+          </div>         
+        </div>
+    </div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="footer">
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
+
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

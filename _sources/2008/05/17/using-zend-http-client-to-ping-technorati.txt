@@ -32,6 +32,5 @@ Guide <http://technorati.com/developers/ping/>`_ and ready to go you
 are!
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

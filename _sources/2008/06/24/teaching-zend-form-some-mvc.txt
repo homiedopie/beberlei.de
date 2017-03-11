@@ -182,6 +182,5 @@ a field key level, which is not currently done.
     supposed to do.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -17,6 +17,5 @@ Before you start cursing the world try this (rather obvious) workaround:
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

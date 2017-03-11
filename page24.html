@@ -1,0 +1,347 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 24 &mdash; beberlei.de</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="next" title="Older" href="page25.html" /><link rel="prev" title="Newer" href="page23.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+          <div id="page24">
+            
+            <div class="section">
+            <h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
+<p>I am not too happy with the ZF Frameworks Table access solution. Not
+that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
+pattern</a>,
+but in most web applications you almost always have to join data some
+way or another. Even this rather simple application, a blog, needs joins
+for displaying articles so that category, comment count and tags can be
+displayed. Therefore I use an instance of Zend_Db_Table_Abstract only
+for the simplest purposes and pimp it by using lots of public methods
+and
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.db.select.html">Zend_Db_Select</a>.
+An example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeModel extends Zend_Db_Table_Abstract</span>
+<span class="x">{</span>
+<span class="x">  $_name = "someTable";</span>
+<span class="x">  $_primary = "id";</span>
+
+<span class="x">  public function getSomethingByJoin($param1, $param2)</span>
+<span class="x">  {</span>
+<span class="x">     $db = $this-&gt;getAdapter();</span>
+<span class="x">     $select = $db-&gt;select();</span>
+<span class="x">     ...[build select]</span>
+<span class="x">     $result = $db-&gt;query($select);</span>
+
+<span class="x">     return $result;</span>
+<span class="x">  }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>That way you still follow the MVC pattern and don’t have to take one
+compromise after another for getting the Table Gateway to reproduce a
+result that looks like a join.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 24, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
+<p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
+Mainz, Germany was the first php conference I have been to. It ended
+some hours ago and i am quite happy to have been there. I had several
+great discussions which pointed me to new stuff (to follow) and also met
+great people.</p>
+<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
+support</a>. It feels much
+more easy to use than Eclipse PDT. Its faster (from the little tests i
+could make) and does not strike when you add several large libraries
+into the include path. It offers much more help on refactoring and
+organizing than Eclipse PDT does, for example it offers to generate
+getter/setter, constructor, inheritance methods. Much thanks to Petr who
+explained to me in detail how NetBeans works.</p>
+<p>Ez had lots of people at the conference (to Kore and Tobias i spoke in
+more detail) and I had some talks with them about
+<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a>. This was especially
+interesting after the great session on object persistence in ez, as well
+when I heard that ezcMvc, a model-view-controller component, wil be
+included in the next release of ezc in December 2008. ezComponents has a
+Database layer, that does not seem to enforce too much overhead on you
+but still offers great extensibility through a persistence layer and a
+library that offers to build Database Diffs. The latter feature is
+really great and I will definitely have a look at this.</p>
+<p>Sebastian Bergmann had a great talk on MapReduce which is an old LISP
+programming paradigm to work with huge datasets. This style was recently
+<a class="reference external" href="http://labs.google.com/papers/mapreduce.html">revived by Google</a>
+because tasks can easily be split and distributed for computing on
+different nodes with hundreds of threads. Implementing a working example
+in PHP is really easy, just finding a good way to process your large
+data seems to be a topic that needs lots of thinking.</p>
+<p>Additional great things:</p>
+<ul class="simple">
+<li>Meet Thomas, the guy that wrote Weaverslave (I use it for years to
+build simple php applications).</li>
+<li>He is working on a cool open source project <a class="reference external" href="http://sourceforge.net/projects/ccg/">Carica
+Cachegrind</a> with Bastian
+Feder that will process xdebug cachegrind files via a webinterface
+(They told me webgrind is actually calculating the numbers wrong).</li>
+<li>Jan Lehnhart and Kore Nordmann had some great things to say about
+<a class="reference external" href="http://incubator.apache.org/couchdb/">CouchDB</a>.</li>
+<li>Brian Acker talked about <a class="reference external" href="https://launchpad.net/drizzle">Drizzle</a>,
+which is a forked MySQL that throws out lots of legacy stuff from
+MySQL out, to build a micro-kernel database server that suites the
+web.</li>
+<li>Ulf Wendel talked about Mysqli + Mysqlnd.
+<a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd/">Mysqlnd</a>
+will be a new internal driver for PHP to access MySQL through Mysqli
+and optimizes processing and memory consumption. Additionally Mysqli
+will be extended to offer asynchronous queries that can be fired at
+the database and polled latter. To be included in PHP 5.3</li>
+</ul>
+<p>Not so good things: There were absolutely to few power lines. People
+using their notebooks were packed on hotspots where power was available.
+Please more power plug possibilities next time!</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/conferences.html">Conferences</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on October 30, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html">My recent ZF ongoings: JQuery, Action Controller, CouchDb</a></h1>
+<p>In the last weeks lots of stuff came up for me regarding the Zend
+Framework. My <a class="reference external" href="http://jquery.com">jQuery</a> component is finished, i
+have even committed the documentation into the SVN already. Do read it
+you have to be either an XML fetishist or compile it using a docbook
+compiler. Lots of questions about ZF and jQuery come up regularly on the
+mailing lists so I really look forward for the first ZF 1.7 release
+candidate which will include the helpers for a broader audience. This
+component comes at a good point, since <a class="reference external" href="http://jquery.com/blog/2008/09/28/jquery-microsoft-nokia/">a few days ago the jQuery team
+announced a deal with Microsoft and
+Nokia</a>.
+Microsoft will include jQuery as the framework to go into its Webbased
+ASP.Net applications and Nokia will include the library in their mobile
+phones.</p>
+<p>Additionally i reported an <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-4385">important issue
+(ZF-4385)</a> that
+offers a patch to create an interface of the Action Controller and
+therefore allows everyone to implement their own action controller
+classes. May it be lightweight implementations or like my current
+use-case webservice only controllers that route all their actions
+through soap, xml-rpc or a rest server. I would really appreciate if
+more people would vote +1 on this issue to get it included in 1.7</p>
+<p>In the last weeks i also played around with
+<a class="reference external" href="http://incubator.apache.org/couchdb/docs/overview.html">CouchDb</a>, a
+document based database. Its the perfect storage medium for blogs, wikis
+or other knowledge-based applications and comes with a lightweight and
+easy REST Api for ClientSide access. Within the
+<a class="reference external" href="http://www.zym-project.com">Zym</a> project i managed to implement a
+prototype that is based on Jurrien’s prototype for a CouchDb client.
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_Couch+-+Matthew+Weier+O'Phinney">Matthew of Zend Fame published a proposal for a Zend
+Couch</a>
+component yesterday and we teamed up to implement two prototypes
+(<a class="reference external" href="http://github.com/weierophinney/phly/tree/beberlei">mine</a> is based
+on <a class="reference external" href="http://github.com/weierophinney/phly/tree/master">Matthews</a> and
+integrates lots of stuff of the Zym component).</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+            <a href="tags/couchdb.html">CouchDB</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on October 01, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
+<p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
+class</a> I
+realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
+calculate correlation coefficients like Mathlab has.</p>
+<p>Our assignment was to replicate the Dynamic Correlations graph in
+<a class="reference external" href="http://www.amazon.de/gp/redirect.html?ie=UTF8&amp;location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&amp;s=books-intl-de&amp;qid=1209289935&amp;sr=8-1&amp;site-redirect=de&amp;tag=economystuden-21&amp;linkCode=ur2&amp;camp=1638&amp;creative=6742">Walshs’ Monetary Theory and
+Policy</a>
+for European Data, which shows the cross-correlation of different
+monetary aggregates (M0,M1,M2) with GDP over lagging periods of -8 to +8
+quarters.</p>
+<p>What was missing for me to do that assignment in Ox was a function to
+calculate cross-correlation coefficients for two vectors for a specified
+lag length:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>#include &lt;oxfloat.h&gt;
+
+/**
+ * Computes the cross-correlation coefficient for two vector series allowing
+ * to optionally specify the number of positive and negative lags the ccc
+ * should be calculated for.
+ *
+ * @author Benjamin Eberlei (kontakt at beberlei dot de)
+ * @param vVarY Tx1 vector of variable related to
+ * @param vVarX Tx1 vector of variable which is tested in different lags
+ * @param lags Integer indicating the number of negative and positive lags.
+ * @returns (1+lags*2)*1 vector of correlations from -lags to lags
+ **/
+ccf(const vVarY, const vVarX, const lags)
+{
+    // Generate positive and negative lags of given length and fill with NaN, so
+    // that rows with not available numbers can be dropped from calculating the CCF later on.
+    decl mXLag = lag0(vVarX, range(lags, -lags), M_NAN);
+
+    decl mCorr, sCov;
+
+    // initialize result vector holding one crosscorrelation per lag
+    decl vCorrLags = zeros(1+lags*2, 1);
+
+    // sadly there are no matrix operations to ease this computation, loop over all lags
+    for(decl i = 0; i &lt; 1+lags*2; i++) {
+        mCorr = deleter(vVarY ~ mXLag[][i]); // stick y and current lagged x together and delete NaN rows
+
+        // calculate covariance of both time series
+        sCov = 1/(rows(mCorr)-1) * sumc( (mCorr[][0]-meanc(mCorr[][0]))' * (mCorr[][1]-meanc(mCorr[][1])) );
+
+        // calculate correlation coefficient
+        vCorrLags[i][0] = sCov / ( sqrt(varc(mCorr[][0])) * sqrt(varc(mCorr[][1])) );
+    }
+
+    return vCorrLags;
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>It may prove useful to someone.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/ox.html">Ox</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on April 27, 2008 by beberlei <kontakt@beberlei.de></small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/09/05/jquery-component-approved-for-extras-library.html">jQuery Component approved for extras library</a></h1>
+<p>Yesterday both my jQuery Helper proposals (<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">Core
+Helper</a>,
+<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei?focusedCommentId=7373203#comment-7373203">UI
+Widgets</a>)
+for the Zend Framework have been accepted for development. I have
+already checked my working prototypes <a class="reference external" href="http://framework.zend.com/svn/framework/extras/incubator/">into the Zend Framework
+SVN</a>. In my
+opinion the usage is quite stable already. There is likely to be no
+argument flip, function renaming or whatsoever. I have renamed the
+jqLink helper to ajaxLink though, because other libraries are offering
+the same functionality to make Ajax related calls and this way the
+learning curve for people using different libraries in different
+projects may be more easy.</p>
+<p>What is still missing? I have to add captureStart()/captureEnd()
+functions to the Container Widgets Accordion and Tabs, and will create
+additional pane helpers for both of them. This will likely be finished
+this weekend and then there is only the documentation missing. I am very
+confident this component will be finished for the Zend Framework 1.7
+release later this year.</p>
+<p>Since this component also includes helpers for the jQuery UI Widgets 1.6
+release (which is not released yet), a little waiting time before
+release is still good. I hope this all works out and the jQuery UI 1.6
+release is in the Google CDN, when ZF 1.7 comes out.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+            <a href="tags/jquery.html">jQuery</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on September 05, 2008</small></p>
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+          </div>         
+        </div>
+    </div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="footer">
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
+
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

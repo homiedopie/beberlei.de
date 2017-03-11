@@ -22,6 +22,6 @@ My next plans for the blog bundle are:
 Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)
 
 .. categories:: none
-.. tags:: none
+.. tags:: ThisBlog
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

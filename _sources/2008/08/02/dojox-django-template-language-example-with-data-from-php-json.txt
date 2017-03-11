@@ -33,6 +33,5 @@ Language component filled with data from a JSON GET Response:
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: Javascript, Dojo
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

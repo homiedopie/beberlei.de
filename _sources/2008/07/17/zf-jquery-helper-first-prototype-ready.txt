@@ -11,6 +11,5 @@ that nicely present the functionality.
 Please test and comment!
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

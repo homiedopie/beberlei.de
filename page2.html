@@ -15,16 +15,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Page 2 &mdash; Whitewashing</title>
+        <title>Page 2 &mdash; beberlei.de</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 <meta content="width=device-width" />
-
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/default.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -47,1660 +44,743 @@
         <![endif]-->
 
       <div id="container">
-<div class="container">
-    <div id="header" class="span-8">
-        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
-    </div>
-    <div class="span-11" id="about">
-        <p>
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </p>
-    </div>
-    <div class="span-5 last">
-        <p class="buttons" style="text-align: right">
-            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
-            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
-        </p>
-    </div>
-</div>
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
 
 <div class="main-container" role="main">
 <div class="container">
-    <div class="span-24 content">
-      <div>
-        <div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
           <div id="page2">
             
-            <div class="timestamp postmeta">
-            <span>October 26, 2014</span>
-        </div>
-        <div class="section">
-            <h1><a href="2014/10/26/symfony_all_the_things_web.html">Symfony All The Things (Web)</a></h1>
-<p>My <a class="reference external" href="http://www.whitewashing.de/2014/04/24/symfony_hello_world.html">Symfony Hello World post</a> introduced
-the smallest possible example of a Symfony application. Using this in trainings
-helps the participants understand of just how few parts a Symfony application
-contains. Sure, there are lots of classes participating under the hood, but
-I don’t care about the internals only about the public API.</p>
-<p>We use microservice architectures for the <a class="reference external" href="http://info.bepado.de">bepado</a> and
-<a class="reference external" href="https://qafoolabs.com">PHP Profiler</a> projects that Qafoo is working on at
-the monent. For the different components a mix of Symfony Framework, Silex,
-Symfony Components and our own Rest-Microframework (RMF) are used. This zoo of
-different solutions sparked a recent discussion with <a class="reference external" href="https://twitter.com/manuelp">my colleague Manuel</a> about when we would want to use Symfony for a
-web application.</p>
-<p>We quickly agreed on: Always. I can’t speak for Manuel, but these are my
-reasons for this decision:</p>
-<ul>
-<li><p class="first">I always want to use a technology that is based on Symfony HttpKernel,
-because of the built-in caching, ESI and the <a class="reference external" href="http://stackphp.com/">Stack-PHP</a> project. I usually don’t need this at the beginning
-of a project, but at some point the simplicity of extending the Kernel
-through aggregation is incredible.</p>
-<p>This leaves three solutions: Silex, Symfony Framework and Plain Components.</p>
-</li>
-<li><p class="first">I want a well documented and standardized solution. We are working with
-a big team on bepado, often rotating team members for just some weeks or months.</p>
-<p>We can count the hours lost for developers when they have to start learning a
-new stack again. Knowing where to put routes, controllers, templates,
-configuration et al is important to make time for the real tasks.</p>
-<p>This leaves Symfony Framework and Silex. Everything built with the components
-is always custom and therefore not documented well enough.</p>
-</li>
-<li><p class="first">I want a stable and extendable solution. Even when you just use Symfony
-for a very small component you typically need to interface with the outside
-world: OAuth, REST-API, HTTP Clients, Databases (SQL and NoSQL). <a class="reference external" href="http://friendsofsymfony.github.io/slides/there_is_a_bundle_for_that.html#1">There is
-(always) a bundle for that</a> in Symfony.</p>
-<p>Yes, Silex typically has a copy-cat Provider for their own DIC system, but
-it is usually missing some configuration option or advanced use-case. In some
-cases its just missing something as simple as a WebDebug Toolbar integration
-that the Symfony Bundle has.</p>
-<p>My experience with Silex has been that its always several steps behind
-Symfony in terms of reusable functionality. One other downside with Silex in
-my opinion is its missing support for DIC and Route caching. Once your Silex
-application grows beyond its initial scope it starts to slow down.</p>
-</li>
-<li><p class="first">I want just one solution if its flexible enough.</p>
-<p>It is great to have so many options, but that is also a curse. <a class="reference external" href="https://twitter.com/lsmith/status/526284891718443009">Lukas</a> points out he is picking
-between Laravel, Silex or Symfony depending on the application use-case.</p>
-<p>But the web technology stack is already complex enough in my opionion. I
-rather have my developers learn and use different storage/queue or frontend
-technologies than have them juggle between three frameworks. If my experience
-with Symfony in the last 4 years taught me anything: Hands-on exposure
-with a single framework for that long leads to impressive productivity.</p>
-<p>And Symfony is flexible. The Dependency Injection based approach combined
-with the very balanced decoupling through bundles allows you to cherry-pick
-only what you need for every application: APIs, RAD, Large Teams. Everything
-is possible.</p>
-</li>
-</ul>
-<p>The analysis is obviously biased because of my previous exposure to the
-framework. The productivity gains are possible with any framework as long as it
-has a flourishing ecosystem. For anyone else this reasoning can end up to
-choose Laravel, Silex or Zend Framework 2.</p>
-<p>So what is the minimal Symfony distribution that would be a starting point.
-Extending on the <a class="reference external" href="http://www.whitewashing.de/2014/04/24/symfony_hello_world.html">Symfony Hello World post</a>:</p>
+            <div class="section">
+            <h1><a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a></h1>
+<p>Asset Management in Symfony2 is handled with the PHP based library Assetic by
+default, however I have never really connected to this library and at least for
+me it usually wastes more time than it saves.</p>
+<p>I am also not a big fan of the Node.JS based stack, because it tends to fail
+alot for me as well. With teams that primarily consist of PHP developers and
+web-designers the transition to use Node.JS tools should be very conservative
+in my opinion. Each team member should not feel overburdend by this new
+technology stack.</p>
+<p>Frontend development is really not my strong suit, so these first steps
+I document here may seem obvious to some readers.</p>
+<p>While researching about <a class="reference external" href="https://github.com/facebook/react">React.JS</a> I came across
+a tool called <a class="reference external" href="http://webpack.github.io/">Webpack</a> which you could compare
+to Symfony’s Assetic. It is primarily focussing on bundling Javascript modules,
+but you can also ship CSS assets with it.</p>
+<p>The real benefits for Webpack however are:</p>
 <ol class="arabic simple">
-<li>composer.json</li>
-<li>index.php file</li>
-<li>A minimal <span class="docutils literal"><span class="pre">AppKernel</span></span></li>
-<li>A minimal config.yml file</li>
-<li>routing files</li>
-<li>A console script</li>
-<li>A minimal application bundle</li>
+<li>the builtin support for AMD or CommonJS style module loaders</li>
+<li>a builtin development web-server that runs on a dedicated port, serving your
+combined assets.</li>
+<li>a hot reloading plugin that automatically refreshes either the full page or
+just selected code when the assets change.</li>
+<li>module loaders that allow instant translation of JSX or other languages
+with Javascript transpilers (CoffeeScript, ...)</li>
 </ol>
-<p>You can find <a class="reference external" href="https://github.com/beberlei/symfony-minimal-distribution">all the code on Github</a>.</p>
-<p>Start with the composer.json:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"symfony/symfony"</span><span class="p">:</span> <span class="s2">"@stable"</span><span class="p">,</span>
-        <span class="s2">"symfony/monolog-bundle"</span><span class="p">:</span> <span class="s2">"@stable"</span><span class="p">,</span>
-        <span class="s2">"vlucas/phpdotenv"</span><span class="p">:</span> <span class="s2">"@stable"</span>
-    <span class="p">},</span>
-    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"Acme"</span><span class="p">:</span> <span class="s2">"src/"</span> <span class="p">}</span>
+<p>Let’s have a look at a simple example javascript application in <span class="docutils literal"><span class="pre">app.js</span></span>
+requiring jQuery. The code is part of the Symfony2 document root in <span class="docutils literal"><span class="pre">web/</span></span>:</p>
+<div class="highlight-python"><div class="highlight"><pre>web/
+   css/
+     page.css
+   js/
+     vendor/
+       jquery.js
+     app.js
+</pre></div>
+</div>
+<p>Then we can use <a class="reference external" href="http://webpack.github.io/docs/amd.html">AMD-style</a> modules
+to resolve the dependencies in our code:</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="c1">// app.js</span>
+<span class="nx">define</span><span class="p">([</span><span class="s1">'./vendor/jquery.js'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s2">"#content"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">"Webpack Hello World!"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p>You can compare this to PHPs <span class="docutils literal"><span class="pre">require()</span></span> and autoloading functionality,
+something that Javascript has historically been lacking and usually leads to
+javascript files with many thousands lines of code. You can also use
+<a class="reference external" href="http://webpack.github.io/docs/commonjs.html">CommonJS-style</a> module loading
+if your prefer this approach.</p>
+<p>The downside of adding this functionality is that your code <strong>always</strong> has to
+run through Webpack to work on the browser. But Webpack solves this geniously
+by including a web-server that does the translation for you in the background
+all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span></p>
+<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">"./web/js/app.js"</span><span class="p">,</span>
+    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">filename</span><span class="o">:</span> <span class="s2">"bundle.js"</span><span class="p">,</span>
+        <span class="nx">path</span> <span class="o">:</span> <span class="s1">'web/assets/'</span><span class="p">,</span>
+        <span class="nx">publicPath</span> <span class="o">:</span> <span class="s1">'/assets/'</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The index.php:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// web/index.php</span>
-
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
-
-<span class="nx">Dotenv</span><span class="o">::</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../'</span><span class="p">);</span>
-
-<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
-<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_ENV'</span><span class="p">],</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_DEBUG'</span><span class="p">]);</span>
-<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
-<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
-<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">terminate</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$response</span><span class="p">);</span>
+<p>we can start our assets development server by calling:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ webpack-dev-server --progress --colors --port 8090 --content-base=web/
 </pre></div>
 </div>
-<p>We are using the package <a class="reference external" href="https://github.com/vlucas/phpdotenv">vlucas/phpdotenv</a> to add <a class="reference external" href="http://12factor.net/">Twelve Factor app</a> compatibility, simplyfing configuration. This allows us to get rid of
-the different front controller files based on environment. We need a file
-called <span class="docutils literal"><span class="pre">.env</span></span> in our application root containing key-value pairs of
-environment variables:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c1"># .env</span>
-<span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
-<span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
+<p>This will start serving the combined javascript file at
+<span class="docutils literal"><span class="pre">http://localhost:8090/assets/bundle.js</span></span> as well as the asset <span class="docutils literal"><span class="pre">page.css</span></span> at
+<span class="docutils literal"><span class="pre">http://localhost:8090/css/page.css</span></span> by using the <span class="docutils literal"><span class="pre">--content-base</span></span> flag.
+Every change to any of the files that are part of the result will trigger a
+rebuild similar to the <span class="docutils literal"><span class="pre">--watch</span></span> flag of Assetic, Grunt or Gulp.</p>
+<p>Webpack can be installed globally so it is easy to get started with. I find
+this a huge benefit not having to require a <span class="docutils literal"><span class="pre">package.json</span></span> and Node+npm
+workflow for your PHP/Symfony project.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo npm install -g webpack
 </pre></div>
 </div>
-<p>Add this file to <span class="docutils literal"><span class="pre">.gitignore</span></span>. Your deployment to production needs
-a mechanism to generate this file with production configuration.</p>
-<p>Our minimal AppKernel looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// app/AppKernel.php</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$bundles</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\MonologBundle\MonologBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Acme\HelloBundle\AcmeHelloBundle</span><span class="p">()</span>
-        <span class="p">);</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEnvironment</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="nv">$bundles</span><span class="p">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Bundle\WebProfilerBundle\WebProfilerBundle</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nv">$bundles</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/config/config.yml'</span><span class="p">);</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEnvironment</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'web_profiler'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'toolbar'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
-                <span class="p">));</span>
-            <span class="p">});</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>It points to a configuration file <span class="docutils literal"><span class="pre">config.yml</span></span>. We don’t use
-different configuration files per environment here because we don’t
-need it. Instead we use the closure loader to enable the web debug
-toolbar when we are in development environment.</p>
-<p>Symfony configuration becomes much simpler if we don’t use the inheritance
-and load everything from just a single file:</p>
+<p>For integration into Symfony we make use of some Framework configuration to
+change the base path used for the <span class="docutils literal"><span class="pre">{{</span> <span class="pre">asset()</span> <span class="pre">}}</span></span> twig-function:</p>
 <div class="highlight-python"><div class="highlight"><pre># app/config/config.yml
 framework:
-    secret: %secret%
-    router:
-        resource: "%kernel.root_dir%/config/routing_%kernel.environment%.yml"
-        strict_requirements: %kernel.debug%
-    templating:
-        engines: ['twig']
-    profiler:
-        enabled: %kernel.debug%
+  templating:
+    assets_base_url: "%assets_base_url%"
 
-monolog:
-    handlers:
-        main:
-            type:         fingers_crossed
-            action_level: %monolog_action_level%
-            handler:      nested
-        nested:
-            type:  stream
-            path:  "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
+# app/config/parameters.yml
+parameters:
+  assets_base_url: "http://localhost:8090"
 </pre></div>
 </div>
-<p>We can set the parameter values for <span class="docutils literal"><span class="pre">%secret%</span></span> and <span class="docutils literal"><span class="pre">%monolog_action_level%</span></span>
-by adding new lines to <span class="docutils literal"><span class="pre">.env</span></span> file, making use of the excellent <a class="reference external" href="http://symfony.com/doc/current/cookbook/configuration/external_parameters.html">external
-configuration parameter support</a>
-in Symfony.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c1"># .env</span>
-<span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
-<span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">SYMFONY__SECRET</span><span class="o">=</span><span class="n">abcdefg</span>
-<span class="n">SYMFONY__MONOLOG_ACTION_LEVEL</span><span class="o">=</span><span class="n">debug</span>
+<p>This adds a base path in front of all your assets pointing to the Webpack dev
+server.</p>
+<p>The only thing left for integration is to load the javascript file from your
+twig layout file:</p>
+<div class="highlight-jinja"><div class="highlight"><pre><span class="x">&lt;html&gt;</span>
+<span class="x">    &lt;body&gt;</span>
+<span class="x">        &lt;div id="content"&gt;&lt;/div&gt;</span>
+
+<span class="x">        </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">app.environment</span> <span class="o">==</span> <span class="s2">"dev"</span> <span class="cp">%}</span><span class="x"/>
+<span class="x">        &lt;script src="</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'webpack-dev-server.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">"&gt;&lt;/script&gt;</span>
+<span class="x">        </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="x"/>
+<span class="x">        &lt;script type="text/javascript" src="</span><span class="cp">{{</span> <span class="nv">asset</span><span class="o">(</span><span class="s1">'assets/bundle.js'</span><span class="o">)</span> <span class="cp">}}</span><span class="x">"&gt;&lt;/script&gt;</span>
+<span class="x">    &lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
 </pre></div>
 </div>
-<p>Now add a <span class="docutils literal"><span class="pre">routing_prod.yml</span></span> file with a hello world route:</p>
-<div class="highlight-python"><div class="highlight"><pre># app/config/routing_prod.yml
-hello_world:
-    pattern: /hello/{name}
-    defaults:
-        _controller: "AcmeHelloBundle:Default:hello"
+<p>The <span class="docutils literal"><span class="pre">webpack-dev-server.js</span></span> file loaded only in development environment
+handles the <a class="reference external" href="http://webpack.github.io/docs/hot-module-replacement-with-webpack.html">hot module reload</a>
+exchanging, adding, or removing modules while an application is running without
+a page reload whenever possible.</p>
+<p>For production use the <span class="docutils literal"><span class="pre">assets_base_url</span></span> parameter has to be adjusted
+to your specific needs and you use the <span class="docutils literal"><span class="pre">webpack</span></span> command to generate a
+minified and optimized version of your javascript code.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ webpack
+Hash: 69657874504a1a1db7cf
+Version: webpack 1.6.0
+Time: 329ms
+    Asset   Size  Chunks             Chunk Names
+bundle.js  30533       0  [emitted]  main
+   [2] ./web/js/app.js 1608 {0} [built]
+   [5] ./web/js/vendor/jquery.js 496 {0} [built]
 </pre></div>
 </div>
-<p>And because our routes are dependent on the environment in <span class="docutils literal"><span class="pre">config.yml</span></span> also a
-<span class="docutils literal"><span class="pre">routing_dev.yml</span></span> containing the WebDebug toolbar and profiler routes:</p>
-<div class="highlight-python"><div class="highlight"><pre># app/config/routing_dev.yml
-_wdt:
-    resource: "@WebProfilerBundle/Resources/config/routing/wdt.xml"
-    prefix:   /_wdt
-
-_profiler:
-    resource: "@WebProfilerBundle/Resources/config/routing/profiler.xml"
-    prefix:   /_profiler
-
-_main:
-    resource: routing_prod.yml
-</pre></div>
-</div>
-<p>We now need a bundle <span class="docutils literal"><span class="pre">AcmeHelloBundle</span></span> that is referenced
-in routing.yml and in the AppKernel. When we follow Fabiens best practice
-about adding services, routes and templates into the <span class="docutils literal"><span class="pre">app/config</span></span> and
-<span class="docutils literal"><span class="pre">app/Resources/views</span></span> folders adding a bundle just requires the bundle class:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// src/Acme/HelloBundle/AcmeHelloBundle.php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme\HelloBundle</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Bundle\Bundle</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">AcmeHelloBundle</span> <span class="k">extends</span> <span class="nx">Bundle</span>
-<span class="p">{</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>And the controller that renders our Hello World:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// src/Acme/HelloBundle/Controller/DefaultController.php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme\HelloBundle\Controller</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">DefaultController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span>
-            <span class="s1">'AcmeHelloBundle:Default:hello.html.twig'</span><span class="p">,</span>
-            <span class="k">array</span><span class="p">(</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">)</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Now we only put a template into <span class="docutils literal"><span class="pre">app/Resources</span></span>:</p>
-<div class="highlight-jinja"><div class="highlight"><pre><span class="c">{# app/Resources/AcmeHelloBundle/views/Default/hello.html.twig #}</span><span class="x"/>
-<span class="x">Hello </span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">!</span>
-</pre></div>
-</div>
-<p>As a last requirement we need a console script to manage our Symfony
-application. We reuse the vlucas/phpdotenv integration here to
-load all the required environment variables:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">#!/usr/bin/env php</span>
-<span class="cp">&lt;?php</span>
-<span class="c1">// app/console</span>
-
-<span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/AppKernel.php'</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Console\Application</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\Console\Input\ArgvInput</span><span class="p">;</span>
-
-<span class="nx">Dotenv</span><span class="o">::</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../'</span><span class="p">);</span>
-
-<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArgvInput</span><span class="p">();</span>
-<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_ENV'</span><span class="p">],</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SYMFONY_DEBUG'</span><span class="p">]);</span>
-<span class="nv">$application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">(</span><span class="nv">$kernel</span><span class="p">);</span>
-<span class="nv">$application</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>Voila. The minimal Symfony distribution is done.</p>
-<p>Start the php built in webserver to take a look</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8080 web/index.php
-</pre></div>
-</div>
-<p>I personally like this simplicity of that, the only thing that annoys me are
-the two routing files that I need to conditionally load the web profiler routes
-and the closure loader for the web_profiler extension. I suppose the nicer
-approach would be a compiler pass that does all the magic behind the scenes.</p>
-<p>From this minimal distribution you can:</p>
+<p>It will be placed inside <span class="docutils literal"><span class="pre">web/assets/bundle.js</span></span> as specified by the output
+configuration in the Webpack configuration. Getting started in production is as
+easy as seting the assets base url to null and pushing the bundle.js to your
+production server.</p>
+<p>I hope this example shows you some of the benefits of using Webpack over
+Assetic, Grunt or Gulp and the simplicity using it between development and
+production. While the example is Symfony2 related, the concepts apply to any
+kind of application.</p>
+<p>Back to why I stumbled over Webpack in the first place: React.JS. I have been
+circling around React for a while with the impression that is extremly
+well-suited for frontend development. The problems I had with React where
+purely operation/workflow based:</p>
 <ol class="arabic simple">
-<li>Add new services to <span class="docutils literal"><span class="pre">app/config/config.yml</span></span>.</li>
-<li>Add new routes to <span class="docutils literal"><span class="pre">app/config/routing_prod.yml</span></span>.</li>
-<li>Add controllers into new bundles and templates into <span class="docutils literal"><span class="pre">app/Resources</span></span>.</li>
-<li>Add third party bundles or Stack-PHP implementations when you need existing, reusable functionality such
-as OAuth, Databases etc.</li>
-<li>Add configuration variables to <span class="docutils literal"><span class="pre">.env</span></span> file instead of using the
-<span class="docutils literal"><span class="pre">app/config/parameters.yml</span></span> approach.</li>
+<li>React encourages modular design of applications, something that you
+have to get working first using require.js for example.</li>
+<li>Differentation between development (refresh on modify) and production assets
+(minified).</li>
+<li>React uses a template language JSX that requires cross-compiling the
+<span class="docutils literal"><span class="pre">*.jsx</span></span> files they are written in into plain javascript files.</li>
 </ol>
-<p>This scales well, because at every point you can move towards abstracting
-bundles and configuration more using Symfony’s built in functionality.
-No matter what type of application you build, it is always based on Symfony
-and the building blocks are always the same.</p>
-<p>I suggest to combine this minimal Symfony with the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">QafooLabsFrameworkExtraBundle</a> that I <a class="reference external" href="http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html">blogged
-about two weeks ago</a>.
-Not only will the Symfony be lightweight also your controllers. You can built
-anything on top this foundation from simple CRUD, APIs, hexagonal- or CQRS-architextures.</p>
+<p>Now this blog post has already shown that Webpack solves points one and two,
+but it also solves the JSX Transformation with some extra configuration
+in <span class="docutils literal"><span class="pre">webpack.config.js</span></span>:</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">entry</span><span class="o">:</span> <span class="s1">'./web/js/app.jsx'</span><span class="p">,</span>
+    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">filename</span><span class="o">:</span> <span class="s1">'bundle.js'</span><span class="p">,</span>
+        <span class="nx">path</span><span class="o">:</span> <span class="s1">'web/assets/'</span><span class="p">,</span>
+        <span class="nx">publicPath</span><span class="o">:</span> <span class="s1">'/assets'</span>
+    <span class="p">},</span>
+    <span class="nx">module</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.jsx$/</span><span class="p">,</span> <span class="nx">loader</span><span class="o">:</span> <span class="s1">'jsx-loader?insertPragma=React.DOM&amp;harmony'</span> <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="nx">externals</span><span class="o">:</span> <span class="p">{</span><span class="s1">'react'</span><span class="o">:</span> <span class="s1">'React'</span><span class="p">},</span>
+    <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span><span class="nx">extensions</span><span class="o">:</span> <span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'.js'</span><span class="p">,</span> <span class="s1">'.jsx'</span><span class="p">]}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now it is trivally easy to use React, just create a file with the <span class="docutils literal"><span class="pre">*.jsx</span></span>
+extension and Webpack will automatically load it through Facebooks JSX
+transformer before serving it as plain javascript. The only requirement is that
+you have to install the NPM package <span class="docutils literal"><span class="pre">jsx-loader</span></span>.</p>
+<p>So far I have used webpack only for two playground projects, but I am very
+confident integrating it into some of my production projects now.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/10/26/symfony_all_the_things_web.html#disqus_thread" data-disqus-identifier="2014/10/26/symfony_all_the_things_web">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>October 14, 2014</span>
-        </div>
-        <div class="section">
-            <h1><a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a></h1>
-<p>For quite some time I have been experimenting how to best implement Symfony 2
-controllers to avoid depending on the framework. I have discussed many of these
-insights here in my blog.</p>
-<p>There are three reasons for my quest:</p>
-<p>Simplicity: Solutions to avoid the dependencies between framework
-and your model typically introduce layers of abstraction that produce
-complexity. Service layers, CQRS and various design patterns are useful
-tools, but developing every application with this kind of abstraction screams
-over-engineering.</p>
-<p>While the Domain-Driven Design slogan is “Tackling complexity in software”,
-there are many abstractions out there that can better be described as “Causing
-complexity in software”. I have written some of them myself.</p>
-<p>Testability: There is a mantra “Don’t unit-test your controllers” that arose
-because controllers in most frameworks are just not testable. They have many
-dependencies on other framework classes and cannot be created in a test
-environment. This lead many teams to use slow and brittle integration tests instead.</p>
-<p>But what if controllers were testable because they don’t depend on the
-framework anymore. We could avoid testing all the many layers that we
-have removed for the sake of simplicity and also reduce the number of
-slow integration tests.</p>
-<p>Refactorability: I found that when using service layer or CQRS, there is a
-tendency to use them for every use-case, because the abstraction is in place.
-Any use-case that is not written with those patterns is coupled against the
-framework again. Both development approaches are very different and refactoring
-from one to the other typically requires a rewrite.</p>
-<p>A good solution should allow refactoring from a lightweight controller to a
-service layer with a small number of extract method and extract class
-refactorings.</p>
-<p>While working on the <a class="reference external" href="https://qafoolabs.com/">Qafoo PHP Profiler</a> product I
-went to work on a solution that allowed for Simplicity, Testability and
-Refactorability and came up with the
-<a class="reference external" href="https://github.com/qafoolabs/QafooLabsNoFrameworkBundle">NoFrameworkBundle</a>.</p>
-<p>The design of the bundle is careful to extend Symfony in a way that is easy
-for Symfony developers to understand. To achieve this it heavily extends
-upon the FrameworkExtraBundle that is bundled with Symfony.</p>
-<p>The design goals are:</p>
-<ul class="simple">
-<li>Favour Controller as Services to decouple them from the Framework.</li>
-<li>Replace every functionality of the Symfony Base controller in a way
-that does not require injecting a service into your controller.</li>
-<li>Never fetch state from services and inject it into the controller instead.</li>
-<li>Avoid annotations</li>
-</ul>
-<p>The concepts are best explained by showing an example:</p>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/symfony.html">Symfony</a>
+                 / 
+            <a href="tags/webpack.html">Webpack</a>
+                 / 
+            <a href="tags/javascript.html">Javascript</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 26, 2015 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a></h1>
+<p>I have ranted about Node.JS and NPM on Twitter before, costing me lots of time,
+so I have to make up for this now and offer some solutions.</p>
+<p>One problem I regularly have is the following: I have a Vagrant/Virtualbox
+using NFS and want to run NPM inside of that. Running it inside the box
+is necessary, because I don’t want everyone using the box have to setup the
+node stack.</p>
+<p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn’t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
+#3565</a> because a chmod fails and
+apparently from the ticket, this is not going to be fixed.</p>
+<p>I finally got it working with a <a class="reference external" href="https://gist.github.com/kevinastone/8790717">workaround script</a> by <a class="reference external" href="https://github.com/kevinastone">Kevin
+Stone</a> that mimics NPM, but
+moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
+<div class="highlight-python"><div class="highlight"><pre>#!/bin/bash
+# roles/nodejs/files/tmpnpm.sh
+
+BASE_DIR=${TMPDIR:-/var/tmp}
+ORIG_DIR=$PWD
+HASH_CMD="md5sum"
+
+DIR_NAME=`echo $PWD | $HASH_CMD | cut -f1 -d " "`
+
+TMP_DIR=$BASE_DIR/$DIR_NAME
+mkdir -p $TMP_DIR
+
+pushd $TMP_DIR
+
+ln -sf $ORIG_DIR/package.json
+npm $1
+
+# Can't use archive mode cause of the permissions
+rsync --recursive --links --times node_modules $ORIG_DIR
+
+popd
+</pre></div>
+</div>
+<p>Integrating this into my Ansible setup of the machine it looked like this:</p>
+<div class="highlight-python"><div class="highlight"><pre># roles/nodejs/tasks/main.yml
+# More tasks here before this...
+- name: "Install npm workaround"
+  copy: &gt;
+      src=tmpnpm.sh
+      dest=/usr/local/bin/tmpnpm
+      mode="0755"
+
+- name: "Install Global Dependencies"
+  command: &gt;
+      /usr/local/bin/tmpnpm install -g {{ item }}
+  with_items: global_packages
+
+- name: "Install Package Dependencies"
+  command: &gt;
+      /usr/local/bin/tmpnpm install
+      chdir={{ item }}
+  with_items: package_dirs
+</pre></div>
+</div>
+<p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
+outside when invoking the role:</p>
+<div class="highlight-python"><div class="highlight"><pre># deploy.yml
+---
+- hosts: all
+  roles:
+    - name: nodejs
+      global_packages:
+        - grunt-cli
+      package_dirs:
+        - "/var/www/project"
+</pre></div>
+</div>
+<p>This way the Ansible Node.JS role is reusable in different projects.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/vagrant.html">Vagrant</a>
+                 / 
+            <a href="tags/ansible.html">Ansible</a>
+                 / 
+            <a href="tags/javascript.html">Javascript</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 19, 2015 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
+<p>I have written about why I think <a class="reference external" href="http://www.whitewashing.de/2013/04/12/traits_are_static_access.html">traits should be avoided</a>. There
+is a practical use-case that serves me well however: Extending PHPUnit tests.</p>
+<p>The PHPUnit TestCase is not very extendable except through inheritance. This
+often leads to a weird, deep inheritance hierachy in testsuites to achieve code
+reuse. For example the Doctrine ORM testsuite having <span class="docutils literal"><span class="pre">OrmFunctionalTestCase</span></span>
+extending from <span class="docutils literal"><span class="pre">OrmTestCase</span></span> extending from PHPUnits testcase.</p>
+<p>Dependency Injection is something that is not possible easily in a PHPUnit
+testcase, but could be solved using an additional listener and some
+configuration in <span class="docutils literal"><span class="pre">phpunit.xml</span></span>.</p>
+<p>This leaves traits as a simple mechanism that doesn’t require writing an
+extension for PHPUnit and allows “multiple inheritance” to compose different
+features for our test cases.</p>
+<p>See this simple example that is adding some more assertions:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">TaskController</span>
+<span class="k">trait</span> <span class="nx">MyAssertions</span>
 <span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">TaskRepository</span> <span class="nv">$taskRepository</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">assertIsNotANumber</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span> <span class="o">=</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nb">is_nan</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
     <span class="p">}</span>
+<span class="p">}</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">MathTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">MyAssertions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testIsNotANumber</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">isGranted</span><span class="p">(</span><span class="s1">'ROLE_TASK'</span><span class="p">,</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">AccessDeniedHttpException</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertIsNotANumber</span><span class="p">(</span><span class="nb">acos</span><span class="p">(</span><span class="mi">8</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When you have more complex requirements, you might need the trait to implement
+<span class="docutils literal"><span class="pre">setUp()</span></span> method. This will prevent you from using multiple traits that all
+need to invoke <span class="docutils literal"><span class="pre">setUp()</span></span>. You could use the trait conflict resolution, but
+then the renamed setup methods do not get called anymore.</p>
+<p>Fortunately PHPUnit 3.8+ comes to the rescue with new <span class="docutils literal"><span class="pre">@before</span></span> and
+<span class="docutils literal"><span class="pre">@beforeClass</span></span> annotations.</p>
+<p>See this trait I use for making sure my database is using the
+most current database version by invoking migrations in <span class="docutils literal"><span class="pre">@beforeClass</span></span></p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\DBAL\DriverManager</span><span class="p">;</span>
+
+<span class="k">trait</span> <span class="nx">DatabaseSetup</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var bool</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="nv">$initialized</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @beforeClass</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">initializeDatabase</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
         <span class="p">}</span>
 
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'task'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="p">);</span>
+        <span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+        <span class="nv">$conn</span> <span class="o">=</span> <span class="nx">DriverManager</span><span class="o">::</span><span class="na">getConnection</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'TEST_DATABASE_DSN'</span><span class="p">]</span>
+        <span class="p">));</span>
+
+        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../../src/schema'</span><span class="p">));</span>
+        <span class="nv">$dbDeploy</span><span class="o">-&gt;</span><span class="na">migrate</span><span class="p">();</span>
+        <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This example demos the following features:</p>
-<ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">TokenContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
-used for checking access permissions and retrieving the current User object.
-It is passed to the controller with the help of ParamConverter feature.</p>
-<p><span class="docutils literal"><span class="pre">TokenContext</span></span> here is just an interface and for testing you can
-use a very simple mock implementation to pass an authenticated user to your
-controller.</p>
-</li>
-<li><p class="first">View parameters are returned from the controller as an array, however
-without requiring the <span class="docutils literal"><span class="pre">@Template</span></span> annotation of the
-SensioFrameworkExtraBundle.</p>
-</li>
-</ul>
-<p>The next example demontrates the abstraction for form requests that help writing very
-concise form code:</p>
+<p>I could mix this with a second trait <span class="docutils literal"><span class="pre">SymfonySetup</span></span> that makes the DIC
+container available for my integration tests:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\FormRequest</span><span class="p">;</span>
+<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
 
-<span class="k">class</span> <span class="nc">TaskController</span>
+<span class="k">trait</span> <span class="nx">SymfonySetup</span>
 <span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$kernel</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">)</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @before</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">setupKernel</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Task</span><span class="p">(</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">());</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createKernel</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">boot</span><span class="p">();</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TaskType</span><span class="p">(),</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$task</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">getContainer</span><span class="p">();</span>
+    <span class="p">}</span>
 
-            <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectRouteResponse</span><span class="p">(</span><span class="s1">'Task.show'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()));</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">createKernel</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">\AppKernel</span><span class="p">(</span><span class="s1">'test'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @after</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">tearDownSymfonyKernel</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">!==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">shutdown</span><span class="p">();</span>
         <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'form'</span> <span class="o">=&gt;</span> <span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">createFormView</span><span class="p">());</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">RedirectRouteResponse</span></span> is used to redirect to a route without
-a need for the <span class="docutils literal"><span class="pre">router</span></span> service.</p>
-</li>
-<li><p class="first">Usage of the <span class="docutils literal"><span class="pre">FormRequest</span></span> object that is a wrapper around FormFactory and
-Request object. It is passed by using a ParamConverter. The method
-<span class="docutils literal"><span class="pre">$formRequest-&gt;handle</span></span> combines binding the request and checking for valid
-data.</p>
-<p>Again there is a set of mock form request that allow you to simulate valid or
-invalid form requests for testing.</p>
-</li>
-</ul>
-<p>Writing controllers in this way addresses my requirements Simplicity,
-Testability and Refactorability. For simple CRUD controllers they only ever
-need access to a repository service. If one of your controllers grows too big,
-just refactor out its business logic into services and inject them.</p>
-<p>Check out the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">repository on Github</a> for some more
-features that we are using the <a class="reference external" href="https://qafoolabs.com/">Profiler</a>.</p>
-<p>Update 1: Renamed <span class="docutils literal"><span class="pre">FrameworkContext</span></span> to <span class="docutils literal"><span class="pre">TokenContext</span></span> as done
-in new 2.0 version of the bundle.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html#disqus_thread" data-disqus-identifier="2014/10/14/lightweight_symfony2_controllers">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 11, 2014</span>
-        </div>
-        <div class="section">
-            <h1><a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a></h1>
-<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki’s</a> on the
-<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
-conference last week about Legacy Code and Refactoring. In the session a piece
-of real-world code was shown that contained one of most common code smells in
-LegacyCode: Feature Envy.</p>
-<p>Martin Fowler describes this smell as “a method that seems more interested in
-a class other than the one it is in. The most common focus of the envy is the
-data.”</p>
-<p>This code smell causes two very similar problems in a code base:</p>
-<ul class="simple">
-<li>Duplication of rules related to their data throughout the code base.</li>
-<li>Spreading domain concepts throughout the whole code-base.</li>
-</ul>
-<p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
-PHP projects. We often see code such as the following computation to
-create a range of dates for a reporting function:</p>
+<p>The Symfony setup trait uses <span class="docutils literal"><span class="pre">@before</span></span> and <span class="docutils literal"><span class="pre">@after</span></span> to setup and cleanup
+without clashing with the traditional PHPUnit <span class="docutils literal"><span class="pre">setUp</span></span> method.</p>
+<p>Combining all this we could write a testcase like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">UserRepositoryTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
 <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="k">use</span> <span class="nx">DatabaseSetup</span><span class="p">;</span>
+    <span class="k">use</span> <span class="nx">SymfonySetup</span><span class="p">;</span>
 
-    <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$start</span><span class="p">;</span>
-    <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
-
-    <span class="c1">// calculation code here</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This is a really simple example for Feature Envy: The computation and
-validation of creating an end date some days in the future of a start date
-can easily be duplicated throughout the whole code base and implements
-business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">DateTime</span>
-<span class="p">{</span>
-    <span class="c1">// ... other methods</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-        <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="nv">$endDate</span><span class="p">;</span>
+        <span class="c1">// do setup here</span>
     <span class="p">}</span>
-<span class="p">}</span>
 
-<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$endDate</span> <span class="o">=</span> <span class="nv">$start</span><span class="o">-&gt;</span><span class="na">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-
-    <span class="c1">// calculation code here.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>(Note: You cant extend the builtin DateTime this way and need to subclass).</p>
-<p>This is a great way to improve your code base massively and achieve what
-Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
-domain by encapsulating data and behavior.</p>
-<p>Learning to spot this kind of Feature Envy is a very good way to incrementally
-improve your legacy code base towards better models. I find it very interesting
-that the focus on fixing technical code-smells duplication and feature envy
-actually leads to a better domain model. As a side effect it massively
-deemphasizes DDD building blocks like Entity or Value Object, which in my
-opinion are a big cause for confusion. Testability increases as well, because
-data objects with behavior are much simpler to setup for testing.</p>
-<p>That is why I recommend learning about Feature Envy. For me it is a very simple
-approach to find improvements.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/08/11/spotting_featureenvy_and_refactoring.html#disqus_thread" data-disqus-identifier="2014/08/11/spotting_featureenvy_and_refactoring">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>April 24, 2014</span>
-        </div>
-        <div class="section">
-            <h1><a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a></h1>
-<p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
-I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
-to start with a very simple “Hello World” example.</p>
-<p>The Symfony2 Standard Edition already contains a huge burden of concepts,
-assumptions and conventions that can be confusing for a beginner.</p>
-<ul class="simple">
-<li>YAML</li>
-<li>Twig</li>
-<li>Environments and Dependency Injection Container</li>
-<li>Various weird and magic syntaxes for bundles, <span class="docutils literal"><span class="pre">_controller</span></span> and template names</li>
-<li>Various files to open and poke around in</li>
-<li>Composer</li>
-<li>Maybe even Doctrine</li>
-</ul>
-<p>As a trainer it is very hard to explain all this at the same time.
-It makes a lot of sense to avoid as many of them as possible.</p>
-<p>That is why the Standard Edition is not the best way to start teaching Symfony,
-but one should actually consider a much lighter version of the framework and
-then gradually add more and more features until you end up with the standard
-edition.</p>
-<p>Fabien discussed the simplification of the Symfony Standard Edition from
-another angle before, considering the minimum necessary code to use when
-reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">“Packing a Symfony Full-Stack Application in
-one file”</a>.</p>
-<p>This blog post is about a truely minimal Symfony edition to start learning
-about the framework.  The first thing I like to show is a really simple Hello
-World controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">HelloController</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testNotFindUserReturnsNull</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="nx">Response</span><span class="p">(</span><span class="s1">'Hello World!'</span><span class="p">);</span>
+        <span class="nv">$userRepository</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'user_repository'</span><span class="p">);</span>
+        <span class="nv">$unusedId</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">;</span>
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$userRepository</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$unusedId</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>What is the necessary framework glue code to support this Hello World? Lets start
-from the index file <cite>web/index.php</cite>:</p>
+<p>Sadly the <span class="docutils literal"><span class="pre">@before</span></span> calls are invoced <em>after</em> the original <span class="docutils literal"><span class="pre">setup()</span></span> method
+so we cannot access the Symfony container here already. Maybe it would be more
+practical to have it work the other way around. I have <a class="reference external" href="https://github.com/sebastianbergmann/phpunit/issues/1616">opened an issue on
+PHPUnit</a> for that.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/testing.html">Testing</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 14, 2015 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a></h1>
+<p>TL;DR: I was one voice for having strict type hints until I tried the current
+patch. From both a library and application developer POV they don’t bring much
+to the table. I think PHP would be more consistent with weak type hints only.</p>
+<p>These last weeks there have been tons of discussions about <a class="reference external" href="https://wiki.php.net/rfc/scalar_type_hints">scalar type
+hints</a>
+in PHP following <a class="reference external" href="https://twitter.com/andreafaulds">Andrea Faulds</a> RFC
+that is currently in voting. Most of them were limited to PHP Internals
+mailinglist but since the voting started some days ago much has also been said
+on Twitter and blogs.</p>
+<p>This post is my completly subjective opinion on the issue.</p>
+<p>I would have preferred strict type hints, however after trying the patch, I
+think that strict type hints</p>
+<ul class="simple">
+<li>will cause considerable problems for application developers, forcing them to
+“replicate weak type hinting” by manually casting everywhere.</li>
+<li>are useless for library developers, because they have to assume the user
+is in weak type mode.</li>
+<li>are useless within a library because I already know the types at the public
+API, weak mode would suffice for all the lower layers of my library.</li>
+</ul>
+<p>Neither group of developers gets a considerable benefit from the current RFCs strict mode.</p>
+<p>The simple reason for this, request, console inputs and many databases provide
+us with strings, casting has to happen somewhere. Having strict type hints
+would not save us from this, type juggling and casting has to happen and
+PHP’s current approach is one of the main benefits of the language.</p>
+<div class="section" id="real-world-weak-vs-strict-code-example">
+<h2>Real World Weak vs Strict Code Example</h2>
+<p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
+Code</a> to
+support my case:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
 
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">listAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$status</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">);</span> <span class="c1">// this is a string</span>
 
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">'users'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchUsers</span><span class="p">(</span><span class="nv">$status</span><span class="p">),</span>
+            <span class="s1">'total'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchTotalCount</span><span class="p">(</span><span class="nv">$status</span><span class="p">)</span>
+        <span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
-<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+<span class="k">class</span> <span class="nc">UserService</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">STATUS_INACTIVE</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_WAITING</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_APPROVED</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$connection</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchUsers</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT u.id, u.username FROM users u WHERE u.status = ? LIMIT 10'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchTotalCount</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT count(*) FROM users u WHERE u.status = ?'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchColumn</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span> <span class="c1">// returns a string</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
-at them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">{</span>
-<span class="x">    "require": {</span>
-<span class="x">        "symfony/symfony": "@stable"</span>
-<span class="x">    },</span>
-<span class="x">    "autoload": {</span>
-<span class="x">        "psr-0": { "Acme": "src/" }</span>
-<span class="x">    }</span>
+<p>See how the code on <span class="docutils literal"><span class="pre">UserService</span></span> is guarded by scalar typehints to enforce
+having the right types inside the service:</p>
+<ul class="simple">
+<li><span class="docutils literal"><span class="pre">$status</span></span> is a flag to filter the result by and it is one of the integer constants, the type hint coerces an integer from the request string.</li>
+<li><span class="docutils literal"><span class="pre">fetchTotalCount()</span></span> returns an integer of total number of users matching the query, the type hint coerces an integer from the database string.</li>
+</ul>
+<p>This code example <em>only</em> works with weak typehinting mode as described in the RFC.</p>
+<p>Now lets enable strict type hinting to see how the code fails:</p>
+<ul class="simple">
+<li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
+<li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>Catchable fatal error: Argument 1 passed to UserService::fetchUsers() must
+be of the type integer, string given, called in /tmp/hints.php on line 22
+and defined in /tmp/hints.php on line 37
+
+Catchable fatal error: Return value of UserService::fetchTotalCount() must
+be of the type integer, string returned in /tmp/hints.php on line 48
+</pre></div>
+</div>
+<p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function listAction(Request $request)</span>
+<span class="x">{</span>
+<span class="x">    $status = (int)$request-&gt;get('status'); // this is a string</span>
+
+<span class="x">    return [</span>
+<span class="x">        'users' =&gt; $this-&gt;service-&gt;fetchUsers($status),</span>
+<span class="x">        'total' =&gt; $this-&gt;service-&gt;fetchTotalCount($status)</span>
+<span class="x">    ];</span>
 <span class="x">}</span>
 </pre></div>
 </div>
-<p>The <cite>composer.json</cite> file installs the latest stable Symfony release and
-adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
-<p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
-and the minimal version of this looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<p>and:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<span class="x">{</span>
+<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
 
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'framework'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-                <span class="s1">'secret'</span> <span class="o">=&gt;</span> <span class="s1">'some secret here'</span><span class="p">,</span>
-                <span class="s1">'router'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'resource'</span> <span class="o">=&gt;</span> <span class="s1">'%kernel.root_dir%/config/routing.yml'</span>
-                <span class="p">),</span>
-                <span class="s1">'templating'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'engines'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'twig'</span><span class="p">))</span>
-            <span class="p">));</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
+<span class="x">}</span>
 </pre></div>
 </div>
-<p>In trainings we are starting with a single <span class="docutils literal"><span class="pre">config.yml</span></span> file but that is
-technically not necessary by using the <span class="docutils literal"><span class="pre">ClosureLoader</span></span>. The routing
-component has no such closure loader, so its not possible to avoid
-YAML in the first minutes of Symfony2 exposure and we reference
-the <cite>app/config/routing.yml</cite>:</p>
-<div class="highlight-yaml"><div class="highlight"><pre>hello:
-  pattern: /
-  defaults:
-    _controller: "Acme\TrainingBundle\Controller\HelloController::helloAction"
-</pre></div>
+<p>It feels to me that enabling strict mode completly defeats the purpose, because
+now we are forced to convert manually, reimplementing weak type hinting in our
+own code.</p>
+<p>More important: We write code with casts already, the scalar type hints patch
+is not necessary for that! Only a superficial level of additional safety is
+gained, one additional check of something we already know is true!</p>
+<p>Strict mode is useless for library developers, because I always have to assume
+weak mode anyways.</p>
+<p><strong>EDIT:</strong> I argued before that you have to check for casting strings to 0 when
+using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount("foo")</span></span>
+will throw a catchable fatal error in weak mode already!</p>
 </div>
-<p>Did you know that you can specify controllers in Symfony by using the static callback
-syntax? It has disadvantages when considering bundle inheritance, but why
-bother a beginner with this feature and confuse him with the convention of
-<span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello"</span></span>.</p>
-<p>There are still lots of trip wires to stumble upon in this simple piece of <span class="docutils literal"><span class="pre">routing.yml</span></span>:</p>
+<div class="section" id="do-we-need-strict-mode">
+<h2>Do we need strict mode?</h2>
+<p>In a well designed application or library, the developer can already trust the
+types of his variables today, 95% of the time, without even having type hints,
+using carefully designed abstractions (example Symfony Forms and Doctrine ORM): No
+substantial win for her from having strict type hints.</p>
+<p>In a badly designed application, the developer is uncertain about the types of
+variables. Using strict mode in this scenario she needs to start casting
+everywhere just to be sure. I cannot imagine the resulting code to look
+anything but bad. Strict would actually be counterproductive here.</p>
+<p>I also see a danger here, that writing “strict mode” code will become a best
+practice and this might lead developers working on badly desigend applications
+to write even crappier code just to follow best practices.</p>
+<p>As a pro strict mode developer I could argue:</p>
 <ul class="simple">
-<li>Tabs are not allowed in YAML, in every training at least one person gets
-bitten by that.</li>
-<li>2 vs 4 spaces ambiguity.</li>
-<li>What is this magic <span class="docutils literal"><span class="pre">_controller</span></span> key?</li>
-<li>I carefully avoid the <span class="docutils literal"><span class="pre">{}</span></span> inline syntax of YAML here as well as it
-introduces yet another ambiguity.</li>
+<li>that libraries such as Doctrine ORM and Symfony Forms already
+abstract all the nitty gritty casting from request or database today. But I
+don’t think that is valid: They are two of the most sophisticated PHP libraries
+out there, maybe used by 1-5% of the userbase. I don’t want to force this
+level of abstraction on all users. I can’t use this level myself all the
+time. Also if libraries already abstract this for us, why need to duplicate
+the checks again if we can trust the variables types?</li>
+<li>that I might have complex (mathematical) algorithms that benefit from strict
+type hinting. But that is not really true: Once the variables have passed
+through the public API of my fully typehinted library I know the types and can rely
+on them on all lower levels. Weak or strict type hinting doesn’t make a
+difference anymore. Well designed libraries written in PHP5 already provide
+this kind of trust using carefully designed value objects and guard clauses.</li>
+<li>that using strict type in my library reduce the likelihood of bugs, but that
+is not guaranteed.  Users of my library can always decide not to use strict
+type hints and that requires me as a library author to consider this use-case
+and prevent possible problems. Again using strict mode doesn’t provide a
+benefit here.</li>
+<li>to write parts of the code in strict and parts in weak mode. But how to
+decide this? Projects usually pick only one paradigm for good reason:
+<span class="docutils literal"><span class="pre">E_STRICT</span></span> compatible code yes or no for example. Switching is arbitrary
+and dangerously inconsistent. As a team lead I would reject such kind of
+convention because it is impractible. Code that follows this paradigm in
+strict languages such as Java and C# has an aweful lot of converting methods
+such as <span class="docutils literal"><span class="pre">$connection-&gt;fetchColumnAsInteger()</span></span>. I do not want to go down
+that road.</li>
 </ul>
-<p>Run this application with the build in webserver:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 web/index.php
-</pre></div>
 </div>
-<p>Hello World!</p>
-<p>The next step for a beginner is his first twig template to print the Hello
-World. To avoid another confusing convention at the beginning, the <span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello.html.twig"</span></span>
-template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
-that is automatically registered in the Twig Bundle. Just create
-a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">HelloController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'hello.html.twig'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The total number of files is 5 (6 with template) for this example. Note that we
-haven’t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
-the static syntax we don’t need it.</p>
-<p>This is a very good starting point to start exploring more features of Symfony
-and gradually add the required configuration and files for this.</p>
-
-        </div>
-        <div class="postmeta">
-        
-        
-        
-        </div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 31, 2014</span>
-        </div>
-        <div class="section">
-            <h1><a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a></h1>
-<blockquote>
-<div>“The SOAP stack is generally regarded as an embarrassing failure these days.”
-– Tim Bray</div></blockquote>
-<p>While the quote by Tim Bray is still true to some degree, the toolstack and
-possiblities behind SOAP are still superior to REST in my opinion. REST still
-requires alot of manual coding, where RPC with SOAP allows much automation with
-tools.</p>
-<p>These last years REST has gotten all the buzz, everybody seems to be using it
-and there are lots of talks about REST on conferences. SOAP used to be big for
-building APIs, but everybody seems to hate it for various reasons. I have used
-SOAP in several projects over the last 10 years and this blog post is a random
-collection of information about the state of SOAP in PHP 2014, as a reminder
-to myself and to others as well.</p>
-<p>Why care about SOAP in 2014? For server to server (RPC) communication it still
-has massive time to market and stability benefits over REST. The REST toolchain
-is just not well developed enough, it lacks:</p>
-<ul class="simple">
-<li>a standard to describe the input/output formats of endpoints</li>
-<li>a way to “just do it”</li>
-<li>ways to automatically generate clients in any language</li>
-</ul>
-<p>While solutions exist for these problems in the REST space, they are often not
-standardized and don’t serve the full stack and different languages.</p>
-<p>WSDLs for SOAP however allow you to generate servers and clients from
-datastructures by the click of a button or execution of a script. I can get two
-servers communicating over SOAP, exposing all service methods in literally
-minutes.</p>
-<div class="section" id="basics">
-<h2>Basics</h2>
-<p>SOAP is a protocol for Remote-Procedure Calls. HTTP is used as mechanism
-to talk between client and servers by sending POST requests with XML request
-and response bodies.</p>
-<p>The <span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> objects ship with PHP core by default.</p>
-<p>You can expose functions, classes or objects as server by registering
-service callbacks with
-<span class="docutils literal"><span class="pre">SOAPServer#addFunction</span></span>, <span class="docutils literal"><span class="pre">SOAPServer#setClass</span></span> or
-<span class="docutils literal"><span class="pre">SOAPServer#setObject</span></span> and then calling the <span class="docutils literal"><span class="pre">handle()</span></span> method, which
-handles request and response generation and sending in one step. You can
-normally exit the request directly after handle.</p>
-<p>The client is even simpler, it overwrites the <span class="docutils literal"><span class="pre">__call</span></span> magic method.
-Any call to the client therefore looks exactly like the same call
-on the server in your code.</p>
-</div>
-<div class="section" id="phps-non-wsdl-mode">
-<h2>PHPs Non-WSDL mode</h2>
-<p>One argument against SOAP is the requirement to define WSDL documents for
-both server and client to allow communication. This is not true for Clients and
-Servers both written in PHP. You can use the non-WSDL mode to expose an object
-from the server and use a non-wsdl client to talk to it. The PHP <span class="docutils literal"><span class="pre">SOAPClient</span></span>
-and <span class="docutils literal"><span class="pre">SOAPServer</span></span> have a common exchange format that is used in this case
-and replaces WSDL entirely.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// server.php</span>
-<span class="k">class</span> <span class="nc">MyService</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$x</span> <span class="o">+</span> <span class="nv">$y</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'uri'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/namespace'</span><span class="p">,</span>
-    <span class="s1">'location'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/location'</span><span class="p">,</span>
-<span class="p">);</span>
-
-<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">());</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>The client is as simple as the following lines of code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// client.php</span>
-<span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'uri'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/namespace'</span><span class="p">,</span>
-    <span class="s1">'location'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/location'</span><span class="p">,</span>
-<span class="p">);</span>
-<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-<span class="k">echo</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>This kind of services work with flawlessly all datatypes except with objects,
-which get converted to <span class="docutils literal"><span class="pre">stdClass</span></span> with public properties on the Client.</p>
-<p>If you are developing internal APIs between components in your own system,
-then using SOAP in non-WSDL mode is a massive time saver. You can expose
-remote services for Remote procedure calls this way very easily.</p>
-<p>The only downside is that you have no documentation what methods exist on the
-client and <strong>ALL</strong> public methods of the server object can be called, so make sure
-they only have those methods you want to be called remotely.</p>
-</div>
-<div class="section" id="debugging-soap">
-<h2>Debugging SOAP</h2>
-<p>When something goes wrong in either the client or server, it sucks to debug
-these problems. In general there are several mechanisms to debug SOAP in PHP:</p>
-<ol class="arabic simple">
-<li>Enable <span class="docutils literal"><span class="pre">'trace'</span> <span class="pre">=&gt;</span> <span class="pre">true</span></span> option on the SOAPClient. This allows you
-to call the methods <span class="docutils literal"><span class="pre">$client-&gt;__getLastResponse()</span></span> and
-<span class="docutils literal"><span class="pre">$client-&gt;__getLastRequest()</span></span> to take a look at the interaction between
-server and client.</li>
-<li>When failures happen, <span class="docutils literal"><span class="pre">SOAPClient</span></span> throws a <span class="docutils literal"><span class="pre">SOAPFault</span></span> exception.
-You can even throw this exception yourself from the SOAPServer code,
-and the client can then read this failure. However you must know
-that the <span class="docutils literal"><span class="pre">$faultcode</span></span> variable in the constructor of <span class="docutils literal"><span class="pre">new</span>
-<span class="pre">SOAPFault($faultcode,</span> <span class="pre">$faultmsg)</span></span> is <strong>NOT</strong> an integer error code
-like in normal Exceptions. Instead its either a value <span class="docutils literal"><span class="pre">SERVER</span></span> or <span class="docutils literal"><span class="pre">CLIENT</span></span>,
-with the component of the interaction that failed.</li>
-<li>If you throw non <span class="docutils literal"><span class="pre">SOAPFault</span></span> exceptions from the server, then you
-need to catch them and recast them to <span class="docutils literal"><span class="pre">SOAPFault</span></span>, otherwise
-the client only sees “Internal Server Error” messages.</li>
-</ol>
-<p>You can easily solve the <span class="docutils literal"><span class="pre">SOAPFault</span></span> problem by decorating your service with an exception handler,
-and also logging the errors yourself.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">SoapExceptionHandler</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$exposeExceptionMessages</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-        <span class="s1">'MyProject\DomainException'</span><span class="p">,</span>
-    <span class="p">);</span>
-
-    <span class="k">private</span> <span class="nv">$service</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span> <span class="o">=</span> <span class="nv">$service</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">try</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span>
-                <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="p">,</span> <span class="nv">$method</span><span class="p">),</span>
-                <span class="nv">$args</span>
-            <span class="p">);</span>
-        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-            <span class="c1">// log errors here as well!</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="p">),</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">exposeExceptionMessages</span><span class="p">))</span> <span class="p">{</span>
-                <span class="k">throw</span> <span class="k">new</span> <span class="nx">SOAPFAult</span><span class="p">(</span><span class="s1">'SERVER'</span><span class="p">,</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">());</span>
-            <span class="p">}</span>
-
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">SOAPFault</span><span class="p">(</span><span class="s1">'SERVER'</span><span class="p">,</span> <span class="s1">'Application Error'</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">SoapExceptionHandler</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">()));</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="generating-wsdls">
-<h2>Generating WSDLs</h2>
-<p>SOAP uses a service description format called WSDL to describe the input and
-output of the server and what methods exist. WSDL are formatted with XML
-and use XMLSchema to describe the input/output messages. The format is very
-complex, however tools for any languages allow you to autogenerate WSDLs
-from code.</p>
-<p>There are several reasons to introduce WSDLs for your SOAP service:</p>
-<ul class="simple">
-<li>Your SOAP clients will not be written in PHP, which prevents use of the non-WSDL mode.</li>
-<li>Clients of the service are used and  written by other teams or companies.</li>
-<li>You want to use the WSDL as a validation mechanism for input from clients.</li>
-</ul>
-<p>While you should have some understanding of how a WSDL looks like,
-you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
-By default it uses the docblocks <span class="docutils literal"><span class="pre">@param</span></span> and <span class="docutils literal"><span class="pre">@return</span></span> to generate
-the correct WSDL for a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
-<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">'MyService'</span><span class="p">)</span>
-             <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">'http://server/namespace'</span><span class="p">)</span> <span class="c1">// same as server 'uri'</span>
-             <span class="o">-&gt;</span><span class="na">setLocation</span><span class="p">(</span><span class="s1">'http://server/soap.php'</span><span class="p">)</span> <span class="c1">// same as server 'location'</span>
-             <span class="o">-&gt;</span><span class="na">setServiceName</span><span class="p">(</span><span class="s1">'MyService'</span><span class="p">);</span>
-<span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
-<span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">dump</span><span class="p">(</span><span class="s2">"/path/to/file.wsdl"</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>You can now place that WSDL file in any public location and then point both
-<span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> at the file using the first constructor
-argument:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>To make the WSDL generation work with objects and object graphs, you have
-to use objects in your service API that have only public properties. If
-you dont do it this way, you will need to convert the objects in a seperate
-step, something to avoid.</p>
-<p>Sometimes you want to use other metadata than docblocks. When using
-tools like Doctrine you already now much better what datatypes an object has.
-You can write your own <cite>ComplexTypeStrategy</cite> to generate the metadata
-for your WSDL files. This is more advanced topic, but can be understood and
-automated in a reasonable amount of time.</p>
-</div>
-<div class="section" id="generating-objects-from-wsdl">
-<h2>Generating Objects from WSDL</h2>
-<p>If you implement a client, you want to generate objects for the datastructures
-of a WSDL file. You can use those objects instead of the <span class="docutils literal"><span class="pre">stdClass</span></span> objects
-which are used by default.</p>
-<p>For this task I use the <a class="reference external" href="https://github.com/moyarada/XSD-to-PHP">XSD-TO-PHP library</a>.  I normally hack around in the code
-a little to adjust for correct namespace generation and code-style adjustments,
-but it works quite well by default. Here is an example of a generated class
-for the DHL Intraship SOAP API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">DHL\Intraship</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ComplexType</span>
-<span class="p">{</span>
-  <span class="sd">/**</span>
-<span class="sd">   *</span>
-<span class="sd">   * @var salutation $salutation</span>
-<span class="sd">   * @access public</span>
-<span class="sd">   */</span>
-  <span class="k">public</span> <span class="nv">$salutation</span><span class="p">;</span>
-
-  <span class="sd">/**</span>
-<span class="sd">   *</span>
-<span class="sd">   * @var title $title</span>
-<span class="sd">   * @access public</span>
-<span class="sd">   */</span>
-  <span class="k">public</span> <span class="nv">$title</span><span class="p">;</span>
-
-  <span class="sd">/**</span>
-<span class="sd">   *</span>
-<span class="sd">   * @var firstname $firstname</span>
-<span class="sd">   * @access public</span>
-<span class="sd">   */</span>
-  <span class="k">public</span> <span class="nv">$firstname</span><span class="p">;</span>
-
-  <span class="sd">/**</span>
-<span class="sd">   *</span>
-<span class="sd">   * @var middlename $middlename</span>
-<span class="sd">   * @access public</span>
-<span class="sd">   */</span>
-  <span class="k">public</span> <span class="nv">$middlename</span><span class="p">;</span>
-
-  <span class="sd">/**</span>
-<span class="sd">   *</span>
-<span class="sd">   * @var lastname $lastname</span>
-<span class="sd">   * @access public</span>
-<span class="sd">   */</span>
-  <span class="k">public</span> <span class="nv">$lastname</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The next thing you can generate is a classmap, that maps every WSDL Type to
-your newly generated code, in the above example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'classmap'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-        <span class="s1">'Person'</span> <span class="o">=&gt;</span> <span class="s1">'DHL\Intraship\Person'</span><span class="p">,</span>
-        <span class="c1">// all the other types</span>
-    <span class="p">)</span>
-<span class="p">));</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="soap-with-different-languages">
-<h2>SOAP with different Languages</h2>
-<p>As long as you stay within the PHP world, SOAP is rather easy with both WSDL
-and non-WSDL modes. Once you want to talk to Java or C# you need solve some
-more problems.</p>
-<p>The first thing to understand is that SOAP can actually talk in 4 different
-modes. You can use ‘document’ or ‘rpc’ style, ‘literal’ or ‘encoded’  use.
-This post on the <a class="reference external" href="http://www.ibm.com/developerworks/library/ws-whichwsdl/">IBM website</a> describes all the
-different modes in much detail and I recommend everybody having to work with
-SOAP to read it.</p>
-<p>The essence from that article is, that you will always want to use
-<cite>document/literal</cite> for your SOAP services, to be compliant with all languages,
-wrapping each method call and response in its own Message Document.</p>
-<p>However using this style is rather complicated in PHP itself, because
-for every input and output message you need to create a wrapper object (or
-array) with a specific structure.</p>
-<p>You can fix this problem on the Server by using this <a class="reference external" href="https://github.com/zendframework/zf2/blob/master/library/Zend/Soap/Server/DocumentLiteralWrapper.php">DocumentLiteralWrapper</a>
-class in Zend Framework 2. It has no external dependencies, so you can just
-copy it into your project if you want.</p>
-<p>To generate a WSDL for document/literal mode, use the following methods
-on Zend Autodiscovery:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
-<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'style'</span> <span class="o">=&gt;</span> <span class="s1">'document'</span><span class="p">))</span>
-             <span class="o">-&gt;</span><span class="na">setOperationStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'use'</span> <span class="o">=&gt;</span> <span class="s1">'literal'</span><span class="p">));</span>
-</pre></div>
-</div>
-<p>Then use the wrapper like such:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
-    <span class="k">new</span> <span class="nx">\Zend\Soap\Server\DocumentLiteralWrapper</span><span class="p">(</span>
-        <span class="k">new</span> <span class="nx">SoapExceptionHandler</span><span class="p">(</span>
-            <span class="k">new</span> <span class="nx">MyService</span><span class="p">()</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">);</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>SOAP Servers generated this way can be converted into a C# SOAP Client with a
-bunch of button clicks from Visual Studio. It will generate both the Client
-object and all the data transfer objects for you. Truely amazing.</p>
-</div>
-<div class="section" id="testing-soap-interaction">
-<h2>Testing SOAP Interaction</h2>
-<p>Because SOAP is very painful about the exact format of messages and rejects
-invalid messages in the client already when they do not match the WSDL you
-certainly want to Integration test your clients and servers.</p>
-<p>You can do that in PHPUnit by using a client, that wraps a Server directly
-and doesn’t require a Webserver. Zend Framework 2 already has such an object,
-named <cite>ZendSoapClientLocal</cite>. Its usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
-<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
-    <span class="k">new</span> <span class="nx">\Zend\Soap\Server\DocumentLiteralWrapper</span><span class="p">(</span>
-        <span class="k">new</span> <span class="nx">SoapExceptionHandler</span><span class="p">(</span>
-            <span class="k">new</span> <span class="nx">MyService</span><span class="p">()</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">);</span>
-<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\Soap\Client\Local</span><span class="p">(</span><span class="nv">$server</span><span class="p">,</span> <span class="nv">$wsdl</span><span class="p">);</span>
-<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>This will pass through the complete SOAP marshalling and unmarshalling
-process and allow you test SOAP interaction.</p>
-<p>If you want to take a look at the code of the Local client, <a class="reference external" href="https://github.com/zendframework/zf2/blob/master/library/Zend/Soap/Client/Local.php">its very easy to
-achieve this</a>.</p>
-</div>
-<div class="section" id="versioning-with-soap-wsdl">
-<h2>Versioning with SOAP/WSDL</h2>
-<p>If you want to version your SOAP Service, you will need to provide versioned
-WSDL files on different URLs. You should never change the WSDL at a location,
-because languages like C# statically create clients from the WSDL, never
-talking to the WSDL again.</p>
-<p>If you take care of your Service objects, then you can design them in a way
-that you can use the same PHP service object for many different versions of the
-WSDL file in a backwards compatible way. If your API changes alot, you might
-need to implement different PHP service classes to allow for versioned APIs.</p>
+<div class="section" id="would-we-benefit-from-only-strict-mode">
+<h2>Would we benefit from only strict mode?</h2>
+<p>Supporters of strict mode only: Make sure to understand why this will never happen!</p>
+<p>Say the current RFC gets rejected, would we benefit from a strict type hinting
+RFC? No, and the current RFC details the exact reasons why. Most notably
+for BC reasons all the PHP API will not use the new strict type hinting.</p>
+<p>This current RFC is the only chance to get any kind of strict hinting into PHP.
+Yet with the limited usefullness as described before, we can agree that just
+having weak mode would be more consistent and therefore better for everyone.</p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion</h2>
-<p>While the full extent of SOAP and WSDL can be scary, they allow you to write
-servers and clients for RPC communication between servers and languages very
-easily. If you don’t need to expose your API to the webbrowser via REST/JSON,
-then using SOAP is a very good alternative to most of the handcrafting that is
-necessary for REST APIs.</p>
+<p>I as PHP developer using frameworks and libraries that help me write type safe
+code today, strict typing appeals to me. But put to a test in real code it
+proves to be impractical for many cases, and not actually much more useful
+than weak type hinting in many other cases.</p>
+<p>Weak types provide me with much of the type safety I need: In any given method,
+using only typehinted parameters and return values, I am safe from type
+juggling. As a library developer I have to assume caller uses weak mode all the
+time.</p>
+<p>Having strict type hints suggests that we can somehow get rid of type juggling
+all together. But that is not true, because we still have to work with user
+input and databases.</p>
+<p>The current RFC only introduced the extra strict mode because developers had a
+very negative reactions towards weak type hints. Strike me from this list, weak
+type hints are everything that PHP should have. I will go as far that others
+strict-typers would probably agree when actually working with the patch.</p>
+<p>I would rather prefer just having weak types for now, this is already
+a big change for the language and would prove to be valuable for everyone.</p>
+<p>I fear Strict mode will have no greater benefit than gamification of the
+language, the winner is the one with the highest percentage of strict mode
+code.</p>
 </div>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/01/31/soap_and_php_in_2014.html#disqus_thread" data-disqus-identifier="2014/01/31/soap_and_php_in_2014">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>January 26, 2014</span>
-        </div>
-        <div class="section">
-            <h1><a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a></h1>
-<p>Almost two years ago I started developing a small library <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> (<a class="reference external" href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html">blog post</a>)
-which contained a set of assertion methods to use in production code. With
-18.000 installations from Packagist this is my most successful piece of open
-source software outside of the Doctrine universe. There is a fair number
-of contributors and I know several companies using the library in production.</p>
-<p>The API however didn’t make me too happy, using the static method calls
-made it impossible to collect multiple errors and also made the code
-more verbose than necessary when validating the same value with multiple
-assertions.</p>
-<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
-these problems. The last two days I had some time to implement those new
-functionalities and I am releasing a new version 2.0 of Assert today.</p>
-<div class="section" id="fluent-api">
-<h2>Fluent API</h2>
-<p>Instead of having to use the static assertion methods, there is now
-a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
-and then all the assertions you want to call on that value.</p>
-<p>Here are some examples:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
-<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
-<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">null</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullOr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">boolean</span><span class="p">();</span>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/php.html">PHP</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 10, 2015 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a></h1>
+<p>I haven’t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
+alternative PHP runtime didn’t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
+Profiler</a> would run out of the box with HHVM using the
+<a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">builtin XHProf extension</a>
+(Answer: It does).</p>
+<p>For this experiment I wanted to run the wordpress blog of my wife on HHVM
+locally. It turns out this is not very easy with an existing LAMP stack,
+because mod-php5 and mod-fastcgi obviously compete for the execution of <cite>.php</cite>
+files.</p>
+<p>Quick googling didn’t turn up a solution (there probably is one, hints in the
+comments are appreciated) and I didn’t want to install a Vagrant Box just for
+this. So I decided to turn this into a sunday side project. Requirements: A
+simple webserver that acts as proxy in front of HHVMs Fast-CGI. Think of it as
+the “builtin webserver” that HHVM is missing.</p>
+<p>This turns out to be really simple with Go, a language I use a lot for small
+projects in the last months.</p>
+<p>The code is <a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">very simple plumbing</a>
+starting with a HTTP Server that accepts client requests, translates them to FastCGI
+requests, sending them to HHVM and then parsing the FastCGI Response to turn it into a
+HTTP Response.</p>
+<p>As a PHP developer I am amazed how Go makes it easy to write this kind of
+infrastructure tooling. I prefer PHP for everything web related, but as I tried
+to explain in <a class="reference external" href="https://joind.in/event/view/2564">my talk at PHPBenelux last week</a>, Go is a fantastic language to write
+small, self-contained infrastructure components (or Microservices if you want a
+buzzword).</p>
+<p>Back to playing with HHVM, if you want to give your application a try with HHVM
+instead of ZendEngine PHP it boils down to <a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">installing a prebuilt HHVM package</a> and then
+using my <span class="docutils literal"><span class="pre">hhvm-serve</span></span> command:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ go get github.com/beberlei/hhvm-serve
+$ hhvm-serve --document-root /var/www
+Listening on http://localhost:8080
+Document root is /var/www
+Press Ctrl-C to quit.
 </pre></div>
 </div>
-<p>This new API allows for much shorter and compact assertions.</p>
-</div>
-<div class="section" id="lazy-assertions">
-<h2>Lazy Assertions</h2>
-<p>Using Assert with webforms was never possible unless you wanted to show
-the user only exactly one error message. Because every assertion fails
-with an Exception, there was no way to execute multiple assertions and
-collect the errors. This has changed with the new lazy assertion API,
-that is similar to the Fluent API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nx">\Assert\lazy</span><span class="p">()</span>
-    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
-    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
-    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="s1">'string'</span><span class="p">,</span> <span class="s1">'baz'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span>
-    <span class="o">-&gt;</span><span class="na">verifyNow</span><span class="p">();</span>
+<p>The server passes all the necessary environment variables to HHVM so that
+catch-all front-controller scripts such as Wordpress <span class="docutils literal"><span class="pre">index.php</span></span> or Symfony’s
+<span class="docutils literal"><span class="pre">app.php</span></span> should just work.</p>
+<p>If you don’t have a running Go Compiler setup this few lines should help you out on
+Ubuntu:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get install golang
+$ GOPATH=~/go
+$ mkdir -p ~/go/{src,bin,pkg}
+$ PATH="$GOPATH/bin:$PATH"
 </pre></div>
 </div>
-<p>The method <span class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></span> requires a property path (name), so
-that you know how to differentiate the errors afterwards.</p>
-<p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
-<span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
-<span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
-<div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
-1) foo: Value "10" expected to be string, type integer given.
-2) bar: Value "&lt;NULL&gt;" is empty, but non empty value was expected.
-3) baz: Value "string" is not an array.
-</pre></div>
-</div>
-<p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
-underyling <span class="docutils literal"><span class="pre">AssertionFailedException</span></span> objects and convert them something
-useable for the frontend.</p>
-</div>
-<div class="section" id="error-messages-values-and-constraints">
-<h2>Error Messages, Values and Constraints</h2>
-<p>In version 1.0 Assert did not have default error messages when failures
-occured. This has changed and now every assertion has a default failure
-message, as well as access to the value and constraints of an exception:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<p>You should put the <span class="docutils literal"><span class="pre">$GOPATH</span></span> and <span class="docutils literal"><span class="pre">$PATH</span></span> changes into your bashrc to make this
+a permanent solution.</p>
+<p>Starting to run HHVM, a Wordpress installation is a good first candidate to
+check on, as I knew from HHVM team blog posts that Wordpress works. Using a
+simple siege based benchmark I was able to trigger the JIT compiler and the
+Profiler charts showed a nice performance boost minute after minute as HHVM
+replaces dynamic PHP with optimized (assembler?) code.</p>
 
-<span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
-
-<span class="k">try</span> <span class="p">{</span>
-    <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
-<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">AssertionFailedException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value "10" is not between 100 and 1000.</span>
-    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span> <span class="c1">// 10</span>
-    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getConstraints</span><span class="p">();</span> <span class="c1">// array('min' =&gt; 100, 'max' =&gt; 1000)</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This helps during development when the assertion exceptions occur and also
-allows to provide error messages to the user, by using the exception code and
-the value and constraint data for translating into human readable messages.</p>
-<p>You can find more information in the <a class="reference external" href="https://github.com/beberlei/assert#assert">README of Assert</a>.</p>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html#disqus_thread" data-disqus-identifier="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>December 31, 2013</span>
-        </div>
-        <div class="section">
-            <h1><a href="2013/12/31/2013_and_2014.html">2013 and 2014</a></h1>
-<p>This year was amazing with my new job, various talks on conferences and also
-for this blog. A total of 15 new posts attracted more than 30.000 unique
-visitors. Most amazing was all the positive feedback that I got at SymfonyCon
-in Warsaw with regard to my posts and the projects I have been working on in
-2013. Thank you all very much for reading and discussing with me. It has been
-a very insightful year for me!</p>
-<p>The three most viewed posts have been on <a class="reference external" href="http://whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Symfony with Vagrant</a>
-(5470),
-<a class="reference external" href="http://whitewashing.de/2013/04/12/traits_are_static_access.html">Traits</a>
-(4450) and
-<a class="reference external" href="http://whitewashing.de/2013/03/04/doctrine_repositories.html">Doctrine Repositories</a> (3850).</p>
-<p>I am always interested in end of the year reading lists to give me an idea what
-I might want to read the next year. This years reading list of <a class="reference external" href="http://www.paperplanes.de/2013/12/30/reading-list-2013.html">Matthias Meyer</a> of TravisCI
-provides many ideas for my next years reading list.  My own sad list contains
-only one technical book that I have read this year, but I think you will
-appreciate the hint if you havent seen this before: <a class="reference external" href="http://www.amazon.de/gp/product/0321834577/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1638&amp;creative=6742&amp;creativeASIN=0321834577&amp;linkCode=as2&amp;tag=whitewashin0c-21">Implementing Domain-Driven
-Design</a>
-by Vaughn Vernon. That book has influenced many of my blog posts, discussions
-and experiments this year and you will see effects of it in 2014 as
-well.</p>
-<p>For 2014 I want to keep up the pace of blogging and complement all those ideas
-with a sample Symfony application that I want to write. The idea for this
-project spawned from discussions with readers at various events, mostly at the
-SymfonyCon in Warsaw. My initial plans were to write an ebook on this issue,
-but various attempts throughout 2013 ended with motivation failures. This is
-one reason why I have explicitly put the item “Do NOT write a book” in my 2014
-todo list.</p>
-<p>Most of my blog posts on architecture are very general and even with the
-practical Symfony and Doctrine posts it is complicated to see the benefits
-without a good open source sample. That is why I want to write one and discuss
-the development on this blog.</p>
-<p>To support this effort I would be very grateful if you consider supporting me
-with a regular <a class="reference external" href="https://www.gittip.com/beberlei/">Gittip donation</a>. Gittip is
-a fairly new service that allows you to make very small microdonations to
-others on a weekly basis.</p>
-<p>There is also a roadmap of ideas in my mind for 2014 blog posts, specifically
-about:</p>
-<ul class="simple">
-<li>Doctrine and Domain-Driven Design</li>
-<li>Hexagonal Architecture</li>
-<li>Domain Events</li>
-</ul>
-<p>I hope to see you again in 2014 and am very eager for the learnings and
-discussions that the new year will bring.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/12/31/2013_and_2014.html#disqus_thread" data-disqus-identifier="2013/12/31/2013_and_2014">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>December 05, 2013</span>
-        </div>
-        <div class="section">
-            <h1><a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a></h1>
-<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
-Doctrine Entities, Metadata Mapping and their database.</p>
-<p>The problem of feature flags with Doctrine is easily explained: If you add
-properties for a new feature that is disabled in the Doctrine metadata, then you
-need to upgrade the database before deployment, even when the feature is not
-being rolled out for some days/weeks. Doctrine requires the database to look
-exactly like the metadata specifies it.</p>
-<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
-easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User"</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
-                    <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
-                <span class="p">));</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something"</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// more mapping</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
-<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
-<p>Then if the feature is enabled fore some time and accepted into the pool of
-permanent features, you can remove the listener and move the mapping onto the
-Entities metadata.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a>, <a href="tags/doctrine.html">Doctrine</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/12/05/feature_flags_and_doctrine_entities.html#disqus_thread" data-disqus-identifier="2013/12/05/feature_flags_and_doctrine_entities">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 19, 2013</span>
-        </div>
-        <div class="section">
-            <h1><a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a></h1>
-<p>A little over a year ago I posted on using <a class="reference external" href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html">Puppet for setting up development
-machines</a>.
-This approach prooved useful as during that time I did setup a new machine
-several times and benefited from the mostly automatic installation with Puppet.
-Github is thinking the same on a bigger scale. Earlier this year they
-introduced <a class="reference external" href="https://github.com/blog/1345-introducing-boxen">Boxen</a> which is
-using Puppet to setup mac-development machines.</p>
-<p>The space of deployment- and configuration management tools
-is exploding these last years and it is not always feasible to evaluate all of
-them. The benefit of Puppet over all these tools is its huge userbase and
-online resources. However the steep learning curve can be a huge pain coupled
-with the fact that most of the modules online are not reusable at all and
-mostly serve a documentation for “how not to work with Puppet”. On top of that
-Puppet is only for configuration management and not suitable for deployment
-of applications.</p>
-<div class="section" id="introduction-to-ansible">
-<h2>Introduction to Ansible</h2>
-<p>I came across a <a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible/">blog post on Ansible</a> by the
-awesome guys at Qandidate.com which lead me to investigate <a class="reference external" href="http://ansibleworks.com">Ansible</a>. It is essentially a hybrid between Capistrano and Puppet,
-solving both the deployment and configuration management problems with a focus
-on simplicity. In fact the learning curve of Ansible is much more flat than
-that of Puppet and you can read the whole documentation and understand even the
-advanced concepts in a few hours.</p>
-<p>Ansible is used from a developer- or continuous-integration-machine, which
-executes tasks on hosts from an inventory. You only need SSH servers running
-and private keys to connect to them to get it working. With the inventory of
-hosts to operate on, you can chose to execute ad-oc commands using the
-<cite>ansible</cite> command or playbooks using the <cite>ansible-playbook</cite> command. Playbooks
-are files written in YAML.</p>
-<p><a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible">Read Sanders post on the Qandidate blog</a> to get an introduction to Ansible.</p>
-</div>
-<div class="section" id="development-machine-setup">
-<h2>Development-Machine Setup</h2>
-<p>Using Ansible to setup a development machine is a bit pointless, given that
-Ansible excels at remote task execution and distribution. The benefit in
-development-machine setup over Puppet is the simplicity of configuration
-compared to Puppet modules + DSL.</p>
-<p>For demonstration I have converted the puppet examples from my blog post on
-Puppet to Ansible.  To start we have to create a folder and create a new file
-<cite>inventory</cite> in it containing our local machine:</p>
-<div class="highlight-python"><div class="highlight"><pre>localhost   ansible_connection=local
-</pre></div>
-</div>
-<p>This is necessary to convince the remote task execution part of Ansible that
-localhost exists and there is no SSH necessary to get into that machine.</p>
-<p>Now I can create playbooks for the different tools I might want to install and
-setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre>---
-- hosts: localhost
-  tasks:
-    - name: Install VIM
-      apt: pkg=vim state=present
-      sudo: yes
-    - name: Install Dotfiles
-      git: &gt;
-        repo=git@github.com/beberlei/vim-dotfiles.git
-        dest=/home/${ansible_user_id}/.vim
-    - name: Create .vimrc Symlink
-      file: &gt;
-        src=/home/${ansible_user_id}/.vim/vimrc
-        dest=/home/${ansible_user_id}/.vimrc
-        state=symlink
-    - name: Compile and Install Command-T plugin
-      command: &gt;
-        rake make
-        chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
-        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe
-</pre></div>
-</div>
-<p>You can see here, tasks are a list of commands to execute. They are always
-executed in order and stop when the first task in the chain fails. Like in
-puppet you try to make those tasks idempotent through flags such as <cite>creates</cite>,
-signaling when a task needs to be or was already executed. I can optionally
-use sudo to run commands such as installing packages.</p>
-<p>To execute the playbook I call:</p>
-<div class="highlight-python"><div class="highlight"><pre>$&gt; ansible-playbook -K -i inventory vim.yml
-</pre></div>
-</div>
-<p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the
-local machine and the playbook applies the <cite>hosts</cite> filter to that inventory.
-The <cite>-K</cite> parameter prompts me to enter the sudo password for my Ubuntu machine,
-otherwise the tasks will fail.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>Compared to Puppet, the configuration management of Ansible simplifies a lot of
-the assumptions for example on ordering and reusability of tasks. For a
-part-time “devop” like me this is great news, as I don’t need to understand a
-complex tool and can focus on solving problems.</p>
-<p>On top of that the deployment features of Ansible with parallel remote
-execution over SSH make Ansible a powerful tool that I hope to use much more in
-the future.</p>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/devops.html">Devops</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/ansible.html">Ansible</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/11/19/setting_up_development_machines_ansible_edition.html#disqus_thread" data-disqus-identifier="2013/11/19/setting_up_development_machines_ansible_edition">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>September 04, 2013</span>
-        </div>
-        <div class="section">
-            <h1><a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a></h1>
-<p>In this blog post I will show how to decouple your core application
-from the Symfony Security component and User bundles such as the FOSUserBundle.</p>
-<p>In my opinion a framework has to be evaluated by how much it allows you to hide
-it from your actual application. This blog post will add another perspective on
-how to achieve decoupling from Symfony user and security with a very simple
-approach. With this puzzle piece and others I wrote about before (<a class="reference external" href="http://whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html">Controllers
-as Service</a>,
-<a class="reference external" href="http://whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html">Param Converters</a>)
-and other pieces I still need to write about, I would classify Symfony2 as a
-good framework.</p>
-<p>A number of other authors have written blog posts on decoupling Symfony and your model
-code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first/">on project structure</a>
-, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure/">on project structure as well</a>
-and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities/">Decoupling Forms from Entities</a>.</p>
-<p>User management breaks the isolation of your business model open,
-by introducing the <span class="docutils literal"><span class="pre">UserInterface</span></span> from the Security component into your
-code base. In combination with the <em>FOSUserBundle</em> this can cause a dependency
-on quite a bit of code already because I wouldn’t call the <span class="docutils literal"><span class="pre">FOS\UserBundle\Model\User</span></span> object
-leightweight. However this and other FriendsOfSymfony bundles
-are very helpful to get annoying features of your application done in a matter
-of hours.</p>
-<p>You can decouple the <em>FOSUserBundle</em> from our own entities and code by
-introducing a second object that representes the user concept in our model.
-The <span class="docutils literal"><span class="pre">UserInterface</span></span> entities need fields for username, password, enabled and
-some more. Except the username and email, the business model rarely needs other
-properties.</p>
-<p>Take an ecommerce system as example, where customers can register as users.
-In this example we could create two entities <span class="docutils literal"><span class="pre">MyProject\UserBundle\Entity\User</span></span> and
-<span class="docutils literal"><span class="pre">MyProject\ShopBundle\Entity\Customer</span></span>. Two strategies exist now:</p>
-<ol class="arabic simple">
-<li>Use the same table for both entities with some shared and other exclusive columns</li>
-<li>Use different tables in the database</li>
-</ol>
-<p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
-<p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
-
-<span class="k">namespace</span> <span class="nx">MyProject\UserBundle\Entity</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">FOS\UserBundle\Model\User</span> <span class="k">as</span> <span class="nx">BaseUser</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\Table(name="fos_user")</span>
-<span class="sd"> */</span>
-<span class="k">class</span> <span class="nc">User</span> <span class="k">extends</span> <span class="nx">BaseUser</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Id</span>
-<span class="sd">     * @ORM\Column(type="integer")</span>
-<span class="sd">     * @ORM\GeneratedValue(strategy="AUTO")</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The <span class="docutils literal"><span class="pre">Customer</span></span> entity is a completly new object, not depending
-on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
-<p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
-correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
-
-<span class="k">namespace</span> <span class="nx">MyProject\ShopBundle\Entity</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\Table(name="customer")</span>
-<span class="sd"> */</span>
-<span class="k">class</span> <span class="nc">Customer</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Id</span>
-<span class="sd">     * @ORM\Column(type="integer")</span>
-<span class="sd">     * @ORM\GeneratedValue(strategy="NONE")</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type="string")</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="nv">$username</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Now you need to extend the application to synchronize all changes from the
-<span class="docutils literal"><span class="pre">User</span></span> entity to the <span class="docutils literal"><span class="pre">Customer</span></span> entity. You can
-achieve this relatively easy by overwriting the <span class="docutils literal"><span class="pre">ModelManager</span></span> or when finally
-supported by <em>FOSUserBundle</em> listening to events.  Your own code can
-exclusively work with <span class="docutils literal"><span class="pre">Customer</span></span> objects now, void of any reference to
-the Symfony Security component or the huge FOSUserBundle dependency.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a>, <a href="categories/symfony2.html">Symfony2</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a>, <a href="tags/symfony2.html">Symfony2</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html#disqus_thread" data-disqus-identifier="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle">Leave a comment</a>
-        </div></div><div class="archive_link">
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/go.html">Go</a>
+                 / 
+            <a href="tags/hhvm.html">HHVM</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 01, 2015 by Benjamin Eberlei</small></p>
+        </div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
-
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/page2.html';
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
           </div>         
         </div>
-      </div>
     </div>
-
-    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li><li>
-            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li></ul>
-</div>
-</section>
-          </aside></div>
 </div>
 </div> <!-- #main-container -->
 
         <div class="footer-container" role="contentinfo">
 <div class="container">
-    <div class="span-24 content">
+    <div class="col-md-8 col-md-offset-2">
         <div class="footer">
-            &copy; Copyright 2008-2015, Benjamin Eberlei.
-            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
 
-        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
         </div>
     </div>
 </div>

@@ -206,5 +206,5 @@ confident integrating it into some of my production projects now.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Symfony, Webpack, Javascript
 .. comments::

@@ -44,6 +44,6 @@ that makes **http://example.com/pathto/wsdl** point to
 to the actual Soap Server, which he doesn't like.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, SOAP
 .. comments::
 .. author:: beberlei <kontakt@beberlei.de>

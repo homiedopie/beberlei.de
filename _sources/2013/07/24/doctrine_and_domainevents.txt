@@ -234,5 +234,5 @@ Doctrine. Again, `see the code on this Gist
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP, Doctrine, DomainEvents, Patterns
+.. tags:: Doctrine, DesignPatterns
 .. comments::

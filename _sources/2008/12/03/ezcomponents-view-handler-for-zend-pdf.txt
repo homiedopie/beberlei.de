@@ -155,6 +155,5 @@ and look like the following:
 There you go!
 
 .. categories:: none
-.. tags:: none
+.. tags:: eZComponents
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -1,0 +1,490 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 25 &mdash; beberlei.de</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="next" title="Older" href="page26.html" /><link rel="prev" title="Newer" href="page24.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+          <div id="page25">
+            
+            <div class="section">
+            <h1><a href="2008/09/11/new-calypso-dtl-version-0-2.html">New Calypso DTL Version 0.2</a></h1>
+<p>I have got some hints about bugs and optimized the performance of loops
+a little bit, so that you can now <a class="reference external" href="http://www.beberlei.de/sources/calypso-dtl-0.2.tar.gz">download version
+0.2</a> of the
+<a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template engine</a>. Have
+fun.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on September 11, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/09/20/dependency-injection-via-interface-in-php-an-example.html">Dependency Injection via Interface in PHP: An example</a></h1>
+<p>Personal projects and work currently both force me to think about
+application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
+injection</a> the
+other day. Its quite a complex Design Pattern and hard to grasp, even
+with the number of examples you can find in the internet. Basically
+Dependency Injection means you register components that might be a
+dependency for other components and when loading new classes via the
+dependency injection framework, it knows of this relationships and
+assembles the object in need and all its dependencies and returns them
+fully initialized. This pattern leads to completely encapsulated objects
+where any class in the object graph can be exchanged for a new
+implementation without breaking all its dependencies. It also makes
+testing complex components and object relationships very easy.</p>
+<p>As far as I could find out, three different types of Dependency Injection
+implementations exist: Via Constructor, via Setter and via Interfaces.
+There exist implementations of Dependency Injection for Java (Spring)
+that are configured via XML config files and seem very complex. They are
+also hard to read in code I presume, since you always have to be aware
+of the current application configuration. There are also some more
+lightweight implementations (PicoContainer) that assemble their
+relationships in the application and work with config methods that act
+as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
+implementation via
+interfaces</a>,
+which seems most accessible for me.</p>
+<p>All PHP clones of any dependency injection framework seem to go the
+complex way via configuration though. With traits and multiple class
+inheritance on the horizon, some kind of interface injection seems
+mighty powerful though. So I implemented a really lightweight
+implementation of Interface Dependency Injection for PHP. The Container
+works with static method only, is therefore in the global scope, such
+that configuration is reduced to a minimum. Generally you have to write
+interfaces for object injection, for example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">interface InjectDbAdapter</span>
+<span class="x">{</span>
+<span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>Other potential examples include “InjectLogger”, “InjectSoapClient”, or
+“InjectAppConfig”. You then have to register a component for usage with
+this interface:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</span>
+</pre></div>
+</div>
+<p>Now any class that implements the InjectDbAdapter interface can be
+instantiated via:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class');</span>
+</pre></div>
+</div>
+<p>and the loader takes care of calling the ‘Class’ implementation of
+injectDbAdapter with the given Database Adapter. A negative consequence
+of this approach is that you have to implement the inject methods for
+all interfaces in your concrete class implementations. With Traits
+(multiple class inheritance) being a new feature in PHP soon, injection
+via parent classes seems to become a very powerful approach though,
+which can handle the concrete implementations.</p>
+<p>The Container takes care of all the dependency building, so when testing
+your components you can register lots of mock objects. You can also
+exchange dependencies for only a subset of objects very easily. I
+implemented a method “Whitewashing_Container::registerClassComponent”,
+which registers a dependency component that is used with higher priority
+in construction of the given class. You can also specify a third
+parameter $localInterfaceOverride for the highest priority:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
+</pre></div>
+</div>
+<p>Speedwise the usage of the Container reduces class instantiation by about
+50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
+on my machine. But naturally only classes with dependencies and lots of
+them should be using this mechanism and with good application design,
+this shouldn’t be to many. You can download
+<a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
+and <a class="reference external" href="http://www.beberlei.de/sources/di.phps">Example</a> sourcecode, to
+take a look. Currently this Container is not really creating new
+dependencies for each new class generation but rather inverts the usage
+of a registry. It should be an easy task to extend the registering
+method to decide between new class generation and using the globally
+registered class instance.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on September 20, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/12/30/dependency-injection-with-php-introducing-sphicy.html">Dependency Injection with PHP: Introducing Sphicy</a></h1>
+<p>I have written <a class="reference external" href="http://www.whitewashing.de/blog/articles/101">on dependency
+injection</a> before
+christmas and how <a class="reference external" href="http://code.google.com/p/guice">Guice</a>, googles DI
+framework, offers a simple solution. I copied the functionality for a
+PHP clone of Guice and named it
+<a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a>. You saw an early prototype of
+it in the blogpost mentioned above.</p>
+<p><a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy</a> configures object dependencies
+with modules: You explicitly state which implementation should be bound
+to which interface. An injector then creates instances of these objects
+via reflection: All constructor dependencies are resolved by looking at
+the given type hints and initializes those according to the specified
+bindings.</p>
+<p>Two examples included in the <a class="reference external" href="http://www.beberlei.de/dev/svn/sphicy/">source code of
+Sphicy</a> are <a class="reference external" href="http://framework.zend.com">Zend
+Framework</a> and
+<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a> MVC bootstrapping modules.
+Sadly both frameworks default front controllers are engineered in such a
+way that useful dependency injection needs some workarounds.</p>
+<p>As an example I will now discuss the Sphicy Module for Zend Framework
+MVC applications. To circumvent the singleton and protected Constructor
+of Zend_Controller_Front, we have to build a new front controller that
+wraps around it and requires all the dependencies:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class Sphicy_Controller_Front
+{
+    protected $front;
+
+    /**
+     * Create Front Controller for Zend Framework using explicitly dependencies created by Sphicy.
+     *
+     * @param Zend_Controller_Request_Abstract      $request
+     * @param Zend_Controller_Response_Abstract     $response
+     * @param Zend_Controller_Router_Interface      $router
+     * @param Zend_Controller_Dispatcher_Interface  $dispatcher
+     */
+    public function __construct(
+        Zend_Controller_Request_Abstract $request,
+        Zend_Controller_Response_Abstract $response,
+        Zend_Controller_Router_Interface $router,
+        Zend_Controller_Dispatcher_Interface $dispatcher=null
+    )
+    {
+        $front = Zend_Controller_Front::getInstance();
+        $front-&gt;setRequest($request);
+        $front-&gt;setResponse($response);
+        $front-&gt;setRouter($router);
+
+        if($dispatcher === null) {
+            $dispatcher = $front-&gt;getDispatcher();
+        }
+        $front-&gt;setDispatcher($dispatcher);
+    }
+
+    public function dispatch()
+    {
+        $this-&gt;front-&gt;dispatch();
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You can see that the <strong>Sphicy_Controller_Front</strong> class requires
+dependencies in its constructor that are then forward injected into
+<strong>Zend_Controller_Front</strong>. You can now create a module that binds all
+the required dependencies to concrete implementations, for example a
+module for a Zend MVC Http Application might look like:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class Sphicy_ZendMvc_ExampleModule implements spModule {
+     public function configure(spBinder $binder) {
+         // Sphicy_Controller_Front does not extend Zend_Controller_Front, because of Singletonitis
+         // It offers the dispatch method to proxy against Zend_Controller_Front::dispatch.
+         $binder-&gt;bind("Sphicy_Controller_Front")-&gt;to("Sphicy_Controller_Front");
+         $binder-&gt;bind("Zend_Controller_Request_Abstract")-&gt;to("Zend_Controller_Request_Http");
+         $binder-&gt;bind("Zend_Controller_Response_Abstract")-&gt;to("Zend_Controller_Response_Http");
+         // loads all routes
+         $binder-&gt;bind("Zend_Controller_Router_Interface")-&gt;to("MyApplication_Router");
+     }
+ }
+</pre></div>
+</div>
+</div></blockquote>
+<p>The class <strong>MyApplication_Router</strong> might look up all the routing
+information of the application via a hardcoded configuration mechanism.
+You may say this is a hard dependency, but actually you can just switch
+modules or implementations at this position to replace the router with
+another implementation. You can also see that no implementation for the
+dispatcher is bound. But this dependency is optional and will be created
+automatically as can be seen in the <strong>Sphicy_Controller_Front</strong> class.</p>
+<p>The front controllers is now created by calling:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$injector = new spDefaultInjector(new Sphicy_ZendMvc_ExampleModule());
+$front = $injector-&gt;getInstance("Sphicy_Controller_Front");
+$front-&gt;dispatch();
+</pre></div>
+</div>
+</div></blockquote>
+<p>What happens in the <strong>$injector-&gt;getInstance()</strong> line? Sphicy looks at
+<strong>Sphicy_Controller_Front</strong>‘s constructor and finds that four
+dependencies are needed: Request, Response, Router and Dispatcher
+implementations. It looks up the bindings and searches for them,
+creating Zend_Controller_Request_Http,
+Zend_Controller_Response_Http and MyApplication_Router objects. A
+dispatcher implementation is not found, but Sphicy recognizes that null
+is a valid paramater and injects it. The 3 concrete implementations and
+one null are instantiated and used to construct a valid
+<strong>Sphicy_Controller_Front</strong> instance.</p>
+<p>You have now stated the dependencies of the Zend Controller Front
+explicitly and can switch them instantaneously by switching the bindings
+of interface to implementations in the configuration module.</p>
+<p>Have a look at the <a class="reference external" href="http://www.beberlei.de/sphicy">Sphicy Website</a> and
+<a class="reference external" href="http://www.beberlei.de/sphicy/documentation/faq.html">FAQ</a> to see
+more examples and information about the possibilites of this dependency
+injection framework.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                 / 
+            <a href="tags/sphicylibrary.html">SphicyLibrary</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on December 30, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/12/01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html">Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill</a></h1>
+<p>Some weeks ago <a class="reference external" href="http://framework.zend.com">Zend Framework 1.7</a> was
+released with the <a class="reference external" href="http://jquery.com">jQuery</a> support I contributed.
+What is the essential advantage of using jQuery support in ZF? You can
+develop forms with ajax support either by using View Helpers or directly
+by the integrated Zend_Form support. The implementation of a DatePicker
+or AutoComplete functionality becomes as easy as using 2-3 lines of php
+code.</p>
+<p>Currently only support for the jQuery UI library is shipped, but you can
+easily extend the jQuery support on your own and this blog post will
+show you how using three very popular jQuery plugins:
+<a class="reference external" href="http://malsup.com/jquery/form/">AjaxForm</a>,
+<a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-tooltip/">Tooltip</a>
+and <a class="reference external" href="http://plugins.jquery.com/project/Autofill">AutoFill</a>. This will
+be a series of installments, beginning with the first one: AjaxForms</p>
+<p>AjaxForm allows you to enhance any form of yours to submit the data with
+ajax to the server, so no additional overhead of loading a new page is
+necessary. Combining the power of Zend_Form and jQuery’s ajaxForm you
+can even go so far as differentiating between successful and
+non-validated form submits. We will build a Form Decorator that
+integrates the AjaxForm plugin in any of your Zend_Form’s. On submit it
+will send the form data to the server via ajax and clears the form
+afterwards. Clients that have javascript disabled will work too, the
+form is submitted to the server in a standard pre-ajax fashion and
+processed that way.</p>
+<p>First what we need is obviously the new decorator, we will call it
+“My_JQuery_Form_Decorator_AjaxForm” and it will inherit from
+Zend_Form_Decorator_Form. What we then realize is, that this is just
+using a view helper to render, so what we need additionally is a
+“My_JQuery_View_Helper_AjaxForm” that extends from
+“Zend_View_Helper_Form”. The code of the view helper will have to
+look as follows to fulfil our needs:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>require_once "Zend/View/Helper/Form.php";class ZendX_JQuery_View_Helper_AjaxForm extends Zend_View_Helper_Form{  /**   * Contains reference to the jQuery view helper   *   * @var ZendX_JQuery_View_Helper_JQuery_Container   */  protected $jquery;  /**   * Set view and enable jQuery Core and UI libraries   *   * @param Zend_View_Interface $view   * @return ZendX_JQuery_View_Helper_Widget   */  public function setView(Zend_View_Interface $view)  {    parent::setView($view);    $this-&gt;jquery = $this-&gt;view-&gt;jQuery();    $this-&gt;jquery-&gt;enable()           -&gt;uiEnable();    return $this;  }  public function ajaxForm($name, $attribs = null, $content = false, array $options=array())  {    $id = $name;    if(isset($attribs['id'])) {      $id = $attribs['id'];    }    if(!isset($options['clearForm'])) {      $options['clearForm'] = true;    }    if(count($options) &gt; 0) {      require_once "Zend/Json.php";      $jsonOptions = Zend_Json::encode($options);      // Fix Callbacks if present      if(isset($options['beforeSubmit'])) {        $jsonOptions = str_replace('"beforeSubmit":"'.$options['beforeSubmit'].'"', '"beforeSubmit":'.$options['beforeSubmit'], $jsonOptions);      }      if(isset($options['success'])) {        $jsonOptions = str_replace('"success":"'.$options['success'].'"', '"success":'.$options['success'], $jsonOptions);      }    } else {      $jsonOptions = "{}";    }    $this-&gt;jquery-&gt;addOnLoad(sprintf(      '$("#%s").ajaxForm(%s)', $id, $jsonOptions    ));    return parent::form($name, $attribs, $content);  }}
+</pre></div>
+</div>
+</div></blockquote>
+<p>It takes all the form-tag building of the inherited view helper for
+granted and just appends the necessary jQuery code to the jQuery
+onLoadActions stack. They will be outputted to the clients browser when
+calling &lt;?php $this-&gt;jQuery(); ?&gt; in your layout or view script. Make
+sure that you include the jQuery Form plugin in your code, for example
+with &lt;?php $view-&gt;jQuery()-&gt;addJavascriptFile(..); &gt;</p>
+<p>Programming the decorator becomes a simple trick now:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>require_once "Zend/Form/Decorator/Form.php";class My_JQuery_Form_Decorator_AjaxForm extends Zend_Form_Decorator_Form{  protected $_helper = "ajaxForm";  protected $_jQueryParams = array();  public function getOptions()  {    $options = parent::getOptions();    if(isset($options['jQueryParams'])) {      $this-&gt;_jQueryParams = $options['jQueryParams'];      unset($options['jQueryParams']);      unset($this-&gt;_options['jQueryParams']);    }    return $options;  }  /**   * Render a form   *   * Replaces $content entirely from currently set element.   *   * @param string $content   * @return string   */  public function render($content)  {    $form  = $this-&gt;getElement();    $view  = $form-&gt;getView();    if (null === $view) {      return $content;    }    $helper    = $this-&gt;getHelper();    $attribs    = $this-&gt;getOptions();    $name     = $form-&gt;getFullyQualifiedName();    $attribs['id'] = $form-&gt;getId();    return $view-&gt;$helper($name, $attribs, $content, $this-&gt;_jQueryParams);  }}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now to use either the decorator for your form, or just the view helper
+to print your form tag with jQuery code you can invoke:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$form-&gt;addPrefixPath('My_JQuery_Form_Decorator', 'My/JQuery/Form/Decorator', 'decorator');$form-&gt;removeDecorator('Form')-&gt;addDecorator(array('AjaxForm', array(  'jQueryParams' =&gt; array(),)));$view-&gt;addHelperPath("My/JQuery/View/Helper", "My_JQuery_View_Helper");$view-&gt;ajaxForm("formId1", $attribs, $content, $options);
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now we finished up the view side of our script. Assuming that we use the
+Form Decorator instead of the View Helper, we can additionally add some
+fancy logic and error handling ajax fun to the action controller that is
+handling the Zend_Form instance.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class IndexController extends Zend_Controller_Action{  public function indexAction()  {    $foo = new MyAjaxTestForm();    try {      if(!$foo-&gt;isValid($_POST)) {        throw new Exception("Form is not valid!");      } else {        // do much saving and stuff here        if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {          $this-&gt;_helper-&gt;json(array("success" =&gt; "SUCCESSMESSAGEHERE"));        }      }    } catch(Exception $e) {      if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {        $jsonErrors = array();        foreach( ( new RecursiveIteratorIterator(new RecursiveArrayIterator($form-&gt;getMessages())) ) AS $error) {          $jsonErrors[] = $error;        }        $this-&gt;_helper-&gt;json-&gt;sendJson($jsonErrors);      }    }  }}
+</pre></div>
+</div>
+</div></blockquote>
+<p>This has to be processed by a callback function of the AjaxForm and
+which may for example look like the following which uses a predefined
+div box (#formMessages, don’t forget to implement it) to render either
+the success or the error messages.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$form-&gt;addDecorator(array('AjaxForm', array(  'jQueryParams' =&gt; array(    'success' =&gt; "formCallback1",   ),)));$view-&gt;jQuery()-&gt;addJavascript('function formCallback1(data) {  if(data.errors) {    $("#formMessages").append("&lt;ul&gt;");    for each(var item in data.errors) {      $("#formMessages").append("&lt;li&gt;"+item+"&lt;/li&gt;");    }    $("#formMessages").append("&lt;/ul&gt;");  } else {    $("#formMessages").html(data.success);  }}');
+</pre></div>
+</div>
+</div></blockquote>
+<p>This seems very complex, but you could include that javascript code into
+the AjaxForm decorator and implement an Action Helper to do the action
+controller side of the stuff. This will be an exercise for a future
+post.</p>
+<p>AutoFill and Tooltip extensions will be topic of the next installments
+of this series, so be aware of new content soonish.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/jquery.html">jQuery</a>
+                 / 
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on December 01, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/12/18/dependecy-injection-the-juicy-way.html">Dependency Injection the juicy way</a></h1>
+<p>I have written on dependency injection before and <a class="reference external" href="http://www.whitewashing.de/blog/articles/83">came up with a
+solution for PHP via interface
+injection</a>. Thinking
+about it twice I didn’t like it very much. Its too much overkill that
+you have to implement all setter methods again and again.</p>
+<p>Still dependency injection is the way to write good, testable and easily
+exchanged and re-wired object graphs. I tried to do lots of dependency
+injection via constructor lately and realized that it pollutes my
+constructors when my object graph is too deep.</p>
+<p>An example: When I setup my database connection in the bootstrap file
+and encapsulate it in my model creation factory object, i have to insert
+the model factory through the configuration into the dispatcher into the
+different controllers and views to be accessible in the MVC pattern. The
+model factory has to walk 3 nodes in the object graph without being used
+at all in the “higher” steps. This creates very unnecessary
+dependencies.</p>
+<p>I came across <a class="reference external" href="http://misko.hevery.com/">Misko Hevery</a>‘s Blog, which
+rocks. There are also some <a class="reference external" href="http://www.youtube.com/results?search_query=misko+hevery&amp;search_type=&amp;aq=f">great Google Tech Talks by
+him</a>,
+where he argues in favour of dependency injection and debunks singletons
+as being evil (he does that on his blog too). From there I learnt about
+<a class="reference external" href="http://code.google.com/p/google-guice/">Guice</a>, a dependency
+injection framework for Java by Google.</p>
+<p>What I like about Guice: Its easy to use and its immediately obvious to
+someone without experience, why it works so good and you don’t have to
+hand down objects deep down the object graph. I cloned the basic
+functionality for PHP and an example would work as follows.</p>
+<p>We first have to implement a <strong>module</strong>, which defines which concrete
+implementation should be injected as a placeholder for which interface.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind("Service")-&gt;to("ConcreteService");  $b-&gt;bind("Add")-&gt;to("ConcreteAdd");  $b-&gt;bind("Sub")-&gt;to("ConcreteSub"); }}
+</pre></div>
+</div>
+</div></blockquote>
+<p>We can now use this module to instantiate an injector object:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance("Service");
+</pre></div>
+</div>
+</div></blockquote>
+<p>Given that the constructor of <strong>ConcreteService</strong> would expect an Add
+and a Sub object, the Injector would realize this and instantiate the
+concrete implementations <strong>ConcreteAdd</strong> and <strong>ConcreteSub</strong> and inject
+them into the constructor.</p>
+<p>What makes this dependency injection so simple and great to use? You can
+instantiate an injector everywhere in your code and just have to
+configure it using the additional module implementation. This way you
+don’t have to make sure that you pass down the dependency injection
+container from the bootstrap into all nodes of the application. You can
+also easily work with many frameworks and still be able to use
+dependency injection without having to hack the whole core of the
+framework.</p>
+<p>My guice clone does more. It allows to pass down additional non-object
+arguments into constructors, even for object dependencies. It offers a
+<strong>Provider</strong> interface to be able to wrap adapters around your already
+existing ServiceLocator or Registry objects. But its reflection
+capabilities have to be extended to docblock comments, so that better
+dependency detection is possible.</p>
+<p>Because using dependency injection with only this little example I will
+refrain from releasing the source code yet. I have to provide some
+useful documentation for it to be of use to anyone.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                 / 
+            <a href="tags/sphicylibrary.html">SphicyLibrary</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on December 18, 2008</small></p>
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+          </div>         
+        </div>
+    </div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="footer">
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
+
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

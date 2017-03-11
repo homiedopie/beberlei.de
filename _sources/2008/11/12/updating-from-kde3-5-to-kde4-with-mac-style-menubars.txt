@@ -9,6 +9,5 @@ To solve this little issue find a variable "macStyle = true" in the
 macStyle = false and you have your menubars back.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Linux
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

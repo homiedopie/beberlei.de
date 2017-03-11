@@ -1,0 +1,224 @@
+<!DOCTYPE html><!--[if lt IE 7]>      <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:og="http://ogp.me/ns#"
+    xmlns:fb="https://www.facebook.com/2008/fbml" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="My blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Page 22 &mdash; beberlei.de</title>
+<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
+<meta content="width=device-width" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+        <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="next" title="Older" href="page23.html" /><link rel="prev" title="Newer" href="page21.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    <body role="document">
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+      <div id="container">
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="main-container" role="main">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+          <div id="page22">
+            
+            <div class="section">
+            <h1><a href="2008/01/14/helpers-in-zend-view-class-prefix.html">Helpers in Zend_View: Class Prefix</a></h1>
+<p>I have to say, the Zend Framework documentation is a bit imprecise
+sometimes. Regarding custom Helpers in Zend_View it states:</p>
+<blockquote>
+<div>The class name must, at the very minimum, end with the helper name
+itself, using CamelCaps. E.g., if you were writing a helper called
+“specialPurpose”, the class name would minimally need to be
+“SpecialPurpose”. You may, and should, give the class name a prefix,
+and it is recommended that you use ‘View_Helper’ as part of that
+prefix: “My_View_Helper_SpecialPurpose”. (You will need to pass
+in the prefix, with or without the trailing underscore, to
+addHelperPath() or setHelperPath()).</div></blockquote>
+<p>What does that mean regarding how your Helper has to be called? The
+default prefix for a Helper function that should be called foobar() is
+actually:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class Zend_View_Helper_Foobar()</span>
+<span class="x">{</span>
+<span class="x">    function foobar() { }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>It took me some time to realize that. Why doesn’t Zend just give an
+example like that? To change the prefix in a context of the
+Zend_Controller_Action you have to do something like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class SomeController extends Zend_Controller_Action</span>
+<span class="x">{</span>
+<span class="x">    function init() {</span>
+<span class="x">        $this-&gt;initView();</span>
+<span class="x">        $this-&gt;view-&gt;addHelperPath("pathtohelpers", "ClassPrefix");</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/zendframework.html">ZendFramework</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 14, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal.html">A knight’s tour solver in pascal</a></h1>
+<p>My professor has a task on the current problem set of my pascal
+programming course to program, demanding a recursive program finding a
+solution to the <a class="reference external" href="http://en.wikipedia.org/wiki/Knight's_tour">knights tour problem</a> on a chess board
+of size n&gt;=3 given a starting position. I used a backtracking algorithm
+(at least that is what wikipedia tells me it is), by trying all possible
+combinations and setting steps back, when they do not lead to a
+solution.</p>
+<p>Beginning with n = 7 my algorithms gets very slow, caused by the
+backtracking algorithm which is not very efficient. I found some
+interesting articles regarding this problem using graph theory to solve
+it. Some pretty big minds have thought about the problem, I guess its
+not for me to find such an solution for a little task of the weekly
+problem set.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://mathworld.wolfram.com/KnightsTour.html">Wolfram MathWorld: Knights Tour</a></li>
+<li><a class="reference external" href="http://www.zaik.uni-koeln.de/AFS/teachings/ss07/InfoSeminar/handout/leonid_torgovitski_nknighttours.pdf">Presentation Knights Tour (German Language)</a></li>
+</ul>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/algorithms.html">Algorithms</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 22, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/01/22/knights-tour-using-warndorff-s-rule.html">Knights Tour using Warndorff’s rule</a></h1>
+<p>When using <a class="reference external" href="http://web.telia.com/~u85905224/knight/eWarnsd.htm">Warndorff’s
+rule</a> for solving
+the Knights Tour problem, the solution is found within a second. It took
+some time for me to realize it in PASCAL though using a <strong>RECORD</strong> type
+to match the jumps to the number of free fields and then sort them. You
+can view my source code
+<a class="reference external" href="http://www.beberlei.de/sources/knightstour.txt">here</a>.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/algorithms.html">Algorithms</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 22, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html">A knight’s tour solver in pascal - supplement</a></h1>
+<p>Following my <a class="reference external" href="http://www.whitewashing.de/blog/articles/6">earlier post on the Knights
+tour</a>: It seems it is
+crucial for a backtracking algorithm what the knights starting position
+is, and even more important in what order the jumps are tried. Because
+there are 8 possible moves for a knight, you have to decide in which
+order they should be performed. If there is not a deviation when
+backtracking the algorithm gets stuck in almost the same positions very
+very often.</p>
+<p>I rewrote the order of jumps for my 7x7 board and found a solution in
+seconds. Using the same order for an 8x8 board gets me stuck in endless
+tries again. I see its important to implement the <a class="reference external" href="http://en.wikipedia.org/wiki/Warnsdorff's_algorithm">Warnsdorff’s
+algorithm</a>,
+perhaps I will do so.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/algorithms.html">Algorithms</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 22, 2008</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2008/01/28/linux-style-mysql-shell-prompt.html">Linux style MySQL Shell prompt</a></h1>
+<dl class="docutils">
+<dt>Just add the following to the [mysql] section in your .my.cnf file:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre>prompt=\u@\h [\d]&gt;\
+</pre></div>
+</div>
+</dd>
+</dl>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/linux.html">Linux</a>
+                 / 
+            <a href="tags/mysql.html">MySQL</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 28, 2008</small></p>
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div>
+          </div>         
+        </div>
+    </div>
+</div>
+</div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo">
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="footer">
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
+
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+        </div>
+    </div>
+</div>
+</div> <!-- footer-container -->
+
+      </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
+          <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+          <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+        <![endif]-->
+    </body>
+</html>

@@ -43,6 +43,5 @@ Plugin <http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Fr
 This prevents caching for registered identities.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

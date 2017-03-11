@@ -212,5 +212,5 @@ topic that I will discuss in the next blog post.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

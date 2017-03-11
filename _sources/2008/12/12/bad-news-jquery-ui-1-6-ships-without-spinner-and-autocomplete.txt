@@ -18,6 +18,5 @@ will make its way to the manual of the 1.7.2 release. This will
 hopefully help and guide everyone to the correct dependencies.
 
 .. categories:: none
-.. tags:: none
+.. tags:: jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

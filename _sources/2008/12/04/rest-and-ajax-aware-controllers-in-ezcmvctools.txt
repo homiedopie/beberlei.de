@@ -49,6 +49,5 @@ user example, you would use the new router in the following way:
 We have now simple rest route support in our ezcMvcTools application.
 
 .. categories:: none
-.. tags:: none
+.. tags:: eZComponents
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

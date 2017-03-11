@@ -90,5 +90,5 @@ you wan't to suffer.
 
 .. author:: default
 .. categories:: PHP, Symfony
-.. tags:: PHP, Symfony
+.. tags:: Vagrant, Symfony
 .. comments::

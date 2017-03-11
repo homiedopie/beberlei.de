@@ -15,16 +15,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Page 4 &mdash; Whitewashing</title>
+        <title>Page 4 &mdash; beberlei.de</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 <meta content="width=device-width" />
-
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/default.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -47,1207 +44,461 @@
         <![endif]-->
 
       <div id="container">
-<div class="container">
-    <div id="header" class="span-8">
-        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
-    </div>
-    <div class="span-11" id="about">
-        <p>
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </p>
-    </div>
-    <div class="span-5 last">
-        <p class="buttons" style="text-align: right">
-            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
-            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
-        </p>
-    </div>
-</div>
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
 
 <div class="main-container" role="main">
 <div class="container">
-    <div class="span-24 content">
-      <div>
-        <div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
           <div id="page4">
             
-            <div class="timestamp postmeta">
-            <span>February 19, 2013</span>
-        </div>
-        <div class="section">
-            <h1><a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a></h1>
-<p>Symfony2 is an extremely extendable framework, everything is extendable or
-overwritable through the Dependency Injection Container. The problem developers
-face is knowing about the extension points and when to use them.  If you don’t
-know the extension points, your Symfony application will end up with code
-duplication, too much inheritance and very little unit-testable code.</p>
-<p>This blog post will be the first in a series, describing Symfony2 extension
-points that help you achieve clean and duplicateless code. In my experience,
-using Symfony extension points to avoid code duplication helps you avoid
-writing thousands of lines of code in your controllers.</p>
-<div class="section" id="the-problem-duplicate-finder-logic">
-<h2>The problem: Duplicate finder logic</h2>
-<p>Inside controllers you can easily end with lots of duplication using the same
-general finder logic again in several actions. Take this following example:</p>
+            <div class="section">
+            <h1><a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a></h1>
+<p>Almost two years ago I started developing a small library <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> (<a class="reference external" href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html">blog post</a>)
+which contained a set of assertion methods to use in production code. With
+18.000 installations from Packagist this is my most successful piece of open
+source software outside of the Doctrine universe. There is a fair number
+of contributors and I know several companies using the library in production.</p>
+<p>The API however didn’t make me too happy, using the static method calls
+made it impossible to collect multiple errors and also made the code
+more verbose than necessary when validating the same value with multiple
+assertions.</p>
+<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
+these problems. The last two days I had some time to implement those new
+functionalities and I am releasing a new version 2.0 of Assert today.</p>
+<div class="section" id="fluent-api">
+<h2>Fluent API</h2>
+<p>Instead of having to use the static assertion methods, there is now
+a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
+and then all the assertions you want to call on that value.</p>
+<p>Here are some examples:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">null</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullOr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">boolean</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This new API allows for much shorter and compact assertions.</p>
+</div>
+<div class="section" id="lazy-assertions">
+<h2>Lazy Assertions</h2>
+<p>Using Assert with webforms was never possible unless you wanted to show
+the user only exactly one error message. Because every assertion fails
+with an Exception, there was no way to execute multiple assertions and
+collect the errors. This has changed with the new lazy assertion API,
+that is similar to the Fluent API:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nx">\Assert\lazy</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="s1">'string'</span><span class="p">,</span> <span class="s1">'baz'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">verifyNow</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The method <span class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></span> requires a property path (name), so
+that you know how to differentiate the errors afterwards.</p>
+<p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
+<span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
+<span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
+<div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
+1) foo: Value "10" expected to be string, type integer given.
+2) bar: Value "&lt;NULL&gt;" is empty, but non empty value was expected.
+3) baz: Value "string" is not an array.
+</pre></div>
+</div>
+<p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
+underyling <span class="docutils literal"><span class="pre">AssertionFailedException</span></span> objects and convert them something
+useable for the frontend.</p>
+</div>
+<div class="section" id="error-messages-values-and-constraints">
+<h2>Error Messages, Values and Constraints</h2>
+<p>In version 1.0 Assert did not have default error messages when failures
+occured. This has changed and now every assertion has a default failure
+message, as well as access to the value and constraints of an exception:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">AssertionFailedException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value "10" is not between 100 and 1000.</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span> <span class="c1">// 10</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getConstraints</span><span class="p">();</span> <span class="c1">// array('min' =&gt; 100, 'max' =&gt; 1000)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This helps during development when the assertion exceptions occur and also
+allows to provide error messages to the user, by using the exception code and
+the value and constraint data for translating into human readable messages.</p>
+<p>You can find more information in the <a class="reference external" href="https://github.com/beberlei/assert#assert">README of Assert</a>.</p>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/assertlibrary.html">AssertLibrary</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on January 26, 2014 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2013/12/31/2013_and_2014.html">2013 and 2014</a></h1>
+<p>This year was amazing with my new job, various talks on conferences and also
+for this blog. A total of 15 new posts attracted more than 30.000 unique
+visitors. Most amazing was all the positive feedback that I got at SymfonyCon
+in Warsaw with regard to my posts and the projects I have been working on in
+2013. Thank you all very much for reading and discussing with me. It has been
+a very insightful year for me!</p>
+<p>The three most viewed posts have been on <a class="reference external" href="http://whitewashing.de/2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Symfony with Vagrant</a>
+(5470),
+<a class="reference external" href="http://whitewashing.de/2013/04/12/traits_are_static_access.html">Traits</a>
+(4450) and
+<a class="reference external" href="http://whitewashing.de/2013/03/04/doctrine_repositories.html">Doctrine Repositories</a> (3850).</p>
+<p>I am always interested in end of the year reading lists to give me an idea what
+I might want to read the next year. This years reading list of <a class="reference external" href="http://www.paperplanes.de/2013/12/30/reading-list-2013.html">Matthias Meyer</a> of TravisCI
+provides many ideas for my next years reading list.  My own sad list contains
+only one technical book that I have read this year, but I think you will
+appreciate the hint if you havent seen this before: <a class="reference external" href="http://www.amazon.de/gp/product/0321834577/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1638&amp;creative=6742&amp;creativeASIN=0321834577&amp;linkCode=as2&amp;tag=whitewashin0c-21">Implementing Domain-Driven
+Design</a>
+by Vaughn Vernon. That book has influenced many of my blog posts, discussions
+and experiments this year and you will see effects of it in 2014 as
+well.</p>
+<p>For 2014 I want to keep up the pace of blogging and complement all those ideas
+with a sample Symfony application that I want to write. The idea for this
+project spawned from discussions with readers at various events, mostly at the
+SymfonyCon in Warsaw. My initial plans were to write an ebook on this issue,
+but various attempts throughout 2013 ended with motivation failures. This is
+one reason why I have explicitly put the item “Do NOT write a book” in my 2014
+todo list.</p>
+<p>Most of my blog posts on architecture are very general and even with the
+practical Symfony and Doctrine posts it is complicated to see the benefits
+without a good open source sample. That is why I want to write one and discuss
+the development on this blog.</p>
+<p>To support this effort I would be very grateful if you consider supporting me
+with a regular <a class="reference external" href="https://www.gittip.com/beberlei/">Gittip donation</a>. Gittip is
+a fairly new service that allows you to make very small microdonations to
+others on a weekly basis.</p>
+<p>There is also a roadmap of ideas in my mind for 2014 blog posts, specifically
+about:</p>
+<ul class="simple">
+<li>Doctrine and Domain-Driven Design</li>
+<li>Hexagonal Architecture</li>
+<li>Domain Events</li>
+</ul>
+<p>I hope to see you again in 2014 and am very eager for the learnings and
+discussions that the new year will bring.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/retrospection.html">Retrospection</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on December 31, 2013 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a></h1>
+<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
+Doctrine Entities, Metadata Mapping and their database.</p>
+<p>The problem of feature flags with Doctrine is easily explained: If you add
+properties for a new feature that is disabled in the Doctrine metadata, then you
+need to upgrade the database before deployment, even when the feature is not
+being rolled out for some days/weeks. Doctrine requires the database to look
+exactly like the metadata specifies it.</p>
+<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
+easily:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
 <span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">"SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1"</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+    <span class="p">}</span>
 
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
 
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User"</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                    <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
+                    <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
+                <span class="p">));</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something"</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// more mapping</span>
+            <span class="p">}</span>
         <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>If we need this block of code in several actions of different controllers, we
-will end up with duplication that has to be eliminated.</p>
+<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
+<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
+<p>Then if the feature is enabled fore some time and accepted into the pool of
+permanent features, you can remove the listener and move the mapping onto the
+Entities metadata.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/doctrine.html">Doctrine</a>
+                 / 
+            <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on December 05, 2013 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a></h1>
+<p>A little over a year ago I posted on using <a class="reference external" href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html">Puppet for setting up development
+machines</a>.
+This approach prooved useful as during that time I did setup a new machine
+several times and benefited from the mostly automatic installation with Puppet.
+Github is thinking the same on a bigger scale. Earlier this year they
+introduced <a class="reference external" href="https://github.com/blog/1345-introducing-boxen">Boxen</a> which is
+using Puppet to setup mac-development machines.</p>
+<p>The space of deployment- and configuration management tools
+is exploding these last years and it is not always feasible to evaluate all of
+them. The benefit of Puppet over all these tools is its huge userbase and
+online resources. However the steep learning curve can be a huge pain coupled
+with the fact that most of the modules online are not reusable at all and
+mostly serve a documentation for “how not to work with Puppet”. On top of that
+Puppet is only for configuration management and not suitable for deployment
+of applications.</p>
+<div class="section" id="introduction-to-ansible">
+<h2>Introduction to Ansible</h2>
+<p>I came across a <a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible/">blog post on Ansible</a> by the
+awesome guys at Qandidate.com which lead me to investigate <a class="reference external" href="http://ansibleworks.com">Ansible</a>. It is essentially a hybrid between Capistrano and Puppet,
+solving both the deployment and configuration management problems with a focus
+on simplicity. In fact the learning curve of Ansible is much more flat than
+that of Puppet and you can read the whole documentation and understand even the
+advanced concepts in a few hours.</p>
+<p>Ansible is used from a developer- or continuous-integration-machine, which
+executes tasks on hosts from an inventory. You only need SSH servers running
+and private keys to connect to them to get it working. With the inventory of
+hosts to operate on, you can chose to execute ad-oc commands using the
+<cite>ansible</cite> command or playbooks using the <cite>ansible-playbook</cite> command. Playbooks
+are files written in YAML.</p>
+<p><a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible">Read Sanders post on the Qandidate blog</a> to get an introduction to Ansible.</p>
 </div>
-<div class="section" id="the-quick-and-dirty-solution">
-<h2>The Quick and Dirty Solution</h2>
-<p>One way of resolving the duplication appearing in this case, is moving the
-finder + not found logic into a common controller base class or into a trait.
-But this leaves us with a helper method buried in the code and a static
-dependency to a base class or a trait that we want to avoid.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">AbstractController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">findUser</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">"SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1"</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nv">$user</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<div class="section" id="development-machine-setup">
+<h2>Development-Machine Setup</h2>
+<p>Using Ansible to setup a development machine is a bit pointless, given that
+Ansible excels at remote task execution and distribution. The benefit in
+development-machine setup over Puppet is the simplicity of configuration
+compared to Puppet modules + DSL.</p>
+<p>For demonstration I have converted the puppet examples from my blog post on
+Puppet to Ansible.  To start we have to create a folder and create a new file
+<cite>inventory</cite> in it containing our local machine:</p>
+<div class="highlight-python"><div class="highlight"><pre>localhost   ansible_connection=local
 </pre></div>
 </div>
-<p>There are two problems with this sort of refactoring:</p>
+<p>This is necessary to convince the remote task execution part of Ansible that
+localhost exists and there is no SSH necessary to get into that machine.</p>
+<p>Now I can create playbooks for the different tools I might want to install and
+setup, such as Vim in a <cite>vim.yml</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre>---
+- hosts: localhost
+  tasks:
+    - name: Install VIM
+      apt: pkg=vim state=present
+      sudo: yes
+    - name: Install Dotfiles
+      git: &gt;
+        repo=git@github.com/beberlei/vim-dotfiles.git
+        dest=/home/${ansible_user_id}/.vim
+    - name: Create .vimrc Symlink
+      file: &gt;
+        src=/home/${ansible_user_id}/.vim/vimrc
+        dest=/home/${ansible_user_id}/.vimrc
+        state=symlink
+    - name: Compile and Install Command-T plugin
+      command: &gt;
+        rake make
+        chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
+        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe
+</pre></div>
+</div>
+<p>You can see here, tasks are a list of commands to execute. They are always
+executed in order and stop when the first task in the chain fails. Like in
+puppet you try to make those tasks idempotent through flags such as <cite>creates</cite>,
+signaling when a task needs to be or was already executed. I can optionally
+use sudo to run commands such as installing packages.</p>
+<p>To execute the playbook I call:</p>
+<div class="highlight-python"><div class="highlight"><pre>$&gt; ansible-playbook -K -i inventory vim.yml
+</pre></div>
+</div>
+<p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the
+local machine and the playbook applies the <cite>hosts</cite> filter to that inventory.
+The <cite>-K</cite> parameter prompts me to enter the sudo password for my Ubuntu machine,
+otherwise the tasks will fail.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Compared to Puppet, the configuration management of Ansible simplifies a lot of
+the assumptions for example on ordering and reusability of tasks. For a
+part-time “devop” like me this is great news, as I don’t need to understand a
+complex tool and can focus on solving problems.</p>
+<p>On top of that the deployment features of Ansible with parallel remote
+execution over SSH make Ansible a powerful tool that I hope to use much more in
+the future.</p>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/ansible.html">Ansible</a>
+                 / 
+            <a href="tags/automation.html">Automation</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on November 19, 2013 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a></h1>
+<p>In this blog post I will show how to decouple your core application
+from the Symfony Security component and User bundles such as the FOSUserBundle.</p>
+<p>In my opinion a framework has to be evaluated by how much it allows you to hide
+it from your actual application. This blog post will add another perspective on
+how to achieve decoupling from Symfony user and security with a very simple
+approach. With this puzzle piece and others I wrote about before (<a class="reference external" href="http://whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html">Controllers
+as Service</a>,
+<a class="reference external" href="http://whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html">Param Converters</a>)
+and other pieces I still need to write about, I would classify Symfony2 as a
+good framework.</p>
+<p>A number of other authors have written blog posts on decoupling Symfony and your model
+code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first/">on project structure</a>
+, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure/">on project structure as well</a>
+and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities/">Decoupling Forms from Entities</a>.</p>
+<p>User management breaks the isolation of your business model open,
+by introducing the <span class="docutils literal"><span class="pre">UserInterface</span></span> from the Security component into your
+code base. In combination with the <em>FOSUserBundle</em> this can cause a dependency
+on quite a bit of code already because I wouldn’t call the <span class="docutils literal"><span class="pre">FOS\UserBundle\Model\User</span></span> object
+leightweight. However this and other FriendsOfSymfony bundles
+are very helpful to get annoying features of your application done in a matter
+of hours.</p>
+<p>You can decouple the <em>FOSUserBundle</em> from our own entities and code by
+introducing a second object that representes the user concept in our model.
+The <span class="docutils literal"><span class="pre">UserInterface</span></span> entities need fields for username, password, enabled and
+some more. Except the username and email, the business model rarely needs other
+properties.</p>
+<p>Take an ecommerce system as example, where customers can register as users.
+In this example we could create two entities <span class="docutils literal"><span class="pre">MyProject\UserBundle\Entity\User</span></span> and
+<span class="docutils literal"><span class="pre">MyProject\ShopBundle\Entity\Customer</span></span>. Two strategies exist now:</p>
 <ol class="arabic simple">
-<li>We are using inheritance for code-reuse.</li>
-<li>We hide the <span class="docutils literal"><span class="pre">findUser</span></span> behavior in an abstract class and make it hard to test.</li>
+<li>Use the same table for both entities with some shared and other exclusive columns</li>
+<li>Use different tables in the database</li>
 </ol>
-</div>
-<div class="section" id="the-preferred-solution">
-<h2>The Preferred Solution</h2>
-<p>The <a class="reference external" href="http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html">SensioFrameworkExtraBundle</a>
-offers an extension hook called <strong>Parameter Converters</strong> to transform Request
-attributes to objects directly for controller method arguments. They hook into
-the <span class="docutils literal"><span class="pre">kernel.controller</span></span> event that you can use yourself to achieve the same
-goal.</p>
-<p>Lets see how the action will look like after our refactoring:</p>
+<p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
+<p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">User</span> <span class="nv">$user</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Very concise and easy to read. The param converter doing the heavy lifting
-looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Request\ParamConverter</span><span class="p">;</span>
+<span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
 
-<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Exception\NotFoundHttpException</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
+<span class="k">namespace</span> <span class="nx">MyProject\UserBundle\Entity</span><span class="p">;</span>
 
-<span class="k">class</span> <span class="nc">UserParamConverter</span> <span class="k">implements</span> <span class="nx">ParamConverterInterface</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$entityManager</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">EntityManager</span> <span class="nv">$entityManager</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">apply</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$id</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
-
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">"SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1"</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="nv">$param</span> <span class="o">=</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
-        <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="p">(</span><span class="nv">$param</span><span class="p">,</span> <span class="nv">$user</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">supports</span><span class="p">(</span><span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="s2">"MyProject\Entity\User"</span> <span class="o">===</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getClass</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Now we only need to register this class in the dependency injection container:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_project.user_param_converter"</span>
-      <span class="na">class=</span><span class="s">"MyProject\Request\ParamConverter\UserParamConverter"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">"service"</span> <span class="na">id=</span><span class="s">"doctrine.orm.default_entity_manager"</span> <span class="nt">/&gt;</span>
-
-    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">"request.param_converter"</span> <span class="na">converter=</span><span class="s">"user"</span> <span class="na">priority=</span><span class="s">"10"</span> <span class="nt">/&gt;</span>
-<span class="nt">&lt;/service&gt;</span>
-</pre></div>
-</div>
-<p>With the priority configuration the <span class="docutils literal"><span class="pre">User</span></span> entity is now always handled
-by our custom param converter and not by the default Doctrine converter.</p>
-<p>In a next step, we should extract the query logic from the ParamConverter
-into a custom Doctrine entity repository. But that is a task for another blog
-post in this series.</p>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/symfony2.html">Symfony2</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/symfony2_extendingsymfony2.html">Symfony2 ExtendingSymfony2</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html#disqus_thread" data-disqus-identifier="2013/02/19/extending_symfony2__paramconverter">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 04, 2013</span>
-        </div>
-        <div class="section">
-            <h1><a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a></h1>
-<p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
-time. It bugs me having to reply: It is not really possible.  Because Doctrine2
-does not support value-objects (or embedded-objects), it is very hard to pull
-the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
-<p>These problems are related to the inability to share behavioral code through
-aggregation and the complexity of state transformations. Combining both, your
-average entity with 5-15 fields can end up with hundreds or thousands lines of
-code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
-maximizing clarity</a>.</p>
-<div class="section" id="extracting-value-objects-minimize-duplication">
-<h2>Extracting Value Objects: Minimize Duplication</h2>
-<p>Entity classes responsibility are the state transformations of their internal
-fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
-setters</a>,
-with use-case driven methods.  These state transformations can be part of
-different responsibilities, specifically when properties belong to different
-groups of concepts.</p>
-<p>Take a very simple entity that contains updated/created at logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">FOS\UserBundle\Model\User</span> <span class="k">as</span> <span class="nx">BaseUser</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
 
 <span class="sd">/**</span>
 <span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\HasLifecycleCallbacks</span>
-<span class="sd"> **/</span>
-<span class="k">class</span> <span class="nc">Person</span>
+<span class="sd"> * @ORM\Table(name="fos_user")</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">User</span> <span class="k">extends</span> <span class="nx">BaseUser</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type="datetime")</span>
-<span class="sd">     **/</span>
-    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
+<span class="sd">     * @ORM\Id</span>
+<span class="sd">     * @ORM\Column(type="integer")</span>
+<span class="sd">     * @ORM\GeneratedValue(strategy="AUTO")</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">Customer</span></span> entity is a completly new object, not depending
+on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
+<p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
+correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
+
+<span class="k">namespace</span> <span class="nx">MyProject\ShopBundle\Entity</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\Table(name="customer")</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Customer</span>
+<span class="p">{</span>
     <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type="datetime")</span>
-<span class="sd">     **/</span>
-    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
+<span class="sd">     * @ORM\Id</span>
+<span class="sd">     * @ORM\Column(type="integer")</span>
+<span class="sd">     * @ORM\GeneratedValue(strategy="NONE")</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
 
     <span class="sd">/**</span>
-<span class="sd">     * @ORM\PreUpdate</span>
-<span class="sd">     **/</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
+<span class="sd">     * @ORM\Column(type="string")</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$username</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>If you want to duplicate this logic to another second entity, then in Doctrine
-the solution for this is using traits. <a class="reference external" href="http://kore-nordmann.de/blog.html">Kore</a> will dismiss this solution, because
-traits create a hard dependency. Even if we accept the static dependency,
-traits are not perfect even for this very simple example, because its very
-likely that you cannot override the constructor of every entity.</p>
-<p>The solution is to extract a value object <span class="docutils literal"><span class="pre">Timestamped</span></span> that contains
-all the logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">Timestamped</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
+<p>Now you need to extend the application to synchronize all changes from the
+<span class="docutils literal"><span class="pre">User</span></span> entity to the <span class="docutils literal"><span class="pre">Customer</span></span> entity. You can
+achieve this relatively easy by overwriting the <span class="docutils literal"><span class="pre">ModelManager</span></span> or when finally
+supported by <em>FOSUserBundle</em> listening to events.  Your own code can
+exclusively work with <span class="docutils literal"><span class="pre">Customer</span></span> objects now, void of any reference to
+the Symfony Security component or the huge FOSUserBundle dependency.</p>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">class</span> <span class="nc">Person</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$timestamped</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">timestamped</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamped</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>See how all the code could be moved into <span class="docutils literal"><span class="pre">Timestamped</span></span> and is now reusable
-in other entities.</p>
-<p>Doctrine has no support for embedded objects, which is very sad. I am working
-very hard to get this feature into Doctrine as soon as possible. You can use
-the “object” type as a workaround and <span class="docutils literal"><span class="pre">serialize()</span></span> the value object into
-the database. However this is beyond ugly in my opinion.</p>
-</div>
-<div class="section" id="extract-method-objects-maximizing-clarity">
-<h2>Extract Method Objects: Maximizing clarity</h2>
-<p>Once you have identified groups of fields that are modified, then the
-complexity of the state transformations can attract lots of code.</p>
-<p>Take an <span class="docutils literal"><span class="pre">Order</span></span> object that has a method for calculating the shipping costs,
-depending all the order items and products.
-To separate calculations from state transformations you can extract
-method objects instead of inlining the code into the <span class="docutils literal"><span class="pre">Order</span></span> object.</p>
-<p>For this kind of extraction I create a folder <span class="docutils literal"><span class="pre">Order</span></span> and put all
-the extracted method objects in the <span class="docutils literal"><span class="pre">Order</span></span> subnamespace.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
-
-    <span class="k">class</span> <span class="nc">Order</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">()</span>
-        <span class="p">{</span>
-            <span class="nv">$calculator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ShippingCostCalculator</span><span class="p">();</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">namespace</span> <span class="nx">MyProject\Entity\Order</span> <span class="p">{</span>
-
-    <span class="k">class</span> <span class="nc">ShippingCostCalculator</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nx">Order</span> <span class="nv">$order</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>From this step its easy to make the code reusable by passing the shipping cost
-calculator:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">Order</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Another benefit is that you can test the shipping cost calculator directly in a
-unit-test and avoid checking for the correctness indirectly through a getter
-method for the shipping costs.</p>
-<p>Extracting every method of an entity into a method object is obviously
-overkill. You should exercise caution and common sense when performing this
-refactoring.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>Not all the techniques to implement SOLID code can be exploited when using Doctrine
-for technical reasons. In the future I hope to support value objects in
-Doctrine to make this possible.</p>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/php.html">PHP</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2013/02/04/doctrine_and_solid.html#disqus_thread" data-disqus-identifier="2013/02/04/doctrine_and_solid">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 19, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
-<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
-research I found out Azure supports post deployment hooks to run
-Composer and allows you to configure environment variables from the Management
-console.</p>
-<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites/">Azure Websites</a> in June this
-year.  It is a platform as a service solution where you can deploy your
-websites via FTP or Git. With Azure Websites you can avoid having to deal with
-the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services/">Azure Hosted Cloud
-Services</a>.
-As long as your website only requires an SQLServer, MySQL or external APIs you
-can actually achieve quite a lot already.</p>
-<p>For a <a class="reference external" href="http://www.symfony.com">Symfony2</a>, <a class="reference external" href="http://www.silex-project.org">Silex</a> or any other modern project however you want
-<a class="reference external" href="http://www.getcomposer.org">Composer</a> support during the deployment as
-long as failures with Composer don’t break your site.</p>
-<p>It turns out that Azure Websites - to support other platforms that require
-compiling - actually has an extremely robust deployment system (as far as I
-understood its internals). The Git repository is separated from the actual code
-that is served from the webserver and a number of old checkouts is kept to
-allow rollbacks through the Web interface. Once a Git push was recognized,
-Azure websites will execute a build step, and then copy all the files over to a
-directory with the name of the Git SHA hash. This directory is then symlinked
-to the document root.</p>
-<p>If Composer fails during this step, the website will still be served from the
-currently running version and you don’t have to face unexpected downtime.</p>
-<p>To actually run Composer as a post-deployment tool you have to do some manual
-work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">"D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php</span>
-</pre></div>
-</div>
-<p>If you are using PHP 5.4, then you probably have to change the command version
-name to “v5.4”, but I haven’t tested this.</p>
-<p>Then you need to create the <span class="docutils literal"><span class="pre">build_azure.php</span></span> file that is referenced in the
-deployment command. The actual implementation is up to you, my version is
-the most simple one:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nv">$url</span> <span class="o">=</span> <span class="s1">'https://getcomposer.org/composer.phar'</span><span class="p">;</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"update"</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"--prefer-dist"</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"-v"</span><span class="p">;</span>
-<span class="k">require</span> <span class="s2">"composer.phar"</span><span class="p">;</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This currently only works with a Composer version, where
-<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
-You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
-<span class="docutils literal"><span class="pre">./bin/compile</span></span> to generate a composer.phar that works.</p>
-</div>
-<p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
-You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/azure.html">Azure</a></span>
-        </div>
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/11/19/composer_and_azure_websites_git_deployment.html#disqus_thread" data-disqus-identifier="2012/11/19/composer_and_azure_websites_git_deployment">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>October 27, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a></h1>
-<p>I wanted to host a simple application to play around with the <a class="reference external" href="https://tent.io">Tent Protocol</a> (see <a class="reference external" href="http://whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html">my last blogpost</a>), so
-I checked through some of the PHP Cloud providers again for the fun of it. One
-requirement was to deploy from Git and update dependencies from Composer. I
-found a new provider that i haven’t heard of before, <a class="reference external" href="http://www.fortrabbit.com/">Fortrabbit</a> that supports this so I had to check it out.
-It has some more features that I really dig:</p>
-<p>Fortrabbit provides you with a Git url where you can push your repository.
-It is directly deployed during the push operation. You can trigger composer
-updates by having a special syntax in the commit message. The push
-output informs you about all the steps performed during deployment.</p>
-<p>Additionally you can configure environment variables in the web-administration
-interface that are available in the application through <span class="docutils literal"><span class="pre">$_SERVER</span></span>. You
-can easily use them to configure your application, if its hosted in a public
-repository. Great to share sample applications on Github and host them from
-there.</p>
-<p>You get SSH access to the machines, where you can take a look at the apache
-and php error log files. You have vim available. Quite cool and very helpful
-for any kind of debugging necessary. Deployments overwrite every change you
-make, so its still a save environment.</p>
-<p>The composer support allows for post install scripts, which is cool to perform
-all sorts of cache warmup and other deployment tasks.</p>
-<p>You can host one application for free, however they shutdown after 48 hours if
-you don’t regularly click on a reset button. Its definitely enough to get small
-prototypes up and running. From there you can upgrade in many small steps from
-small plans (10€/month) to bigger ones (80€/month).</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/10/27/babysteps_with_fortrabbit_php_cloud.html#disqus_thread" data-disqus-identifier="2012/10/27/babysteps_with_fortrabbit_php_cloud">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>October 22, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a></h1>
-<p>Over the weekend I built a <a class="reference external" href="http://zelten.eu1.frbit.net">very simple bookmarking application</a> for <a class="reference external" href="http://tent.io">tent.io</a>. I wanted to try the tent functionality to create
-arbitrary entities of data using something as simple as a “Bookmark”.</p>
-<p>The application retrieves and stores bookmarks on your own tent-server, nothing
-is kept on the applications server and as a user you keep full control over
-your content (bookmarks).</p>
-<p>The <a class="reference external" href="https://github.com/beberlei/zelten-bookmarks">code for the application</a>
-is on Github, as well as the <a class="reference external" href="https://github.com/beberlei/TentPHP">TentPHP library</a> I have written to support the protocol.
-The application is using PHP, the Silex microframework and MySQL.</p>
-<div class="section" id="so-what-is-tent-and-why-bother">
-<h2>So what is Tent and why bother?</h2>
-<p>About two month ago a new distributed social networking protocol was launched called
-<a class="reference external" href="http://tent.io">Tent.io</a>. It works over HTTP using JSON and distributes data
-using webhooks. This happened in the shadow of <a class="reference external" href="http://www.app.net">app.net</a>
-funding, just two weeks after they collected over 500k USD. Tent.io got lots of
-attention but not as much as app.net sadly. Its distributed nature however is
-much more suited to achieving true independence of large companies and true privacy
-for the users though. Compared to Diaspora it has the benefit of being a protocol, not
-an application first.</p>
-<p>Now two month later, there are <a class="reference external" href="https://github.com/tent">reference implementations</a>
-for Server, Client and a Twitter like Status application. You can use <a class="reference external" href="http://tent.is">Tent.is</a> to create a free or payed tent account including access to
-the status application or setup your own tentd server on Heroku.</p>
-<p>As a user I can connect any application to the tent server I have registered
-with and control the visibility and sharing policies. Content can be private,
-public or visible to certain groups only. A Tent server then makes sure to
-distribute content to the appropriate subscribers.</p>
-<p>In this early state of the protocol it makes sense to register on the central
-tent.is service, however when the server gets more stable or alternative
-server implementations popup its easy to move all your data off tent.is to your
-own server. One feature that will hit tent.is soonish is registration of domain
-records. That will be the first step to your own tent server, I am eagerly
-waiting to host all my content at <a class="reference external" href="https://tent.beberlei.de">https://tent.beberlei.de</a> at some day.</p>
-</div>
-<div class="section" id="tent-io-sounds-awesome-how-can-i-help">
-<h2>Tent.io sounds awesome, how can I help?</h2>
-<p>Right at the moment the tent software stack is developed by the team that also
-hosts <a class="reference external" href="https://tent.is">Tent.is</a>. If all you can provide is money, then
-signing up for the 12 USD per month is the way to go.</p>
-<p>If you are a developer, then take a look at the <a class="reference external" href="https://github.com/tent/tent.io/wiki/Related-projects">Wiki</a> where related
-projects are listed. You will find a bunch of client libraries for major
-languages already, helping you to get started.</p>
-<p>I suppose the major work lies in implementing Status-Post clients for all
-major smartphone platforms and desktops. As well as the host of applications
-that Facebook and other social networks provides:</p>
-<ul class="simple">
-<li>Manage and share Photo albums</li>
-<li>Plan and share events</li>
-<li>Managing contact data/address book</li>
-<li>Resume details (Linkedin/Xing)</li>
-<li>Track User Events (Timeline)</li>
-<li>Sharing Music and Videos (Myspace)</li>
-<li>Importing all sorts of existing content (RSS,..)</li>
-</ul>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html#disqus_thread" data-disqus-identifier="2012/10/22/a_tent_io_app__zelten_bookmarks">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>September 04, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/09/04/using_assertions_for_validation.html">Using Assertions for validation</a></h1>
-<p>We all know PHP is weakly typed and has some weird type-conversion rules.
-This can often complicate our code checking for invalid or illegal data.
-Using if/else clauses we can do all sorts of validation, but with standard
-coding styles (PSR, Zend, PEAR) we end up with at least 3 lines per check,
-cluttering the whole code-base.</p>
-<p>Take <a class="reference external" href="http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935">this example</a> from
-the old deprecated Windows Azure SDK, a method for putting a binary file into
-Azures blob storage:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Container name is not specified.'</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">self</span><span class="o">::</span><span class="na">isValidContainerName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Container name does not adhere to container naming conventions. See http://msdn.microsoft.com/en-us/library/dd135715.aspx for more information.'</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$blobName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Blob name is not specified.'</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$localFileName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Local file name is not specified.'</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Local file not found.'</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">'$root'</span> <span class="o">&amp;&amp;</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$blobName</span><span class="p">,</span> <span class="s1">'/'</span><span class="p">)</span> <span class="o">!==</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Microsoft_WindowsAzure_Exception</span><span class="p">(</span><span class="s1">'Blobs stored in the root container can not have a name containing a forward slash (/).'</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="c1">// rest of the code here</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The rest of this components public API methods look about the same. It is a
-very complete validation of the input data, however its not very readable.
-Instead you have 6 if branches, which increase the complexity of the method
-and almost take up half the screen without even getting to the actual code.</p>
-<p>The assertion pattern is really helpful here to reduce the complexity of this
-code and hide the <span class="docutils literal"><span class="pre">if/throw</span></span> conditions into little helper methods. Have a
-look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="s1">'Container name is not specified'</span><span class="p">);</span>
-    <span class="nx">self</span><span class="o">::</span><span class="na">assertValidContainerName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">);</span>
-    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$blobName</span><span class="p">,</span> <span class="s1">'Blob name is not specified.'</span><span class="p">);</span>
-    <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">,</span> <span class="s1">'Local file name is not specified.'</span><span class="p">);</span>
-    <span class="nx">Assertion</span><span class="o">::</span><span class="na">file</span><span class="p">(</span><span class="nv">$localFileName</span><span class="p">,</span> <span class="s1">'Local file name is not specified.'</span><span class="p">);</span>
-    <span class="nx">self</span><span class="o">::</span><span class="na">assertValidRootContainerBlobName</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="nv">$blobName</span><span class="p">);</span>
-
-    <span class="c1">// rest of the code</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This is much more readable, using two custom assertions and some general
-assertions.</p>
-<p>There is one risk here though, you introduce additional coupling to another
-library/namespace. Especially when you start using this pattern on a large
-scale, you have to make sure this assertions are <strong>VERY</strong> stable and
-unit-tested.</p>
-<p>That is why you should extend from <span class="docutils literal"><span class="pre">Assertion</span></span> and use your own class when
-using the Assert library. This returns some control in your hands and even
-allows you to overwrite the exception class:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Util</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Assert\Assertion</span> <span class="k">as</span> <span class="nx">BaseAssertion</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">Assertion</span> <span class="k">extends</span> <span class="nx">BaseAssertion</span>
-<span class="p">{</span>
-    <span class="k">static</span> <span class="k">protected</span> <span class="nv">$exceptionClass</span> <span class="o">=</span> <span class="s1">'MyProject\Util\AssertionFailedException'</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html#disqus_thread" data-disqus-identifier="2012/09/04/using_assertions_for_validation">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 26, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/08/26/symfony__monolog_and_different_log_types.html">Symfony, Monolog and different log types</a></h1>
-<p>Symfony uses the excellent Monolog library for logging everything related
-to the symfony application stack. But sometimes you need a different logger
-that responds differently to the log error levels. Ideally you don’t want
-to reuse the application log mechanism to avoid messing with the
-fingers crossed listener of Monolog, that keeps the application log files small
-in case no errors occur.</p>
-<p>This can be easily done with Symfonys MonologBundle with a feature called
-channel. Every log handler, such as file, syslog, mail or
-fingers crossed is attached to the default logger called “app”. This is
-referenced by the dependency injection service called <span class="docutils literal"><span class="pre">monolog.logger</span></span>.</p>
-<p>If you want to create a different logger service that is responsible for a
-different type of your application stack, just define it using the <span class="docutils literal"><span class="pre">channels</span></span>
-option:</p>
-<div class="highlight-yaml"><div class="highlight"><pre>monolog:
-    handlers:
-        myfile:
-            type: stream
-            path: %kernel.logs_dir%/myfile.log
-            channels: mychannel
-</pre></div>
-</div>
-<p>To actually write to <span class="docutils literal"><span class="pre">mychannel</span></span> you have to tag all the services that use
-<span class="docutils literal"><span class="pre">mychannel</span></span> with the following tag:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_service"</span> <span class="na">class=</span><span class="s">"MyService"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">"monolog.logger"</span> <span class="na">channel=</span><span class="s">"mychannel"</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">"service"</span> <span class="na">id=</span><span class="s">"logger"</span> <span class="nt">/&gt;</span>
-<span class="nt">&lt;/service&gt;</span>
-</pre></div>
-</div>
-<p>With this approach you are now as flexible as with the default channel <span class="docutils literal"><span class="pre">app</span></span>
-regarding to logging in development, testing and production environments for
-example. Once there is a channel created through the DIC tag, you can actually
-fetch it from the DIC with <span class="docutils literal"><span class="pre">monolog.logger.mychannel</span></span> in our example.
-I don’t like this approach too much, because it misuses tags for modifying
-arguments, where tags are actually for the services themselves. However it is
-usable and works.</p>
-<p>This feature is included starting with Symfony 2.1. It is <a class="reference external" href="http://symfony.com/doc/master/cookbook/logging/channels_handlers.html">documented in a
-cookbook entry</a>,
-however some insights of this blog post are still inside a pending Pull
-Request.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/26/symfony__monolog_and_different_log_types.html#disqus_thread" data-disqus-identifier="2012/08/26/symfony__monolog_and_different_log_types">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 26, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/08/26/froscon_2012.html">FrOSCon 2012</a></h1>
-<p>This years <a class="reference external" href="http://www.froscon.org">Free and Open Source Conference (FrOSCon)</a> took place this weekend in Bonn, St.  Augustin.
-Because I live in Bonn, visiting the conference is a given for very many years
-now. This year I also did a talk on “Architecture Design Patterns” with <a class="reference external" href="http://twitter.com/go_oh">Gordon</a> so there was an incentive to show up besides
-meeting friends, all the Club Mate and <a class="reference external" href="http://www.quijote-kaffee.de">good open source coffee</a>.</p>
-<p>The most interesting topic in this years conference for me has been the <a class="reference external" href="http://graylog2.org/">Graylog2</a> talk by Lennart Koopmann. Graylog is a logging server
-that uses Elastic Search for persistence and searching. It is sponsored by
-Xing, a pretty big german based Linkedin clone.</p>
-<p>The talk <a class="reference external" href="http://programm.froscon.de/2012/events/954.html">The State of PHPUnit</a> by <a class="reference external" href="http://twitter.com/__edorian/">Volker</a> was interesting to see all the new stuff in
-PHPUnit 3.7 and that it fixes a bunch of annoyances that I stumbled on myself.
-I actually realized that they are so deeply rooted in my brain already, that
-they constitute features for me, not something that could actually be
-optimized. Well done to Volker and Sebastian to the new version.</p>
-<p>Igors talk about building an HTTP server in PHP was interesting to see the
-stream/socket server APIs of PHP at work. Ever since I took part in <a class="reference external" href="https://github.com/conradmueller/maexchen">the
-SoCraTes 2012 Conference Maexchen UDP Bot</a> challenge I think network
-programming is an interesting topic for learning about languages and
-programming itself.</p>
-<p>Volker did a second talk on sunday about Clean Code that was both entertaining
-and interesting. He was reminding the audience that shipping the code is what
-actually creates the value in our profession. Hence clean code is not about
-the beauty of code itself, but its ability to be shippable, changeable and
-adaptable to the business.</p>
-<p>Again FrOSCon 2012 was awesome. Thank you very much especially to all the
-volunteers that organized this event. It really good event to bring together
-people from many different open-source communities and I already look forward
-to the next FrOSCon 2013.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/26/froscon_2012.html#disqus_thread" data-disqus-identifier="2012/08/26/froscon_2012">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 25, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
-<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
-I have described 3 architectural patterns for business applications. Applying
-them to your software helps you decouple the business logic from the
-application/framework/UI. However given sufficient complexity, you will want to
-decouple different parts of your business model from each other as well.</p>
-<p>As an example, lets think of a batch process in your application that updates
-orders from a CRM or logistics system:</p>
-<ul class="simple">
-<li>You receive an XML with full users and order representations</li>
-<li>You need to update certain user fields</li>
-<li>You need to update certain order fields</li>
-<li>Some orders require creating accounts in different remote systems</li>
-<li>If the user has not confirmed his email yet he should receive an opt-in
-mail instead.</li>
-<li>If the user confirms his opt-in mail, all outstanding remote accounts are
-created.</li>
-</ul>
-<p>You can build all the steps into a single batch processing service. This will
-be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
-principle</a>.</p>
-<p>the part with updating of users and fields has nothing to with the sending of
-mails and creation of remote accounts.  We want to decouple them from each
-other.</p>
-<p>The first obvious choice is to decouple them into distinct services:</p>
-<ul class="simple">
-<li>Import Service</li>
-<li>Authentication Service</li>
-<li>Account Generation Service</li>
-</ul>
-<p>All these services have dependencies on infrastructure objects, database,
-mailer and so on. We could inject the authentication and account generation
-services into the Import Service, but with rising complexity this will lead to
-a lasagna of services and the execution path will dig deep into this and this
-is not nearly as tasty as eating real lasagna.</p>
-<div class="highlight-python"><div class="highlight"><pre>ImportService
-|_AuthenticationService
-| |_Mailer
-| |_Database
-|_AccountGenerationService
-| |_Database
-| \_RemoteFacade
-\_Database
-</pre></div>
-</div>
-<p>This becomes more complicated when transaction semantics need to be taken care
-of. For example dependencies between mailer and database services. Also you
-have to take into account that the code in entities and value objects
-participating in this use-case.</p>
-<p>What we want instead is a sequential execution of those nested services, but
-only if the parent service executed successfully:</p>
-<div class="highlight-python"><div class="highlight"><pre>ImportService
-\_Database
-
-AuthenticationService
-|_Mailer
-\_Database
-
-AccountGenerationService
-|_Database
-\_RemoteFacade
-</pre></div>
-</div>
-<p>We could use an event dispatcher in all of the services to notify each other,
-but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
-cleaner way:</p>
-<p>Every entity is an event provider and can emit events. Whenever a transaction
-is committed and an hence an operation is completed successfully, we take all
-the events emitted from all entities (looking at the identity map for example)
-and trigger observing event handlers. However if the operation fails, we do not
-trigger these event handlers.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// 1. do something with $data</span>
-
-        <span class="c1">// 2. raise event</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-            <span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
-            <span class="s2">"data"</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
-        <span class="p">)));</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">interface</span> <span class="nx">EventProviderInterface</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The Event provider trait aggregates all the events, and offers
-and API for external services to pull them from the entity:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">trait</span> <span class="nx">EventProvider</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Our infrastructure must then trigger event handlers, based
-on the event names. It will use <span class="docutils literal"><span class="pre">dequeueEmittedEvents</span></span> and making
-sure the events are not emitted multiple times.</p>
-<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
-<ul class="simple">
-<li>Command executes</li>
-<li>Entities emit events</li>
-<li>Command transaction succeeds</li>
-<li>Events trigger event handlers</li>
-<li>Event handlers execute more commands</li>
-<li>Restart from 1.</li>
-</ul>
-<p>With this approach we can decouple all services from each other and avoid
-deep nesting in each other. Yet we still have transactional dependencies,
-by dropping all events when the parent command fails. Transactions over
-multiple commands will not have ACID properties though, instead you will have
-to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
-that are important in systems with eventual consistency. This is one downside
-that you need to take into account.</p>
-<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
-implementation of DomainEvent and EventProvider classes and integration into
-Symfony and Doctrine ORM. Generally this pattern is very easy to implement
-though, so that you can just have a look at the implementation and take the
-best parts for your own.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/25/decoupling_applications_with_domain_events.html#disqus_thread" data-disqus-identifier="2012/08/25/decoupling_applications_with_domain_events">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 22, 2012</span>
-        </div>
-        <div class="section">
-            <h1><a href="2012/08/22/building_an_object_model__no_setters_allowed.html">Building an Object Model: No setters allowed</a></h1>
-<p>If you are using an object relational mapper or any other database
-abstraction technology that converts rows to objects, then you will probably
-use getter/setter methods or properties (C#) to encapsulate object properties.</p>
-<p>Take <a class="reference external" href="https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Model/User.php">a look</a>
-at the default <span class="docutils literal"><span class="pre">User</span></span> entity from the Symfony2 FOSUserBundle plugin for
-example: A colossus of getter/setter methods with nearly no real business
-logic. This is how most of our persistence related objects look like in PHP.
-A Rails ActiveRecord such as <a class="reference external" href="https://github.com/redmine/redmine/blob/master/app/models/issue.rb">Redmines “Issue”</a> avoids
-the explicit getter/setters, however generates accessors magically for you.
-Nevertheless you have to add considerable amount of code to configure all the
-properties. And code using these active records becomes ambiguous as well.</p>
-<p>Why do we use getters/setters so much?</p>
-<ul class="simple">
-<li>Tools generate objects from a database, adding getters and setters
-automatically.</li>
-<li>Frameworks make them automatically available for database records/rows.</li>
-<li>IDEs can magically create getter/setter pairs for fields.</li>
-<li>We want the flexibility to change every field whenever we want.</li>
-<li>It became natural in OOP to have write access to every field.</li>
-</ul>
-<p>However Getters/setters <a class="reference external" href="http://en.wikipedia.org/wiki/Open/closed_principle">violate the open/closed principle</a>, prevent information
-hiding and <a class="reference external" href="http://stackoverflow.com/questions/565095/are-getters-and-setters-evil">should be considered evil</a>
-(<a class="reference external" href="http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html">Long version</a>). Using
-getters and setters allows to <em>decouples</em> the business logic for setting values from the
-actual storage. Something that object-orientation was suppose to avoid.</p>
-<div class="section" id="getting-rid-of-setters">
-<h2>Getting rid of setters</h2>
-<p>Avoiding setters is much simpler than getters, so lets start with them.</p>
-<p>One way to avoid writing setters is a task based approach to the model. Think
-of every task that is performed in an application and add a method that
-changes all the affected fields at once, to perform this task. In the famous
-blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">Post</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">compose</span><span class="p">(</span><span class="nv">$headline</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$tags</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// check invariants, business logic, filters</span>
-
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headline</span> <span class="o">=</span> <span class="nv">$headline</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">text</span>     <span class="o">=</span> <span class="nv">$text</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span>     <span class="o">=</span> <span class="nv">$tags</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">publish</span><span class="p">(</span><span class="nx">\DateTime</span> <span class="nv">$onDate</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// check invariants, business logic, filters</span>
-
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">state</span>       <span class="o">=</span> <span class="s2">"published"</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$onDate</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The <span class="docutils literal"><span class="pre">Post</span></span> class is now much more protected from the outside and
-is actually much better to read and understand. You can clearly see
-the behaviors that exist on this object. In the future you might even
-be able to change the state of this object without breaking client code.</p>
-<p>You could even call this code domain driven, but actually its just applying
-the SOLID principles to entities.</p>
-</div>
-<div class="section" id="tackling-getters">
-<h2>Tackling getters</h2>
-<p>Avoiding getters is a bit more cumbersome and given no setters, maybe
-not worth the trouble anymore.</p>
-<p>You still need getters to access the object state, either if you display
-models directly in the view or for testing purposes. There is another way
-to get rid of all the getters that you don’t need explicitly in a domain
-model, using the visitor pattern in combination with view models:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">Post</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nx">PostView</span> <span class="nv">$view</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">id</span>          <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span>
-        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">publishDate</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">publishDate</span><span class="p">;</span>
-        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">headline</span>    <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">;</span>
-        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">text</span>        <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">;</span>
-        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">author</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">author</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="k">new</span> <span class="nx">AuthorView</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">class</span> <span class="nc">PostView</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
-    <span class="c1">//... more public properties</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>There are drawbacks with this approach though:</p>
-<ul class="simple">
-<li>Why use the Post model in memory, when you are only passing <span class="docutils literal"><span class="pre">PostView</span></span>
-instances to the controllers and views only anyways? Its much more efficient
-to have the database map to the view objects directly. This is what CQRS
-postulates as separation of read- and write model.</li>
-<li>You have to write additional classes for every entity (Data transfer objects)
-instead of passing the entities directly to the view. But if you want to
-cleanly separate the model from the application/framework, you don’t get
-around view model/data transfer objects anyways.</li>
-<li>It looks awkward in tests at first, but you can write some custom assertions
-to get your sanity back for this task.</li>
-</ul>
-</div>
-<div class="section" id="what-about-the-automagic-form-mapping">
-<h2>What about the automagic form mapping?</h2>
-<p>Some form frameworks like the <a class="reference external" href="http://www.symfony.com">Symfony2</a> or <a class="reference external" href="http://framework.zend.com">Zend
-Framework 2</a> ones map forms directly to objects
-and back. Without getters/setters this is obviously not possible anymore.
-However if you are decoupling the model from the framework, then using this
-kind of form framework on entities is a huge no go anyways.</p>
-<p>Think back to the tasks we are performing on our <span class="docutils literal"><span class="pre">Post</span></span> entity:</p>
-<ul class="simple">
-<li>Edit (title, body, tags)</li>
-<li>Publish (publishDate)</li>
-</ul>
-<p>Both tasks allow only a subset of the properties to be modified. For each of
-these tasks we need a custom form “model”. Think of these models as command
-objects:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">EditPostCommand</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
-    <span class="k">public</span> <span class="nv">$headline</span><span class="p">;</span>
-    <span class="k">public</span> <span class="nv">$text</span><span class="p">;</span>
-    <span class="k">public</span> <span class="nv">$tags</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>In our application we could attach these form models to our form framework and
-then pass these as commands into our “real model” through a service layer,
-<a class="reference external" href="http://www.eaipatterns.com/MessageBus.html">message bus</a> or something equivalent:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">PostController</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$post</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">findPostViewModel</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">));</span>
-
-        <span class="c1">// This could need some more automation/generic code</span>
-        <span class="nv">$editPostCommand</span>           <span class="o">=</span> <span class="k">new</span> <span class="nx">EditPostCommand</span><span class="p">();</span>
-        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">id</span>       <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
-        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">headline</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">;</span>
-        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">text</span>     <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">;</span>
-        <span class="nv">$editPostCommand</span><span class="o">-&gt;</span><span class="na">tags</span>     <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">;</span>
-
-        <span class="c1">// here be the form framework handling...</span>
-        <span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="k">new</span> <span class="nx">EditPostType</span><span class="p">(),</span> <span class="nv">$editPostCommand</span><span class="p">);</span>
-        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">bind</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
-            <span class="c1">// invalid, show errors</span>
-        <span class="p">}</span>
-
-        <span class="c1">// here we invoke the model, finally, through the service layer</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">postService</span><span class="o">-&gt;</span><span class="na">edit</span><span class="p">(</span><span class="nv">$editPostCommand</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">class</span> <span class="nc">PostService</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditPostCommand</span> <span class="nv">$command</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$post</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">postRepository</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
-        <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">compose</span><span class="p">(</span><span class="nv">$command</span><span class="o">-&gt;</span><span class="na">headline</span><span class="p">,</span> <span class="nv">$command</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">,</span> <span class="nv">$command</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This way we separated the business model from the application framework.</p>
-</div>
-<div class="section" id="a-word-about-rad">
-<h2>A word about RAD</h2>
-<p>Rapid-application development or rapid prototyping is a wide-spread approach in web
-development. My explicit approach seems to be completely against this kind of
-development and much slower as well. But I think you don’t loose much time
-in the long run:</p>
-<ul class="simple">
-<li>Simple command objects can be code-generated or generated by IDEs
-in a matter of seconds. Or you could even extend ORMs code generation
-capabilities to generate these dummy objects for you. Since you don’t need
-ORM mapping information for these objects or think about performance
-implications in context with the ORM, you don’t need to spend much
-thinking about their creation.</li>
-<li>Explicit models are much simpler to unit-test and those tests run much faster
-than tests through the UI that RAD prototypes need.</li>
-<li>Generated Rapid prototypes can get hard to maintain quickly. That does not mean they
-are unmaintainable, but they seem to favour reimplementation instead of
-refactoring, something that leads to problems given the low code coverage
-that these prototypes normally have.</li>
-</ul>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>If we take a step back from all our tools suggesting to generate getter/setters
-we find that there is a simple way to avoid using setters when focusing on the
-tasks that objects perform. This actually makes our code much more readable and
-is one building block towards clean object oriented code and domain driven design.</p>
-<p>I am very interested in your opinions on this topic and my attempt to avoid them,
-please leave comments when leaving this website :-)</p>
-</div>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/php.html">PHP</a></span>
-        </div>
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html#disqus_thread" data-disqus-identifier="2012/08/22/building_an_object_model__no_setters_allowed">Leave a comment</a>
-        </div></div><div class="archive_link">
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/symfony.html">Symfony</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on September 04, 2013 by Benjamin Eberlei</small></p>
+        </div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
-
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/page4.html';
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
           </div>         
         </div>
-      </div>
     </div>
-
-    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li><li>
-            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li></ul>
-</div>
-</section>
-          </aside></div>
 </div>
 </div> <!-- #main-container -->
 
         <div class="footer-container" role="contentinfo">
 <div class="container">
-    <div class="span-24 content">
+    <div class="col-md-8 col-md-offset-2">
         <div class="footer">
-            &copy; Copyright 2008-2015, Benjamin Eberlei.
-            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
 
-        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
         </div>
     </div>
 </div>

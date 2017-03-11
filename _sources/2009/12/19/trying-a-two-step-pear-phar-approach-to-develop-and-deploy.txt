@@ -242,6 +242,5 @@ If you need the ability to go back to any version of your application
 you could make use of symlinks.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Deployment
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

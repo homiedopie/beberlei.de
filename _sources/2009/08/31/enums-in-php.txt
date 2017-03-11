@@ -92,6 +92,5 @@ Now you could nice things such as:
 What are your thoughts?
 
 .. categories:: none
-.. tags:: none
+.. tags:: ApplicationDesign, PHP
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

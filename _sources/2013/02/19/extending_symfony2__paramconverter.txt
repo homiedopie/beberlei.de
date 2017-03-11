@@ -183,5 +183,5 @@ post in this series.
 
 .. author:: default
 .. categories:: Symfony2
-.. tags:: Symfony2 ExtendingSymfony2
+.. tags:: Symfony
 .. comments::

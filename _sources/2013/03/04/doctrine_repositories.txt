@@ -499,5 +499,5 @@ tests.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: PHP
+.. tags:: Doctrine
 .. comments::

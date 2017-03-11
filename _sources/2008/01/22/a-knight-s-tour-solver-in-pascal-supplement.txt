@@ -17,6 +17,5 @@ algorithm <http://en.wikipedia.org/wiki/Warnsdorff's_algorithm>`_,
 perhaps I will do so.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Algorithms
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

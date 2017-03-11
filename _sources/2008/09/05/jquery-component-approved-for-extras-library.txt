@@ -28,6 +28,5 @@ release is still good. I hope this all works out and the jQuery UI 1.6
 release is in the Google CDN, when ZF 1.7 comes out.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework, jQuery
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

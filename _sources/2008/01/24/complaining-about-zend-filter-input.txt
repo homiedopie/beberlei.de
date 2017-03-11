@@ -43,6 +43,5 @@ printing my own errors from outside the Zend\_Filter\_Input, rather than
 using the object for what it is probably supposed to do.
 
 .. categories:: none
-.. tags:: none
+.. tags:: ZendFramework
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

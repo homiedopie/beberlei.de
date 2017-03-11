@@ -8,6 +8,5 @@ Just add the following to the [mysql] section in your .my.cnf file:
 
 
 .. categories:: none
-.. tags:: none
+.. tags:: Linux, MySQL
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

@@ -123,6 +123,5 @@ more examples and information about the possibilites of this dependency
 injection framework.
 
 .. categories:: none
-.. tags:: none
+.. tags:: DependencyInjection, SphicyLibrary
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>

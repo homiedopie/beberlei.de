@@ -15,16 +15,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
-        <title>Page 10 &mdash; Whitewashing</title>
+        <title>Page 10 &mdash; beberlei.de</title>
 <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
 <meta content="width=device-width" />
-
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/default.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="_static/blog.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
@@ -47,573 +44,541 @@
         <![endif]-->
 
       <div id="container">
-<div class="container">
-    <div id="header" class="span-8">
-        <a href="index.html"><img src="_static/logo.jpg" alt="Whitewashing.de" /></a>
-    </div>
-    <div class="span-11" id="about">
-        <p>
-            Whitewashing is the blog of Benjamin Eberlei. Benjamin works for
-            <a href="http://qafoo.com/" target="_blank">Qafoo</a> on the PHP
-            Profiler <a href="https://tideways.io" target="_blank">Tideways</a>
-            and you can book him for consulting and trainings.
-        </p>
-    </div>
-    <div class="span-5 last">
-        <p class="buttons" style="text-align: right">
-            <a href="https://twitter.com/beberlei"><img src="_static/twitter-logo.png" alt="Follow me on twitter" height="50" /></a>
-            <a href="http://www.whitewashing.de/rss.xml"><img src="_static/rss2.png" alt="Subscribe to RSS" height="50" /></a>
-            <a href="https://github.com/beberlei"><img src="_static/github-logo.png" alt="My Github Profile" height="50" /></a>
-        </p>
-    </div>
-</div>
+<nav class="navbar navbar-dark">
+  <div class="container">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="pages/about.html">About</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+              <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
 
 <div class="main-container" role="main">
 <div class="container">
-    <div class="span-24 content">
-      <div>
-        <div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
           <div id="page10">
             
-            <div class="timestamp postmeta">
-            <span>November 25, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/25/next-zf-mini-release-1-7-1.html">Next ZF Mini Release: 1.7.1</a></h1>
-<p>In the next days the next mini release of the Zend Framework will be
-released and I want to keep you up to date of my progress on it.
-I got lots of feedback on the jQuery component and also had the
-possibility to fix some bugs and documentation issues. I also fixed some
-minor bugs that have been in the Zend_Soap_Wsdl stuff i added for the
-1.7 release.
-And a question for the 1.8 release that is due around February 2009:
-What do you think is missing in the jQuery support to ZF? Any widgets or
-stuff that you want to have included?</p>
+            <div class="section">
+            <h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
+<p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
+VM management very efficiently. Being always late to new technologies
+investigating Vagrant now felt about right. I am using Virtualbox for
+virtualization for about a year now but have build all my boxes manually. I
+have these machines setup:</p>
+<ul class="simple">
+<li>Windows 7</li>
+<li>Ubuntu with lots of crazy PHP builds</li>
+<li>Ubuntu with Oracle, PostgreSQL for Doctrine Unit-Tests</li>
+</ul>
+<p>The main benefit from this is that I don’t have to clutter my main machine with
+packages and dependencies that might potentially break.</p>
+<p>To benefit from Virtualization on a larger scale I wanted to investigate
+automation of box-building and was pointed to <a class="reference external" href="http://www.vagrantup.com">Vagrant</a>. This is a ruby tool that allows to copy and
+modify virtualboxes on the fly. You define a basebox and inherit from this box
+in your projects. Whenever you work on the project you start a copy of this
+basebox and install more system-dependencies using Chef or Puppet.
+That allows you to put the VM into a defined state just for this project. No
+matter how many different and weird dependencies you need, they will always be
+in this VM that is just created for the project and destroyed at the end of the
+day.</p>
+<p>I am using Ubuntu (currently 12.04) and tried starting with the Vagrant
+example.  It fails, because their example box uses a more current Virtualbox
+Guest Additions. To be able to use vagrant, you need a basebox with the
+virtualbox and guest additions versions matching correctly.</p>
+<p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
+all the latest VM templates:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ git clone https://github.com/jedi4ever/veewee.git
+$ <span class="nb">cd</span> veewee
+$ sudo gem install bundler
+$ sudo bundle install
+$ <span class="nb">alias</span> <span class="nv">vagrant</span><span class="o">=</span><span class="s2">"bundle exec vagrant"</span>
+</pre></div>
+</div>
+<p>You need Ruby and Gems installed for this to work. Veewee can be installed
+using Gems, but this not necessarily gives you the version with the most recent
+templates that match your own operating system version.</p>
+<p>Now lets define our own basebox definition and copy from an existing template
+that Veewee provides:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
+</pre></div>
+</div>
+<p>This creates a copy from the default ubuntu server template into a folder
+<cite>definitions/beberlei-ubuntu-12.04-i386-php</cite>. You can start modifying the files
+in there to adjust the build process of the virtual machine image. For me its
+important to modify the definitions.rb and add the following, otherwise
+building the VMs fails:</p>
+<div class="highlight-bash"><div class="highlight"><pre>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
+</pre></div>
+</div>
+<p>You can then open up the postinstall.sh and install more packages that you need
+in your personal basebox. For example a LAMP stack. Do this right after the
+lines that do <cite>apt-get install -y</cite>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
+</pre></div>
+</div>
+<p>If you are done you can start building a virtualbox image with:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox build
+</pre></div>
+</div>
+<p>Make sure not to start typing in the console window that open ups. It is
+automatically controlled from a ruby script and every change to the keysequence
+breaks the building. This step takes a while. (Enough to write a blog post
+while watching a boring football game for example).</p>
+<p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant basebox <span class="nb">export</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant box add <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php.box'</span>
+</pre></div>
+</div>
+<p>Now this box is also available as Vagrant base box. For example in a project
+that we want to use with vagrant, do:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> myproject/
+$ vagrant init <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant up
+$ vagrant ssh
+</pre></div>
+</div>
+<p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
+point. The use of puppet with Vagrant will be part of a next blog post.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/25/next-zf-mini-release-1-7-1.html#disqus_thread" data-disqus-identifier="2008/11/25/next-zf-mini-release-1-7-1">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 01, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html">ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.</a></h1>
-<p>The next version of <a class="reference external" href="http://framework.zend.com">Zend Framework</a> will
-appear quite soon (16th November) and there will be lots of buzz about
-Zend Amf, the new component sponsored by Adobe to support Adobe Flash
-(or other tools) to PHP communications.</p>
-<p>Besides the buzz there is some stuff from me getting into the Zend
-Framework. jQuery View and Form Helpers will allow you to throw the Dojo
-stuff away and use the great jQuery. This is of course inherently
-subjective, but still different opportunities are always great.</p>
-<p>Additionally I have been fixing quite some bugs on the Zend Soap
-component and will manage to fix further stuff until the 1.7 release I
-hope. This will make especially Wsdl and AutoDiscover produce valid WSDL
-XML plus adds setObject() support to Zend_Soap_Server.</p>
-<p>You can now choose between several strategies to evaluate complex types
-in WSDL Autodiscovering. Array of Datatypes (simple or complex) via
-type[] syntax and complex objects can be parsed differently now based on
-settings.</p>
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/vagrant.html">Vagrant</a>
+                 / 
+            <a href="tags/automation.html">Automation</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on May 31, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
+<blockquote>
+<div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
+successfully in roughly 4 weeks. For that we used a small web-based tool to
+ask the permission of 358 authors that contributed in the last 6 years.</div></blockquote>
+<p>The <a class="reference external" href="http://www.doctrine-project.org">Doctrine project</a> has been LGPL
+licensed since it was started in 2006. When I first started contributing in the
+project late in 2009 we were constantly asked about changing the license to a
+permissive license such as <a class="reference external" href="http://en.wikipedia.org/wiki/MIT_License">MIT</a> or
+New-BSD.  My subjective feeling is that there are much more libraries with
+permissive licenses than 10 years ago. And there are others that <a class="reference external" href="http://news.cnet.com/8301-13556_3-20071811-61/the-open-source-license-landscape-is-changing/">back my
+feeling up with facts</a>.
+The fear of getting screwed when using a permissive license has probably
+declined in favor of the benefits. <a class="reference external" href="http://pooteeweet.org/blog/2084">As Lukas puts it</a>:</p>
+<blockquote>
+<div>Maybe with enough experience you start to realize that it happens close to
+never that a proprietary fork of an open source project ends up outpacing
+the original project.</div></blockquote>
+<p>We wanted all the benefits of permissive licenses as well.  So at the beginning
+of this year we as Doctrine project first started to investigate how the task
+of switching the license could be done. After a short email with the <a class="reference external" href="http://www.fsf.org">FSF</a> it was clear that we had to get the approval of every
+single committer or remove their code.</p>
+<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">successfully attempted a license change</a> last year from GPL to LGPL, so we
+we’re hopeful to get this done. After discussing with Lukas we came up with the
+idea of a tool that helps this process, so <a class="reference external" href="http://dlm.beberlei.de">I wrote it</a>. It features:</p>
+<ul class="simple">
+<li>Import of all commits from one or many Github projects</li>
+<li>Aggregation of commits to authors based on e-mail address from Git log</li>
+<li>Status approved/not-approved for every author.</li>
+<li>An e-mail engine to send a request for approval to every author using
+<a class="reference external" href="http://www.mailgun.net">the awesome Mailgun service</a>, who has not approved
+yet. We use Mailgun for fun and to have a way to act on bounces easily.</li>
+<li>Admin functionality to mark commits as “trivial or deleted”.</li>
+<li>An audit trail to account for all changes and who has done them.</li>
+<li>Symfony2/Doctrine2 application with debian packaging using FPM.</li>
+</ul>
+<p>This project is not yet open-sourced but will be when I have some time to clean
+up the hardcoded passwords and write a small README on how to adjust the
+templates.</p>
+<p>After importing the commits of all the LGPL licensed Doctrine projects we
+realized that we have 358 unique committers and about 40-50 without an e-mail
+address (from the old SVN days). So we started googling for nicknames and
+eventually collected all e-mail addresses except maybe 6-8 missing ones.</p>
+<p>Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
+accepted the license change. No single person refused the change. All commits
+of the 16 people left we’re luckily not part of the code base anymore when we
+completely rewrote Doctrine 2 or trivial one-line changes.</p>
+<p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
+fun with it.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html#disqus_thread" data-disqus-identifier="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 01, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/01/performance-in-calypso-and-bugs.html">Performance in Calypso (and Bugs)</a></h1>
-<p>I have tested Calypso performance some weeks ago and have not been able
-to write on it before. Don’t use it please its fucking slow and cannot
-be optimized in the current architecture, because the template will NOT
-be parsed into intermediate PHP code.</p>
-<p>Additionally there are some bugs:</p>
+        </div><div class="metadata">
+            <p><small>Posted on May 26, 2012 by Benjamin Eberlei</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
+<p>Controller testing using the WebTestCase requires a Symfony Kernel and with
+that a complete application. However you can just ship your own simple kernel
+with just the dependencies necessary to test your application. This way you can
+easily create functional tests for bundles without the bundle requiring an
+application.</p>
+<div class="section" id="create-a-testkernel">
+<h2>Create a TestKernel</h2>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// Tests/Controller/App/AppKernel.php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$bundles</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="c1">// Dependencies</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\SecurityBundle\SecurityBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\MonologBundle\MonologBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">JMS\SerializerBundle\JMSSerializerBundle</span><span class="p">(</span><span class="nv">$this</span><span class="p">),</span>
+            <span class="k">new</span> <span class="nx">FOS\RestBundle\FOSRestBundle</span><span class="p">(),</span>
+            <span class="c1">// My Bundle to test</span>
+            <span class="k">new</span> <span class="nx">Beberlei\WorkflowBundle\BeberleiWorkflowBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$bundles</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// We don't need that Environment stuff, just one config</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-config-yml">
+<h2>Creating the config.yml</h2>
+<div class="highlight-yaml"><div class="highlight"><pre># Tests/Controller/App/config.yml
+framework:
+    secret:          secret
+    charset:         UTF-8
+    test: ~
+    router:          { resource: "%kernel.root_dir%/routing.yml" }
+    form:            true
+    csrf_protection: true
+    validation:      { enable_annotations: true }
+    templating:      { engines: ['twig'] }
+    session:
+        auto_start:     false
+        storage_id: session.storage.filesystem
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-routing-yml">
+<h2>Creating the routing.yml</h2>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># Tests/Controller/App/routing.yml</span>
+<span class="l l-Scalar l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="s">"@BeberleiWorkflowBundle/Controller/"</span>
+    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
+    <span class="l l-Scalar l-Scalar-Plain">prefix</span><span class="p p-Indicator">:</span>   <span class="l l-Scalar l-Scalar-Plain">/</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-phpunit-bootstrap">
+<h2>Adding a PHPUnit bootstrap</h2>
+<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree/">Travis &amp; Composer sitting in a
+Tree K-I-S-S-I-N-G” blog post</a>.</p>
+<p>His setup is missing the spl_autoload_register() call in the bootstrap file
+though.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// Tests/bootstrap.php</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../vendor/.composer/autoload.php'</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;'EOT'</span>
+<span class="s">You must set up the project dependencies, run the following commands:</span>
+<span class="s">wget http://getcomposer.org/composer.phar</span>
+<span class="s">php composer.phar install</span>
+<span class="s">EOT</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">'loadClass'</span><span class="p">));</span>
+
+<span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">'Beberlei\\WorkflowBundle\\'</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">require_once</span> <span class="nv">$path</span><span class="p">;</span>
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p>That means your bundle should have a composer.json that loads all the
+dependencies.</p>
+</div>
+<div class="section" id="modifying-the-phpunit-xml-dist">
+<h2>Modifying the phpunit.xml.dist</h2>
+<p>We have to tell the WebTestCase base class where to find this kernel:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">"Tests/bootstrap.php"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;php&gt;</span>
+        <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">"KERNEL_DIR"</span> <span class="na">value=</span><span class="s">"Tests/Controller/App"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/php&gt;</span>
+<span class="nt">&lt;/phpunit&gt;</span>
+</pre></div>
+</div>
+<p>Now just run your web-test cases.</p>
+<p>If you want to debug the logging happening inside the Kernel just comment out
+the Monolog lines to get the log-messages printed to the screen.</p>
+<p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
+control ignore files.</p>
+</div>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/symfony.html">Symfony</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 25, 2012</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
+<p>Yesterday I finally had the time to setup my first continuous
+integration environment. Possible solutions for CI are
+<a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
+<a class="reference external" href="http://www.hudson-ci.org">Hudson</a> or
+<a class="reference external" href="http://www.arbitracker.org">Arbit</a>. Although phpUnderControl is the
+most wide-spread, but from I heard complex to setup/maintain, solution
+[STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
+to give Hudson a shoot. Another reason for this decision, I heard it has
+a simple plugin architecture and is easy to install and use.
+Additionally Hudson is easily integrated into
+<a class="reference external" href="http://www.netbeans.org">Netbeans</a> and
+<a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
+development.</p>
+<p>My motivation to dive into CI is easily explained. I just never felt it
+was necessary to add a continuous integration environment to my projects,
+since I had one or two simple bash scripts that did the job. In general
+this is rather annoying, because they mostly only run PHPUnit and have
+to be done using a cronjob or manually, without any real process of
+notification. Additionally you have no way to navigate the test-results,
+code-coverage and no history of the last builds. For projects like
+<a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> we have the additional
+requirement to support 4 different database platforms, i.e. 4 different
+PHPUnit configurations. Currently that is solved by me using a Bash
+script that iterates over the configuration file names and invokes
+PHPUnit.</p>
+<p>There are already some awesome sources how to get Hudson and PHP
+working. I’ll list them here:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
+Screenshots</a></li>
+<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
+Hudson</a></li>
+<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
+Screenshots)</a></li>
+</ul>
+<p>All those guides are already awesome and I would recommend choosing one
+of those to install Hudson, I think i can’t add anything new to those. I
+have used Sebastians Howto, however i also like the third one. David
+Luhmans guide adds lots of details that are important to get the
+different parts of a build process to work.</p>
+<p>Now what these tutorials all do is that they use a bash command to
+execute the build process or specify an Ant Build file. However there
+is also a Phing Build process plugin for Hudson that allows to specify
+the build.xml targets to execute in the process. From the “Available
+Plugins” list you can choose the “Phing plugin”.</p>
+<p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
+Plugin Wiki
+Page</a> shows how
+to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
+look for Phing. There you find the dialog to configure your phing
+installations.</p>
+<p>In the context of choosing a build script for your project you can now
+choose “Phing” instead of Ant:</p>
+<div class="figure align-center">
+<img alt="" src="http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849"/>
+</div>
+<p>You can enter the targets to build, for example on my local Hudson
+instance I only execute “test” for Doctrine 2, since I am not interested
+in the building and deployment onto the PEAR channel at this development
+stage.</p>
+<p>From inside Netbeans you can then start builds by pointing to the Hudson
+instance. See this tutorial by one of the <a class="reference external" href="http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6">Hudson + Netbeans
+Developers</a>.
+You can then start all the builds from inside Netbeans and be notified
+of the success or failure.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/continouosintegration.html">ContinouosIntegration</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on February 07, 2010</small></p>
+        </div><div class="separator post_separator"></div><div class="section">
+            <h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
+<p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
+2</a> we plan to integrate pessimistic
+Database-level locks across all the supported vendors (MySQL, Oracle,
+PostgreSql, IBM DB2 so far). This means row-level locking as defined in
+the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
+optionally in DQL Queries and Finder methods. The Implementation of this
+extension to SELECT statements is rather trivial, however functional
+testing of this feature is not.</p>
+<p>A general approach would look like this:</p>
 <ol class="arabic simple">
-<li>You cannot currently use UTF8 encoding since htmlentities deep in the
-escape mechanism cannot be given the utf-8 specification.</li>
-<li>Triple or higher inheritance may not work under some circumstances.
-Which sucks.</li>
+<li>Run Query 1 and 2 with FOR UPDATE into the background</li>
+<li>Have both queries lock the row for a specified time x (using sleep)</li>
+<li>Verify that one of the two processes/threads runs approximately 2*x
+the lock time.</li>
 </ol>
-<p>I sadly have no time currently to fix any of the issues poping up with
-Calypso, so please don’t use it for anything production.</p>
+<p>Since PHP does not support process forking or threads naturally you run
+into a serious problem. How do you execute two database queries in
+parallel and verify that indeed one query is locking read access for the
+second one?</p>
+<p>Side note: There are some drawbacks to this testing approach. It could
+be that one background threads finishes the lock sleep already when the
+second just starts. The locking would work in these cases, however the
+lock time would not nearly be 2*x seconds, producing a test-failure. We
+are talking about a functional test though and I will accept a failure
+from time to time just to be 99% sure that locking works.</p>
+<p>Solving this problem with Gearman provides a pretty nice “real-world”
+example for the Job-Server that I wanted to share. This blog post
+contains a stripped down code-example from the Doctrine 2 testsuite. If
+you are interested, you can see the complete Gearman Locking Tests in
+<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
+GitHub</a>.</p>
+<p>Gearman allows to register worker processes with the job-server and
+offers clients to execute jobs on those workers in parallel. After
+installing the Gearman job-server and PHP pecl/gearman extension
+(<a class="reference external" href="http://toys.lerdorf.com/archives/51-Playing-with-Gearman.html">Rasmus Lerdorf has a post on
+installation</a>)
+we can go on writing our locking tests with Gearman.</p>
+<p>The first bit is the worker, a PHP script that tries to acquire a
+database lock and then sleeps for a second. The return value of this
+script is the total time required for acquiring the lock and sleeping.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class LockAgentWorker</span>
+<span class="x">{</span>
+<span class="x">    public function findWithLock($job)</span>
+<span class="x">    {</span>
+<span class="x">        $fixture = $this-&gt;processWorkload($job); // setup doctrine in here</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/01/performance-in-calypso-and-bugs.html#disqus_thread" data-disqus-identifier="2008/11/01/performance-in-calypso-and-bugs">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 29, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/29/encouraging-forks-for-calypso-dtl.html">Encouraging forks for Calypso DTL</a></h1>
-<p>I still get a bunch of emails regarding the <a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template
-engine</a> that I have written some month
-ago and which i can currently not maintain any further (<a class="reference external" href="http://www.whitewashing.de/blog/articles/86">see my posting
-on that</a>). Still I
-encourage anyone to fork the project and develop it further. Personally
-what I think is missing are some bugfixes and enhancements regarding the
-compiling and parsing. I created a <a class="reference external" href="http://github.com/beberlei/calypsodtl/tree/master">GITHub Project for Calypso
-DTL</a>, so
-collaborative development is very easy and added general TODOS to the
-README.txt that is on the front page of github project page.</p>
+<span class="x">        $s = microtime(true);</span>
+<span class="x">        $this-&gt;em-&gt;beginTransaction();</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/29/encouraging-forks-for-calypso-dtl.html#disqus_thread" data-disqus-identifier="2008/11/29/encouraging-forks-for-calypso-dtl">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>November 12, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars.html">Updating from KDE3.5 to KDE4 with Mac-Style Menubars</a></h1>
-<p>It seems KDE4 has no Mac-Style menubars and when you upgrade from 3.5 to
-4.1 within the same config folder (say you use the kubuntu distribution
-upgrade installer like I did) you end up with no menubars at all.
-To solve this little issue find a variable “macStyle = true” in the
-/home/username/.kde/share/config/kdeglobals file and switch it to
-macStyle = false and you have your menubars back.</p>
+<span class="x">        $entity = $this-&gt;em-&gt;find($fixture['entityName'], $fixture['entityId'], $fixture['lockMode']);</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars.html#disqus_thread" data-disqus-identifier="2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 02, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html">DojoX Django Template Language Example with Data from PHP/JSON</a></h1>
-<p>This is a simple example how you would use DojoX Django Template
-Language component filled with data from a JSON GET Response:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>&lt;script type="text/javascript" src="/development/dojo-release-1.1.1/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;
+<span class="x">        sleep(1);</span>
+<span class="x">        $this-&gt;em-&gt;rollback(); // clean up doctrine</span>
 
-&lt;script language="javascript" type="text/javascript"&gt;&lt;!--
-dojo.require("dojox.dtl");
-dojo.require("dojox.dtl.Context");
-dojo.require("dojox.dtl.ext-dojo.NodeList");
-dojo.addOnLoad(
-    dojo.xhrGet({url: "dojotest.php", handleAs: "json", handle: function(data,ioArgs){
-        if(typeof data == "error"){
-            console.log("error?",data);
-        } else {
-            dojo.query("#test").dtl("I am eating {{food.fruit}} and {{food.meat}}", data);
-        }
-    }
-}));
---&gt;&lt;/script&gt;
-
-::
-
-    &lt;?php
-    header('Content-type: text/json');
-    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
-    echo json_encode($food);
-    ?&gt;
+<span class="x">        return (microtime(true) - $s);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
 </pre></div>
 </div>
-</div></blockquote>
+<p>The glue-code for the worker script contains of the registering of the
+worker method with the job-server and a simple infinite loop:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$lockAgent = new LockAgentWorker();</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html#disqus_thread" data-disqus-identifier="2008/08/02/dojox-django-template-language-example-with-data-from-php-json">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 02, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/08/02/wrestling-with-dojo.html">Wrestling with Dojo</a></h1>
-<p>I have to complain about the <a class="reference external" href="http://www.dojotoolkit.org">Dojo
-Toolkit</a> (Considering the <a class="reference external" href="http://www.whitewashing.de/blog/articles/50">project I am
-using this for</a>). It has
-the worst documentation and API guides I have ever seen. The
-documentation (called the Dojo Book) has an unnecessary complex
-structure to click through and its contents are wrapped around examples
-that are so overly complex that you click away the pages when they get
-smashed at your head.</p>
-<p>The API too, has no clear structure and hides its contents behind
-cryptic names such as “dnd”, “fx”, “rpc”. Descriptions of the functions
-sum to very small sentences and additional options are listed without
-any description at all other than a link to where they are defined in
-the project. There are no short examples given to any function like
-<a class="reference external" href="http://www.jquery.com">jQuery</a> does.</p>
-<p>In general I think the Dojos Site is too complex and hard to navigate.
-The layout seems to change massively on each click and you it is hard
-recognize common patterns. Dear Dojo Team, please make your project more
-accessible!</p>
+<span class="x">$worker = new \GearmanWorker();</span>
+<span class="x">$worker-&gt;addServer();</span>
+<span class="x">$worker-&gt;addFunction("findWithLock", array($lockAgent, "findWithLock"));</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/02/wrestling-with-dojo.html#disqus_thread" data-disqus-identifier="2008/08/02/wrestling-with-dojo">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 08, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html">First impressions on Zend_Soap and a basic implementation</a></h1>
-<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> release candidate for
-version 1.6 includes a new component for SOAP operations.
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.html">Zend_Soap_Server/Client</a>
-extend the PHP functionality of the SOAPClient and SOAPServer objects,
-which by itself is trivial. The more important functionality it ads to
-the package is the <a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.autodiscovery.introduction.html">AutoDiscovery
-Component</a>.</p>
-<p>Generally you can use <a class="reference external" href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> in the
-so called “non-wsdl” mode, that is if you specify the correct options
-like the soap service location and uri, you don’t need any description
-of the service for the clients. This is only useful if you’re using the
-SOAP Service internally since you then know about all the available
-functions and methods. If you want to offer the Service for external
-users you want to use the WSDL-mode: Generate a
-<a class="reference external" href="http://en.wikipedia.org/wiki/Web_Services_Description_Language">WSDL</a>
-that describes the services available methods, their parameters and
-return types is an important task.</p>
-<p>Using Zend_Soap_AutoDiscover you can generate your WSDL file
-automatically by reflecting on the given Service Class methods. This
-works as follows. We setup a simple service:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class HelloWorldService
-{
-    /**
-     * @return string
-     */
-    public function helloWorld()
-    {
-        return "Hello World!";
-    }
-
-    /**
-     * @return array
-     */
-    public function getFruits()
-    {
-        return array('apple', 'orange', 'banana');
-    }
-}
+<span class="x">while($worker-&gt;work()) {</span>
+<span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
+<span class="x">        break;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
 </pre></div>
 </div>
-</div></blockquote>
-<p>It is important that you specify the Doc Comments @param and @return
-otherwise the AutoDiscovery of the correct parameter and return types
-cannot be resolved. We will now setup a simple SOAP Server access point,
-that will also generate our WSDL file for description of this HelloWorld
-service:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once "HelloWorldService.php";
-require_once "Zend/Soap/Server.php";
-require_once "Zend/Soap/AutoDiscover.php";
-
-if(isset($_GET['wsdl'])) {
-    $autodiscover = new Zend_Soap_AutoDiscover();
-    $autodiscover-&gt;setClass('HelloWorldService');
-    $autodiscover-&gt;handle();
-} else {
-
-    $soap = new Zend_Soap_Server("http://localhost/soapserver.php?wsdl"); // this current file here
-    $soap-&gt;setClass('HelloWorldService');
-    $soap-&gt;handle();
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now we have our SOAP Service up and running and any client can access
-the HelloWorldService class from a remote or local location with just
-this simple lines:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once "Zend/Exception.php";
-require_once "Zend/Soap/Client.php";
-
-try {
-    $client = new Zend_Soap_Client("http://localhost/soapserver.php?wsdl"); // Servers WSDL Location
-    $string =  $client-&gt;helloWorld();
-    $fruits = $client-&gt;getFruits();
-
-    var_dump($string);
-    var_dump($fruits);
-} catch(Zend_Exception $e) {
-    echo $e-&gt;getMessage();
-}
-</pre></div>
-</div>
-<p>This is easy. Additionally Zend_Soap offers a WSDL class to
-generate your own WSDL file based on your special preferences, which
-is a nice feature. I guess only some people can write a correct WSDL
-XML specification file on their own from scratch, so using a
-powerful helper is reasonable.</p>
-<p>The usage of Zend_Soap is quite simple and straightforward as is
-PHP5’s internal SOAP Service and might therefore gain widespread
-use. I have never tested PEAR’s WSDL Autodiscovery, so i cannot draw
-comparisons.</p>
-</div></blockquote>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html#disqus_thread" data-disqus-identifier="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 22, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/08/22/zend-helper-for-jquery-ui-widgets-demo.html">Zend Helper for jQuery UI Widgets Demo</a></h1>
-<p>I finished <a class="reference external" href="http://www.beberlei.de/jquery/demo">a pretty demo</a> for all
-the <a class="reference external" href="http://ui.jquery.com">jQuery UI widgets</a> view helpers for my
-<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei">Zend Framework
-proposal</a>.
-It utilizes the <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">jQuery View
-helper</a>
-which is <a class="reference external" href="http://www.whitewashing.de/blog/articles/67">further down the proposal
-road</a>. You can have a
-look at how nicely the Javascript is generated for the different jQuery
-UI Widgets. A further demo showing functionality of the form decorators
-and elements will follow when I finished these components.</p>
-<p><strong>Update:</strong> I also added a demo showing the form elements usage I have
-just finished in their first versions. I committed the classes to <a class="reference external" href="http://www.beberlei.de/dev/svn/ZendX_JQuery">the
-SVN</a> so you can already
-check them if you want.</p>
-
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/22/zend-helper-for-jquery-ui-widgets-demo.html#disqus_thread" data-disqus-identifier="2008/08/22/zend-helper-for-jquery-ui-widgets-demo">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 28, 2008</span>
-        </div>
-        <div class="section">
-            <h1><a href="2008/08/28/benchmark-and-optimize-zend-framework-performance.html">Benchmark and Optimize Zend Framework Performance</a></h1>
-<p>In the fall of <a class="reference external" href="http://talks.php.net/show/froscon08">Rasmus presentation (Simple is
-Hard)</a> on
-<a class="reference external" href="http://www.froscon.org">FrOSCon</a> I tried to optimize <a class="reference external" href="http://framework.zend.com">Zend
-Frameworks</a> performance a little bit. There
-has also been a little discussion on the Zend Framework Mailing List on
-this topic.</p>
-<p>I haven’t changed great parts of the code or anything, I just
-benchmarked how different global include strategies affect the overall
-performance of my blog software written with help of the ZF. The
-following include strategies were tested (I’ve used the Zend Framework
-1.6 RC2 package for all of them):</p>
+<p>We need two running workers for this to work, since one worker only
+processes one task at a time. Just open up two terminals and launch the
+php scripts. They will wait for their first task to process.</p>
+<p>Now we need to write our PHPUnit TestCase, which will contain a
+GearmanClient to execute two of the “findWithLock” in parallel. Our
+locking assertion will work like this:</p>
 <ol class="arabic simple">
-<li>Zend_Loader Autoload, Default PHP Include Path</li>
-<li>Zend_Loader Autoload, Swapped Include Path</li>
-<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies,
-Zend_Loader Autoload, Swapped Include Path</li>
-<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies, no
-autoload, used <a class="reference external" href="http://pecl.php.net/package/inclued">inclued</a> to
-find file dependencies and require (not _once) them all on startup.</li>
+<li>Register two tasks for the “findWithLock” method that access the same
+database row.</li>
+<li>Register a completed callback using
+“GearmanClient::setCompleteCallback()” that collects the run-time of
+the individual workers.</li>
+<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
+<li>Assert that the maximum run-time is around 2 seconds (since each
+worker sleeps 1 second)</li>
 </ol>
-<p>To strip all the require_once from the Zend Framework source code, i
-built a little script to do that for me. For the last test I wrote a
-little script that used the <strong>inclued_get_data()</strong> function to built a
-correct dependency tree for all includes. I have put each configuration
-of my Zend Framework install 30 seconds under siege with 5 concurrent
-requests. I have rerun all tests with APC and without APC.</p>
-<div class="section" id="results-without-apc">
-<h2>Results without APC</h2>
-<table border="1" class="docutils">
-<colgroup>
-<col width="42%"/>
-<col width="21%"/>
-<col width="16%"/>
-<col width="21%"/>
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>Include Strategy</td>
-<td>Response time</td>
-<td>Trans/sec</td>
-<td>Performance %</td>
-</tr>
-<tr class="row-even"><td>Autoload, default include path</td>
-<td>0.20</td>
-<td>24.65</td>
-<td>100%</td>
-</tr>
-<tr class="row-odd"><td>Autoload, swapped include path</td>
-<td>0.19</td>
-<td>26.83</td>
-<td>95%</td>
-</tr>
-<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
-<td>0.17</td>
-<td>29.27</td>
-<td>85%</td>
-</tr>
-<tr class="row-odd"><td>No-Autoload, require up front</td>
-<td>0.16</td>
-<td>31.82</td>
-<td>80%</td>
-</tr>
-</tbody>
-</table>
-<p>You can see that each step makes a ZF application run faster and that
-the full optimization with requiring all scripts up front is about 20%
-faster than the default configuration.</p>
-</div>
-<div class="section" id="results-with-apc">
-<h2>Results with APC</h2>
-<table border="1" class="docutils">
-<colgroup>
-<col width="42%"/>
-<col width="21%"/>
-<col width="16%"/>
-<col width="21%"/>
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>Include Strategy</td>
-<td>Response time</td>
-<td>Trans/sec</td>
-<td>Performance %</td>
-</tr>
-<tr class="row-even"><td>Autoload, default include path</td>
-<td>0.11</td>
-<td>45.76</td>
-<td>100%</td>
-</tr>
-<tr class="row-odd"><td>Autoload, swapped include path</td>
-<td>0.09</td>
-<td>53.05</td>
-<td>81,81%</td>
-</tr>
-<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
-<td>0.08</td>
-<td>60.90</td>
-<td>72,72%</td>
-</tr>
-<tr class="row-odd"><td>No-Autoload, require up front</td>
-<td>0.07</td>
-<td>73.99</td>
-<td>63,63%</td>
-</tr>
-</tbody>
-</table>
-<p>Turning APC on gives a boost of about 50% to your application no matter
-what include strategy you are following (so there is excuse not using
-APC). But switching between different include strategies still makes a
-huge difference in performance. Percentage-wise this is a larger
-difference than without APC. Requiring all dependent scripts up front
-takes only about 63% of the default configuration time, which can make a
-major difference on any production server.</p>
-<p>In an application knowing which includes of the Zend Framework will be
-needed on each request is difficult, since different helpers and classes
-might be needed based on which url is requested. It maybe a good
-practice to just include all the classes that might be needed. If this
-is a job to hard to do you can still get lots of performance gain out of
-your application by fixing the include path, using Zend Loaders Autoload
-and stripping all require_once calls from all of the Zend Framework
-files.</p>
-</div>
+<p>The code for this steps could look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
+<span class="x">{</span>
+<span class="x">    private $gearman = null;</span>
+<span class="x">    private $maxRunTime = 0;</span>
+<span class="x">    private $articleId;</span>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by beberlei <kontakt@beberlei.de></span>
-        </div>
-        
-        
-        <div class="comments">
-            <a href="http://www.whitewashing.de/2008/08/28/benchmark-and-optimize-zend-framework-performance.html#disqus_thread" data-disqus-identifier="2008/08/28/benchmark-and-optimize-zend-framework-performance">Leave a comment</a>
-        </div></div><div class="archive_link">
+<span class="x">    public function testLockIsAcquired()</span>
+<span class="x">    {</span>
+<span class="x">        // .. write fixture data into the database</span>
+
+<span class="x">        $gearman = new \GearmanClient();</span>
+<span class="x">        $gearman-&gt;addServer();</span>
+<span class="x">        $gearman-&gt;setCompleteCallback(array($this, "gearmanTaskCompleted"));</span>
+
+<span class="x">        $workload = array(); // necessary workload data to configure workers</span>
+<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
+<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
+
+<span class="x">        $gearman-&gt;runTasks();</span>
+
+<span class="x">        $this-&gt;assertTrue($this-&gt;maxRunTime &gt;= 2);</span>
+<span class="x">    }</span>
+
+<span class="x">    public function gearmanTaskCompleted($task)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;maxRunTime = max($this-&gt;maxRunTime, $task-&gt;data());</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>Now if both workers are waiting for processing the task we can run this
+test and get a green bar for a working lock support.</p>
+
+        </div><div class="tags">
+            <strong>More about:</strong>
+            <a href="tags/testing.html">Testing</a>
+                
+            </span>
+        </div><div class="metadata">
+            <p><small>Posted on May 02, 2010</small></p>
+        </div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
     </div>
-
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                var disqus_shortname = 'whitewashing';
-                var disqus_url = 'http://www.whitewashing.de/page10.html';
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
           </div>         
         </div>
-      </div>
     </div>
-
-    <div class="span-24 last" style="margin-top: 20px"><aside class="yui-b" id="sidebar" class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li><li>
-            <a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a>
-        </li></ul>
-</div>
-</section>
-          </aside></div>
 </div>
 </div> <!-- #main-container -->
 
         <div class="footer-container" role="contentinfo">
 <div class="container">
-    <div class="span-24 content">
+    <div class="col-md-8 col-md-offset-2">
         <div class="footer">
-            &copy; Copyright 2008-2015, Benjamin Eberlei.
-            Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
 
-        <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
         </div>
     </div>
 </div>

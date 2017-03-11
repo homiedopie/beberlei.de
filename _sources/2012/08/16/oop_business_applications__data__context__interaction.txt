@@ -230,5 +230,5 @@ parts of the system.
 
 .. author:: default
 .. categories:: PHP
-.. tags:: none
+.. tags:: ApplicationDesign
 .. comments::

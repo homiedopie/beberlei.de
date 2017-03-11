@@ -44,6 +44,5 @@ in this case in the .forward file syntax: Its empty. So replacing $home
 with its obvious path leads to the final solution.
 
 .. categories:: none
-.. tags:: none
+.. tags:: Linux
 .. comments::
-.. author:: beberlei <kontakt@beberlei.de>
