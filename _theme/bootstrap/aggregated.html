@@ -7,13 +7,15 @@
         <div class="section">
             {{ metadata.body }}
 
+            {% if metadata.filing["tags"] %}
             <div class="tags">
                 More about: 
-                {% for link, tag in post_tags -%}
+                {% for link, tag in metadata.filing["tags"] -%}
                 <a href="{{ pathto('tags/' + link + '.html', 1) }}">{{ tag }}</a>
                 {% if not loop.last %} / {% endif %}
                 {% endfor %}
             </div>
+            {% endif %}
 
             {{ post_meta(metadata, metadata.comment_count) }}
         </div>
