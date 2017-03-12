@@ -3,7 +3,9 @@
 {%- block body -%}
     <div class="blog-post">
         {{ body }}
+        {% if is_post %}
         {{ post_meta(metadata) }}
         {{ comments }}
+        {% endif %}
     </div>
 {%- endblock -%}

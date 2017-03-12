@@ -1,29 +1,29 @@
-{#-
-    boilerplate/archive.html
-    ~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Archive page.
-
-    :copyright: Copyright 2011-2017 by Vlad Riscutia and contributors (see
-    CONTRIBUTORS file)
-    :license: FreeBSD, see LICENSE file
--#}
-
 {%- extends "page.html" -%}
 
 {%- block body -%}
 <div class="archive">
     <div class="row">
-        <div class="col-lg-7">
+        <div class="col-lg-12">
+            {% if title == "Blog Archive" %}
+            <h1>Archive</h1>
+
+            <p>
+                I have written over 130 posts in the last 9 years and the discussed topics have changed with my interests.
+                Feel free to dig through the tags to find posts that belong to a longer discussion of the same topic.
+            </p>
+            {% else %}
             <h1>{{ title }}</h1>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-7">
             {%- for year in years|sort(reverse=True) -%}
             <div class="year">
-                <h1>{{ year }}</h1>
+                <h3>{{ year }}</h3>
                 <ul>
                     {%- for metadata in years[year] -%}
                     <li>
-                        {{ timestamp(metadata.formatted_date_short) }}
-                        <h2><a href="{{ pathto(metadata.link) }}">{{ metadata.title }}</a></h2>
+                        <strong><a href="{{ pathto(metadata.link) }}">{{ metadata.title }}</a></strong>
                         {{ post_meta(metadata, metadata.comment_count) }}
                     </li>
                     {%- if not loop.last -%}
@@ -38,6 +38,18 @@
             {%- endfor -%}
         </div>
         <div class="col-lg-5">
+{%- set fontsize_min = 14 -%}
+{%- set fontsize_max = 32 -%}
+
+        <div class="widget">
+            <h3>Tags</h3>
+            {%- set count_min = 1 %}
+            {%- set count_max = tags.values()|sort|last %}
+            {%- for tag, x in tags|dictsort %}
+            {%- set size = (fontsize_max-fontsize_min)*(x-count_min)/(count_max-count_min or 1) + fontsize_min %}
+            <a href="{{ pathto('tags/' + taglinks[tag]) }}" style="font-size: {{ size|int }}pt">{{ tag }}</a>
+            {%- if not loop.last %}&nbsp;&nbsp;{%- endif %}
+            {%- endfor %}
         </div>
     </div>
 </div>

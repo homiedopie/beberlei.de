@@ -11,6 +11,8 @@ import sys, os
 # Change this to the name of your blog
 project = 'beberlei.de'
 
+description = 'Blog of Benjamin Eberlei, covering a wide range of programming, bootstrapping and entrepreneurial topics'
+
 # Change this to the tagline of your blog
 tagline = ''
 
