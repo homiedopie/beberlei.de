@@ -23,7 +23,7 @@ author = 'Benjamin Eberlei'
 copyright = '2008-2017, ' + author
 
 # Change this to your blog root URL (required for RSS feed)
-website = 'https://www.beberlei.de'
+website = 'https://beberlei.de'
 
 # **************************************************************
 # More tweaks you can do
