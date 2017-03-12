@@ -86,11 +86,11 @@ relevant for the context:
    tentant (selected product plan, activated features, ...) are
    good candidates for the context.
 
-Example: Qafoo Profiler Context
--------------------------------
+Example: Context in Tideways
+----------------------------
 
 How to introduce such a context? We could create an object in our application,
-for example how we did it for the `Qafoo Profiler <https://qafoolabs.com>`_
+for example how we did it in `Tideways <https://tideways.io>`_
 with selected tenant (organization), application, date-range and server environment:
 
 .. code-block:: php
@@ -128,7 +128,7 @@ constraints, showing the 403/access denied page when necessary.
 
 The context is then made available for the application by using a Symfony
 `parameter converter
-<http://www.whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html>`_, every controller-action can get access to the context
+<https://www.beberlei.de/2013/02/19/extending_symfony2__paramconverter.html>`_, every controller-action can get access to the context
 by type-hinting for it:
 
 .. code-block:: php
@@ -148,7 +148,7 @@ the context around in a non-singleton way. Depending on the framework
 you use, it might be hard to achieve this kind of context injection.
 
 Now when I build `lightweight Symfony2 controllers
-<http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html>`_
+<https://www.beberlei.de/2014/10/14/lightweight_symfony2_controllers.html>`_
 in my applications, using a context object allows me to use even less services
 and move repetitive find and access control code outside of the controllers.
 
@@ -170,16 +170,17 @@ A context object can help you make global state explicit and control access to
 it. Good requirements for a context object are immutability and not being a
 singleton.
 
-When this is the case and you found the right variables for a context, this
-pattern will save you tons of redundant code and simplify both controllers and
-views massively.
+When used correctly this pattern can save you alot of redundant code and
+simplify both controllers and views massively.
 
-The pattern has its drawbacks: You have to be careful not put too big objects
-into the context. Everything in there should be immutable and not a singleton
-as well. Additionally you must make sure that retrieval and creating the
-context is a very fast operation to avoid performance problems.
+The pattern has its drawbacks: You have to be careful not put too powerful
+objects into the context and if you can modify the context, then you will
+probably introduce nasty side effets at some point. Additionally if you don't
+make sure that creating the context is a very fast operation then you will
+suffer from performance hits, because the context is created on every request,
+maybe fetching expensive data that isn't even used.
 
 .. author:: default
-.. categories:: Symfony, PHP, DesignPattern
-.. tags:: none
+.. categories:: none
+.. tags:: Symfony, DesignPatterns, ApplicationDesign
 .. comments::
