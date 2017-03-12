@@ -37,7 +37,7 @@ A good solution should allow refactoring from a lightweight controller to a
 service layer with a small number of extract method and extract class
 refactorings.
 
-While working on the `Qafoo PHP Profiler <https://qafoolabs.com/>`_ product I
+While working on `Tideways Profiler <https://tideways.io/>`_ product I
 went to work on a solution that allowed for Simplicity, Testability and
 Refactorability and came up with the
 `NoFrameworkBundle <https://github.com/qafoolabs/QafooLabsNoFrameworkBundle>`_.
@@ -142,7 +142,7 @@ just refactor out its business logic into services and inject them.
 
 Check out the `repository on Github
 <https://github.com/QafooLabs/QafooLabsNoFrameworkBundle>`_ for some more
-features that we are using the `Profiler <https://qafoolabs.com/>`_.
+features that we are using in `Tideways <https://tideways.io/>`_.
 
 Update 1: Renamed ``FrameworkContext`` to ``TokenContext`` as done
 in new 2.0 version of the bundle.
