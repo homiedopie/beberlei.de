@@ -83,13 +83,12 @@ of it is explicit in the code and how much is hidden.</p>
 </div>
 <div class="section" id="context-objects">
 <h2>Context Objects</h2>
-<p>Lets take a look at the Definition of a context object:</p>
-<div class="highlight-python"><div class="highlight"><pre>A context object encapsulates the references/pointers to services and
+<p>Lets take a look at the Definition of a context object</p>
+<blockquote>
+<div>A context object encapsulates the references/pointers to services and
 configuration information used/needed by other objects. It allows the objects
 living within a context to see the outside world. Objects living in a different
-context see a different view of the outside world.
-</pre></div>
-</div>
+context see a different view of the outside world.</div></blockquote>
 <p>Besides the obvious use of encapsulating services and config variables, this
 definition mentions two important properties:</p>
 <ol class="arabic simple">
@@ -111,9 +110,8 @@ Subrequests inside PHP requests.</p>
 </div>
 <div class="section" id="application-context">
 <h2>Application Context</h2>
-<p>Now that we have defined context and the properties that make it useful
-(Immutability and No-Singleton) we should talk about making use of context
-objects in your applications.</p>
+<p>Now that we have defined context we should make use of context objects in your
+applications.</p>
 <p>Anything that is an important global information in your application is
 relevant for the context:</p>
 <ol class="arabic simple">
@@ -127,14 +125,16 @@ be available all the time.</li>
 <li>Building an analytics software? The currently selected date/time-range is
 probably important for all queries.</li>
 <li>Building a CMS/blog? The current page/post-id, the root page id, user
-language/locale seem to be good candidates for an application context.</li>
+language/locale seem to be good candidates for an application context.
+Wordpress does this although their context is global and encapsulated in an
+object.</li>
 <li>Building a multi-tenant app? The tenant-id and configuration for this
 tentant (selected product plan, activated features, ...) are
 good candidates for the context.</li>
 </ol>
 </div>
-<div class="section" id="example-context-in-tideways">
-<h2>Example: Context in Tideways</h2>
+<div class="section" id="real-world-example-context-in-tideways">
+<h2>Real World Example: Context in Tideways</h2>
 <p>How to introduce such a context? We could create an object in our application,
 for example how we did it in <a class="reference external" href="https://tideways.io">Tideways</a>
 with selected tenant (organization), application, date-range and server environment:</p>
@@ -167,8 +167,9 @@ with selected tenant (organization), application, date-range and server environm
 </pre></div>
 </div>
 <p>This object is created during request boot, in my case with a framework
-listener. The listener already checks for access rights and security
-constraints, showing the 403/access denied page when necessary.</p>
+listener. The listener checks for access rights and security constraints,
+showing the 403/access denied page when necessary. This make 90% of access
+control checks unneeded that are usually cluttering the controller.</p>
 <p>The context is then made available for the application by using a Symfony
 <a class="reference external" href="https://www.beberlei.de/2013/02/19/extending_symfony2__paramconverter.html">parameter converter</a>, every controller-action can get access to the context
 by type-hinting for it:</p>

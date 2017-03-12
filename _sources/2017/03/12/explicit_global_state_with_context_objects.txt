@@ -27,7 +27,7 @@ A context object is a way to make the existing context explicit for your code.
 Context Objects
 ---------------
 
-Lets take a look at the Definition of a context object::
+Lets take a look at the Definition of a context object
 
     A context object encapsulates the references/pointers to services and
     configuration information used/needed by other objects. It allows the objects
@@ -59,9 +59,8 @@ Subrequests inside PHP requests.
 Application Context
 -------------------
 
-Now that we have defined context and the properties that make it useful
-(Immutability and No-Singleton) we should talk about making use of context
-objects in your applications.
+Now that we have defined context we should make use of context objects in your
+applications.
 
 Anything that is an important global information in your application is
 relevant for the context:
@@ -81,13 +80,15 @@ relevant for the context:
 
 4. Building a CMS/blog? The current page/post-id, the root page id, user
    language/locale seem to be good candidates for an application context. 
+   Wordpress does this although their context is global and encapsulated in an
+   object.
 
 5. Building a multi-tenant app? The tenant-id and configuration for this
    tentant (selected product plan, activated features, ...) are
    good candidates for the context.
 
-Example: Context in Tideways
-----------------------------
+Real World Example: Context in Tideways
+---------------------------------------
 
 How to introduce such a context? We could create an object in our application,
 for example how we did it in `Tideways <https://tideways.io>`_
@@ -123,8 +124,9 @@ with selected tenant (organization), application, date-range and server environm
     }
 
 This object is created during request boot, in my case with a framework
-listener. The listener already checks for access rights and security
-constraints, showing the 403/access denied page when necessary.
+listener. The listener checks for access rights and security constraints,
+showing the 403/access denied page when necessary. This make 90% of access
+control checks unneeded that are usually cluttering the controller.
 
 The context is then made available for the application by using a Symfony
 `parameter converter
