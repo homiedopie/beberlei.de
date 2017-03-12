@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 21 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,170 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page20.html">Newer</a></li>
+            <li class="right"><a href="page22.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>August 28, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/08/28/benchmark-and-optimize-zend-framework-performance.html">Benchmark and Optimize Zend Framework Performance</a></h1>
+<p>In the fall of <a class="reference external" href="http://talks.php.net/show/froscon08">Rasmus presentation (Simple is
+Hard)</a> on
+<a class="reference external" href="http://www.froscon.org">FrOSCon</a> I tried to optimize <a class="reference external" href="http://framework.zend.com">Zend
+Frameworks</a> performance a little bit. There
+has also been a little discussion on the Zend Framework Mailing List on
+this topic.</p>
+<p>I haven’t changed great parts of the code or anything, I just
+benchmarked how different global include strategies affect the overall
+performance of my blog software written with help of the ZF. The
+following include strategies were tested (I’ve used the Zend Framework
+1.6 RC2 package for all of them):</p>
+<ol class="arabic simple">
+<li>Zend_Loader Autoload, Default PHP Include Path</li>
+<li>Zend_Loader Autoload, Swapped Include Path</li>
+<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies,
+Zend_Loader Autoload, Swapped Include Path</li>
+<li>ZF 1.6 RC2 stripped from all <strong>“require_once”</strong> dependencies, no
+autoload, used <a class="reference external" href="http://pecl.php.net/package/inclued">inclued</a> to
+find file dependencies and require (not _once) them all on startup.</li>
+</ol>
+<p>To strip all the require_once from the Zend Framework source code, i
+built a little script to do that for me. For the last test I wrote a
+little script that used the <strong>inclued_get_data()</strong> function to built a
+correct dependency tree for all includes. I have put each configuration
+of my Zend Framework install 30 seconds under siege with 5 concurrent
+requests. I have rerun all tests with APC and without APC.</p>
+<div class="section" id="results-without-apc">
+<h2>Results without APC</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%"/>
+<col width="21%"/>
+<col width="16%"/>
+<col width="21%"/>
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Include Strategy</td>
+<td>Response time</td>
+<td>Trans/sec</td>
+<td>Performance %</td>
+</tr>
+<tr class="row-even"><td>Autoload, default include path</td>
+<td>0.20</td>
+<td>24.65</td>
+<td>100%</td>
+</tr>
+<tr class="row-odd"><td>Autoload, swapped include path</td>
+<td>0.19</td>
+<td>26.83</td>
+<td>95%</td>
+</tr>
+<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
+<td>0.17</td>
+<td>29.27</td>
+<td>85%</td>
+</tr>
+<tr class="row-odd"><td>No-Autoload, require up front</td>
+<td>0.16</td>
+<td>31.82</td>
+<td>80%</td>
+</tr>
+</tbody>
+</table>
+<p>You can see that each step makes a ZF application run faster and that
+the full optimization with requiring all scripts up front is about 20%
+faster than the default configuration.</p>
+</div>
+<div class="section" id="results-with-apc">
+<h2>Results with APC</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%"/>
+<col width="21%"/>
+<col width="16%"/>
+<col width="21%"/>
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Include Strategy</td>
+<td>Response time</td>
+<td>Trans/sec</td>
+<td>Performance %</td>
+</tr>
+<tr class="row-even"><td>Autoload, default include path</td>
+<td>0.11</td>
+<td>45.76</td>
+<td>100%</td>
+</tr>
+<tr class="row-odd"><td>Autoload, swapped include path</td>
+<td>0.09</td>
+<td>53.05</td>
+<td>81,81%</td>
+</tr>
+<tr class="row-even"><td>Autoload, ZF w/o require_once</td>
+<td>0.08</td>
+<td>60.90</td>
+<td>72,72%</td>
+</tr>
+<tr class="row-odd"><td>No-Autoload, require up front</td>
+<td>0.07</td>
+<td>73.99</td>
+<td>63,63%</td>
+</tr>
+</tbody>
+</table>
+<p>Turning APC on gives a boost of about 50% to your application no matter
+what include strategy you are following (so there is excuse not using
+APC). But switching between different include strategies still makes a
+huge difference in performance. Percentage-wise this is a larger
+difference than without APC. Requiring all dependent scripts up front
+takes only about 63% of the default configuration time, which can make a
+major difference on any production server.</p>
+<p>In an application knowing which includes of the Zend Framework will be
+needed on each request is difficult, since different helpers and classes
+might be needed based on which url is requested. It maybe a good
+practice to just include all the classes that might be needed. If this
+is a job to hard to do you can still get lots of performance gain out of
+your application by fixing the include path, using Zend Loaders Autoload
+and stripping all require_once calls from all of the Zend Framework
+files.</p>
+</div>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
-
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page21">
-            
-            <div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/08/28/benchmark-and-optimize-zend-framework-performance.html#disqus_thread" data-disqus-identifier="2008/08/28/benchmark-and-optimize-zend-framework-performance">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>August 16, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/08/16/zendx-jquery-is-ready-for-recommendation.html">ZendX_JQuery is Ready for Recommendation</a></h1>
 <p>Yesterday night I finished the <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">proposal for
 ZendX_JQuery</a>,
@@ -84,16 +215,21 @@ some additional Use-Case scenarios to ensure proper working. You can
 version</a> at my SVN
 repository.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/jquery.html">jQuery</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on August 16, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/jquery.html">jQuery</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/08/16/zendx-jquery-is-ready-for-recommendation.html#disqus_thread" data-disqus-identifier="2008/08/16/zendx-jquery-is-ready-for-recommendation">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>August 10, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html">Import and PYTHONPATH Problems with PyDev and Linux</a></h1>
 <p>Today is began to configure my <a class="reference external" href="http://pydev.sf.net">PyDev</a> Eclipse
 environment since I want to learn Python and need it for a programming
@@ -116,14 +252,21 @@ with the PythonPath, Symlinks and whatever are gone.</p>
 last used external tool again” as keyboard shortcut in the Eclipse
 preferences. This simplifies the execution even more.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/python.html">Python</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on August 10, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/python.html">Python</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html#disqus_thread" data-disqus-identifier="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>August 04, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html">Complete Django Template Engine Implementation for PHP5 - Downloadable Now</a></h1>
 <p>I prepared a downloadable version of my <a class="reference external" href="http://www.djangoproject.com">Django Template
 Language</a> Engine Clone for PHP5 and the
@@ -149,16 +292,23 @@ See it here: <a class="reference external" href="http://www.beberlei.de/calypso/
 put up a little tutorial how to get the Template Engine running with
 Zend Framework and as a standalone component.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on August 04, 2008 by beberlei <kontakt@beberlei.de></small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/calypsolibrary.html">CalypsoLibrary</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html#disqus_thread" data-disqus-identifier="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>August 31, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/08/31/greaat-python-can-control-your-wiimote.html">Greaat, Python can control your Wiimote</a></h1>
 <p>In the last days I had lots of time to play with my Wiimote and its
 bluetooth capabilities. Sadly there is actively supported driver in non-C
@@ -173,51 +323,49 @@ applications, but that might still be included in the future. You can
 goodie</a> and have a
 look at it.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/python.html">Python</a>
-                 / 
-            <a href="tags/hackingwii.html">HackingWii</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on August 31, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/01/23/constructions.html">Constructions...</a></h1>
-<p>Some people complained: Yes comments do not work YET, and also the links
-behind categories and Tags show nothing. Everything else follows
-shortly. I am programming this whole blog using the <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a> to have a bit of learning
-experience. It will take some more time than if I would do it in “the
-old ways”.</p>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on January 23, 2008</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/python.html">Python</a>, <a href="tags/hackingwii.html">HackingWii</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/08/31/greaat-python-can-control-your-wiimote.html#disqus_thread" data-disqus-identifier="2008/08/31/greaat-python-can-control-your-wiimote">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page20.html">Newer</a></li>
+            <li class="right"><a href="page22.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

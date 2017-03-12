@@ -16,20 +16,18 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 27 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="prev" title="Newer" href="page26.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="next" title="Older" href="page28.html" /><link rel="prev" title="Newer" href="page26.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
         VERSION:     '1.5',
@@ -37,37 +35,75 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page26.html">Newer</a></li>
+            <li class="right"><a href="page28.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>July 14, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/07/14/jquery-helper-what-is-to-include.html">jQuery Helper - What is to include?</a></h1>
+<p>I took some time in the last days to develop the concept for a possible
+jQuery View Helper that could pass the integration into the <a class="reference external" href="http://framework.zend.com">ZF
+Core</a>. Since
+<a class="reference external" href="http://www.jquery.com">jQuery</a> is organized somewhat different than
+Dojo is, its possible implementation for ZF will differ.</p>
+<p>The jQuery Helper itself will manage inclusion of jQuery javascript
+files and the base library, much like the Dojo component works (Using
+the Google CDN). On top of this simple Helpers should mimic $.get,
+$.post, $.load and $.getJSON in a simple way, so that with a simple
+function call you can generate an XmlHttpRequest that updates a
+specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
+Ajax</a>)</p>
+<p>Problematic are the next ideas: Additional Helpers will allow to
+specify the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
+(DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/">jQuery
+Autocomplete</a>
+or <a class="reference external" href="http://malsup.com/jquery/form/">jQuery Form</a> (AjaxForm and
+AjaxSubmit). These libraries need additional javascript content to be
+downloaded and implemented in the Zend Framework project. There
+currently exists no way to implement them using a CDN. Therefore any
+documentation must clearly specify which additional content has to be
+installed and how. The helpers will have to be general enough to support
+this.</p>
+<p>My proposal is currently in the workings and will be on the ZF Wiki in
+the next couple of hours.</p>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
-
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page27">
-            
-            <div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/jquery.html">jQuery</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/07/14/jquery-helper-what-is-to-include.html#disqus_thread" data-disqus-identifier="2008/07/14/jquery-helper-what-is-to-include">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>July 22, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
 <p>Per default any implementation of ArrayObject does not allow to use the
 object as multidimensional array. This snippet here implements the
@@ -100,14 +136,21 @@ support:</p>
 </pre></div>
 </div>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/php.html">PHP</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on July 22, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/php.html">PHP</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/07/22/multidimensional-array-via-spl.html#disqus_thread" data-disqus-identifier="2008/07/22/multidimensional-array-via-spl">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>July 17, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/07/17/zf-jquery-helper-first-prototype-ready.html">ZF jQuery Helper - First Prototype Ready</a></h1>
 <p>I checked in the first implementation of my jQuery Helper into my <a class="reference external" href="http://www.beberlei.de/dev/svn">dev
 svn</a>. It follows my suggested
@@ -117,16 +160,21 @@ and implements all the advertised features. I also implemented 2 demos
 that nicely present the functionality.</p>
 <p>Please test and comment!</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/jquery.html">jQuery</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on July 17, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/jquery.html">jQuery</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/07/17/zf-jquery-helper-first-prototype-ready.html#disqus_thread" data-disqus-identifier="2008/07/17/zf-jquery-helper-first-prototype-ready">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>July 21, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/07/21/zend-dojo-and-the-django-template-language.html">Zend, Dojo and the Django Template Language</a></h1>
 <p>With the Zend Framework <a class="reference external" href="http://www.nabble.com/1.6-RC1-Schedule-tp18538148p18538148.html">nearing its 1.6
 release</a>
@@ -191,14 +239,21 @@ that supports at least the “extends”, “for”, “include”, and “comme
 tags. As a next task I will implement the helper for DojoX DTL and will
 report back on my efforts.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on July 21, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/07/21/zend-dojo-and-the-django-template-language.html#disqus_thread" data-disqus-identifier="2008/07/21/zend-dojo-and-the-django-template-language">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>July 12, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/07/12/discussing-a-jquery-helper-for-zend-framework.html">Discussing a jQuery Helper for Zend Framework</a></h1>
 <p>Yesterday I had some time to test Matthews <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Helper_Dojo">Dojo View
 Helper</a>
@@ -238,51 +293,49 @@ not include plugins for which one might desperately need a View Helper
 except for maybe the Date Picker. I will post further comments on this
 issue in the near future.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/jquery.html">jQuery</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on July 12, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/07/24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a></h1>
-<p>Today I finished the first almost complete <a class="reference external" href="http://www.djangoproject.com">Django Template
-Language</a> Clone for PHP implementing the
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a> View Interface. <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Dtl+-+Benjamin+Eberlei">My
-proposal</a>
-is up and running on the ZF Wiki. The source code can be downloaded from
-my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repository</a>.</p>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on July 24, 2008</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/jquery.html">jQuery</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/07/12/discussing-a-jquery-helper-for-zend-framework.html#disqus_thread" data-disqus-identifier="2008/07/12/discussing-a-jquery-helper-for-zend-framework">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page26.html">Newer</a></li>
+            <li class="right"><a href="page28.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

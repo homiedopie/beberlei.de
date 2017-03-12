@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 14 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,71 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page13.html">Newer</a></li>
+            <li class="right"><a href="page15.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>January 14, 2009</span>
+        </div>
+        <div class="section">
+            <h1><a href="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html">Finally: Zend_Mail charset and/or long lines header encoding bug fixed</a></h1>
+<p>There was this <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">lurking bug in
+Zend_Mail</a> which
+destroyed every Mail-Header (and corresponding Mail) with non US-ASCII
+Chars and more than an encoded length of 74 chars. This is quite a huge
+subset of mails, but it seems a nice solution was not so easy, at least
+nobody tried to fixed it for quite some time.</p>
+<p>Where many hackish solutions we’re offered, Ota Mares aka Littlex spent
+incredible time to hunt the original problem down and with his help I
+tag-teamed the bug to death today. Saturo Yoshida of Zend Fame added
+some further spice regarding an alternative solution with Base64
+Encoding instead of Quoted Printable Mime Header encoding.</p>
+<p>In the end the solution we chose was, not to re-use the Mime encoding
+function that is specific to MIME bodies according to
+<a class="reference external" href="http://tools.ietf.org/html/rfc2045">RFC2045</a>, but to write a
+completely new algorithm for Mime Headers, whose rules are specified in
+<a class="reference external" href="http://tools.ietf.org/html/rfc2047">RFC2047</a>. This is now done and
+unit-tests prove its working according to standard.</p>
+<p>What is missing now is people trying that fix on as many Mail platforms
+as possible and <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">giving feedback in the
+issue</a> if a lengthy
+subject with non-ASCII chars is displayed correctly.</p>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
-
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page14">
-            
-            <div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html#disqus_thread" data-disqus-identifier="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 11, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html">Howto file a good bug report: Suggestions for framework users</a></h1>
 <p>I have fixed quite a number of bugs for the ZF lately, which lead me to
 this post about how to file a good bug report. There are many annoying
@@ -120,14 +152,21 @@ lead to missing information on part of the developer that he has to
 “learn” again. This takes time, which may make your bug last longer than
 it should.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/opensourcecitizen.html">OpenSourceCitizen</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on January 11, 2009</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/opensourcecitizen.html">OpenSourceCitizen</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html#disqus_thread" data-disqus-identifier="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 11, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/01/11/what-will-be-new-in-zf-1-8.html">What will be new in ZF 1.8</a></h1>
 <p>In February or March 2009 the 1.8 version of the <a class="reference external" href="http://framework.zend.com">Zend
 Framework</a> is scheduled to be released. I
@@ -146,14 +185,21 @@ to the newly added WSDL type detection strategies.</p>
 <p>Additionally I went on another bug killing spree and fixed around 20-30
 old bugs in a wide range of different components.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on January 11, 2009</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/01/11/what-will-be-new-in-zf-1-8.html#disqus_thread" data-disqus-identifier="2009/01/11/what-will-be-new-in-zf-1-8">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 12, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/01/12/on-publishing-webservices-within-mvc-frameworks.html">On Publishing Webservices within MVC Frameworks</a></h1>
 <p>Webservices are a very important part in today’s enterprise applications.
 They tie applications of different age or programming languages together
@@ -226,14 +272,23 @@ should be handled via HTTP Authentication to save an additional call.</li>
 issues that generally come with webservices, without loosing flexibility
 at all.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on January 12, 2009 by beberlei <kontakt@beberlei.de></small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/applicationdesign.html">ApplicationDesign</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/01/12/on-publishing-webservices-within-mvc-frameworks.html#disqus_thread" data-disqus-identifier="2009/01/12/on-publishing-webservices-within-mvc-frameworks">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 07, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/01/07/seven-things.html">Seven Things</a></h1>
 <p>I have been tagged by
 <a class="reference external" href="http://dolfschimmel.freeaqingme.com/?p=78">Freeaqingme</a> and the blog
@@ -287,86 +342,49 @@ discussions.</li>
 awesome NetBeans PHP support.</li>
 </ul>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/internetmemes.html">InternetMemes</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on January 07, 2009</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html">Using Zend_Soap Server and Autodiscover in a Controller</a></h1>
-<p>I am in a dilemma. I have condemned the usage of Zend_Soap_Server (or
-any other webservice server handler) <a class="reference external" href="http://www.whitewashing.de/blog/articles/106">inside a Model-View-Controller
-application</a> before.
-Still I get questions about <a class="reference external" href="http://www.whitewashing.de/blog/articles/65">my old Zend_Soap_Server and
-Zend_Soap_AutoDiscover
-example</a> not working in
-the MVC scenario. The following example provides you with a working Soap
-server inside a Zend_Controller_Action, although I discourage the use
-of it and would suggest using a dedicated script outside the dispatching
-process to gain multitudes of performance, which webservices often
-require.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once "/path/to/HelloWorldService.php";
-
-class MyDiscouragedSoapServerController extends Zend_Controller_Action
-{
-    public function serverAction()
-    {
-        $server = new Zend_Soap_Server("http://example.com/pathto/wsdl");
-        $server-&gt;setClass('HelloWorldService');
-        $server-&gt;handle();
-    }
-
-    public function wsdlAction()
-    {
-        $wsdl = new Zend_Soap_AutoDiscover();
-        $wsdl-&gt;setUri('http://example.com/pathto/server');
-        $wsdl-&gt;setClass('HelloWorldService');
-        $wsdl-&gt;handle();
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now all you have to do is create two routes, one that makes
-<strong>http://example.com/pathto/server</strong> point to
-<strong>MyDiscouragedSoapServerController::serverAction</strong> and the other route
-that makes <strong>http://example.com/pathto/wsdl</strong> point to
-<strong>MyDiscouragedSoapServerController::wsdlAction</strong>. The wrong version
-(Version Mismatch) error comes from sending a request for the WSDL file
-to the actual Soap Server, which he doesn’t like.</p>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/soap.html">SOAP</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on March 11, 2009 by beberlei <kontakt@beberlei.de></small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/internetmemes.html">InternetMemes</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/01/07/seven-things.html#disqus_thread" data-disqus-identifier="2009/01/07/seven-things">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page13.html">Newer</a></li>
+            <li class="right"><a href="page15.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 10 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,173 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page9.html">Newer</a></li>
+            <li class="right"><a href="page11.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>June 03, 2012</span>
+        </div>
+        <div class="section">
+            <h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
+<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+describe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
+<li>and I probably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <span class="docutils literal"><span class="pre">.bash_history</span></span> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<span class="docutils literal"><span class="pre">.pp</span></span> file and then invoke <span class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></span>. You can install Puppet
+via <span class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></span> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I separate the installation process into two puppet files, one that has to be
+run with root <span class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></span> and another one that has to be run with
+my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<div class="highlight-python"><div class="highlight"><pre># /home/benny/.puppet/devmachine.pp
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
+# VIM Dot Files
+vcsrepo { 'vim-dotfiles':
+    path     =&gt; "/home/$id/.vim",
+    ensure   =&gt; present,
+    provider =&gt; git,
+    source   =&gt; 'https://...'
+}
 
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page10">
-            
-            <div class="section">
+file { 'vim-dotfiles-symlink':
+    path   =&gt; "/home/$id/.vimrc",
+    ensure =&gt; link,
+    target =&gt; '.vim/vimrc',
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+
+exec { 'vim-make-command-t':
+    command =&gt; 'rake make',
+    cwd     =&gt; "/home/$id/.vim/bundle/Command-T",
+    unless  =&gt; "ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'",
+    require =&gt; Vcsrepo['vim-dotfiles']
+}
+</pre></div>
+</div>
+<p>The three keywords <span class="docutils literal"><span class="pre">vcsrepo</span></span>, <span class="docutils literal"><span class="pre">file</span></span> and <span class="docutils literal"><span class="pre">exec</span></span> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<span class="docutils literal"><span class="pre">~/.vim</span></span> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <span class="docutils literal"><span class="pre">~/.vimrc</span></span> points to <span class="docutils literal"><span class="pre">~/.vim/vimrc</span></span>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <span class="docutils literal"><span class="pre">devmachine.pp</span></span> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<div class="highlight-python"><div class="highlight"><pre># Configure Git
+exec { "git-author-name":
+    command =&gt; 'git config --global user.name "Benjamin Eberlei"',
+    unless =&gt; "git config --global --get user.name|grep 'Benjamin Eberlei'"
+}
+
+exec { "git-author-email":
+    command =&gt; 'git config --global user.email "kontakt@beberlei.de"',
+    unless =&gt; "git config --global --get user.email|grep 'kontakt@beberlei.de'"
+}
+
+exec { "git-global-ignore":
+    command =&gt; "git config --global core.excludesfile /home/$id/.gitignore",
+    unless  =&gt; 'git config -l --global|grep excludesfile'
+}
+
+file { "git-global-ignorefile":
+    path =&gt; "/home/$id/.gitignore",
+    ensure =&gt; present,
+    content =&gt; "*.swo\n*.swp\n"
+}
+</pre></div>
+</div>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used <a class="reference external" href="https://github.com/dietervds/puppet-symfony2">this following Github repository</a> as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <span class="docutils literal"><span class="pre">~/.puppet/modules</span></span>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/automation.html">Automation</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="https://www.beberlei.de/2012/06/03/setting_up_development_machines_with_puppet.html#disqus_thread" data-disqus-identifier="2012/06/03/setting_up_development_machines_with_puppet">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>May 31, 2012</span>
+        </div>
+        <div class="section">
             <h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
 <p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
 VM management very efficiently. Being always late to new technologies
@@ -151,16 +285,23 @@ $ vagrant ssh
 <p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
 point. The use of puppet with Vagrant will be part of a next blog post.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/vagrant.html">Vagrant</a>
-                 / 
-            <a href="tags/automation.html">Automation</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on May 31, 2012 by Benjamin Eberlei</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/vagrant.html">Vagrant</a>, <a href="tags/automation.html">Automation</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html#disqus_thread" data-disqus-identifier="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>May 26, 2012</span>
+        </div>
+        <div class="section">
             <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
@@ -211,9 +352,23 @@ completely rewrote Doctrine 2 or trivial one-line changes.</p>
 <p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.</p>
 
-        </div><div class="metadata">
-            <p><small>Posted on May 26, 2012 by Benjamin Eberlei</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/doctrine.html">Doctrine</a></span>
+        </div>
+        
+        <div class="comments">
+            <a href="https://www.beberlei.de/2012/05/26/doctrine_goes_mit.html#disqus_thread" data-disqus-identifier="2012/05/26/doctrine_goes_mit">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 25, 2012</span>
+        </div>
+        <div class="section">
             <h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
 <p>Controller testing using the WebTestCase requires a Symfony Kernel and with
 that a complete application. However you can just ship your own simple kernel
@@ -348,14 +503,21 @@ the Monolog lines to get the log-messages printed to the screen.</p>
 control ignore files.</p>
 </div>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/symfony.html">Symfony</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 25, 2012</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/symfony.html">Symfony</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2012/02/25/symfony2_controller_testing.html#disqus_thread" data-disqus-identifier="2012/02/25/symfony2_controller_testing">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 07, 2010</span>
+        </div>
+        <div class="section">
             <h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
 <p>Yesterday I finally had the time to setup my first continuous
 integration environment. Possible solutions for CI are
@@ -423,166 +585,49 @@ Developers</a>.
 You can then start all the builds from inside Netbeans and be notified
 of the success or failure.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/continouosintegration.html">ContinouosIntegration</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 07, 2010</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
-<p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
-2</a> we plan to integrate pessimistic
-Database-level locks across all the supported vendors (MySQL, Oracle,
-PostgreSql, IBM DB2 so far). This means row-level locking as defined in
-the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
-optionally in DQL Queries and Finder methods. The Implementation of this
-extension to SELECT statements is rather trivial, however functional
-testing of this feature is not.</p>
-<p>A general approach would look like this:</p>
-<ol class="arabic simple">
-<li>Run Query 1 and 2 with FOR UPDATE into the background</li>
-<li>Have both queries lock the row for a specified time x (using sleep)</li>
-<li>Verify that one of the two processes/threads runs approximately 2*x
-the lock time.</li>
-</ol>
-<p>Since PHP does not support process forking or threads naturally you run
-into a serious problem. How do you execute two database queries in
-parallel and verify that indeed one query is locking read access for the
-second one?</p>
-<p>Side note: There are some drawbacks to this testing approach. It could
-be that one background threads finishes the lock sleep already when the
-second just starts. The locking would work in these cases, however the
-lock time would not nearly be 2*x seconds, producing a test-failure. We
-are talking about a functional test though and I will accept a failure
-from time to time just to be 99% sure that locking works.</p>
-<p>Solving this problem with Gearman provides a pretty nice “real-world”
-example for the Job-Server that I wanted to share. This blog post
-contains a stripped down code-example from the Doctrine 2 testsuite. If
-you are interested, you can see the complete Gearman Locking Tests in
-<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
-GitHub</a>.</p>
-<p>Gearman allows to register worker processes with the job-server and
-offers clients to execute jobs on those workers in parallel. After
-installing the Gearman job-server and PHP pecl/gearman extension
-(<a class="reference external" href="http://toys.lerdorf.com/archives/51-Playing-with-Gearman.html">Rasmus Lerdorf has a post on
-installation</a>)
-we can go on writing our locking tests with Gearman.</p>
-<p>The first bit is the worker, a PHP script that tries to acquire a
-database lock and then sleeps for a second. The return value of this
-script is the total time required for acquiring the lock and sleeping.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class LockAgentWorker</span>
-<span class="x">{</span>
-<span class="x">    public function findWithLock($job)</span>
-<span class="x">    {</span>
-<span class="x">        $fixture = $this-&gt;processWorkload($job); // setup doctrine in here</span>
-
-<span class="x">        $s = microtime(true);</span>
-<span class="x">        $this-&gt;em-&gt;beginTransaction();</span>
-
-<span class="x">        $entity = $this-&gt;em-&gt;find($fixture['entityName'], $fixture['entityId'], $fixture['lockMode']);</span>
-
-<span class="x">        sleep(1);</span>
-<span class="x">        $this-&gt;em-&gt;rollback(); // clean up doctrine</span>
-
-<span class="x">        return (microtime(true) - $s);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>The glue-code for the worker script contains of the registering of the
-worker method with the job-server and a simple infinite loop:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$lockAgent = new LockAgentWorker();</span>
-
-<span class="x">$worker = new \GearmanWorker();</span>
-<span class="x">$worker-&gt;addServer();</span>
-<span class="x">$worker-&gt;addFunction("findWithLock", array($lockAgent, "findWithLock"));</span>
-
-<span class="x">while($worker-&gt;work()) {</span>
-<span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
-<span class="x">        break;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>We need two running workers for this to work, since one worker only
-processes one task at a time. Just open up two terminals and launch the
-php scripts. They will wait for their first task to process.</p>
-<p>Now we need to write our PHPUnit TestCase, which will contain a
-GearmanClient to execute two of the “findWithLock” in parallel. Our
-locking assertion will work like this:</p>
-<ol class="arabic simple">
-<li>Register two tasks for the “findWithLock” method that access the same
-database row.</li>
-<li>Register a completed callback using
-“GearmanClient::setCompleteCallback()” that collects the run-time of
-the individual workers.</li>
-<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
-<li>Assert that the maximum run-time is around 2 seconds (since each
-worker sleeps 1 second)</li>
-</ol>
-<p>The code for this steps could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
-<span class="x">{</span>
-<span class="x">    private $gearman = null;</span>
-<span class="x">    private $maxRunTime = 0;</span>
-<span class="x">    private $articleId;</span>
-
-<span class="x">    public function testLockIsAcquired()</span>
-<span class="x">    {</span>
-<span class="x">        // .. write fixture data into the database</span>
-
-<span class="x">        $gearman = new \GearmanClient();</span>
-<span class="x">        $gearman-&gt;addServer();</span>
-<span class="x">        $gearman-&gt;setCompleteCallback(array($this, "gearmanTaskCompleted"));</span>
-
-<span class="x">        $workload = array(); // necessary workload data to configure workers</span>
-<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
-<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
-
-<span class="x">        $gearman-&gt;runTasks();</span>
-
-<span class="x">        $this-&gt;assertTrue($this-&gt;maxRunTime &gt;= 2);</span>
-<span class="x">    }</span>
-
-<span class="x">    public function gearmanTaskCompleted($task)</span>
-<span class="x">    {</span>
-<span class="x">        $this-&gt;maxRunTime = max($this-&gt;maxRunTime, $task-&gt;data());</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>Now if both workers are waiting for processing the task we can run this
-test and get a green bar for a working lock support.</p>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/testing.html">Testing</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on May 02, 2010</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/continouosintegration.html">ContinouosIntegration</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2010/02/07/resources-for-a-php-and-hudson-ci-integration.html#disqus_thread" data-disqus-identifier="2010/02/07/resources-for-a-php-and-hudson-ci-integration">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page9.html">Newer</a></li>
+            <li class="right"><a href="page11.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

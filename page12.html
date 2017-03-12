@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 12 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,167 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page11.html">Newer</a></li>
+            <li class="right"><a href="page13.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>December 18, 2010</span>
+        </div>
+        <div class="section">
+            <h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
+<p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
+<p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
+<p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <span class="docutils literal"><span class="pre">include()</span></span>. The client code looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nb">stream_wrapper_register</span><span class="p">(</span><span class="s2">"dc2proxy"</span><span class="p">,</span> <span class="s2">"Doctrine\ORM\Proxy\ProxyStreamWrapper"</span><span class="p">);</span>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
+<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">"dc2proxy:///proxies"</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$em</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$className</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$proxyClass</span><span class="p">;</span>
 
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page12">
-            
-            <div class="section">
+<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">"/"</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">".php"</span><span class="p">;</span>
+
+<span class="nb">unset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
+The stream wrapper to make this work looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$proxyCode</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="nf">stream_open</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$options</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$opened_path</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span>
+                <span class="o">-&gt;</span><span class="na">getProxyFactory</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">getProxyClassCode</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">stream_stat</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
+        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">"ino"</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">url_stat</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
+        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="nv">$stat</span><span class="p">[</span><span class="s2">"ino"</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_read</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$ret</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_write</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$left</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
+        <span class="nv">$right</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$left</span> <span class="o">.</span> <span class="nv">$data</span> <span class="o">.</span> <span class="nv">$right</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_tell</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_eof</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">&gt;=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="nf">stream_seek</span><span class="p">(</span><span class="nv">$offset</span><span class="p">,</span> <span class="nv">$whence</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$whence</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">SEEK_SET</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">case</span> <span class="nx">SEEK_CUR</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">case</span> <span class="nx">SEEK_END</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span><span class="p">;</span>
+                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What do you think about this approach? Are there any potential problems I am not seeing?</p>
+
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/phpmagic.html">PHPMagic</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2010/12/18/generate-proxy-code-using-a-stream-wrapper.html#disqus_thread" data-disqus-identifier="2010/12/18/generate-proxy-code-using-a-stream-wrapper">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>December 07, 2010</span>
+        </div>
+        <div class="section">
             <h1><a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a></h1>
 <p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
 <p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
@@ -85,14 +213,23 @@
 </ul>
 <p>Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/thisblog.html">ThisBlog</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on December 07, 2010 by beberlei <kontakt@beberlei.de></small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/thisblog.html">ThisBlog</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html#disqus_thread" data-disqus-identifier="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 25, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/02/25/git-is-great-helping-out-with-mutateme.html">Git is great: Helping out with MutateMe</a></h1>
 <p>These last days I had fun with <a class="reference external" href="https://github.com/padraic/mutateme/tree">Padraic Bradys
 MutateMe</a> project. It
@@ -117,14 +254,23 @@ beginning to write a complete Runner now that calls all three components
 and CodeSniffer at once and directly processes the results. When this is
 done, I will pack it all up as a PEAR package for anyone to test out.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/testing.html">Testing</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 25, 2009 by beberlei <kontakt@beberlei.de></small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/testing.html">Testing</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/02/25/git-is-great-helping-out-with-mutateme.html#disqus_thread" data-disqus-identifier="2009/02/25/git-is-great-helping-out-with-mutateme">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 08, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
 <p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
 <a class="reference external" href="http:/www.pdepend.org">PDepend</a> offer export functionality in XML or
@@ -151,18 +297,21 @@ Github</a>. Its written with
 too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
 page</a>.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/puma.html">PUMA</a>
-                 / 
-            <a href="tags/testing.html">Testing</a>
-                 / 
-            <a href="tags/metrics.html">Metrics</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 08, 2009</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/puma.html">PUMA</a>, <a href="tags/testing.html">Testing</a>, <a href="tags/metrics.html">Metrics</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html#disqus_thread" data-disqus-identifier="2009/02/08/unittest-and-metrics-aggregator-tool-for-php">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 13, 2009</span>
+        </div>
+        <div class="section">
             <h1><a href="2009/02/13/update-on-unittest-and-metrics-tool.html">Update on Unittest and Metrics Tool</a></h1>
 <p>Some days ago i posted about the <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PHP Unittest and Metrics
 Aggregator</a> tool that i
@@ -189,208 +338,49 @@ interesting details on your application.</p>
 Github</a> and play with it.
 I would really like to hear your thoughts.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/puma.html">PUMA</a>
-                 / 
-            <a href="tags/testing.html">Testing</a>
-                 / 
-            <a href="tags/metrics.html">Metrics</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 13, 2009</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/05/01/explicit-code-requires-no-comments-only-bad-code-does.html">Explicit Code requires no comments - Only bad code does</a></h1>
-<p>Following the recent discussion on commenting source code by <a class="reference external" href="http://www.brandonsavage.net/on-code-commenting-and-technical-debt/">Brandon
-Savage</a>
-and <a class="reference external" href="http://mtabini.blogspot.com/2009/04/myth-of-myth-of-self-commenting-code.html">Marco
-Tabini</a>,
-I wanted to add upon Marcos code example to show that it not even needs
-any inline comments and can be greatly enhanced in readability with
-taking 2-5 minutes of time and refactoring the code. The original code
-sample was:</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>function __construct(array $pathInfo) {
-    $section = $pathInfo[0];
-    $file = $pathInfo[1];
-
-    // Assume that the location of this file is inside the main trunk, and that pathInfo has already been filtered.
-
-    $path = dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
-
-    if (!file_exists($path)) {
-        Controller::singleton()-&gt;doError(404);
-    }
-
-    parent::__construct('main/xsl/template.xsl', $path);
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>This sample is somehow related to the response and view rendering of an
-application and its pretty understandable. For me there are some squirks
-though that would make me have to scroll to other classes to see how
-they interact. For example the path information falls from heaven. Why
-is it an array of 2 values and are these sections set the same all the
-time? And what exactly happens when the front controller does the 404
-error? Is there a die() or exit in the <strong>doError()</strong></p>
-<p>The Agile movement postulates the phase of refactoring for a finished
-piece of code. Rebuilding the hacked solutions that did it to make them
-more understandable. I applied this to Marcos code snippet. The
-refactoring produces about double the code, but its done entirely by
-using NetBeans nice Rename variable and copy paste on extracting
-methods, which takes not more than 5 minutes.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class StaticXmlXsltRendererImpl extends AbstractXsltView
-{
-    function render(array $filteredPathInfo) {
-        $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
-
-        if(!$this-&gt;templateExists($templateValuesXmlPath)) {
-            Controller::singleton()-&gt;doError(404);
-        } else {
-            parent::render('main/xsl/template.xsl', $templateValuesXmlPath);
-        }
-    }
-
-    private function getTemplateValuesXmlFile($filteredPathInfo) {
-        $section = $this-&gt;getSection($filteredPathInfo);
-        $file = $this-&gt;getFile($filteredPathInfo);
-
-        // Assume that the location of this file is inside the main trunk
-        return dirname(__FILE__) . '/../../' . $section . '/xml/static/' . $file . '.xml';
-    }
-
-
-    private function getSection($pathInfo) {
-        return $pathInfo[0];
-    }
-
-    private function getFile($pathInfo) {
-        return $pathInfo[1];
-    }
-
-    private function templateExists($path) {
-        return file_exists($path);
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>In this code snippet the class name, variable names and methods clearly
-communicate what is done, which wasn’t the case in the previous example.
-The only change for the clients is the change of using the constructor
-to using the <strong>render()</strong> method, which communicates the intend more.
-Also the render method now clearly communicates that either the error or
-the parent rendering is executed and leaves no doubt about it.</p>
-<p>The <strong>getTemplateValuesXmlFile()</strong> method still uses the comment to show
-the assumption about relative paths, but this is only the case because
-application configuration is made implicit into the code. This has to be
-extracted to be an explicit configuration constant and the comment can
-go.</p>
-<blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>private function getTemplateValuesXmlFile($filteredPathInfo) {
-    $section = $this-&gt;getSection($filteredPathInfo);
-    $file = $this-&gt;getFile($filteredPathInfo);
-
-    return APPLICATION_ROOT . '/' . $section . '/xml/static/' . $file . '.xml';
-}
-</pre></div>
-</div>
-<p>In my opinion commenting code is necessary only for non-refactored
-code that has been hacked into existence and is hard to understand.
-Either the programmer has to get it done and has no chance to
-clearly communicate the intend. Or what is even worse the to be
-changed legacy code is hard to understand but you can’t take the
-chances to refactor it because its also already in production and
-has no tests. Now from the second point it is obvious that upon ugly
-code you put only more and more ugly code to fix the problems. This
-is what leads to the legacy maintenance problems that pretty much
-every programmer faces. And then commenting comes into play: You
-have to add a new feature X and it has to be done fast. You don’t
-really understand the code or how it works together but you know you
-can put the new code for the feature into existence but its really
-unintuitive. So you begin to comment it excessively, because its the
-only way to clearly show its intend.</p>
-<p>There are two mindestting factors that help to write code that is
-understandable without having to excessively comment it:</p>
-<ul class="simple">
-<li>From the beginning, do not write code for the computer but for
-developers. Changing this attitude really helps to write
-understandable code like the one above.</li>
-<li>Only leave code better than it was before, never worse.</li>
-</ul>
-<p>There are five technical practices that - when followed - allow to
-write clearly communicating code from the beginning:</p>
-<ol class="arabic simple">
-<li>Giving classes, variables and methods good names. This is a
-no-brainer but few people seem to follow it anyways.</li>
-<li>Following the object-oriented <strong>Single Responsibility Principle</strong>
-by never giving a class more than one responsibility. Macros
-example seems to follow this one.</li>
-<li>Methods should never switch in the level of detail. Micro-work at
-the datastructure level should never be mixed with macro level
-delegation to executing large chunks of code. Macros code
-violates this by mixing the path building micro-level work with
-the macro-level work of rendering the XSLT template. The path
-building code can be hidden behind a method to communicate intend
-more clearly.</li>
-<li>Exchange if conditions with private methods that explain the
-condition being checked for. In Marcos example this is not really
-necessary, because file_exists already is quite a good
-description to the condition. But in cases of logical
-combinations of conditions the method extracting is a superior
-way to explain the conditions intend without having to write a
-comment.</li>
-<li><strong>Seperate Query and Command</strong>: A method never should do a query
-which returns the state of an object and a command which executes
-a set of rules on the state.</li>
-</ol>
-<p>These practices sum up to one guideline: Make code explicit. This
-obviously requires less commenting since a comment of explicit code
-would be duplication and duplication is bad. What if you have a
-project that does not follow this guidelines? Then of course
-comments should be used to explain code, but in the long run this
-should be refactored to self-explaining code. Additionally every new
-feature should be programmed explicitly to follow the “leave code
-better than before” principle.</p>
-<p>In my opinion two refactoring tools are missing that would greatly
-help PHP programmers write nice to read code: Extract method and
-Replace magic value with constant. Can someone integrate them into
-NetBeans please?</p>
-<p><strong>Update:</strong> Fixed a creepy copy-paste code bug, thanks to azeroth
-for pointing out. Moved methods around a bit to be more reading
-friendly.</p>
-</div></blockquote>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/codequality.html">CodeQuality</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on May 01, 2009</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/puma.html">PUMA</a>, <a href="tags/testing.html">Testing</a>, <a href="tags/metrics.html">Metrics</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2009/02/13/update-on-unittest-and-metrics-tool.html#disqus_thread" data-disqus-identifier="2009/02/13/update-on-unittest-and-metrics-tool">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page11.html">Newer</a></li>
+            <li class="right"><a href="page13.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

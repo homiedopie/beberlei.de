@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 19 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,141 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page18.html">Newer</a></li>
+            <li class="right"><a href="page20.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>November 05, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
+<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
+with the alpha version, since I am currently searching for a good
+framework for a high performance application. My first benchmarks on
+ezcMvc just say: wh000pie! A lot faster as compared to the Zend
+Framework.
+Still ezcMvc is VERY loosely coupled and you have to write lots of lines
+to get where ZF gets you with less (more magic involved). As you can see
+from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
+component</a>
+it is currently a bit unwieldily to work with ezcMvcController since you
+have to create and return result objects everywhere. This is very nice
+since it abstracts from the actual response type (could be www, mail,
+cli, anything).
+I have created a very little extension of the ezcMvcController class
+that hopefully serves you quite some time. You can append variables to
+the ezcMvcResult object by calling the magic __get and __set on the
+controller. Plus it offers a method to use the ezcMvcInternalRedirect
+instead of the result. See for yourself:</p>
+<div class="highlight-python"><div class="highlight"><pre>class myController extends ezcMvcController
+{
+    protected $result;
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
+    public function createResult()
+    {
+        $actionMethod = $this-&gt;createActionMethodName();
 
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page19">
-            
-            <div class="section">
+        if ( method_exists( $this, $actionMethod ) ) {
+            $status = $this-&gt;$actionMethod();
+            if($status != 0) {
+                $this-&gt;getResult()-&gt;status = $status;
+            }
+            return $this-&gt;getResult();
+        } else {
+            throw new ezcMvcActionNotFoundException( $this-&gt;action );
+        }
+    }
+
+    protected function _redirect($uri)
+    {
+        $request = clone $this-&gt;request;
+        $request-&gt;uri = $uri;
+        $this-&gt;result = new ezcMvcInternalRedirect($request);
+    }
+
+    public function __get($name)
+    {
+        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
+            return $this-&gt;getResult()-&gt;variables[$name];
+        }
+        return null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this-&gt;getResult()-&gt;variables[$name] = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this-&gt;getResult()-&gt;variables[$name]);
+    }
+
+    protected function getResult()
+    {
+        if($this-&gt;result === null) {
+            $this-&gt;result = new ezcMvcResult();
+        }
+        return $this-&gt;result;
+    }
+}
+</pre></div>
+</div>
+<p>You can now use a controller in the following way:</p>
+<div class="highlight-python"><div class="highlight"><pre>class dashboardController extends myController
+{
+    public function doIndex()
+    {
+        $this-&gt;cookie = "Cookie!"; // Proxy to $ezcMvcResult-&gt;variables['cookie']
+    }
+
+    public function doRedirect()
+    {
+        $this-&gt;_redirect("/");
+    }
+}
+</pre></div>
+</div>
+<p>Very nice! The next thing I have to extend in ezcMvc is automagical
+matching of controller and action names to view output names with a
+special View Handler that takes care of this. This saves another bunch
+of work you have to cope with in the current standard setup.</p>
+
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/ezcomponents.html">eZComponents</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html#disqus_thread" data-disqus-identifier="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>November 25, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/11/25/next-zf-mini-release-1-7-1.html">Next ZF Mini Release: 1.7.1</a></h1>
 <p>In the next days the next mini release of the Zend Framework will be
 released and I want to keep you up to date of my progress on it.
@@ -79,14 +181,21 @@ And a question for the 1.8 release that is due around February 2009:
 What do you think is missing in the jQuery support to ZF? Any widgets or
 stuff that you want to have included?</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on November 25, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/11/25/next-zf-mini-release-1-7-1.html#disqus_thread" data-disqus-identifier="2008/11/25/next-zf-mini-release-1-7-1">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>November 01, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html">ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.</a></h1>
 <p>The next version of <a class="reference external" href="http://framework.zend.com">Zend Framework</a> will
 appear quite soon (16th November) and there will be lots of buzz about
@@ -105,16 +214,21 @@ in WSDL Autodiscovering. Array of Datatypes (simple or complex) via
 type[] syntax and complex objects can be parsed differently now based on
 settings.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/soap.html">SOAP</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on November 01, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/soap.html">SOAP</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html#disqus_thread" data-disqus-identifier="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>November 01, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/11/01/performance-in-calypso-and-bugs.html">Performance in Calypso (and Bugs)</a></h1>
 <p>I have tested Calypso performance some weeks ago and have not been able
 to write on it before. Don’t use it please its fucking slow and cannot
@@ -130,14 +244,21 @@ Which sucks.</li>
 <p>I sadly have no time currently to fix any of the issues poping up with
 Calypso, so please don’t use it for anything production.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on November 01, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/calypsolibrary.html">CalypsoLibrary</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/11/01/performance-in-calypso-and-bugs.html#disqus_thread" data-disqus-identifier="2008/11/01/performance-in-calypso-and-bugs">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>November 29, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/11/29/encouraging-forks-for-calypso-dtl.html">Encouraging forks for Calypso DTL</a></h1>
 <p>I still get a bunch of emails regarding the <a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template
 engine</a> that I have written some month
@@ -150,49 +271,49 @@ DTL</a>, so
 collaborative development is very easy and added general TODOS to the
 README.txt that is on the front page of github project page.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on November 29, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars.html">Updating from KDE3.5 to KDE4 with Mac-Style Menubars</a></h1>
-<p>It seems KDE4 has no Mac-Style menubars and when you upgrade from 3.5 to
-4.1 within the same config folder (say you use the kubuntu distribution
-upgrade installer like I did) you end up with no menubars at all.
-To solve this little issue find a variable “macStyle = true” in the
-/home/username/.kde/share/config/kdeglobals file and switch it to
-macStyle = false and you have your menubars back.</p>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/linux.html">Linux</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on November 12, 2008</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/calypsolibrary.html">CalypsoLibrary</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/11/29/encouraging-forks-for-calypso-dtl.html#disqus_thread" data-disqus-identifier="2008/11/29/encouraging-forks-for-calypso-dtl">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page18.html">Newer</a></li>
+            <li class="right"><a href="page20.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 7 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,507 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page6.html">Newer</a></li>
+            <li class="right"><a href="page8.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>March 04, 2013</span>
+        </div>
+        <div class="section">
+            <h1><a href="2013/03/04/doctrine_repositories.html">On Taming Repository Classes in Doctrine</a></h1>
+<p>Over at the <a class="reference external" href="http://drafts.easybib.com/post/44139111915/taiming-repository-classes-in-doctrine-with-the">easybib/dev</a>
+Blog Anne posted an entry about their usage of Doctrine Repositories with a
+growing amount of query responsibilities. I want to respond to this blog post
+with two alternative approaches, because I have seen the easybib approach multiple
+times in different projects by different teams and think it can be approved upon a lot.</p>
+<p>The problems with the approach outlined are:</p>
+<ul>
+<li><p class="first">The Repository API does not hide implementation details of the ORM,
+the QueryBuilder API is returned to the client code. This might seen
+like nitpicking, however it leads to bloated client code doing the
+query builder work over and over again. For example the
+<span class="docutils literal"><span class="pre">-&gt;getQuery()-&gt;getSingleResult(AbstractQuery::HYDRATE_ARRAY)</span></span> call.</p>
+</li>
+<li><p class="first">Different parts of the QueryBuilder filtering cannot be composed together,
+because of the way the API is created. Assume we have the
+<span class="docutils literal"><span class="pre">filterGroupsForApi()</span></span> call, there is no way to combine it with another
+call <span class="docutils literal"><span class="pre">filterGroupsForPermissions()</span></span>.  Instead reusing this code will lead
+to a third method <span class="docutils literal"><span class="pre">filterGroupsForApiAndPermissions()</span></span>.</p>
+<p>This can lead to combinatorial explosion of methods that the developer using
+the repository needs to know.  And wading through a list of 100 methods to
+find the right one is never fun, most importantly when the naming of methods
+is imprecise.</p>
+</li>
+</ul>
+<p>Generally introducing a new object such as a repository should pass the
+“<a class="reference external" href="http://www.growing-object-oriented-software.com/toc.html">Composite is simpler than the sum of its parts</a>” rule. However the
+approach also clearly demonstrates a bad abstraction. In OOP the primary goal is avoiding
+changes to affect the whole system.</p>
+<div class="section" id="introduce-criteria-objects">
+<h2>Introduce Criteria Objects</h2>
+<p>Instead of using the <span class="docutils literal"><span class="pre">QueryBuilder</span></span> outside of the Repository, lets start with an
+alternative refactoring. I will introduce a <span class="docutils literal"><span class="pre">Criteria</span></span> class for the <span class="docutils literal"><span class="pre">User</span></span>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserCriteria</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$groupId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$hydrateMode</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">HYDRATE_OBJECT</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is important not to introduce a constructor here, because when we add
+more and more criterions, the constructor will get bloated. Static
+factory methods that create a criteria do make sense however.</p>
+<p>Now we can introduce a <span class="docutils literal"><span class="pre">match</span></span> method on the <span class="docutils literal"><span class="pre">UserRepository</span></span>. Lets see
+that on an interface level first, to see how simple usage is for the client
+side of the repository:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">UserRepository</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @param UserCriteria $criteria</span>
+<span class="sd">     * @return array&lt;User&gt;|array&lt;array&gt;</span>
+<span class="sd">     ***/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">UserCriteria</span> <span class="nv">$criteria</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Put in a <span class="docutils literal"><span class="pre">$criteria</span></span> get back users or array data. Very nice and simple!
+The implementation would look like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="sd">/**</span>
+<span class="sd"> * @param UserCriteria $criteria</span>
+<span class="sd"> * @return array&lt;User&gt;</span>
+<span class="sd"> ***/</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">UserCriteria</span> <span class="nv">$criteria</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$qb</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">(</span><span class="s1">'u'</span><span class="p">);</span>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$criteria</span><span class="p">);</span>
+    <span class="p">}</span>
 
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page7">
-            
-            <div class="section">
+    <span class="k">return</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">getQuery</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">hydrateMode</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="k">function</span> <span class="nf">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$criteria</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">'u.group = :group'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">'group'</span><span class="p">,</span> <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The benefit here is, that we can add additional conditions and processing
+by only adding a new property on the <span class="docutils literal"><span class="pre">UserCriteria</span></span> and then handling
+this inside <span class="docutils literal"><span class="pre">UserRepository#match()</span></span>. Additionally you can save the <span class="docutils literal"><span class="pre">UserCriteria</span></span>
+in the session, or even in the database to that users can “save filter” or return
+to a search overview, with the previous criteria still known.</p>
+<p>The client code now looks like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$criteria</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserCriteria</span><span class="p">();</span>
+<span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">=</span> <span class="nv">$groupId</span><span class="p">;</span>
+<span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">hydrateMode</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">HYDRATE_ARRAY</span><span class="p">;</span>
+
+<span class="nv">$groups</span> <span class="o">=</span> <span class="nv">$app</span><span class="p">[</span><span class="s1">'orm.ems'</span><span class="p">][</span><span class="s1">'api'</span><span class="p">]</span>
+    <span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">'EasyBib\Api\Entity\User'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$criteria</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>What we achieved in this step, is a simple API for the developer using the
+Repository and a simple way to compose conditions by setting new properties
+in the criteria.</p>
+<p>If you complain that the solution has the same amount of lines, than the
+original EasyBib solution, then you are missing the point.  We have factored
+away a violation of the Law Of Demeter and calls on an API (Doctrine)
+that should be implementation detail of the repository.</p>
+<p>Lets try this by adding a new filter criteria, for example permissions I mentioned before:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserCriteria</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">PERMISSION_READ</span> <span class="o">=</span> <span class="s1">'read'</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">PERMISSION_WRITE</span> <span class="o">=</span> <span class="s1">'write'</span><span class="p">;</span>
+    <span class="c1">//...</span>
+    <span class="k">public</span> <span class="nv">$permissions</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">UserRepository</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">UserCriteria</span> <span class="nv">$criteria</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ...</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchPermissions</span><span class="p">(</span><span class="nv">$criteria</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Simple enough, now we can use it everywhere we want by adding
+for example <span class="docutils literal"><span class="pre">$criteria-&gt;permissions</span> <span class="pre">=</span> <span class="pre">UserCriteria::PERMISSION_WRITE</span></span>
+in our client code.</p>
+</div>
+<div class="section" id="specification-pattern">
+<h2>Specification Pattern</h2>
+<p>The Criteria object gets us very far in abstracting lots of query building
+behind a very simple API, but it fails short when:</p>
+<ul class="simple">
+<li>Composing Conditions using combinations of Not/And/Or is not possible
+without a tree structure, however <span class="docutils literal"><span class="pre">Criteria</span></span> is just a single object.</li>
+<li>Removing duplication of code between different repositories. If you
+have similar conditions, limit or ordering requirements then you can
+only solve this by having all repositories extend a base repository.
+But <a class="reference external" href="http://c2.com/cgi/wiki?ImplementationInheritanceIsEvil">Inheritance is evil</a>.</li>
+</ul>
+<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Specification_pattern">Specification pattern</a> solves
+this issue. There are several ways to implement it, in the spirit of refactoring I will
+approach it from our existing Criteria.</p>
+<p>Lets move the QueryBuilder code from the repository, into the Criteria object and
+rename it <span class="docutils literal"><span class="pre">UserSpecification</span></span>. Its important here to change the query builder
+code to use expressions that can be composed.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserSpecification</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$groupId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$hydrateMode</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">HYDRATE_OBJECT</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$permissions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$expr</span> <span class="o">=</span> <span class="s2">"1=1"</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">and</span><span class="p">(</span><span class="nv">$expr</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">matchPermissions</span><span class="p">(</span><span class="nv">$qb</span><span class="p">));</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$expr</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setHydrationMode</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">hydrateMode</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">function</span> <span class="nf">matchGroup</span><span class="p">(</span><span class="nv">$qb</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">'group'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">groupId</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">eq</span><span class="p">(</span><span class="s1">'u.group'</span><span class="p">,</span> <span class="s1">':group'</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">function</span> <span class="nf">matchPermissions</span><span class="p">(</span><span class="nv">$qb</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The repository is then delegating the expression generation
+and puts the result into the <span class="docutils literal"><span class="pre">where()</span></span> method of the builder</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserRepository</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">UserSpecification</span> <span class="nv">$specification</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$qb</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">(</span><span class="s1">'u'</span><span class="p">);</span>
+        <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="s1">'u'</span><span class="p">);</span>
+
+        <span class="nv">$query</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="nv">$expr</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getQuery</span><span class="p">();</span>
+
+        <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">modifyQuery</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Strictly speaking, the <span class="docutils literal"><span class="pre">UserSpecification</span></span> violates the single responsibility
+principle, which prevents the composability of specifications and reuse in
+different repositories. This is apparent by the <span class="docutils literal"><span class="pre">$expr</span> <span class="pre">=</span> <span class="pre">"1=1";</span></span> line that is
+required to make the combination of conditions possible.
+Lets factor away the violation of the single
+responsibility principle by introducing three specifications:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @param \Doctrine\ORM\QueryBuilder $qb</span>
+<span class="sd">     * @param string $dqlAlias</span>
+<span class="sd">     *</span>
+<span class="sd">     * @return \Doctrine\ORM\Query\Expr</span>
+<span class="sd">     ***/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">);</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param \Doctrine\ORM\Query $query</span>
+<span class="sd">     ***/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">AsArray</span> <span class="k">implements</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$parent</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$parent</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">parent</span> <span class="o">=</span> <span class="nv">$parent</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setHydrationMode</span><span class="p">(</span><span class="nx">Query</span><span class="o">::</span><span class="na">HYDRATE_ARRAY</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">FilterGroup</span> <span class="k">implements</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$group</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$group</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">group</span> <span class="o">=</span> <span class="nv">$group</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">'group'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">group</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">eq</span><span class="p">(</span><span class="nv">$dqlAlias</span> <span class="o">.</span> <span class="s1">'.group'</span><span class="p">,</span> <span class="s1">':group'</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* empty ***/</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">FilterPermission</span> <span class="k">implements</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$permissions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$permissions</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">=</span> <span class="nv">$permissions</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* empty ***/</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we need a new And-Specification to combine this in our code. This
+looks rather abstract and complex on the inside, but for clients
+of this object, the usage is simple and obvious.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">AndX</span> <span class="k">implements</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$children</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">children</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span><span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">(),</span> <span class="s1">'andX'</span><span class="p">),</span>
+            <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$specification</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">);</span>
+            <span class="p">},</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">children</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">children</span> <span class="k">as</span> <span class="nv">$child</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">modifyQuery</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Assuming we import all specifications
+from a common namespace <span class="docutils literal"><span class="pre">Spec</span></span>, our client code will look
+like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$specification</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spec\AsArray</span><span class="p">(</span><span class="k">new</span> <span class="nx">Spec\AndX</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Spec\FilterGroup</span><span class="p">(</span><span class="nv">$groupId</span><span class="p">),</span>
+    <span class="k">new</span> <span class="nx">Spec\FilterPermission</span><span class="p">(</span><span class="nv">$permission</span><span class="p">)</span>
+<span class="p">));</span>
+
+<span class="nv">$groups</span> <span class="o">=</span> <span class="nv">$app</span><span class="p">[</span><span class="s1">'orm.ems'</span><span class="p">][</span><span class="s1">'api'</span><span class="p">]</span>
+    <span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">'\EasyBib\Api\Entity\Group'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$specification</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In contrast to the criteria, we could now implement
+or and not specifications to enhance query capabilities.</p>
+</div>
+<div class="section" id="improving-specifications">
+<h2>Improving Specifications</h2>
+<p>You can now introduce reusability across different repositories by adding
+functionality to check if a specification supports a given entity.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="c1">// ..</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @param string $className</span>
+<span class="sd">     * @return bool</span>
+<span class="sd">     ***/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">supports</span><span class="p">(</span><span class="nv">$className</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Every composite can delegate this operation to its children, and every leaf of
+the tree can return true or false. The Repository can then check for a valid
+specification in its match method:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">abstract</span> <span class="k">class</span> <span class="nc">EntitySpecificationRepository</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$specification</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">supports</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEntityName</span><span class="p">()))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentException</span><span class="p">(</span><span class="s2">"Specification not supported by this repository."</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nv">$qb</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">(</span><span class="s1">'r'</span><span class="p">);</span>
+        <span class="nv">$expr</span> <span class="o">=</span> <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">);</span>
+
+        <span class="nv">$query</span> <span class="o">=</span> <span class="nv">$qb</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="nv">$expr</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getQuery</span><span class="p">();</span>
+
+        <span class="nv">$specification</span><span class="o">-&gt;</span><span class="na">modifyQuery</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we can introduce very generic specifications, such as <cite>OnlyPage($page, Specification $spec)`</cite>
+for limit queries, or <span class="docutils literal"><span class="pre">Equals($field,</span> <span class="pre">$value)</span></span>. For more readable code, you can then create
+a domain language for your specifications that is composed of more simple specifications:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">PowerUsers</span> <span class="k">implements</span> <span class="nx">Specification</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$spec</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">spec</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OnlyPage</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">new</span> <span class="nx">AndX</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">UsersWithInteraction</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">EnabledUsers</span><span class="p">(),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">QueryBuilder</span> <span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">spec</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="nv">$qb</span><span class="p">,</span> <span class="nv">$dqlAlias</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modifyQuery</span><span class="p">(</span><span class="nx">Query</span> <span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">spec</span><span class="o">-&gt;</span><span class="na">modifyQuery</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">supports</span><span class="p">(</span><span class="nv">$className</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nv">$className</span> <span class="o">===</span> <span class="s1">'EasyBib\Api\Entity\User'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$top20powerUsers</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spec\PowerUsers</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Hiding this kind of composition inside another specification allows
+you to reuse query logic in different places in the application
+easily and in terms of the domain language.</p>
+</div>
+<div class="section" id="testability-of-doctrine-repositories">
+<h2>Testability of Doctrine Repositories</h2>
+<p>One reasons outlined by Anne for this design is testability: Because the
+Repository returns the QueryBuilder you have access to the generated SQL.
+However testing Doctrine Repositories should never be verifying the generated
+SQL. I see a lot of people doing this and it is very fragile and dangerous.
+Doctrine is a third party library and as such a rather complex one. Possible
+changes that break the test are:</p>
+<ul class="simple">
+<li>Doctrine adds/removes whitespaces to SQL in a next version</li>
+<li>Doctrine performs SQL optimizations in certain cases, the result is the same though.</li>
+<li>You add a field/column to any of the tables involved that does not affect the result.</li>
+<li>You change something in the Doctrine mapping files, that leads to a reordering of SQL.</li>
+</ul>
+<p>These are 4 changes that have absolutely nothing to do with the feature you are
+actually testing, making the test code very fragile. In terms of abstraction
+SQL generation is an implementation detail of the Doctrine ORM and you as
+developer are only interested in the public API, which the SQL generation is
+not part of.</p>
+<p>The code should really be tested against Doctrine itself. Since you are using
+Doctrine to get rid of SQL query generation for some use-cases, why should you
+use them as measure of quality in your testing efforts.</p>
+<p>Testing repositories with the Specification pattern is testing the different
+specifications in isolation against a real Doctrine database backend. This will
+not be super simple to setup, but the isolation of specifications and their
+reusability across repositories actually allows us to keep the number of
+tests very small. The pattern avoids the problem of combinatorial explosion of
+test-cases very neatly.</p>
+<p>The real benefit of testability is achieved in tests of repository client code.
+Before we were not able to unit-test this code, because of the Doctrine
+EntityManager, Query + QueryBuilder dependencies.  Now We can inject the
+repositories into our controllers and services and then use mock objects in the
+tests.</p>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/doctrine.html">Doctrine</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2013/03/04/doctrine_repositories.html#disqus_thread" data-disqus-identifier="2013/03/04/doctrine_repositories">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 19, 2013</span>
+        </div>
+        <div class="section">
             <h1><a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a></h1>
 <p>Symfony2 is an extremely extendable framework, everything is extendable or
 overwritable through the Dependency Injection Container. The problem developers
@@ -233,14 +701,27 @@ into a custom Doctrine entity repository. But that is a task for another blog
 post in this series.</p>
 </div>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/symfony.html">Symfony</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 19, 2013 by Benjamin Eberlei</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/symfony2.html">Symfony2</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/symfony.html">Symfony</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2013/02/19/extending_symfony2__paramconverter.html#disqus_thread" data-disqus-identifier="2013/02/19/extending_symfony2__paramconverter">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>February 04, 2013</span>
+        </div>
+        <div class="section">
             <h1><a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a></h1>
 <p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
 time. It bugs me having to reply: It is not really possible.  Because Doctrine2
@@ -398,16 +879,27 @@ for technical reasons. In the future I hope to support value objects in
 Doctrine to make this possible.</p>
 </div>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/doctrine.html">Doctrine</a>
-                 / 
-            <a href="tags/codequality.html">CodeQuality</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on February 04, 2013 by Benjamin Eberlei</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/doctrine.html">Doctrine</a>, <a href="tags/codequality.html">CodeQuality</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2013/02/04/doctrine_and_solid.html#disqus_thread" data-disqus-identifier="2013/02/04/doctrine_and_solid">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>November 19, 2012</span>
+        </div>
+        <div class="section">
             <h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
 <p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
 research I found out Azure supports post deployment hooks to run
@@ -466,16 +958,27 @@ You can check out <a class="reference external" href="https://github.com/beberle
 <p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
 You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/azure.html">Azure</a>
-                 / 
-            <a href="tags/composer.html">Composer</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on November 19, 2012 by Benjamin Eberlei</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        <div class="categories">
+            <span>
+                Filed under:
+                <a href="categories/php.html">PHP</a></span>
+        </div>
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/azure.html">Azure</a>, <a href="tags/composer.html">Composer</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2012/11/19/composer_and_azure_websites_git_deployment.html#disqus_thread" data-disqus-identifier="2012/11/19/composer_and_azure_websites_git_deployment">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>October 27, 2012</span>
+        </div>
+        <div class="section">
             <h1><a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a></h1>
 <p>I wanted to host a simple application to play around with the <a class="reference external" href="https://tent.io">Tent Protocol</a> (see <a class="reference external" href="http://whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html">my last blogpost</a>), so
 I checked through some of the PHP Cloud providers again for the fun of it. One
@@ -502,96 +1005,51 @@ you don’t regularly click on a reset button. Its definitely enough to get smal
 prototypes up and running. From there you can upgrade in many small steps from
 small plans (10€/month) to bigger ones (80€/month).</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/clouds.html">Clouds</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on October 27, 2012 by Benjamin Eberlei</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a></h1>
-<p>Over the weekend I built a <a class="reference external" href="http://zelten.eu1.frbit.net">very simple bookmarking application</a> for <a class="reference external" href="http://tent.io">tent.io</a>. I wanted to try the tent functionality to create
-arbitrary entities of data using something as simple as a “Bookmark”.</p>
-<p>The application retrieves and stores bookmarks on your own tent-server, nothing
-is kept on the applications server and as a user you keep full control over
-your content (bookmarks).</p>
-<p>The <a class="reference external" href="https://github.com/beberlei/zelten-bookmarks">code for the application</a>
-is on Github, as well as the <a class="reference external" href="https://github.com/beberlei/TentPHP">TentPHP library</a> I have written to support the protocol.
-The application is using PHP, the Silex microframework and MySQL.</p>
-<div class="section" id="so-what-is-tent-and-why-bother">
-<h2>So what is Tent and why bother?</h2>
-<p>About two month ago a new distributed social networking protocol was launched called
-<a class="reference external" href="http://tent.io">Tent.io</a>. It works over HTTP using JSON and distributes data
-using webhooks. This happened in the shadow of <a class="reference external" href="http://www.app.net">app.net</a>
-funding, just two weeks after they collected over 500k USD. Tent.io got lots of
-attention but not as much as app.net sadly. Its distributed nature however is
-much more suited to achieving true independence of large companies and true privacy
-for the users though. Compared to Diaspora it has the benefit of being a protocol, not
-an application first.</p>
-<p>Now two month later, there are <a class="reference external" href="https://github.com/tent">reference implementations</a>
-for Server, Client and a Twitter like Status application. You can use <a class="reference external" href="http://tent.is">Tent.is</a> to create a free or payed tent account including access to
-the status application or setup your own tentd server on Heroku.</p>
-<p>As a user I can connect any application to the tent server I have registered
-with and control the visibility and sharing policies. Content can be private,
-public or visible to certain groups only. A Tent server then makes sure to
-distribute content to the appropriate subscribers.</p>
-<p>In this early state of the protocol it makes sense to register on the central
-tent.is service, however when the server gets more stable or alternative
-server implementations popup its easy to move all your data off tent.is to your
-own server. One feature that will hit tent.is soonish is registration of domain
-records. That will be the first step to your own tent server, I am eagerly
-waiting to host all my content at <a class="reference external" href="https://tent.beberlei.de">https://tent.beberlei.de</a> at some day.</p>
-</div>
-<div class="section" id="tent-io-sounds-awesome-how-can-i-help">
-<h2>Tent.io sounds awesome, how can I help?</h2>
-<p>Right at the moment the tent software stack is developed by the team that also
-hosts <a class="reference external" href="https://tent.is">Tent.is</a>. If all you can provide is money, then
-signing up for the 12 USD per month is the way to go.</p>
-<p>If you are a developer, then take a look at the <a class="reference external" href="https://github.com/tent/tent.io/wiki/Related-projects">Wiki</a> where related
-projects are listed. You will find a bunch of client libraries for major
-languages already, helping you to get started.</p>
-<p>I suppose the major work lies in implementing Status-Post clients for all
-major smartphone platforms and desktops. As well as the host of applications
-that Facebook and other social networks provides:</p>
-<ul class="simple">
-<li>Manage and share Photo albums</li>
-<li>Plan and share events</li>
-<li>Managing contact data/address book</li>
-<li>Resume details (Linkedin/Xing)</li>
-<li>Track User Events (Timeline)</li>
-<li>Sharing Music and Videos (Myspace)</li>
-<li>Importing all sorts of existing content (RSS,..)</li>
-</ul>
-</div>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/tentio.html">Tentio</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on October 22, 2012 by Benjamin Eberlei</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Benjamin Eberlei</span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/clouds.html">Clouds</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2012/10/27/babysteps_with_fortrabbit_php_cloud.html#disqus_thread" data-disqus-identifier="2012/10/27/babysteps_with_fortrabbit_php_cloud">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page6.html">Newer</a></li>
+            <li class="right"><a href="page8.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

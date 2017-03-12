@@ -16,13 +16,11 @@
         <meta name="description" content="My blog">
         <meta name="viewport" content="width=device-width">
         <title>Page 24 &mdash; beberlei.de</title>
-<meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4" />
-<meta content="width=device-width" />
-<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-<link rel="stylesheet" href="_static/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="_static/blog.css" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -37,37 +35,87 @@
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script><script type="text/javascript" src="_static/ga.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container">
-<nav class="navbar navbar-dark">
-  <div class="container">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
-      </div>
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page23.html">Newer</a></li>
+            <li class="right"><a href="page25.html">Older</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>January 24, 2008</span>
+        </div>
+        <div class="section">
+            <h1><a href="2008/01/24/complaining-about-zend-filter-input.html">Complaining about Zend_Filter_Input</a></h1>
+<p>Zend_Filter_Input is really nice to be sure form data is filtered
+correctly, but i have some serious complaints: Why the hell are the
+error messages so user-unfriendly? I really would like to use the output
+of Zend_Filter_Input::getMessages(), but I could never trust to show
+them to a user of my website: They are obviously written for developers.
+Some examples:</p>
+<blockquote>
+<div>‘’ does not appear to be an integer ‘’ is an empty string</div></blockquote>
+<p>I use a ton of validators to filter the comments form and all possible
+error messages that can be thrown are not “user-save”. Because all these
+messages are handled in each Validator class its almost impossible to
+change them without going nuts:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">$validators = array(</span>
+<span class="x">    'article_id' =&gt; array(</span>
+<span class="x">        'Int',</span>
+<span class="x">        new Zend_Validate_Int(),</span>
+<span class="x">        array('GreaterThan', 0)</span>
+<span class="x">        ),</span>
+<span class="x">    'username' =&gt; 'Alnum',</span>
+<span class="x">    'userEmail' =&gt; new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL, true),</span>
+<span class="x">    'cp'   =&gt; array(</span>
+<span class="x">        'Digits',                // string</span>
+<span class="x">        new Zend_Validate_Int(), // object instance</span>
+<span class="x">        array('Between', 1138, 1138)  // string with constructor arguments</span>
+<span class="x">    ),</span>
+<span class="x">    'comment' =&gt; 'NotEmpty',</span>
+<span class="x">);</span>
+</pre></div>
+</div>
+<p>This simple $validators requirement creates templates for error
+messages in each validator object, that are: Zend_Validate_Int,
+Zend_Validate_Alnum, Zend_Validate_EmailAddress,
+Zend_Validate_Hostname, and the not empty message. To allow for user
+friendly messages one had to make child objects of each of the
+Validators and edit the error messages accordingly. I avoid this by
+printing my own errors from outside the Zend_Filter_Input, rather than
+using the object for what it is probably supposed to do.</p>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="pages/about.html">About</a></li>
-              <li><a href="/archive.html">Archive</a></li>
-              <li><a href="/rss.xml">RSS</a></li>
-          </ul>
-      </div>
-  </div>
-</nav>
-
-<div class="main-container" role="main">
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-12">
-          <div id="page24">
-            
-            <div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/01/24/complaining-about-zend-filter-input.html#disqus_thread" data-disqus-identifier="2008/01/24/complaining-about-zend-filter-input">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 24, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
 <p>I am not too happy with the ZF Frameworks Table access solution. Not
 that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
@@ -101,14 +149,21 @@ An example:</p>
 compromise after another for getting the Table Gateway to reproduce a
 result that looks like a join.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on January 24, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/01/24/how-my-zend-db-table-models-look-like.html#disqus_thread" data-disqus-identifier="2008/01/24/how-my-zend-db-table-models-look-like">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>October 30, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
 <p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
 Mainz, Germany was the first php conference I have been to. It ended
@@ -165,14 +220,21 @@ the database and polled latter. To be included in PHP 5.3</li>
 using their notebooks were packed on hotspots where power was available.
 Please more power plug possibilities next time!</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/conferences.html">Conferences</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on October 30, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/conferences.html">Conferences</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html#disqus_thread" data-disqus-identifier="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>October 01, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html">My recent ZF ongoings: JQuery, Action Controller, CouchDb</a></h1>
 <p>In the last weeks lots of stuff came up for me regarding the Zend
 Framework. My <a class="reference external" href="http://jquery.com">jQuery</a> component is finished, i
@@ -209,16 +271,21 @@ component yesterday and we teamed up to implement two prototypes
 on <a class="reference external" href="http://github.com/weierophinney/phly/tree/master">Matthews</a> and
 integrates lots of stuff of the Zym component).</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/couchdb.html">CouchDB</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on October 01, 2008</small></p>
-        </div><div class="separator post_separator"></div><div class="section">
+        </div>
+        <div class="postmeta">
+        
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/zendframework.html">ZendFramework</a>, <a href="tags/couchdb.html">CouchDB</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html#disqus_thread" data-disqus-identifier="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb">Leave a comment</a>
+        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>April 27, 2008</span>
+        </div>
+        <div class="section">
             <h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
 <p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
 class</a> I
@@ -276,68 +343,51 @@ ccf(const vVarY, const vVarX, const lags)
 </div></blockquote>
 <p>It may prove useful to someone.</p>
 
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/ox.html">Ox</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on April 27, 2008 by beberlei <kontakt@beberlei.de></small></p>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/09/05/jquery-component-approved-for-extras-library.html">jQuery Component approved for extras library</a></h1>
-<p>Yesterday both my jQuery Helper proposals (<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">Core
-Helper</a>,
-<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei?focusedCommentId=7373203#comment-7373203">UI
-Widgets</a>)
-for the Zend Framework have been accepted for development. I have
-already checked my working prototypes <a class="reference external" href="http://framework.zend.com/svn/framework/extras/incubator/">into the Zend Framework
-SVN</a>. In my
-opinion the usage is quite stable already. There is likely to be no
-argument flip, function renaming or whatsoever. I have renamed the
-jqLink helper to ajaxLink though, because other libraries are offering
-the same functionality to make Ajax related calls and this way the
-learning curve for people using different libraries in different
-projects may be more easy.</p>
-<p>What is still missing? I have to add captureStart()/captureEnd()
-functions to the Container Widgets Accordion and Tabs, and will create
-additional pane helpers for both of them. This will likely be finished
-this weekend and then there is only the documentation missing. I am very
-confident this component will be finished for the Zend Framework 1.7
-release later this year.</p>
-<p>Since this component also includes helpers for the jQuery UI Widgets 1.6
-release (which is not released yet), a little waiting time before
-release is still good. I hope this all works out and the jQuery UI 1.6
-release is in the Google CDN, when ZF 1.7 comes out.</p>
-
-        </div><div class="tags">
-            <strong>More about:</strong>
-            <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-            <a href="tags/jquery.html">jQuery</a>
-                
-            </span>
-        </div><div class="metadata">
-            <p><small>Posted on September 05, 2008</small></p>
-        </div><div class="archive_link">
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by beberlei <kontakt@beberlei.de></span>
+        </div>
+        
+        <div class="tags">
+            <span>
+                Tags:
+                <a href="tags/ox.html">Ox</a></span>
+        </div>
+        <div class="comments">
+            <a href="https://www.beberlei.de/2008/04/27/ox-cross-correlation-coefficients-with-lags.html#disqus_thread" data-disqus-identifier="2008/04/27/ox-cross-correlation-coefficients-with-lags">Leave a comment</a>
+        </div></div><div class="archive_link">
         <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div>
-          </div>         
-        </div>
-    </div>
+    </div><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="page23.html">Newer</a></li>
+            <li class="right"><a href="page25.html">Older</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
+        </li><li>
+            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
+        </li><li>
+            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
+        </li><li>
+            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
+        </li><li>
+            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
+        </li><li>
+            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
+        </li><li>
+            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
+        </li><li>
+            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
+        </li><li>
+            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
+        </li><li>
+            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
+        </li></ul>
 </div>
-</div> <!-- #main-container -->
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo">
-<div class="container">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="footer">
-            <small>&copy; Copyright 2008-2017, Benjamin Eberlei.</small>
-
-            <script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
-        </div>
-    </div>
-</div>
-</div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
 
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>

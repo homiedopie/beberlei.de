@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2017/03/12/explicit_global_state_with_context_objects
    2016/05/28/composer_monorepo_plugin_previously_called_fiddler
    2016/02/21/how_i_use_wordpress_with_git_and_composer
    2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading
