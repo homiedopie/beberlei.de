@@ -13,14 +13,14 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="description" content="My blog">
+        <meta name="description" content="Blog of Benjamin Eberlei, covering a wide range of programming, bootstrapping and entrepreneurial topics">
         <meta name="viewport" content="width=device-width">
+        <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4">
         <title>Page 10 &mdash; beberlei.de</title>
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+            <link rel="stylesheet" href="/_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="/_static/css/bootstrap.min.css" type="text/css" />
+            <link rel="stylesheet" href="/_static/blog.css" type="text/css" />
+            <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" />
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -33,6 +33,7 @@
         VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -41,27 +42,25 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container"><header role="banner">
-            <hgroup>
-              <h1><a href="index.html">beberlei.de</a></h1></hgroup>
-          </header>
-      <nav role="navigation">
-            <ul><li class="quicklink"><div class="rss">
-        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
-    </div></li><li class="main-nav">
-                  <a href="index.html">Home</a>
-                </li>
-              <li class="main-nav">
-                  <a href="pages/about.html">About</a>
-                </li>
-              </ul>
-          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
-            <li class="left"> &laquo; <a href="page9.html">Newer</a></li>
-            <li class="right"><a href="page11.html">Older</a> &raquo; </li>
-        </ul><div class="timestamp postmeta">
-            <span>June 03, 2012</span>
-        </div>
-        <div class="section">
+      <div id="container"><nav class="navbar navbar-dark">
+		  <div class="container">
+			  <div class="navbar-header">
+				  <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+			  </div>
+
+			  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				  <ul class="nav navbar-nav navbar-right">
+						<li><a href="index.html">Home</a></li>
+						<li><a href="pages/about.html">About</a></li>
+						<li><a href="/archive.html">Archive</a></li>
+					  <li><a href="/rss.xml">RSS</a></li>
+				  </ul>
+			  </div>
+		  </div>
+		</nav><div class="main-container" role="main"><div class="container">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
+							<div class="section">
             <h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
 <p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
 mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
@@ -185,23 +184,15 @@ all the machines I work with.</p>
 <li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
 </ul>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/automation.html">Automation</a></span>
-        </div>
-        
-        <div class="comments">
-            <a href="https://www.beberlei.de/2012/06/03/setting_up_development_machines_with_puppet.html#disqus_thread" data-disqus-identifier="2012/06/03/setting_up_development_machines_with_puppet">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 31, 2012</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 03, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
 <p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
 VM management very efficiently. Being always late to new technologies
@@ -285,23 +276,15 @@ $ vagrant ssh
 <p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
 point. The use of puppet with Vagrant will be part of a next blog post.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/vagrant.html">Vagrant</a>, <a href="tags/automation.html">Automation</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html#disqus_thread" data-disqus-identifier="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 26, 2012</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 31, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
@@ -352,23 +335,15 @@ completely rewrote Doctrine 2 or trivial one-line changes.</p>
 <p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
 fun with it.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        <div class="categories">
-            <span>
-                Filed under:
-                <a href="categories/doctrine.html">Doctrine</a></span>
-        </div>
-        
-        <div class="comments">
-            <a href="https://www.beberlei.de/2012/05/26/doctrine_goes_mit.html#disqus_thread" data-disqus-identifier="2012/05/26/doctrine_goes_mit">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 25, 2012</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 26, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
 <p>Controller testing using the WebTestCase requires a Symfony Kernel and with
 that a complete application. However you can just ship your own simple kernel
@@ -503,21 +478,15 @@ the Monolog lines to get the log-messages printed to the screen.</p>
 control ignore files.</p>
 </div>
 
-        </div>
-        <div class="postmeta">
-        
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/symfony.html">Symfony</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2012/02/25/symfony2_controller_testing.html#disqus_thread" data-disqus-identifier="2012/02/25/symfony2_controller_testing">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 07, 2010</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 25, 2012
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
 <p>Yesterday I finally had the time to setup my first continuous
 integration environment. Possible solutions for CI are
@@ -585,50 +554,31 @@ Developers</a>.
 You can then start all the builds from inside Netbeans and be notified
 of the success or failure.</p>
 
-        </div>
-        <div class="postmeta">
-        
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/continouosintegration.html">ContinouosIntegration</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2010/02/07/resources-for-a-php-and-hudson-ci-integration.html#disqus_thread" data-disqus-identifier="2010/02/07/resources-for-a-php-and-hudson-ci-integration">Leave a comment</a>
-        </div></div><div class="archive_link">
-        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div><ul class="related clearfix">
-            <li class="left"> &laquo; <a href="page9.html">Newer</a></li>
-            <li class="right"><a href="page11.html">Older</a> &raquo; </li>
-        </ul></article><aside class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
-        </li><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li></ul>
-</div>
-</section></aside></div> <!-- #main --></div> <!-- #main-container -->
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 07, 2010
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="archive_link">
+        <a href="archive.html">Archive</a>
+    </div></article></div> <!-- #main -->
+				</div>
+			</div></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo">
+			<div class="container">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="footer">
+						<small>© Copyright 2008-2017, Benjamin Eberlei.</small>
 
+						<script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+					</div>
+				</div>
+			</div>
+        </div> <!-- footer-container -->
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
           <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>

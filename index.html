@@ -13,14 +13,14 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="description" content="My blog">
+        <meta name="description" content="Blog of Benjamin Eberlei, covering a wide range of programming, bootstrapping and entrepreneurial topics">
         <meta name="viewport" content="width=device-width">
+        <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4">
         <title>Home &mdash; beberlei.de</title>
-            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
-            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
-            <link rel="stylesheet" href="_static/main.css" type="text/css">
-            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+            <link rel="stylesheet" href="/_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="/_static/css/bootstrap.min.css" type="text/css" />
+            <link rel="stylesheet" href="/_static/blog.css" type="text/css" />
+            <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" />
         <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
         <script src="_static/vendor/modernizr-2.6.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -33,6 +33,7 @@
         VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -41,27 +42,25 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-      <div id="container"><header role="banner">
-            <hgroup>
-              <h1><a href="#">beberlei.de</a></h1></hgroup>
-          </header>
-      <nav role="navigation">
-            <ul><li class="quicklink"><div class="rss">
-        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
-    </div></li><li class="main-nav">
-                  <a href="#">Home</a>
-                </li>
-              <li class="main-nav">
-                  <a href="pages/about.html">About</a>
-                </li>
-              </ul>
-          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
-            <li class="left"></li>
-            <li class="right"><a href="page2.html">Older</a> &raquo; </li>
-        </ul><div class="timestamp postmeta">
-            <span>March 12, 2017</span>
-        </div>
-        <div class="section">
+      <div id="container"><nav class="navbar navbar-dark">
+		  <div class="container">
+			  <div class="navbar-header">
+				  <a class="navbar-brand" href="https://beberlei.de">Benjamin Eberlei</a>
+			  </div>
+
+			  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				  <ul class="nav navbar-nav navbar-right">
+						<li><a href="#">Home</a></li>
+						<li><a href="pages/about.html">About</a></li>
+						<li><a href="/archive.html">Archive</a></li>
+					  <li><a href="/rss.xml">RSS</a></li>
+				  </ul>
+			  </div>
+		  </div>
+		</nav><div class="main-container" role="main"><div class="container">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
+							<div class="section">
             <h1><a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a></h1>
 <p>Global State is considered bad for maintainability of software. Side effects on
 global state can cause a very nasty class of bugs. Context objects are one
@@ -214,23 +213,15 @@ suffer from performance hits, because the context is created on every request,
 maybe fetching expensive data that isn’t even used.</p>
 </div>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/symfony.html">Symfony</a>, <a href="tags/designpatterns.html">DesignPatterns</a>, <a href="tags/applicationdesign.html">ApplicationDesign</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2017/03/12/explicit_global_state_with_context_objects.html#disqus_thread" data-disqus-identifier="2017/03/12/explicit_global_state_with_context_objects">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>May 28, 2016</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on March 12, 2017
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a></h1>
 <p>I have <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">written about monorepos</a>
 in this blog before, <a class="reference external" href="https://qafoo.com/resources/presentations/symfony_live_berlin_2015/monorepos.html">presented a talk</a>
@@ -273,23 +264,15 @@ update or dump-autoload commands, the subpackages will be updated as well and
 each get their own autoloader that can be included from <span class="docutils literal"><span class="pre">vendor/autoload.php</span></span>
 relative to the subpackages root directory as usual.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/monorepos.html">Monorepos</a>, <a href="tags/composer.html">Composer</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html#disqus_thread" data-disqus-identifier="2016/05/28/composer_monorepo_plugin_previously_called_fiddler">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>February 21, 2016</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 28, 2016
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a></h1>
 <p>I maintain two Wordpress blogs for my wife and wanted to find a workflow to
 develop, update, version-contol and maintain them with Git and Composer, like I
@@ -504,23 +487,15 @@ arguments:</p>
 <p>Keep this command running and visit <cite>localhost:8000</cite>.</p>
 </div>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/wordpress.html">Wordpress</a>, <a href="tags/deployment.html">Deployment</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2016/02/21/how_i_use_wordpress_with_git_and_composer.html#disqus_thread" data-disqus-identifier="2016/02/21/how_i_use_wordpress_with_git_and_composer">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>August 08, 2015</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 21, 2016
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
 <p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
 is a way for monolithic PHP repositories with multiple components
@@ -558,23 +533,15 @@ components that don’t define their own dependencies. The <a class="reference e
 problems by forcing to rely on the same dependencies in a project globally and
 only once.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/monorepos.html">Monorepos</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html#disqus_thread" data-disqus-identifier="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading">Leave a comment</a>
-        </div></div><div class="separator post_separator"></div><div class="timestamp postmeta">
-            <span>June 12, 2015</span>
-        </div>
-        <div class="section">
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 08, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/06/12/the_containertest.html">The ContainerTest</a></h1>
 <p>This is a short post before the weekend about testing in applications with
 dependency injection container (DIC). This solution helps me with a problem
@@ -622,52 +589,31 @@ easy as that.</p>
 <span class="docutils literal"><span class="pre">getContainer()</span></span> as you can see in the test method. See <a class="reference external" href="http://www.whitewashing.de/2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">my blog post</a>
 on traits in tests for more information.</p>
 
-        </div>
-        <div class="postmeta">
-        <div class="author">
-            <span>Posted by Benjamin Eberlei</span>
-        </div>
-        
-        <div class="tags">
-            <span>
-                Tags:
-                <a href="tags/symfony.html">Symfony</a>, <a href="tags/testing.html">Testing</a></span>
-        </div>
-        <div class="comments">
-            <a href="https://www.beberlei.de/2015/06/12/the_containertest.html#disqus_thread" data-disqus-identifier="2015/06/12/the_containertest">Leave a comment</a>
-        </div></div><div class="archive_link">
-        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
-    </div><ul class="related clearfix">
-            <li class="left"></li>
-            <li class="right"><a href="page2.html">Older</a> &raquo; </li>
-        </ul></article><aside class="sidebar"><section><div class="widget">
-    <h1>Recent Posts</h1>
-    <ul><li>
-            <a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a>
-        </li><li>
-            <a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a>
-        </li><li>
-            <a href="2016/02/21/how_i_use_wordpress_with_git_and_composer.html">How I use Wordpress with Git and Composer</a>
-        </li><li>
-            <a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a>
-        </li><li>
-            <a href="2015/06/12/the_containertest.html">The ContainerTest</a>
-        </li><li>
-            <a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a>
-        </li><li>
-            <a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a>
-        </li><li>
-            <a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a>
-        </li><li>
-            <a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a>
-        </li><li>
-            <a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a>
-        </li></ul>
-</div>
-</section></aside></div> <!-- #main --></div> <!-- #main-container -->
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 12, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="archive_link">
+        <a href="archive.html">Archive</a>
+    </div></article></div> <!-- #main -->
+				</div>
+			</div></div> <!-- #main-container -->
 
-        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2008-2017, Benjamin Eberlei. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
+        <div class="footer-container" role="contentinfo">
+			<div class="container">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="footer">
+						<small>© Copyright 2008-2017, Benjamin Eberlei.</small>
 
+						<script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script>
+					</div>
+				</div>
+			</div>
+        </div> <!-- footer-container -->
       </div> <!--! end of #container --><script type="text/javascript">    var disqus_shortname = "whitewashing";    disqus_count();</script><!--[if lt IE 7 ]>
           <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
           <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
