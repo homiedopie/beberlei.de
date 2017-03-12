@@ -27,7 +27,7 @@ A context object is a way to make the existing context explicit for your code.
 Context Objects
 ---------------
 
-Lets take a look at the Definition of a context object::
+Lets take a look at the Definition of a context object
 
     A context object encapsulates the references/pointers to services and
     configuration information used/needed by other objects. It allows the objects
