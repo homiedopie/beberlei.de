@@ -1,0 +1,78 @@
+Composer and Azure Websites Git Deployment
+==========================================
+
+Continuing my series on PHP PaaS Clouds (`Fortrabbit
+<http://fortrabbit.com/>`_), I turn to Microsoft Azure today. After some
+research I found out Azure supports post deployment hooks to run
+Composer and allows you to configure environment variables from the Management
+console.
+
+Microsoft launched `Azure Websites
+<https://www.windowsazure.com/en-us/home/scenarios/web-sites/>`_ in June this
+year.  It is a platform as a service solution where you can deploy your
+websites via FTP or Git. With Azure Websites you can avoid having to deal with
+the complex deployment automation that is necessary for `Azure Hosted Cloud
+Services <https://www.windowsazure.com/en-us/home/features/cloud-services/>`_.
+As long as your website only requires an SQLServer, MySQL or external APIs you
+can actually achieve quite a lot already.
+
+For a `Symfony2 <http://www.symfony.com>`_, `Silex
+<http://www.silex-project.org>`_ or any other modern project however you want
+`Composer <http://www.getcomposer.org>`_ support during the deployment as
+long as failures with Composer don't break your site.
+
+It turns out that Azure Websites - to support other platforms that require
+compiling - actually has an extremely robust deployment system (as far as I
+understood its internals). The Git repository is separated from the actual code
+that is served from the webserver and a number of old checkouts is kept to
+allow rollbacks through the Web interface. Once a Git push was recognized,
+Azure websites will execute a build step, and then copy all the files over to a
+directory with the name of the Git SHA hash. This directory is then symlinked
+to the document root.
+
+If Composer fails during this step, the website will still be served from the
+currently running version and you don't have to face unexpected downtime.
+
+To actually run Composer as a post-deployment tool you have to do some manual
+work. Create a ``.deployment`` file in your project root folder:
+
+.. code-block:: ini
+
+    [config]
+    command = "D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php
+
+If you are using PHP 5.4, then you probably have to change the command version
+name to "v5.4", but I haven't tested this.
+
+Then you need to create the ``build_azure.php`` file that is referenced in the
+deployment command. The actual implementation is up to you, my version is
+the most simple one:
+
+.. code-block:: php
+
+    <?php
+    if (!file_exists("composer.phar")) {
+        $url = 'https://getcomposer.org/composer.phar';
+        file_put_contents("composer.phar", file_get_contents($url));
+    }
+
+    $_SERVER['argv'][1] = "update";
+    $_SERVER['argv'][2] = "--prefer-dist";
+    $_SERVER['argv'][3] = "-v";
+    require "composer.phar";
+
+.. note::
+
+    This currently only works with a Composer version, where
+    `PR-1341 <https://github.com/composer/composer/pull/1341>`_ is applied.
+    You can check out `my Composer fork
+    <https://github.com/beberlei/composer/tree/GH-1339>`_ and run
+    ``./bin/compile`` to generate a composer.phar that works.
+
+Instead of using this approach, you could ship ``composer.phar`` with your repository for example.
+You can of course execute additional steps in the ``build_azure.php``, for example warmup caches.
+
+.. author:: default
+.. categories:: PHP
+.. tags:: Azure, Composer
+.. comments::

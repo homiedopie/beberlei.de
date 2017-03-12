@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page9.html" /><link rel="prev" title="Newer" href="page7.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page9.html" /><link rel="prev" title="Newer" href="page7.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -144,7 +144,7 @@ cluttering the whole code-base.</p>
 <p>Take <a class="reference external" href="http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935">this example</a> from
 the old deprecated Windows Azure SDK, a method for putting a binary file into
 Azures blob storage:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
@@ -176,7 +176,7 @@ and almost take up half the screen without even getting to the actual code.</p>
 <p>The assertion pattern is really helpful here to reduce the complexity of this
 code and hide the <span class="docutils literal"><span class="pre">if/throw</span></span> conditions into little helper methods. Have a
 look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="s1">'Container name is not specified'</span><span class="p">);</span>
@@ -199,7 +199,7 @@ unit-tested.</p>
 <p>That is why you should extend from <span class="docutils literal"><span class="pre">Assertion</span></span> and use your own class when
 using the Assert library. This returns some control in your hands and even
 allows you to overwrite the exception class:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Util</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Assert\Assertion</span> <span class="k">as</span> <span class="nx">BaseAssertion</span><span class="p">;</span>
@@ -244,7 +244,7 @@ referenced by the dependency injection service called <span class="docutils lite
 <p>If you want to create a different logger service that is responsible for a
 different type of your application stack, just define it using the <span class="docutils literal"><span class="pre">channels</span></span>
 option:</p>
-<div class="highlight-yaml"><div class="highlight"><pre>monolog:
+<div class="highlight-yaml"><div class="highlight"><pre><span/>monolog:
     handlers:
         myfile:
             type: stream
@@ -254,7 +254,7 @@ option:</p>
 </div>
 <p>To actually write to <span class="docutils literal"><span class="pre">mychannel</span></span> you have to tag all the services that use
 <span class="docutils literal"><span class="pre">mychannel</span></span> with the following tag:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_service"</span> <span class="na">class=</span><span class="s">"MyService"</span><span class="nt">&gt;</span>
+<div class="highlight-xml"><div class="highlight"><pre><span/><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_service"</span> <span class="na">class=</span><span class="s">"MyService"</span><span class="nt">&gt;</span>
     <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">"monolog.logger"</span> <span class="na">channel=</span><span class="s">"mychannel"</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">"service"</span> <span class="na">id=</span><span class="s">"logger"</span> <span class="nt">/&gt;</span>
 <span class="nt">&lt;/service&gt;</span>
@@ -373,14 +373,14 @@ mailer and so on. We could inject the authentication and account generation
 services into the Import Service, but with rising complexity this will lead to
 a lasagna of services and the execution path will dig deep into this and this
 is not nearly as tasty as eating real lasagna.</p>
-<div class="highlight-python"><div class="highlight"><pre>ImportService
-|_AuthenticationService
-| |_Mailer
-| |_Database
-|_AccountGenerationService
-| |_Database
-| \_RemoteFacade
-\_Database
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">ImportService</span>
+<span class="o">|</span><span class="n">_AuthenticationService</span>
+<span class="o">|</span> <span class="o">|</span><span class="n">_Mailer</span>
+<span class="o">|</span> <span class="o">|</span><span class="n">_Database</span>
+<span class="o">|</span><span class="n">_AccountGenerationService</span>
+<span class="o">|</span> <span class="o">|</span><span class="n">_Database</span>
+<span class="o">|</span> \<span class="n">_RemoteFacade</span>
+\<span class="n">_Database</span>
 </pre></div>
 </div>
 <p>This becomes more complicated when transaction semantics need to be taken care
@@ -389,16 +389,16 @@ have to take into account that the code in entities and value objects
 participating in this use-case.</p>
 <p>What we want instead is a sequential execution of those nested services, but
 only if the parent service executed successfully:</p>
-<div class="highlight-python"><div class="highlight"><pre>ImportService
-\_Database
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">ImportService</span>
+\<span class="n">_Database</span>
 
-AuthenticationService
-|_Mailer
-\_Database
+<span class="n">AuthenticationService</span>
+<span class="o">|</span><span class="n">_Mailer</span>
+\<span class="n">_Database</span>
 
-AccountGenerationService
-|_Database
-\_RemoteFacade
+<span class="n">AccountGenerationService</span>
+<span class="o">|</span><span class="n">_Database</span>
+\<span class="n">_RemoteFacade</span>
 </pre></div>
 </div>
 <p>We could use an event dispatcher in all of the services to notify each other,
@@ -409,7 +409,7 @@ is committed and an hence an operation is completed successfully, we take all
 the events emitted from all entities (looking at the identity map for example)
 and trigger observing event handlers. However if the operation fails, we do not
 trigger these event handlers.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
 <span class="p">{</span>
@@ -435,7 +435,7 @@ trigger these event handlers.</p>
 </div>
 <p>The Event provider trait aggregates all the events, and offers
 and API for external services to pull them from the entity:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">trait</span> <span class="nx">EventProvider</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>

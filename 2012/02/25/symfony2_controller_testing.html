@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Resources for a PHP and Hudson CI Integration" href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html" /><link rel="prev" title="Doctrine switches from LGPL to MIT" href="../../05/26/doctrine_goes_mit.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Resources for a PHP and Hudson CI Integration" href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html" /><link rel="prev" title="Doctrine switches from LGPL to MIT" href="../../05/26/doctrine_goes_mit.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -70,7 +70,7 @@ easily create functional tests for bundles without the bundle requiring an
 application.</p>
 <div class="section" id="create-a-testkernel">
 <h2>Create a TestKernel</h2>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// Tests/Controller/App/AppKernel.php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
@@ -99,7 +99,7 @@ application.</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="c1">// We don&#39;t need that Environment stuff, just one config</span>
-        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">&#39;/config.yml&#39;</span><span class="p">);</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/config.yml&#39;</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -107,7 +107,7 @@ application.</p>
 </div>
 <div class="section" id="creating-the-config-yml">
 <h2>Creating the config.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre># Tests/Controller/App/config.yml
+<div class="highlight-yaml"><div class="highlight"><pre><span></span># Tests/Controller/App/config.yml
 framework:
     secret:          secret
     charset:         UTF-8
@@ -136,7 +136,7 @@ monolog:
 </div>
 <div class="section" id="creating-the-routing-yml">
 <h2>Creating the routing.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># Tests/Controller/App/routing.yml</span>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># Tests/Controller/App/routing.yml</span>
 <span class="l l-Scalar l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="s">&quot;@BeberleiWorkflowBundle/Controller/&quot;</span>
     <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
@@ -150,22 +150,22 @@ monolog:
 Tree K-I-S-S-I-N-G&#8221; blog post</a>.</p>
 <p>His setup is missing the spl_autoload_register() call in the bootstrap file
 though.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// Tests/bootstrap.php</span>
-<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../vendor/.composer/autoload.php&#39;</span><span class="p">;</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../vendor/.composer/autoload.php&#39;</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;&#39;EOT&#39;</span>
+    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;&#39;</span><span class="dl">EOT</span><span class="s">&#39;</span>
 <span class="s">You must set up the project dependencies, run the following commands:</span>
 <span class="s">wget http://getcomposer.org/composer.phar</span>
 <span class="s">php composer.phar install</span>
-<span class="s">EOT</span>
+<span class="dl">EOT</span>
     <span class="p">);</span>
 <span class="p">}</span>
 <span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">&#39;loadClass&#39;</span><span class="p">));</span>
 
 <span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">&#39;Beberlei\\WorkflowBundle\\&#39;</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nv">$path</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">&#39;/../&#39;</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">&#39;\\&#39;</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">&#39;.php&#39;</span><span class="p">;</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/../&#39;</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">&#39;\\&#39;</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">&#39;.php&#39;</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
             <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
         <span class="p">}</span>
@@ -181,7 +181,7 @@ dependencies.</p>
 <div class="section" id="modifying-the-phpunit-xml-dist">
 <h2>Modifying the phpunit.xml.dist</h2>
 <p>We have to tell the WebTestCase base class where to find this kernel:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
 <span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Tests/bootstrap.php&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;php&gt;</span>
         <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">&quot;KERNEL_DIR&quot;</span> <span class="na">value=</span><span class="s">&quot;Tests/Controller/App&quot;</span> <span class="nt">/&gt;</span>

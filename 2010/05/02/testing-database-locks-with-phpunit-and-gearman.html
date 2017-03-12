@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Immutable DateTime Objects" href="../../01/08/immutable-datetime-objects.html" /><link rel="prev" title="Resources for a PHP and Hudson CI Integration" href="../../02/07/resources-for-a-php-and-hudson-ci-integration.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Immutable DateTime Objects" href="../../01/08/immutable-datetime-objects.html" /><link rel="prev" title="Resources for a PHP and Hudson CI Integration" href="../../02/07/resources-for-a-php-and-hudson-ci-integration.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -103,7 +103,7 @@ we can go on writing our locking tests with Gearman.</p>
 <p>The first bit is the worker, a PHP script that tries to acquire a
 database lock and then sleeps for a second. The return value of this
 script is the total time required for acquiring the lock and sleeping.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class LockAgentWorker</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">class LockAgentWorker</span>
 <span class="x">{</span>
 <span class="x">    public function findWithLock($job)</span>
 <span class="x">    {</span>
@@ -124,7 +124,7 @@ script is the total time required for acquiring the lock and sleeping.</p>
 </div>
 <p>The glue-code for the worker script contains of the registering of the
 worker method with the job-server and a simple infinite loop:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$lockAgent = new LockAgentWorker();</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">$lockAgent = new LockAgentWorker();</span>
 
 <span class="x">$worker = new \GearmanWorker();</span>
 <span class="x">$worker-&gt;addServer();</span>
@@ -154,7 +154,7 @@ the individual workers.</li>
 worker sleeps 1 second)</li>
 </ol>
 <p>The code for this steps could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
 <span class="x">{</span>
 <span class="x">    private $gearman = null;</span>
 <span class="x">    private $maxRunTime = 0;</span>

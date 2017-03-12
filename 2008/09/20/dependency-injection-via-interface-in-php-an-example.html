@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Dependency Injection with PHP: Introducing Sphicy" href="../../12/30/dependency-injection-with-php-introducing-sphicy.html" /><link rel="prev" title="New Calypso DTL Version 0.2" href="../11/new-calypso-dtl-version-0-2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Dependency Injection with PHP: Introducing Sphicy" href="../../12/30/dependency-injection-with-php-introducing-sphicy.html" /><link rel="prev" title="New Calypso DTL Version 0.2" href="../11/new-calypso-dtl-version-0-2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -96,7 +96,7 @@ implementation of Interface Dependency Injection for PHP. The Container
 works with static method only, is therefore in the global scope, such
 that configuration is reduced to a minimum. Generally you have to write
 interfaces for object injection, for example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">interface InjectDbAdapter</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">interface InjectDbAdapter</span>
 <span class="x">{</span>
 <span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
 <span class="x">}</span>
@@ -105,12 +105,12 @@ interfaces for object injection, for example:</p>
 <p>Other potential examples include &#8220;InjectLogger&#8221;, &#8220;InjectSoapClient&#8221;, or
 &#8220;InjectAppConfig&#8221;. You then have to register a component for usage with
 this interface:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">Whitewashing_Container::registerComponent(&#39;InjectDbAdapter&#39;, Zend_Db::factory($dbConfig));</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">Whitewashing_Container::registerComponent(&#39;InjectDbAdapter&#39;, Zend_Db::factory($dbConfig));</span>
 </pre></div>
 </div>
 <p>Now any class that implements the InjectDbAdapter interface can be
 instantiated via:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;);</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;);</span>
 </pre></div>
 </div>
 <p>and the loader takes care of calling the &#8216;Class&#8217; implementation of
@@ -127,7 +127,7 @@ implemented a method &#8220;Whitewashing_Container::registerClassComponent&#8221
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
 parameter $localInterfaceOverride for the highest priority:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;, null, array(&#39;InjectDbAdapter&#39; =&gt; $newDbAdapter));</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;, null, array(&#39;InjectDbAdapter&#39; =&gt; $newDbAdapter));</span>
 </pre></div>
 </div>
 <p>Speedwise the usage of the Container reduces class instantiation by about

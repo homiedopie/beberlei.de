@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Integrated Zend_Layout into this blog" href="../17/integrated-zend-layout-into-this-blog.html" /><link rel="prev" title="Introducing: Zend Controller Scaffolding" href="../25/introducing-zend-controller-scaffolding.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Integrated Zend_Layout into this blog" href="../17/integrated-zend-layout-into-this-blog.html" /><link rel="prev" title="Introducing: Zend Controller Scaffolding" href="../25/introducing-zend-controller-scaffolding.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -73,7 +73,7 @@ Mine looks as follows. The first thing is to Set an Analyzer other from
 the default one. The Default Analyzer only looks at letters, not at
 numbers.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
     Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
 );
 $index = Zend_Search_Lucene::open(&#39;/path/to/index/directory&#39;);
@@ -83,7 +83,7 @@ $index = Zend_Search_Lucene::open(&#39;/path/to/index/directory&#39;);
 <p>We can now save an identifier containing letters and numbers, for
 example the md5 string of the Article Database ID.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$doc = new Zend_Search_Lucene_Document();
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$doc = new Zend_Search_Lucene_Document();
 $field = Zend_Search_Lucene_Field::Keyword(&#39;id&#39;, md5($data[&#39;id&#39;]));
 $doc-&gt;addField($field);
 $index-&gt;addDocument($doc);
@@ -93,7 +93,7 @@ $index-&gt;addDocument($doc);
 <p>Before updating an entry you have to delete any entry that has been
 indexed before:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$hits = $index-&gt;find(&#39;id:&#39;.md5($articleID));
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$hits = $index-&gt;find(&#39;id:&#39;.md5($articleID));
 foreach($hits AS $hit) {
     $index-&gt;delete($hit-&gt;id);
 }

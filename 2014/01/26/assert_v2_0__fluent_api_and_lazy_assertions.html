@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="2013 and 2014" href="../../../2013/12/31/2013_and_2014.html" /><link rel="prev" title="SOAP and PHP in 2014" href="../31/soap_and_php_in_2014.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="2013 and 2014" href="../../../2013/12/31/2013_and_2014.html" /><link rel="prev" title="SOAP and PHP in 2014" href="../31/soap_and_php_in_2014.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -81,7 +81,7 @@ functionalities and I am releasing a new version 2.0 of Assert today.</p>
 a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
 and then all the assertions you want to call on that value.</p>
 <p>Here are some examples:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
@@ -97,7 +97,7 @@ the user only exactly one error message. Because every assertion fails
 with an Exception, there was no way to execute multiple assertions and
 collect the errors. This has changed with the new lazy assertion API,
 that is similar to the Fluent API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nx">\Assert\lazy</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
@@ -110,10 +110,10 @@ that you know how to differentiate the errors afterwards.</p>
 <p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
 <span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
 <span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
-<div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
-1) foo: Value &quot;10&quot; expected to be string, type integer given.
-2) bar: Value &quot;&lt;NULL&gt;&quot; is empty, but non empty value was expected.
-3) baz: Value &quot;string&quot; is not an array.
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="mi">3</span> <span class="n">assertions</span> <span class="n">failed</span><span class="p">:</span>
+<span class="mi">1</span><span class="p">)</span> <span class="n">foo</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">&quot;10&quot;</span> <span class="n">expected</span> <span class="n">to</span> <span class="n">be</span> <span class="n">string</span><span class="p">,</span> <span class="nb">type</span> <span class="n">integer</span> <span class="n">given</span><span class="o">.</span>
+<span class="mi">2</span><span class="p">)</span> <span class="n">bar</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">&quot;&lt;NULL&gt;&quot;</span> <span class="ow">is</span> <span class="n">empty</span><span class="p">,</span> <span class="n">but</span> <span class="n">non</span> <span class="n">empty</span> <span class="n">value</span> <span class="n">was</span> <span class="n">expected</span><span class="o">.</span>
+<span class="mi">3</span><span class="p">)</span> <span class="n">baz</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">&quot;string&quot;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">array</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
@@ -125,7 +125,7 @@ useable for the frontend.</p>
 <p>In version 1.0 Assert did not have default error messages when failures
 occured. This has changed and now every assertion has a default failure
 message, as well as access to the value and constraints of an exception:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
 

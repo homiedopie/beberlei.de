@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page19.html" /><link rel="prev" title="Newer" href="page17.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page19.html" /><link rel="prev" title="Newer" href="page17.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -126,7 +126,7 @@ at the gain change in performance.</p>
 Devzone</a> and a missing function
 getCache() in the code fragment:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>public function getCache()
+<div><div class="highlight-default"><div class="highlight"><pre><span/>public function getCache()
 {
     if( ($response = $this-&gt;cache-&gt;load($this-&gt;key)) != false) {
         return $response;
@@ -145,29 +145,29 @@ this blog, the request time dropped by half, from six to three seconds
 (still lot of time, but this isn’t the best webserver).</p>
 <div class="section" id="results-without-caching">
 <h2>Results without caching</h2>
-<div class="highlight-python"><div class="highlight"><pre>Requests per second:    1.49 [#/sec] (mean)
-Time per request:       6695.213 [ms] (mean)
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Requests</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span>    <span class="mf">1.49</span> <span class="p">[</span><span class="c1">#/sec] (mean)</span>
+<span class="n">Time</span> <span class="n">per</span> <span class="n">request</span><span class="p">:</span>       <span class="mf">6695.213</span> <span class="p">[</span><span class="n">ms</span><span class="p">]</span> <span class="p">(</span><span class="n">mean</span><span class="p">)</span>
 
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:       26   30   4.0     30      43
-Processing:  1556 6452 3372.1   5511   14768
-Waiting:     1436 6129 3174.1   5145   14595
-Total:       1583 6483 3373.2   5538   14810
+<span class="n">Connection</span> <span class="n">Times</span> <span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+              <span class="nb">min</span>  <span class="n">mean</span><span class="p">[</span><span class="o">+/-</span><span class="n">sd</span><span class="p">]</span> <span class="n">median</span>   <span class="nb">max</span>
+<span class="n">Connect</span><span class="p">:</span>       <span class="mi">26</span>   <span class="mi">30</span>   <span class="mf">4.0</span>     <span class="mi">30</span>      <span class="mi">43</span>
+<span class="n">Processing</span><span class="p">:</span>  <span class="mi">1556</span> <span class="mi">6452</span> <span class="mf">3372.1</span>   <span class="mi">5511</span>   <span class="mi">14768</span>
+<span class="n">Waiting</span><span class="p">:</span>     <span class="mi">1436</span> <span class="mi">6129</span> <span class="mf">3174.1</span>   <span class="mi">5145</span>   <span class="mi">14595</span>
+<span class="n">Total</span><span class="p">:</span>       <span class="mi">1583</span> <span class="mi">6483</span> <span class="mf">3373.2</span>   <span class="mi">5538</span>   <span class="mi">14810</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="results-with-caching">
 <h2>Results with caching</h2>
-<div class="highlight-python"><div class="highlight"><pre>Requests per second:    3.03 [#/sec] (mean)
-Time per request:       3304.534 [ms] (mean)
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Requests</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span>    <span class="mf">3.03</span> <span class="p">[</span><span class="c1">#/sec] (mean)</span>
+<span class="n">Time</span> <span class="n">per</span> <span class="n">request</span><span class="p">:</span>       <span class="mf">3304.534</span> <span class="p">[</span><span class="n">ms</span><span class="p">]</span> <span class="p">(</span><span class="n">mean</span><span class="p">)</span>
 
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:       26   31   6.3     30      73
-Processing:   781 3214 1757.7   3103    7445
-Waiting:      650 3055 1731.4   2928    7190
-Total:        809 3245 1757.8   3135    7475
+<span class="n">Connection</span> <span class="n">Times</span> <span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+              <span class="nb">min</span>  <span class="n">mean</span><span class="p">[</span><span class="o">+/-</span><span class="n">sd</span><span class="p">]</span> <span class="n">median</span>   <span class="nb">max</span>
+<span class="n">Connect</span><span class="p">:</span>       <span class="mi">26</span>   <span class="mi">31</span>   <span class="mf">6.3</span>     <span class="mi">30</span>      <span class="mi">73</span>
+<span class="n">Processing</span><span class="p">:</span>   <span class="mi">781</span> <span class="mi">3214</span> <span class="mf">1757.7</span>   <span class="mi">3103</span>    <span class="mi">7445</span>
+<span class="n">Waiting</span><span class="p">:</span>      <span class="mi">650</span> <span class="mi">3055</span> <span class="mf">1731.4</span>   <span class="mi">2928</span>    <span class="mi">7190</span>
+<span class="n">Total</span><span class="p">:</span>        <span class="mi">809</span> <span class="mi">3245</span> <span class="mf">1757.8</span>   <span class="mi">3135</span>    <span class="mi">7475</span>
 </pre></div>
 </div>
 <p>As said before this testing is superficial, but its gives a broad sense
@@ -261,7 +261,7 @@ class which offers the possibility to circumvent the access of variables
 via $this and directly registers each variable key of the Zend_View
 object as an own variable in the script template:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class Zend_View_Extended extends Zend_View_Abstract
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class Zend_View_Extended extends Zend_View_Abstract
 {
     protected function _run()
     {
@@ -284,7 +284,7 @@ variable settings in any Controller Action, which would shorten the
 $this-&gt;view-&gt;variable call, to derive the same functionality via
 $this-&gt;variable. I haven’t tested this though.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class Zend_Controller_SimpleAction extends Zend_Controller_Action
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class Zend_Controller_SimpleAction extends Zend_Controller_Action
 {
     function __set($name, $value)
     {
@@ -339,7 +339,7 @@ array_merge() solution is not the correct way of how this snippet
 should work. Any merge operation of the messages and errors has to be on
 a field key level, which is not currently done.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_Form_Mvc extends Zend_Form
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_Form_Mvc extends Zend_Form
 {
     protected $model = null;
 
@@ -413,7 +413,7 @@ a field key level, which is not currently done.</p>
 loading of decorators in the Constructor and additionally allow to
 pass a Model to the constructor as second argument:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_Form_Mvc
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_Form_Mvc
 {
     protected $model = null;
 
@@ -448,7 +448,7 @@ displaying of the form</strong>. For each different style of form
 displaying, we can generate different helpers. For example a helper
 that would only apply the default decorators would look like this:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_View_Helper_FormDefault
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_View_Helper_FormDefault
 {
     /**
      * Load only default decorators on this Zend_Form object
@@ -471,7 +471,7 @@ $this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
 controller action that implements this form and we will see that it
 does not look different from what we would have done before:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>function formAction()
+<div><div class="highlight-default"><div class="highlight"><pre><span/>function formAction()
 {
     $model = new SomeModel();
 

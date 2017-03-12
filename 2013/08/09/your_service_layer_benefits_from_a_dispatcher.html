@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Doctrine and Domain Events" href="../../07/24/doctrine_and_domainevents.html" /><link rel="prev" title="Speedup Symfony2 on Vagrant boxes" href="../19/speedup_symfony2_on_vagrant_boxes.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Doctrine and Domain Events" href="../../07/24/doctrine_and_domainevents.html" /><link rel="prev" title="Speedup Symfony2 on Vagrant boxes" href="../19/speedup_symfony2_on_vagrant_boxes.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -86,7 +86,7 @@ is about finding a maintainable solution to handle them.</p>
 <p>As a practical example I will pick the classical user registration example,
 starting with a service-layer that implements the cross-cutting
 concerns inside the service method:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserService</span>
 <span class="p">{</span>
@@ -127,7 +127,7 @@ can already see this leads to lots of spagetti-code.</p>
 into their own services. This requires to introduce an interface for <span class="docutils literal"><span class="pre">UserService</span></span>
 and then building decorators for the different concerns. Then the service
 can be built as a decorator chain:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$userService</span> <span class="o">=</span>
     <span class="k">new</span> <span class="nx">LogUserService</span><span class="p">(</span>
@@ -156,7 +156,7 @@ to registered services, we add all the cross-cutting concerns our application
 needs. Note: This is <strong>deliberatly written without further abstraction</strong>, just
 to show the concept. The real thing would propably seperate the
 responsibilities from each other.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">CommandDispatcher</span>
 <span class="p">{</span>
@@ -200,7 +200,7 @@ that when they send emails, those only get send when the transaction was
 successful. It checks if the user has the correct access
 controls/authentication and performs some generic logging.</p>
 <p>And using the dispatcher in your code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
 <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
 
@@ -222,7 +222,7 @@ adding a new method or service.</p>
 you actually call methods on the service-layer.</p>
 <p>There are two ways to make this call nicer. The first is use magic <span class="docutils literal"><span class="pre">__call</span></span> and some
 clever duck-typing to create an API similar to this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
 <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
@@ -232,7 +232,7 @@ clever duck-typing to create an API similar to this:</p>
 </div>
 <p>The second approach does not require magic <span class="docutils literal"><span class="pre">__call</span></span>, but requires you to write a class for each
 command. We map the command class name to a callback:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$userService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">();</span>
 

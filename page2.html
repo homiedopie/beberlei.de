@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page3.html" /><link rel="prev" title="Newer" href="index.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page3.html" /><link rel="prev" title="Newer" href="index.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -188,7 +188,7 @@ dependencies.</p>
 <p>Say you have three packages in your application, Library_1, Project_A
 and Project_B and both projects depend on the library which in turn depends
 on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
-<div class="highlight-python"><div class="highlight"><pre>projects
+<div class="highlight-default"><div class="highlight"><pre><span/>projects
 ├── components
 │   ├── Project_A
 │   │   └── fiddler.json
@@ -200,21 +200,21 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Library1</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
     <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ProjectA</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
     <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"components/Library_1"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s2">"~2.6"</span>
     <span class="p">}</span>
@@ -228,7 +228,7 @@ together. Dropping the need for explicit versions when specifying internal
 dependencies.</p>
 <p>With this setup you can now generate the autoloading files for each package
 exactly like Composer would by calling:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php fiddler.phar build
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php fiddler.phar build
 Building fiddler.json projects.
  [Build] components/Library_1
  [Build] components/Project_A
@@ -238,7 +238,7 @@ Building fiddler.json projects.
 <p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">"vendor/autoload.php";</span></span> and it loads an
 autoloader with all the dependencies specified for each component, for example
 in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
 
@@ -301,18 +301,18 @@ with Javascript transpilers (CoffeeScript, ...)</li>
 </ol>
 <p>Let’s have a look at a simple example javascript application in <span class="docutils literal"><span class="pre">app.js</span></span>
 requiring jQuery. The code is part of the Symfony2 document root in <span class="docutils literal"><span class="pre">web/</span></span>:</p>
-<div class="highlight-python"><div class="highlight"><pre>web/
-   css/
-     page.css
-   js/
-     vendor/
-       jquery.js
-     app.js
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">web</span><span class="o">/</span>
+   <span class="n">css</span><span class="o">/</span>
+     <span class="n">page</span><span class="o">.</span><span class="n">css</span>
+   <span class="n">js</span><span class="o">/</span>
+     <span class="n">vendor</span><span class="o">/</span>
+       <span class="n">jquery</span><span class="o">.</span><span class="n">js</span>
+     <span class="n">app</span><span class="o">.</span><span class="n">js</span>
 </pre></div>
 </div>
 <p>Then we can use <a class="reference external" href="http://webpack.github.io/docs/amd.html">AMD-style</a> modules
 to resolve the dependencies in our code:</p>
-<div class="highlight-js"><div class="highlight"><pre><span class="c1">// app.js</span>
+<div class="highlight-js"><div class="highlight"><pre><span/><span class="c1">// app.js</span>
 <span class="nx">define</span><span class="p">([</span><span class="s1">'./vendor/jquery.js'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
         <span class="nx">$</span><span class="p">(</span><span class="s2">"#content"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">"Webpack Hello World!"</span><span class="p">);</span>
@@ -329,7 +329,7 @@ if your prefer this approach.</p>
 run through Webpack to work on the browser. But Webpack solves this geniously
 by including a web-server that does the translation for you in the background
 all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span></p>
-<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<div class="highlight-js"><div class="highlight"><pre><span/><span class="c1">// webpack.config.js</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">"./web/js/app.js"</span><span class="p">,</span>
     <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
@@ -341,7 +341,7 @@ all the time.  With a little help of a configuration file called <span class="do
 </pre></div>
 </div>
 <p>we can start our assets development server by calling:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ webpack-dev-server --progress --colors --port 8090 --content-base=web/
+<div class="highlight-default"><div class="highlight"><pre><span/>$ webpack-dev-server --progress --colors --port 8090 --content-base=web/
 </pre></div>
 </div>
 <p>This will start serving the combined javascript file at
@@ -352,26 +352,26 @@ rebuild similar to the <span class="docutils literal"><span class="pre">--watch<
 <p>Webpack can be installed globally so it is easy to get started with. I find
 this a huge benefit not having to require a <span class="docutils literal"><span class="pre">package.json</span></span> and Node+npm
 workflow for your PHP/Symfony project.</p>
-<div class="highlight-python"><div class="highlight"><pre>$ sudo npm install -g webpack
+<div class="highlight-default"><div class="highlight"><pre><span/>$ sudo npm install -g webpack
 </pre></div>
 </div>
 <p>For integration into Symfony we make use of some Framework configuration to
 change the base path used for the <span class="docutils literal"><span class="pre">{{</span> <span class="pre">asset()</span> <span class="pre">}}</span></span> twig-function:</p>
-<div class="highlight-python"><div class="highlight"><pre># app/config/config.yml
-framework:
-  templating:
-    assets_base_url: "%assets_base_url%"
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># app/config/config.yml</span>
+<span class="n">framework</span><span class="p">:</span>
+  <span class="n">templating</span><span class="p">:</span>
+    <span class="n">assets_base_url</span><span class="p">:</span> <span class="s2">"%assets_base_url%"</span>
 
-# app/config/parameters.yml
-parameters:
-  assets_base_url: "http://localhost:8090"
+<span class="c1"># app/config/parameters.yml</span>
+<span class="n">parameters</span><span class="p">:</span>
+  <span class="n">assets_base_url</span><span class="p">:</span> <span class="s2">"http://localhost:8090"</span>
 </pre></div>
 </div>
 <p>This adds a base path in front of all your assets pointing to the Webpack dev
 server.</p>
 <p>The only thing left for integration is to load the javascript file from your
 twig layout file:</p>
-<div class="highlight-jinja"><div class="highlight"><pre><span class="x">&lt;html&gt;</span>
+<div class="highlight-jinja"><div class="highlight"><pre><span/><span class="x">&lt;html&gt;</span>
 <span class="x">    &lt;body&gt;</span>
 <span class="x">        &lt;div id="content"&gt;&lt;/div&gt;</span>
 
@@ -390,7 +390,7 @@ a page reload whenever possible.</p>
 <p>For production use the <span class="docutils literal"><span class="pre">assets_base_url</span></span> parameter has to be adjusted
 to your specific needs and you use the <span class="docutils literal"><span class="pre">webpack</span></span> command to generate a
 minified and optimized version of your javascript code.</p>
-<div class="highlight-python"><div class="highlight"><pre>$ webpack
+<div class="highlight-default"><div class="highlight"><pre><span/>$ webpack
 Hash: 69657874504a1a1db7cf
 Version: webpack 1.6.0
 Time: 329ms
@@ -423,7 +423,7 @@ have to get working first using require.js for example.</li>
 <p>Now this blog post has already shown that Webpack solves points one and two,
 but it also solves the JSX Transformation with some extra configuration
 in <span class="docutils literal"><span class="pre">webpack.config.js</span></span>:</p>
-<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<div class="highlight-js"><div class="highlight"><pre><span/><span class="c1">// webpack.config.js</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">entry</span><span class="o">:</span> <span class="s1">'./web/js/app.jsx'</span><span class="p">,</span>
     <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
@@ -484,7 +484,7 @@ apparently from the ticket, this is not going to be fixed.</p>
 <p>I finally got it working with a <a class="reference external" href="https://gist.github.com/kevinastone/8790717">workaround script</a> by <a class="reference external" href="https://github.com/kevinastone">Kevin
 Stone</a> that mimics NPM, but
 moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
-<div class="highlight-python"><div class="highlight"><pre>#!/bin/bash
+<div class="highlight-default"><div class="highlight"><pre><span/>#!/bin/bash
 # roles/nodejs/files/tmpnpm.sh
 
 BASE_DIR=${TMPDIR:-/var/tmp}
@@ -508,37 +508,37 @@ popd
 </pre></div>
 </div>
 <p>Integrating this into my Ansible setup of the machine it looked like this:</p>
-<div class="highlight-python"><div class="highlight"><pre># roles/nodejs/tasks/main.yml
-# More tasks here before this...
-- name: "Install npm workaround"
-  copy: &gt;
-      src=tmpnpm.sh
-      dest=/usr/local/bin/tmpnpm
-      mode="0755"
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># roles/nodejs/tasks/main.yml</span>
+<span class="c1"># More tasks here before this...</span>
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"Install npm workaround"</span>
+  <span class="n">copy</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="n">src</span><span class="o">=</span><span class="n">tmpnpm</span><span class="o">.</span><span class="n">sh</span>
+      <span class="n">dest</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span>
+      <span class="n">mode</span><span class="o">=</span><span class="s2">"0755"</span>
 
-- name: "Install Global Dependencies"
-  command: &gt;
-      /usr/local/bin/tmpnpm install -g {{ item }}
-  with_items: global_packages
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"Install Global Dependencies"</span>
+  <span class="n">command</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="p">{{</span> <span class="n">item</span> <span class="p">}}</span>
+  <span class="n">with_items</span><span class="p">:</span> <span class="n">global_packages</span>
 
-- name: "Install Package Dependencies"
-  command: &gt;
-      /usr/local/bin/tmpnpm install
-      chdir={{ item }}
-  with_items: package_dirs
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"Install Package Dependencies"</span>
+  <span class="n">command</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span> <span class="n">install</span>
+      <span class="n">chdir</span><span class="o">=</span><span class="p">{{</span> <span class="n">item</span> <span class="p">}}</span>
+  <span class="n">with_items</span><span class="p">:</span> <span class="n">package_dirs</span>
 </pre></div>
 </div>
 <p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
 outside when invoking the role:</p>
-<div class="highlight-python"><div class="highlight"><pre># deploy.yml
----
-- hosts: all
-  roles:
-    - name: nodejs
-      global_packages:
-        - grunt-cli
-      package_dirs:
-        - "/var/www/project"
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># deploy.yml</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="p">:</span> <span class="nb">all</span>
+  <span class="n">roles</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">nodejs</span>
+      <span class="n">global_packages</span><span class="p">:</span>
+        <span class="o">-</span> <span class="n">grunt</span><span class="o">-</span><span class="n">cli</span>
+      <span class="n">package_dirs</span><span class="p">:</span>
+        <span class="o">-</span> <span class="s2">"/var/www/project"</span>
 </pre></div>
 </div>
 <p>This way the Ansible Node.JS role is reusable in different projects.</p>
@@ -580,7 +580,7 @@ configuration in <span class="docutils literal"><span class="pre">phpunit.xml</s
 extension for PHPUnit and allows “multiple inheritance” to compose different
 features for our test cases.</p>
 <p>See this simple example that is adding some more assertions:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">trait</span> <span class="nx">MyAssertions</span>
 <span class="p">{</span>
@@ -609,7 +609,7 @@ then the renamed setup methods do not get called anymore.</p>
 <span class="docutils literal"><span class="pre">@beforeClass</span></span> annotations.</p>
 <p>See this trait I use for making sure my database is using the
 most current database version by invoking migrations in <span class="docutils literal"><span class="pre">@beforeClass</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
 
@@ -637,7 +637,7 @@ most current database version by invoking migrations in <span class="docutils li
             <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'TEST_DATABASE_DSN'</span><span class="p">]</span>
         <span class="p">));</span>
 
-        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../../src/schema'</span><span class="p">));</span>
+        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/../../src/schema'</span><span class="p">));</span>
         <span class="nv">$dbDeploy</span><span class="o">-&gt;</span><span class="na">migrate</span><span class="p">();</span>
         <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
     <span class="p">}</span>
@@ -646,7 +646,7 @@ most current database version by invoking migrations in <span class="docutils li
 </div>
 <p>I could mix this with a second trait <span class="docutils literal"><span class="pre">SymfonySetup</span></span> that makes the DIC
 container available for my integration tests:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
 
@@ -686,7 +686,7 @@ container available for my integration tests:</p>
 <p>The Symfony setup trait uses <span class="docutils literal"><span class="pre">@before</span></span> and <span class="docutils literal"><span class="pre">@after</span></span> to setup and cleanup
 without clashing with the traditional PHPUnit <span class="docutils literal"><span class="pre">setUp</span></span> method.</p>
 <p>Combining all this we could write a testcase like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserRepositoryTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
 <span class="p">{</span>
@@ -763,7 +763,7 @@ PHP’s current approach is one of the main benefits of the language.</p>
 <p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
 Code</a> to
 support my case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
@@ -814,16 +814,16 @@ having the right types inside the service:</p>
 <li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
 <li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre>Catchable fatal error: Argument 1 passed to UserService::fetchUsers() must
-be of the type integer, string given, called in /tmp/hints.php on line 22
-and defined in /tmp/hints.php on line 37
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Argument</span> <span class="mi">1</span> <span class="n">passed</span> <span class="n">to</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchUsers</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">given</span><span class="p">,</span> <span class="n">called</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">22</span>
+<span class="ow">and</span> <span class="n">defined</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">37</span>
 
-Catchable fatal error: Return value of UserService::fetchTotalCount() must
-be of the type integer, string returned in /tmp/hints.php on line 48
+<span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Return</span> <span class="n">value</span> <span class="n">of</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchTotalCount</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">returned</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">48</span>
 </pre></div>
 </div>
 <p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function listAction(Request $request)</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">public function listAction(Request $request)</span>
 <span class="x">{</span>
 <span class="x">    $status = (int)$request-&gt;get('status'); // this is a string</span>
 
@@ -835,7 +835,7 @@ be of the type integer, string returned in /tmp/hints.php on line 48
 </pre></div>
 </div>
 <p>and:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">public function fetchTotalCount(int $status): int</span>
 <span class="x">{</span>
 <span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
 

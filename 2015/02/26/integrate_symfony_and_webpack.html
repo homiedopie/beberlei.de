@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Vagrant, NFS and NPM" href="../19/vagrant_nfs_and_npm.html" /><link rel="prev" title="Monolithic Repositories with PHP and Composer" href="../../04/11/monolithic_repositories_with_php_and_composer.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Vagrant, NFS and NPM" href="../19/vagrant_nfs_and_npm.html" /><link rel="prev" title="Monolithic Repositories with PHP and Composer" href="../../04/11/monolithic_repositories_with_php_and_composer.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -89,18 +89,18 @@ with Javascript transpilers (CoffeeScript, ...)</li>
 </ol>
 <p>Let&#8217;s have a look at a simple example javascript application in <span class="docutils literal"><span class="pre">app.js</span></span>
 requiring jQuery. The code is part of the Symfony2 document root in <span class="docutils literal"><span class="pre">web/</span></span>:</p>
-<div class="highlight-python"><div class="highlight"><pre>web/
-   css/
-     page.css
-   js/
-     vendor/
-       jquery.js
-     app.js
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">web</span><span class="o">/</span>
+   <span class="n">css</span><span class="o">/</span>
+     <span class="n">page</span><span class="o">.</span><span class="n">css</span>
+   <span class="n">js</span><span class="o">/</span>
+     <span class="n">vendor</span><span class="o">/</span>
+       <span class="n">jquery</span><span class="o">.</span><span class="n">js</span>
+     <span class="n">app</span><span class="o">.</span><span class="n">js</span>
 </pre></div>
 </div>
 <p>Then we can use <a class="reference external" href="http://webpack.github.io/docs/amd.html">AMD-style</a> modules
 to resolve the dependencies in our code:</p>
-<div class="highlight-js"><div class="highlight"><pre><span class="c1">// app.js</span>
+<div class="highlight-js"><div class="highlight"><pre><span></span><span class="c1">// app.js</span>
 <span class="nx">define</span><span class="p">([</span><span class="s1">&#39;./vendor/jquery.js&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
         <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#content&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;Webpack Hello World!&quot;</span><span class="p">);</span>
@@ -117,7 +117,7 @@ if your prefer this approach.</p>
 run through Webpack to work on the browser. But Webpack solves this geniously
 by including a web-server that does the translation for you in the background
 all the time.  With a little help of a configuration file called <span class="docutils literal"><span class="pre">webpack.config.js</span></span></p>
-<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<div class="highlight-js"><div class="highlight"><pre><span></span><span class="c1">// webpack.config.js</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">entry</span>   <span class="o">:</span> <span class="s2">&quot;./web/js/app.js&quot;</span><span class="p">,</span>
     <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
@@ -129,7 +129,7 @@ all the time.  With a little help of a configuration file called <span class="do
 </pre></div>
 </div>
 <p>we can start our assets development server by calling:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ webpack-dev-server --progress --colors --port 8090 --content-base=web/
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ webpack-dev-server --progress --colors --port 8090 --content-base=web/
 </pre></div>
 </div>
 <p>This will start serving the combined javascript file at
@@ -140,26 +140,26 @@ rebuild similar to the <span class="docutils literal"><span class="pre">--watch<
 <p>Webpack can be installed globally so it is easy to get started with. I find
 this a huge benefit not having to require a <span class="docutils literal"><span class="pre">package.json</span></span> and Node+npm
 workflow for your PHP/Symfony project.</p>
-<div class="highlight-python"><div class="highlight"><pre>$ sudo npm install -g webpack
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo npm install -g webpack
 </pre></div>
 </div>
 <p>For integration into Symfony we make use of some Framework configuration to
 change the base path used for the <span class="docutils literal"><span class="pre">{{</span> <span class="pre">asset()</span> <span class="pre">}}</span></span> twig-function:</p>
-<div class="highlight-python"><div class="highlight"><pre># app/config/config.yml
-framework:
-  templating:
-    assets_base_url: &quot;%assets_base_url%&quot;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># app/config/config.yml</span>
+<span class="n">framework</span><span class="p">:</span>
+  <span class="n">templating</span><span class="p">:</span>
+    <span class="n">assets_base_url</span><span class="p">:</span> <span class="s2">&quot;%assets_base_url%&quot;</span>
 
-# app/config/parameters.yml
-parameters:
-  assets_base_url: &quot;http://localhost:8090&quot;
+<span class="c1"># app/config/parameters.yml</span>
+<span class="n">parameters</span><span class="p">:</span>
+  <span class="n">assets_base_url</span><span class="p">:</span> <span class="s2">&quot;http://localhost:8090&quot;</span>
 </pre></div>
 </div>
 <p>This adds a base path in front of all your assets pointing to the Webpack dev
 server.</p>
 <p>The only thing left for integration is to load the javascript file from your
 twig layout file:</p>
-<div class="highlight-jinja"><div class="highlight"><pre><span class="x">&lt;html&gt;</span>
+<div class="highlight-jinja"><div class="highlight"><pre><span></span><span class="x">&lt;html&gt;</span>
 <span class="x">    &lt;body&gt;</span>
 <span class="x">        &lt;div id=&quot;content&quot;&gt;&lt;/div&gt;</span>
 
@@ -178,7 +178,7 @@ a page reload whenever possible.</p>
 <p>For production use the <span class="docutils literal"><span class="pre">assets_base_url</span></span> parameter has to be adjusted
 to your specific needs and you use the <span class="docutils literal"><span class="pre">webpack</span></span> command to generate a
 minified and optimized version of your javascript code.</p>
-<div class="highlight-python"><div class="highlight"><pre>$ webpack
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ webpack
 Hash: 69657874504a1a1db7cf
 Version: webpack 1.6.0
 Time: 329ms
@@ -211,7 +211,7 @@ have to get working first using require.js for example.</li>
 <p>Now this blog post has already shown that Webpack solves points one and two,
 but it also solves the JSX Transformation with some extra configuration
 in <span class="docutils literal"><span class="pre">webpack.config.js</span></span>:</p>
-<div class="highlight-js"><div class="highlight"><pre><span class="c1">// webpack.config.js</span>
+<div class="highlight-js"><div class="highlight"><pre><span></span><span class="c1">// webpack.config.js</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">entry</span><span class="o">:</span> <span class="s1">&#39;./web/js/app.jsx&#39;</span><span class="p">,</span>
     <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>

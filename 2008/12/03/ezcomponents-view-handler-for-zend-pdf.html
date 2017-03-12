@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="ezComponents 2008.2 Beta - Mvc separation for win" href="ezcomponents-2008-2-beta-mvc-separation-for-win.html" /><link rel="prev" title="Dependency Injection the juicy way" href="../18/dependecy-injection-the-juicy-way.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="ezComponents 2008.2 Beta - Mvc separation for win" href="ezcomponents-2008-2-beta-mvc-separation-for-win.html" /><link rel="prev" title="Dependency Injection the juicy way" href="../18/dependecy-injection-the-juicy-way.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -75,7 +75,7 @@ View Handler in the new <a class="reference external" href="http://www.ezcompone
 MvcTools</a>.</p>
 <p>The code for the View Handler would look like the following:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>abstract class myPdfViewHandler implements ezcMvcViewHandler
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>abstract class myPdfViewHandler implements ezcMvcViewHandler
 {
     /**
      * Contains the zone name
@@ -185,7 +185,7 @@ MvcTools</a>.</p>
 <p>Now you would implement a concrete PDF view handler by extending
 myPdfViewHandler.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myConcretePdfViewHandler extends myPdfViewHandler {
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class myConcretePdfViewHandler extends myPdfViewHandler {
     public function process( $last )
     {
         $pdf = new Zend_Pdf();
@@ -201,7 +201,7 @@ myPdfViewHandler.</p>
 <p>And your <strong>ezcMvcView</strong> implementation will make of <strong>createZones()</strong>
 and look like the following:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myPdfView extends ezcMvcView {
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class myPdfView extends ezcMvcView {
     function createZones( $layout )
     {
         $zones = array();

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Extending Symfony2: Controller Utilities" href="../../06/27/extending_symfony2__controller_utilities.html" /><link rel="prev" title="Your Service Layer benefits from a Dispatcher" href="../../08/09/your_service_layer_benefits_from_a_dispatcher.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Extending Symfony2: Controller Utilities" href="../../06/27/extending_symfony2__controller_utilities.html" /><link rel="prev" title="Your Service Layer benefits from a Dispatcher" href="../../08/09/your_service_layer_benefits_from_a_dispatcher.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -86,7 +86,7 @@ but you can try the full code by checking out <a class="reference external" href
 <span class="docutils literal"><span class="pre">composer</span> <span class="pre">install</span></span> and then <span class="docutils literal"><span class="pre">php</span> <span class="pre">domain_events.php</span></span>.</p>
 <p>Lets look at the following entity, an <span class="docutils literal"><span class="pre">InventoryItem</span></span> tracking the number
 we have this item in stock:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Domain</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
@@ -110,7 +110,7 @@ we have this item in stock:</p>
 <span class="sd">     */</span>
     <span class="k">private</span> <span class="nv">$counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="s1">&#39;InventoryItemCreated&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">));</span>
@@ -126,7 +126,7 @@ we have this item in stock:</p>
 </div>
 <p>We want this entity to raise two domain events using the <span class="docutils literal"><span class="pre">raise($eventName,</span>
 <span class="pre">array</span> <span class="pre">$properties)</span></span> method.  Our preferred use case for this code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$item</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InventoryItem</span><span class="p">(</span><span class="s1">&#39;Cookies&#39;</span><span class="p">);</span>
 <span class="nv">$item</span><span class="o">-&gt;</span><span class="na">checkIn</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 
@@ -135,7 +135,7 @@ we have this item in stock:</p>
 </pre></div>
 </div>
 <p>One or many listeners should react to the events being fired, for example print their contents to the screen:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">EchoInventoryListener</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">onInventoryItemCreated</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
@@ -152,7 +152,7 @@ we have this item in stock:</p>
 </div>
 <p>As the first building block, we need a <a class="reference external" href="http://martinfowler.com/eaaCatalog/layerSupertype.html">Layer Supertype</a> for our entities,
 called <span class="docutils literal"><span class="pre">AggregateRoot</span></span> adding the event raising capabilities to all entities that need it:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainSuperTypes</span><span class="p">;</span>
 
 <span class="k">abstract</span> <span class="k">class</span> <span class="nc">AggregateRoot</span>
@@ -183,7 +183,7 @@ of the domain events pattern, because it guarantees every listener that the
 state leading to the event is already in the database.</p>
 <p>Technically we implement this with a Doctrine EventListener that listeners for
 the <span class="docutils literal"><span class="pre">postFlush</span></span>, <span class="docutils literal"><span class="pre">postPersist</span></span>, <span class="docutils literal"><span class="pre">postUpdate</span></span> and <span class="docutils literal"><span class="pre">postRemove</span></span> events:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainEvents</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
@@ -238,7 +238,7 @@ the <span class="docutils literal"><span class="pre">postFlush</span></span>, <s
 </pre></div>
 </div>
 <p>Now we only need to put this code together with Doctrine to get it working:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$evm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">();</span>
 <span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">addEventListener</span><span class="p">(</span>
     <span class="k">array</span><span class="p">(</span><span class="s1">&#39;postInsert&#39;</span><span class="p">,</span> <span class="s1">&#39;postUpdate&#39;</span><span class="p">,</span> <span class="s1">&#39;postRemove&#39;</span><span class="p">,</span> <span class="s1">&#39;postFlush&#39;</span><span class="p">),</span>

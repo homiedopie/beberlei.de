@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Running HHVM with a Webserver" href="../01/running_hhvm_webserver.html" /><link rel="prev" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Running HHVM with a Webserver" href="../01/running_hhvm_webserver.html" /><link rel="prev" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -93,7 +93,7 @@ PHP&#8217;s current approach is one of the main benefits of the language.</p>
 <p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
 Code</a> to
 support my case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
@@ -144,16 +144,16 @@ having the right types inside the service:</p>
 <li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
 <li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre>Catchable fatal error: Argument 1 passed to UserService::fetchUsers() must
-be of the type integer, string given, called in /tmp/hints.php on line 22
-and defined in /tmp/hints.php on line 37
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Argument</span> <span class="mi">1</span> <span class="n">passed</span> <span class="n">to</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchUsers</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">given</span><span class="p">,</span> <span class="n">called</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">22</span>
+<span class="ow">and</span> <span class="n">defined</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">37</span>
 
-Catchable fatal error: Return value of UserService::fetchTotalCount() must
-be of the type integer, string returned in /tmp/hints.php on line 48
+<span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Return</span> <span class="n">value</span> <span class="n">of</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchTotalCount</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">returned</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">48</span>
 </pre></div>
 </div>
 <p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function listAction(Request $request)</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">public function listAction(Request $request)</span>
 <span class="x">{</span>
 <span class="x">    $status = (int)$request-&gt;get(&#39;status&#39;); // this is a string</span>
 
@@ -165,7 +165,7 @@ be of the type integer, string returned in /tmp/hints.php on line 48
 </pre></div>
 </div>
 <p>and:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">public function fetchTotalCount(int $status): int</span>
 <span class="x">{</span>
 <span class="x">    $sql = &#39;SELECT count(*) FROM users u WHERE u.status = ?&#39;;</span>
 

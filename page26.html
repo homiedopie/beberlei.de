@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page27.html" /><link rel="prev" title="Newer" href="page25.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page27.html" /><link rel="prev" title="Newer" href="page25.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -92,13 +92,13 @@ functionality for PHP and an example would work as follows.</p>
 <p>We first have to implement a <strong>module</strong>, which defines which concrete
 implementation should be injected as a placeholder for which interface.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind("Service")-&gt;to("ConcreteService");  $b-&gt;bind("Add")-&gt;to("ConcreteAdd");  $b-&gt;bind("Sub")-&gt;to("ConcreteSub"); }}
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind("Service")-&gt;to("ConcreteService");  $b-&gt;bind("Add")-&gt;to("ConcreteAdd");  $b-&gt;bind("Sub")-&gt;to("ConcreteSub"); }}
 </pre></div>
 </div>
 </div></blockquote>
 <p>We can now use this module to instantiate an injector object:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance("Service");
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance("Service");
 </pre></div>
 </div>
 </div></blockquote>
@@ -158,7 +158,7 @@ View Handler in the new <a class="reference external" href="http://www.ezcompone
 MvcTools</a>.</p>
 <p>The code for the View Handler would look like the following:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>abstract class myPdfViewHandler implements ezcMvcViewHandler
+<div><div class="highlight-default"><div class="highlight"><pre><span/>abstract class myPdfViewHandler implements ezcMvcViewHandler
 {
     /**
      * Contains the zone name
@@ -268,7 +268,7 @@ MvcTools</a>.</p>
 <p>Now you would implement a concrete PDF view handler by extending
 myPdfViewHandler.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myConcretePdfViewHandler extends myPdfViewHandler {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myConcretePdfViewHandler extends myPdfViewHandler {
     public function process( $last )
     {
         $pdf = new Zend_Pdf();
@@ -284,7 +284,7 @@ myPdfViewHandler.</p>
 <p>And your <strong>ezcMvcView</strong> implementation will make of <strong>createZones()</strong>
 and look like the following:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myPdfView extends ezcMvcView {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myPdfView extends ezcMvcView {
     function createZones( $layout )
     {
         $zones = array();
@@ -337,7 +337,7 @@ generally make no difference for the controller. We add two routes, one
 for the pdf one for the html view that execute the same controller and
 action:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myRouter extends ezcMvcRouter{ public function createRoutes() {  return array(   new ezcMvcRailsRoute( '/pdf', 'SomeController', 'index'),   new ezcMvcRailsRoute( '/', 'SomeController', index' ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables['items'] = Model::retrieveLotsOfItems();  return $result; }}
+<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="k">class</span> <span class="nc">myRouter</span> <span class="n">extends</span> <span class="n">ezcMvcRouter</span><span class="p">{</span> <span class="n">public</span> <span class="n">function</span> <span class="n">createRoutes</span><span class="p">()</span> <span class="p">{</span>  <span class="k">return</span> <span class="n">array</span><span class="p">(</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">'/pdf'</span><span class="p">,</span> <span class="s1">'SomeController'</span><span class="p">,</span> <span class="s1">'index'</span><span class="p">),</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">'/'</span><span class="p">,</span> <span class="s1">'SomeController'</span><span class="p">,</span> <span class="n">index</span><span class="s1">' ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables['</span><span class="n">items</span><span class="s1">'] = Model::retrieveLotsOfItems();  return $result; }}</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -345,7 +345,7 @@ action:</p>
 of our dispatcher configuration, but we still only need the http
 response writer, nothing more.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, "/pdf")) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, "/pdf")) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}
 </pre></div>
 </div>
 </div></blockquote>
@@ -355,7 +355,7 @@ type. Please note that overwriting createResponseBody() in myPdfView is
 a shortcut that circumvents me having to write a new PDF View Handler
 (which would be the way to go).</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = "application/pdf";   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = "application/pdf";   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}
 </pre></div>
 </div>
 </div></blockquote>
@@ -402,7 +402,7 @@ methods: isPost(), isGet(), isDelete(), isPut(), isXmlHttpRequest(),
 isMethod() and getMethod(). These methods can now be easily used on the
 request object to determine which action will be undertaken:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myMvcRequest extends ezcMvcRequest{  public function isPost()  {    return $this-&gt;isMethod("POST");  }  public function isGet()  {    return $this-&gt;isMethod("GET");  }  public function isPut()  {    return $this-&gt;isMethod("PUT");  }  public function isDelete()  {    return $this-&gt;isMethod("DELETE");  }  public function isXmlHttpRequest()  {    if(isset($this-&gt;raw['HTTP_X_REQUESTED_WITH'])      &amp;&amp; strtolower($this-&gt;raw['HTTP_X_REQUESTED_WITH']) == "xmlhttprequest") {      return true;    }    return false;  }    public function getMethod()  {    if(isset($this-&gt;raw['REQUEST_METHOD']))      return strtolower($this-&gt;raw['REQUEST_METHOD']);    }    return false;  }  public function isMethod($method)  {    if(isset($this-&gt;raw['REQUEST_METHOD']) &amp;&amp;       $this-&gt;getMethod() == strtolower($method)) {      return true;    }    return false;  }}class myMvcHttpRequestParser extends ezcMvcHttpRequestParser{  /**   * Uses the data from the superglobals.   *   * @return ezcMvcRequest   */  public function createRequest()  {    $this-&gt;request = new myMvcRequest;    $this-&gt;processStandardHeaders();    $this-&gt;processAcceptHeaders();    $this-&gt;processUserAgentHeaders();    $this-&gt;processFiles();    $this-&gt;processAuthVars();    $this-&gt;request-&gt;raw = &amp;$_SERVER;    return $this-&gt;request;  }}
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myMvcRequest extends ezcMvcRequest{  public function isPost()  {    return $this-&gt;isMethod("POST");  }  public function isGet()  {    return $this-&gt;isMethod("GET");  }  public function isPut()  {    return $this-&gt;isMethod("PUT");  }  public function isDelete()  {    return $this-&gt;isMethod("DELETE");  }  public function isXmlHttpRequest()  {    if(isset($this-&gt;raw['HTTP_X_REQUESTED_WITH'])      &amp;&amp; strtolower($this-&gt;raw['HTTP_X_REQUESTED_WITH']) == "xmlhttprequest") {      return true;    }    return false;  }    public function getMethod()  {    if(isset($this-&gt;raw['REQUEST_METHOD']))      return strtolower($this-&gt;raw['REQUEST_METHOD']);    }    return false;  }  public function isMethod($method)  {    if(isset($this-&gt;raw['REQUEST_METHOD']) &amp;&amp;       $this-&gt;getMethod() == strtolower($method)) {      return true;    }    return false;  }}class myMvcHttpRequestParser extends ezcMvcHttpRequestParser{  /**   * Uses the data from the superglobals.   *   * @return ezcMvcRequest   */  public function createRequest()  {    $this-&gt;request = new myMvcRequest;    $this-&gt;processStandardHeaders();    $this-&gt;processAcceptHeaders();    $this-&gt;processUserAgentHeaders();    $this-&gt;processFiles();    $this-&gt;processAuthVars();    $this-&gt;request-&gt;raw = &amp;$_SERVER;    return $this-&gt;request;  }}
 </pre></div>
 </div>
 </div></blockquote>
@@ -416,7 +416,7 @@ request method, so that two requests <strong>GET /user/1/delete</strong> and <st
 will simply extend the <strong>ezcMvcRailsRoute</strong> to support decision based on
 http request methods:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myMvcRestRoute extends ezcMvcRailsRoute{  protected $method;  public function __construct( $method, $pattern, $controllerClassName, $action = null, array $defaultValues = array() )  {    $this-&gt;method = $method;    parent::__construct($pattern, $controllerClassName, $action, $defaultValues);  }  public function matches( ezcMvcRequest $request )  {    if(strtolower($this-&gt;method) == strtolower($request-&gt;raw['REQUEST_METHOD'])) {      return parent::matches($request);    }    return null;  }}
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myMvcRestRoute extends ezcMvcRailsRoute{  protected $method;  public function __construct( $method, $pattern, $controllerClassName, $action = null, array $defaultValues = array() )  {    $this-&gt;method = $method;    parent::__construct($pattern, $controllerClassName, $action, $defaultValues);  }  public function matches( ezcMvcRequest $request )  {    if(strtolower($this-&gt;method) == strtolower($request-&gt;raw['REQUEST_METHOD'])) {      return parent::matches($request);    }    return null;  }}
 </pre></div>
 </div>
 </div></blockquote>
@@ -424,7 +424,7 @@ http request methods:</p>
 given above, so you could use it separately. In the light of our delete
 user example, you would use the new router in the following way:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class myRouter extends ezcMvcRouter{  public function createRoutes()  {    return array(      new myMvcRestRoute( 'GET', '/users/:id/delete', 'UserController', 'deleteDialog' ),      new myMvcRestRoute( 'POST', '/users/:id/delete', 'UserController', 'delete' ),    );  }}
+<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="k">class</span> <span class="nc">myRouter</span> <span class="n">extends</span> <span class="n">ezcMvcRouter</span><span class="p">{</span>  <span class="n">public</span> <span class="n">function</span> <span class="n">createRoutes</span><span class="p">()</span>  <span class="p">{</span>    <span class="k">return</span> <span class="n">array</span><span class="p">(</span>      <span class="n">new</span> <span class="n">myMvcRestRoute</span><span class="p">(</span> <span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'/users/:id/delete'</span><span class="p">,</span> <span class="s1">'UserController'</span><span class="p">,</span> <span class="s1">'deleteDialog'</span> <span class="p">),</span>      <span class="n">new</span> <span class="n">myMvcRestRoute</span><span class="p">(</span> <span class="s1">'POST'</span><span class="p">,</span> <span class="s1">'/users/:id/delete'</span><span class="p">,</span> <span class="s1">'UserController'</span><span class="p">,</span> <span class="s1">'delete'</span> <span class="p">),</span>    <span class="p">);</span>  <span class="p">}}</span>
 </pre></div>
 </div>
 </div></blockquote>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page14.html" /><link rel="prev" title="Newer" href="page12.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page14.html" /><link rel="prev" title="Newer" href="page12.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -71,7 +71,7 @@ any inline comments and can be greatly enhanced in readability with
 taking 2-5 minutes of time and refactoring the code. The original code
 sample was:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>function __construct(array $pathInfo) {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>function __construct(array $pathInfo) {
     $section = $pathInfo[0];
     $file = $pathInfo[1];
 
@@ -102,7 +102,7 @@ refactoring produces about double the code, but its done entirely by
 using NetBeans nice Rename variable and copy paste on extracting
 methods, which takes not more than 5 minutes.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class StaticXmlXsltRendererImpl extends AbstractXsltView
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class StaticXmlXsltRendererImpl extends AbstractXsltView
 {
     function render(array $filteredPathInfo) {
         $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
@@ -150,7 +150,7 @@ application configuration is made implicit into the code. This has to be
 extracted to be an explicit configuration constant and the comment can
 go.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>private function getTemplateValuesXmlFile($filteredPathInfo) {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>private function getTemplateValuesXmlFile($filteredPathInfo) {
     $section = $this-&gt;getSection($filteredPathInfo);
     $file = $this-&gt;getFile($filteredPathInfo);
 
@@ -272,7 +272,7 @@ inside the Front Controller and the Action Controller classes. Assume
 the resource ‘Db’ is initialized in your application, you can access it
 with:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$front = Zend_Controller_Front::getInstance();
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$front = Zend_Controller_Front::getInstance();
 $container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
 $db = $container-&gt;db;
 
@@ -311,7 +311,7 @@ can be used as dependencies for objects that are lazy-loaded from the
 container. Skipping the tech-talk, here is an example. First we have to
 replace the default Container with Yadif:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
 $container = new Yadif_Container($objects);
 
 $application = new Zend_Application(
@@ -332,7 +332,7 @@ first time from the container. We can merge these two worlds and make
 use of the Application resources inside the Yadif Configuration
 “objects.xml”, which looks like:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>&lt;?xml version="1.0" ?&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span/>&lt;?xml version="1.0" ?&gt;
 &lt;objects&gt;
     &lt;myModel&gt;
         &lt;class&gt;MyModel&lt;/class&gt;
@@ -344,7 +344,7 @@ use of the Application resources inside the Yadif Configuration
 <p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
 the the Database and Cache resources as constructor arguments:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class FooController extends Zend_Controller_Action {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class FooController extends Zend_Controller_Action {
     public function barAction()
     {
         $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
@@ -449,7 +449,7 @@ it is a very elegant solution to enforce a limited set of specific
 values throughout your code-base.</p>
 <p>Here is the code plus a small example:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>abstract class MyEnum
+<div><div class="highlight-default"><div class="highlight"><pre><span/>abstract class MyEnum
 {
     final public function __construct($value)
     {
@@ -493,7 +493,7 @@ if($b == $c) {
 </div></blockquote>
 <p>Now you could nice things such as:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>function doStuff(Foo $foo) {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>function doStuff(Foo $foo) {
     switch($foo) {
         case Foo::FOO:
             echo "do more here!\n";
@@ -571,7 +571,7 @@ mediator code. This code is very simple and might produce maintenance
 overhead fast, but I propose some refactoring enhancements later in the
 discussion.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>interface WW_Model_AcceptFormRequest
+<div><div class="highlight-default"><div class="highlight"><pre><span/>interface WW_Model_AcceptFormRequest
 {
     /**
      * Acceept a form request
@@ -623,7 +623,7 @@ internal state. Our BankAccountModel implements the
 <strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
 BankAccount. If found the given amount is withdrawn.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class BankAccountModel implements WW_Model_AcceptFormRequest {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class BankAccountModel implements WW_Model_AcceptFormRequest {
     public function acceptFormRequest($values)
     {
         $bankAccount = $this-&gt;getBankAccountBy($values['bankAccountNumber'], $values['pin']);
@@ -663,7 +663,7 @@ displayed again for the client showing the new error message that was
 returned from the model. The controller handling this process would look
 like this:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class BankAccountController extends Zend_Controller_Action {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class BankAccountController extends Zend_Controller_Action {
     public function performWithdrawlAction() {
         $form = new BankAccountWithdrawlForm(); // extends Zend_Form and builds the form
 

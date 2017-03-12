@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page11.html" /><link rel="prev" title="Newer" href="page9.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page11.html" /><link rel="prev" title="Newer" href="page9.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -104,29 +104,29 @@ run with root <span class="docutils literal"><span class="pre">~/.puppet/devmach
 my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:</p>
-<div class="highlight-python"><div class="highlight"><pre># /home/benny/.puppet/devmachine.pp
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
 
-# VIM Dot Files
-vcsrepo { 'vim-dotfiles':
-    path     =&gt; "/home/$id/.vim",
-    ensure   =&gt; present,
-    provider =&gt; git,
-    source   =&gt; 'https://...'
-}
+<span class="c1"># VIM Dot Files</span>
+<span class="n">vcsrepo</span> <span class="p">{</span> <span class="s1">'vim-dotfiles'</span><span class="p">:</span>
+    <span class="n">path</span>     <span class="o">=&gt;</span> <span class="s2">"/home/$id/.vim"</span><span class="p">,</span>
+    <span class="n">ensure</span>   <span class="o">=&gt;</span> <span class="n">present</span><span class="p">,</span>
+    <span class="n">provider</span> <span class="o">=&gt;</span> <span class="n">git</span><span class="p">,</span>
+    <span class="n">source</span>   <span class="o">=&gt;</span> <span class="s1">'https://...'</span>
+<span class="p">}</span>
 
-file { 'vim-dotfiles-symlink':
-    path   =&gt; "/home/$id/.vimrc",
-    ensure =&gt; link,
-    target =&gt; '.vim/vimrc',
-    require =&gt; Vcsrepo['vim-dotfiles']
-}
+<span class="n">file</span> <span class="p">{</span> <span class="s1">'vim-dotfiles-symlink'</span><span class="p">:</span>
+    <span class="n">path</span>   <span class="o">=&gt;</span> <span class="s2">"/home/$id/.vimrc"</span><span class="p">,</span>
+    <span class="n">ensure</span> <span class="o">=&gt;</span> <span class="n">link</span><span class="p">,</span>
+    <span class="n">target</span> <span class="o">=&gt;</span> <span class="s1">'.vim/vimrc'</span><span class="p">,</span>
+    <span class="n">require</span> <span class="o">=&gt;</span> <span class="n">Vcsrepo</span><span class="p">[</span><span class="s1">'vim-dotfiles'</span><span class="p">]</span>
+<span class="p">}</span>
 
-exec { 'vim-make-command-t':
-    command =&gt; 'rake make',
-    cwd     =&gt; "/home/$id/.vim/bundle/Command-T",
-    unless  =&gt; "ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'",
-    require =&gt; Vcsrepo['vim-dotfiles']
-}
+<span class="n">exec</span> <span class="p">{</span> <span class="s1">'vim-make-command-t'</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'rake make'</span><span class="p">,</span>
+    <span class="n">cwd</span>     <span class="o">=&gt;</span> <span class="s2">"/home/$id/.vim/bundle/Command-T"</span><span class="p">,</span>
+    <span class="n">unless</span>  <span class="o">=&gt;</span> <span class="s2">"ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'"</span><span class="p">,</span>
+    <span class="n">require</span> <span class="o">=&gt;</span> <span class="n">Vcsrepo</span><span class="p">[</span><span class="s1">'vim-dotfiles'</span><span class="p">]</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>The three keywords <span class="docutils literal"><span class="pre">vcsrepo</span></span>, <span class="docutils literal"><span class="pre">file</span></span> and <span class="docutils literal"><span class="pre">exec</span></span> are called types. They
@@ -144,27 +144,27 @@ puppet. The require makes sure this resource is only activated after the dotfile
 were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
-<div class="highlight-python"><div class="highlight"><pre># Configure Git
-exec { "git-author-name":
-    command =&gt; 'git config --global user.name "Benjamin Eberlei"',
-    unless =&gt; "git config --global --get user.name|grep 'Benjamin Eberlei'"
-}
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># Configure Git</span>
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-author-name"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'git config --global user.name "Benjamin Eberlei"'</span><span class="p">,</span>
+    <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">"git config --global --get user.name|grep 'Benjamin Eberlei'"</span>
+<span class="p">}</span>
 
-exec { "git-author-email":
-    command =&gt; 'git config --global user.email "kontakt@beberlei.de"',
-    unless =&gt; "git config --global --get user.email|grep 'kontakt@beberlei.de'"
-}
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-author-email"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'git config --global user.email "kontakt@beberlei.de"'</span><span class="p">,</span>
+    <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">"git config --global --get user.email|grep 'kontakt@beberlei.de'"</span>
+<span class="p">}</span>
 
-exec { "git-global-ignore":
-    command =&gt; "git config --global core.excludesfile /home/$id/.gitignore",
-    unless  =&gt; 'git config -l --global|grep excludesfile'
-}
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-global-ignore"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s2">"git config --global core.excludesfile /home/$id/.gitignore"</span><span class="p">,</span>
+    <span class="n">unless</span>  <span class="o">=&gt;</span> <span class="s1">'git config -l --global|grep excludesfile'</span>
+<span class="p">}</span>
 
-file { "git-global-ignorefile":
-    path =&gt; "/home/$id/.gitignore",
-    ensure =&gt; present,
-    content =&gt; "*.swo\n*.swp\n"
-}
+<span class="n">file</span> <span class="p">{</span> <span class="s2">"git-global-ignorefile"</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=&gt;</span> <span class="s2">"/home/$id/.gitignore"</span><span class="p">,</span>
+    <span class="n">ensure</span> <span class="o">=&gt;</span> <span class="n">present</span><span class="p">,</span>
+    <span class="n">content</span> <span class="o">=&gt;</span> <span class="s2">"*.swo</span><span class="se">\n</span><span class="s2">*.swp</span><span class="se">\n</span><span class="s2">"</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>Here A bunch of commands is executed unless some option is already set. At last
@@ -224,7 +224,7 @@ Guest Additions. To be able to use vagrant, you need a basebox with the
 virtualbox and guest additions versions matching correctly.</p>
 <p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
 all the latest VM templates:</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ git clone https://github.com/jedi4ever/veewee.git
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ git clone https://github.com/jedi4ever/veewee.git
 $ <span class="nb">cd</span> veewee
 $ sudo gem install bundler
 $ sudo bundle install
@@ -236,7 +236,7 @@ using Gems, but this not necessarily gives you the version with the most recent
 templates that match your own operating system version.</p>
 <p>Now lets define our own basebox definition and copy from an existing template
 that Veewee provides:</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
 </pre></div>
 </div>
 <p>This creates a copy from the default ubuntu server template into a folder
@@ -244,18 +244,18 @@ that Veewee provides:</p>
 in there to adjust the build process of the virtual machine image. For me its
 important to modify the definitions.rb and add the following, otherwise
 building the VMs fails:</p>
-<div class="highlight-bash"><div class="highlight"><pre>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
+<div class="highlight-bash"><div class="highlight"><pre><span/>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
 </pre></div>
 </div>
 <p>You can then open up the postinstall.sh and install more packages that you need
 in your personal basebox. For example a LAMP stack. Do this right after the
 lines that do <cite>apt-get install -y</cite>:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+<div class="highlight-bash"><div class="highlight"><pre><span/><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
 apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
 </pre></div>
 </div>
 <p>If you are done you can start building a virtualbox image with:</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ vagrant basebox build
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ vagrant basebox build
 </pre></div>
 </div>
 <p>Make sure not to start typing in the console window that open ups. It is
@@ -263,14 +263,14 @@ automatically controlled from a ruby script and every change to the keysequence
 breaks the building. This step takes a while. (Enough to write a blog post
 while watching a boring football game for example).</p>
 <p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
 $ vagrant basebox <span class="nb">export</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
 $ vagrant box add <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php.box'</span>
 </pre></div>
 </div>
 <p>Now this box is also available as Vagrant base box. For example in a project
 that we want to use with vagrant, do:</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> myproject/
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ <span class="nb">cd</span> myproject/
 $ vagrant init <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
 $ vagrant up
 $ vagrant ssh
@@ -370,7 +370,7 @@ easily create functional tests for bundles without the bundle requiring an
 application.</p>
 <div class="section" id="create-a-testkernel">
 <h2>Create a TestKernel</h2>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// Tests/Controller/App/AppKernel.php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
@@ -399,7 +399,7 @@ application.</p>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="c1">// We don't need that Environment stuff, just one config</span>
-        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -407,7 +407,7 @@ application.</p>
 </div>
 <div class="section" id="creating-the-config-yml">
 <h2>Creating the config.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre># Tests/Controller/App/config.yml
+<div class="highlight-yaml"><div class="highlight"><pre><span/># Tests/Controller/App/config.yml
 framework:
     secret:          secret
     charset:         UTF-8
@@ -436,7 +436,7 @@ monolog:
 </div>
 <div class="section" id="creating-the-routing-yml">
 <h2>Creating the routing.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># Tests/Controller/App/routing.yml</span>
+<div class="highlight-yaml"><div class="highlight"><pre><span/><span class="c1"># Tests/Controller/App/routing.yml</span>
 <span class="l l-Scalar l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="s">"@BeberleiWorkflowBundle/Controller/"</span>
     <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
@@ -450,22 +450,22 @@ monolog:
 Tree K-I-S-S-I-N-G” blog post</a>.</p>
 <p>His setup is missing the spl_autoload_register() call in the bootstrap file
 though.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// Tests/bootstrap.php</span>
-<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/../vendor/.composer/autoload.php'</span><span class="p">;</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/../vendor/.composer/autoload.php'</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;'EOT'</span>
+    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;'</span><span class="dl">EOT</span><span class="s">'</span>
 <span class="s">You must set up the project dependencies, run the following commands:</span>
 <span class="s">wget http://getcomposer.org/composer.phar</span>
 <span class="s">php composer.phar install</span>
-<span class="s">EOT</span>
+<span class="dl">EOT</span>
     <span class="p">);</span>
 <span class="p">}</span>
 <span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">'loadClass'</span><span class="p">));</span>
 
 <span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">'Beberlei\\WorkflowBundle\\'</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nv">$path</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
+        <span class="nv">$path</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
             <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
         <span class="p">}</span>
@@ -481,7 +481,7 @@ dependencies.</p>
 <div class="section" id="modifying-the-phpunit-xml-dist">
 <h2>Modifying the phpunit.xml.dist</h2>
 <p>We have to tell the WebTestCase base class where to find this kernel:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
+<div class="highlight-xml"><div class="highlight"><pre><span/><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
 <span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">"Tests/bootstrap.php"</span><span class="nt">&gt;</span>
     <span class="nt">&lt;php&gt;</span>
         <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">"KERNEL_DIR"</span> <span class="na">value=</span><span class="s">"Tests/Controller/App"</span> <span class="nt">/&gt;</span>

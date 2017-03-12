@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="A case for weak type hints only in PHP7" href="../10/a_case_for_weak_type_hints_only_in_php7.html" /><link rel="prev" title="Vagrant, NFS and NPM" href="../19/vagrant_nfs_and_npm.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="A case for weak type hints only in PHP7" href="../10/a_case_for_weak_type_hints_only_in_php7.html" /><link rel="prev" title="Vagrant, NFS and NPM" href="../19/vagrant_nfs_and_npm.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -76,7 +76,7 @@ configuration in <span class="docutils literal"><span class="pre">phpunit.xml</s
 extension for PHPUnit and allows &#8220;multiple inheritance&#8221; to compose different
 features for our test cases.</p>
 <p>See this simple example that is adding some more assertions:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">trait</span> <span class="nx">MyAssertions</span>
 <span class="p">{</span>
@@ -105,7 +105,7 @@ then the renamed setup methods do not get called anymore.</p>
 <span class="docutils literal"><span class="pre">&#64;beforeClass</span></span> annotations.</p>
 <p>See this trait I use for making sure my database is using the
 most current database version by invoking migrations in <span class="docutils literal"><span class="pre">&#64;beforeClass</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
 
@@ -133,7 +133,7 @@ most current database version by invoking migrations in <span class="docutils li
             <span class="s1">&#39;url&#39;</span> <span class="o">=&gt;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;TEST_DATABASE_DSN&#39;</span><span class="p">]</span>
         <span class="p">));</span>
 
-        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../../src/schema&#39;</span><span class="p">));</span>
+        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../../src/schema&#39;</span><span class="p">));</span>
         <span class="nv">$dbDeploy</span><span class="o">-&gt;</span><span class="na">migrate</span><span class="p">();</span>
         <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
     <span class="p">}</span>
@@ -142,7 +142,7 @@ most current database version by invoking migrations in <span class="docutils li
 </div>
 <p>I could mix this with a second trait <span class="docutils literal"><span class="pre">SymfonySetup</span></span> that makes the DIC
 container available for my integration tests:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
 
@@ -182,7 +182,7 @@ container available for my integration tests:</p>
 <p>The Symfony setup trait uses <span class="docutils literal"><span class="pre">&#64;before</span></span> and <span class="docutils literal"><span class="pre">&#64;after</span></span> to setup and cleanup
 without clashing with the traditional PHPUnit <span class="docutils literal"><span class="pre">setUp</span></span> method.</p>
 <p>Combining all this we could write a testcase like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserRepositoryTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
 <span class="p">{</span>

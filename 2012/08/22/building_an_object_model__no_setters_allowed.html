@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="prev" title="Decoupling applications with Domains Events" href="../25/decoupling_applications_with_domain_events.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="prev" title="Decoupling applications with Domains Events" href="../25/decoupling_applications_with_domain_events.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -95,7 +95,7 @@ actual storage. Something that object-orientation was suppose to avoid.</p>
 of every task that is performed in an application and add a method that
 changes all the affected fields at once, to perform this task. In the famous
 blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">compose</span><span class="p">(</span><span class="nv">$headline</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$tags</span><span class="p">)</span>
@@ -132,7 +132,7 @@ not worth the trouble anymore.</p>
 models directly in the view or for testing purposes. There is another way
 to get rid of all the getters that you don&#8217;t need explicitly in a domain
 model, using the visitor pattern in combination with view models:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nx">PostView</span> <span class="nv">$view</span><span class="p">)</span>
@@ -183,7 +183,7 @@ kind of form framework on entities is a huge no go anyways.</p>
 <p>Both tasks allow only a subset of the properties to be modified. For each of
 these tasks we need a custom form &#8220;model&#8221;. Think of these models as command
 objects:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">EditPostCommand</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
@@ -196,7 +196,7 @@ objects:</p>
 <p>In our application we could attach these form models to our form framework and
 then pass these as commands into our &#8220;real model&#8221; through a service layer,
 <a class="reference external" href="http://www.eaipatterns.com/MessageBus.html">message bus</a> or something equivalent:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">PostController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" /><link rel="prev" title="OOP Business Applications: Trying to escape the mess" href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" /><link rel="prev" title="OOP Business Applications: Trying to escape the mess" href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -105,29 +105,29 @@ run with root <span class="docutils literal"><span class="pre">~/.puppet/devmach
 my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:</p>
-<div class="highlight-python"><div class="highlight"><pre># /home/benny/.puppet/devmachine.pp
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
 
-# VIM Dot Files
-vcsrepo { &#39;vim-dotfiles&#39;:
-    path     =&gt; &quot;/home/$id/.vim&quot;,
-    ensure   =&gt; present,
-    provider =&gt; git,
-    source   =&gt; &#39;https://...&#39;
-}
+<span class="c1"># VIM Dot Files</span>
+<span class="n">vcsrepo</span> <span class="p">{</span> <span class="s1">&#39;vim-dotfiles&#39;</span><span class="p">:</span>
+    <span class="n">path</span>     <span class="o">=&gt;</span> <span class="s2">&quot;/home/$id/.vim&quot;</span><span class="p">,</span>
+    <span class="n">ensure</span>   <span class="o">=&gt;</span> <span class="n">present</span><span class="p">,</span>
+    <span class="n">provider</span> <span class="o">=&gt;</span> <span class="n">git</span><span class="p">,</span>
+    <span class="n">source</span>   <span class="o">=&gt;</span> <span class="s1">&#39;https://...&#39;</span>
+<span class="p">}</span>
 
-file { &#39;vim-dotfiles-symlink&#39;:
-    path   =&gt; &quot;/home/$id/.vimrc&quot;,
-    ensure =&gt; link,
-    target =&gt; &#39;.vim/vimrc&#39;,
-    require =&gt; Vcsrepo[&#39;vim-dotfiles&#39;]
-}
+<span class="n">file</span> <span class="p">{</span> <span class="s1">&#39;vim-dotfiles-symlink&#39;</span><span class="p">:</span>
+    <span class="n">path</span>   <span class="o">=&gt;</span> <span class="s2">&quot;/home/$id/.vimrc&quot;</span><span class="p">,</span>
+    <span class="n">ensure</span> <span class="o">=&gt;</span> <span class="n">link</span><span class="p">,</span>
+    <span class="n">target</span> <span class="o">=&gt;</span> <span class="s1">&#39;.vim/vimrc&#39;</span><span class="p">,</span>
+    <span class="n">require</span> <span class="o">=&gt;</span> <span class="n">Vcsrepo</span><span class="p">[</span><span class="s1">&#39;vim-dotfiles&#39;</span><span class="p">]</span>
+<span class="p">}</span>
 
-exec { &#39;vim-make-command-t&#39;:
-    command =&gt; &#39;rake make&#39;,
-    cwd     =&gt; &quot;/home/$id/.vim/bundle/Command-T&quot;,
-    unless  =&gt; &quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep &#39;command-t.recipe&#39;&quot;,
-    require =&gt; Vcsrepo[&#39;vim-dotfiles&#39;]
-}
+<span class="n">exec</span> <span class="p">{</span> <span class="s1">&#39;vim-make-command-t&#39;</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">&#39;rake make&#39;</span><span class="p">,</span>
+    <span class="n">cwd</span>     <span class="o">=&gt;</span> <span class="s2">&quot;/home/$id/.vim/bundle/Command-T&quot;</span><span class="p">,</span>
+    <span class="n">unless</span>  <span class="o">=&gt;</span> <span class="s2">&quot;ls -aFlh /home/$id/.vim/bundle/Command-T|grep &#39;command-t.recipe&#39;&quot;</span><span class="p">,</span>
+    <span class="n">require</span> <span class="o">=&gt;</span> <span class="n">Vcsrepo</span><span class="p">[</span><span class="s1">&#39;vim-dotfiles&#39;</span><span class="p">]</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>The three keywords <span class="docutils literal"><span class="pre">vcsrepo</span></span>, <span class="docutils literal"><span class="pre">file</span></span> and <span class="docutils literal"><span class="pre">exec</span></span> are called types. They
@@ -145,27 +145,27 @@ puppet. The require makes sure this resource is only activated after the dotfile
 were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
-<div class="highlight-python"><div class="highlight"><pre># Configure Git
-exec { &quot;git-author-name&quot;:
-    command =&gt; &#39;git config --global user.name &quot;Benjamin Eberlei&quot;&#39;,
-    unless =&gt; &quot;git config --global --get user.name|grep &#39;Benjamin Eberlei&#39;&quot;
-}
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Configure Git</span>
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">&quot;git-author-name&quot;</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">&#39;git config --global user.name &quot;Benjamin Eberlei&quot;&#39;</span><span class="p">,</span>
+    <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">&quot;git config --global --get user.name|grep &#39;Benjamin Eberlei&#39;&quot;</span>
+<span class="p">}</span>
 
-exec { &quot;git-author-email&quot;:
-    command =&gt; &#39;git config --global user.email &quot;kontakt@beberlei.de&quot;&#39;,
-    unless =&gt; &quot;git config --global --get user.email|grep &#39;kontakt@beberlei.de&#39;&quot;
-}
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">&quot;git-author-email&quot;</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">&#39;git config --global user.email &quot;kontakt@beberlei.de&quot;&#39;</span><span class="p">,</span>
+    <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">&quot;git config --global --get user.email|grep &#39;kontakt@beberlei.de&#39;&quot;</span>
+<span class="p">}</span>
 
-exec { &quot;git-global-ignore&quot;:
-    command =&gt; &quot;git config --global core.excludesfile /home/$id/.gitignore&quot;,
-    unless  =&gt; &#39;git config -l --global|grep excludesfile&#39;
-}
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">&quot;git-global-ignore&quot;</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s2">&quot;git config --global core.excludesfile /home/$id/.gitignore&quot;</span><span class="p">,</span>
+    <span class="n">unless</span>  <span class="o">=&gt;</span> <span class="s1">&#39;git config -l --global|grep excludesfile&#39;</span>
+<span class="p">}</span>
 
-file { &quot;git-global-ignorefile&quot;:
-    path =&gt; &quot;/home/$id/.gitignore&quot;,
-    ensure =&gt; present,
-    content =&gt; &quot;*.swo\n*.swp\n&quot;
-}
+<span class="n">file</span> <span class="p">{</span> <span class="s2">&quot;git-global-ignorefile&quot;</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=&gt;</span> <span class="s2">&quot;/home/$id/.gitignore&quot;</span><span class="p">,</span>
+    <span class="n">ensure</span> <span class="o">=&gt;</span> <span class="n">present</span><span class="p">,</span>
+    <span class="n">content</span> <span class="o">=&gt;</span> <span class="s2">&quot;*.swo</span><span class="se">\n</span><span class="s2">*.swp</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>Here A bunch of commands is executed unless some option is already set. At last

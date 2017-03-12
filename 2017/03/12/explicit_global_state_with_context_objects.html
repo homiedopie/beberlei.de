@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Composer Monorepo Plugin (previously called Fiddler)" href="../../../2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Composer Monorepo Plugin (previously called Fiddler)" href="../../../2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -138,7 +138,7 @@ good candidates for the context.</li>
 <p>How to introduce such a context? We could create an object in our application,
 for example how we did it in <a class="reference external" href="https://tideways.io">Tideways</a>
 with selected tenant (organization), application, date-range and server environment:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">PageContext</span>
 <span class="p">{</span>
@@ -173,7 +173,7 @@ control checks unneeded that are usually cluttering the controller.</p>
 <p>The context is then made available for the application by using a Symfony
 <a class="reference external" href="https://www.beberlei.de/2013/02/19/extending_symfony2__paramconverter.html">parameter converter</a>, every controller-action can get access to the context
 by type-hinting for it:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">ApplicationController</span>
 <span class="p">{</span>
@@ -194,7 +194,7 @@ and move repetitive find and access control code outside of the controllers.</p>
 object, so I don&#8217;t have to return it from every controller and created
 a wrapper for the URL Generation that appends context information
 to every URL (current date range + environment):</p>
-<div class="highlight-jinja2"><div class="highlight"><pre>&lt;h1&gt;{{ pageContext.application.name }}&lt;/h1&gt;
+<div class="highlight-jinja2"><div class="highlight"><pre><span></span>&lt;h1&gt;{{ pageContext.application.name }}&lt;/h1&gt;
 
 &lt;a href=&quot;{{ page_path(&quot;some_route&quot;) }}&quot;&gt;Link with Context query arguments&lt;/a&gt;
 </pre></div>

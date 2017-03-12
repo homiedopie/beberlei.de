@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="prev" title="Integrate Symfony and Webpack" href="../26/integrate_symfony_and_webpack.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="prev" title="Integrate Symfony and Webpack" href="../26/integrate_symfony_and_webpack.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -75,7 +75,7 @@ apparently from the ticket, this is not going to be fixed.</p>
 <p>I finally got it working with a <a class="reference external" href="https://gist.github.com/kevinastone/8790717">workaround script</a> by <a class="reference external" href="https://github.com/kevinastone">Kevin
 Stone</a> that mimics NPM, but
 moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
-<div class="highlight-python"><div class="highlight"><pre>#!/bin/bash
+<div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
 # roles/nodejs/files/tmpnpm.sh
 
 BASE_DIR=${TMPDIR:-/var/tmp}
@@ -99,37 +99,37 @@ popd
 </pre></div>
 </div>
 <p>Integrating this into my Ansible setup of the machine it looked like this:</p>
-<div class="highlight-python"><div class="highlight"><pre># roles/nodejs/tasks/main.yml
-# More tasks here before this...
-- name: &quot;Install npm workaround&quot;
-  copy: &gt;
-      src=tmpnpm.sh
-      dest=/usr/local/bin/tmpnpm
-      mode=&quot;0755&quot;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># roles/nodejs/tasks/main.yml</span>
+<span class="c1"># More tasks here before this...</span>
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Install npm workaround&quot;</span>
+  <span class="n">copy</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="n">src</span><span class="o">=</span><span class="n">tmpnpm</span><span class="o">.</span><span class="n">sh</span>
+      <span class="n">dest</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span>
+      <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;0755&quot;</span>
 
-- name: &quot;Install Global Dependencies&quot;
-  command: &gt;
-      /usr/local/bin/tmpnpm install -g {{ item }}
-  with_items: global_packages
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Install Global Dependencies&quot;</span>
+  <span class="n">command</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="p">{{</span> <span class="n">item</span> <span class="p">}}</span>
+  <span class="n">with_items</span><span class="p">:</span> <span class="n">global_packages</span>
 
-- name: &quot;Install Package Dependencies&quot;
-  command: &gt;
-      /usr/local/bin/tmpnpm install
-      chdir={{ item }}
-  with_items: package_dirs
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Install Package Dependencies&quot;</span>
+  <span class="n">command</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span> <span class="n">install</span>
+      <span class="n">chdir</span><span class="o">=</span><span class="p">{{</span> <span class="n">item</span> <span class="p">}}</span>
+  <span class="n">with_items</span><span class="p">:</span> <span class="n">package_dirs</span>
 </pre></div>
 </div>
 <p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
 outside when invoking the role:</p>
-<div class="highlight-python"><div class="highlight"><pre># deploy.yml
----
-- hosts: all
-  roles:
-    - name: nodejs
-      global_packages:
-        - grunt-cli
-      package_dirs:
-        - &quot;/var/www/project&quot;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># deploy.yml</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="p">:</span> <span class="nb">all</span>
+  <span class="n">roles</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">nodejs</span>
+      <span class="n">global_packages</span><span class="p">:</span>
+        <span class="o">-</span> <span class="n">grunt</span><span class="o">-</span><span class="n">cli</span>
+      <span class="n">package_dirs</span><span class="p">:</span>
+        <span class="o">-</span> <span class="s2">&quot;/var/www/project&quot;</span>
 </pre></div>
 </div>
 <p>This way the Ansible Node.JS role is reusable in different projects.</p>

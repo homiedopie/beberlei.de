@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page17.html" /><link rel="prev" title="Newer" href="page15.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page17.html" /><link rel="prev" title="Newer" href="page15.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -115,7 +115,7 @@ into the Zend Framework. To my surprise it’s possible without having to
 make any changes to one of the two components. An example use-case would
 look like:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$container = new sfServiceContainerBuilder();
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$container = new sfServiceContainerBuilder();
 
 $loader = new sfServiceContainerLoaderFileXml($container);
 $loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
@@ -140,7 +140,7 @@ injecting them into the container. The following code is a restatement
 of my previous example of a <strong>MyModel</strong> class which requires a
 <strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$container-&gt;register('myModel', 'MyModel')
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$container-&gt;register('myModel', 'MyModel')
           -&gt;addArgument(new sfServiceReference('db'))
           -&gt;addArgument(new sfServiceReference('cache'));
 </pre></div>
@@ -221,7 +221,7 @@ Zend_Controller_Action object.</p>
 update forms using Zend_Form and displays them in the Controller. The
 component is very easy to use, as this example shows:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class SomeController extends WW_Controller_Scaffolding {
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class SomeController extends WW_Controller_Scaffolding {
     public function init() {
         $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
     }
@@ -249,7 +249,7 @@ scaffolding view scripts folder via options.</li>
 </ul>
 <p><strong>Install &amp; Usage</strong></p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>Untar the two folders include/ and views/ into your
+<div><div class="highlight-default"><div class="highlight"><pre><span/>Untar the two folders include/ and views/ into your
 Zend Framework project application directory.
 
 Make sure the include folder is in your Zend_Loader
@@ -326,7 +326,7 @@ Mine looks as follows. The first thing is to Set an Analyzer other from
 the default one. The Default Analyzer only looks at letters, not at
 numbers.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
+<div><div class="highlight-default"><div class="highlight"><pre><span/>Zend_Search_Lucene_Analysis_Analyzer::setDefault(new
     Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive()
 );
 $index = Zend_Search_Lucene::open('/path/to/index/directory');
@@ -336,7 +336,7 @@ $index = Zend_Search_Lucene::open('/path/to/index/directory');
 <p>We can now save an identifier containing letters and numbers, for
 example the md5 string of the Article Database ID.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$doc = new Zend_Search_Lucene_Document();
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$doc = new Zend_Search_Lucene_Document();
 $field = Zend_Search_Lucene_Field::Keyword('id', md5($data['id']));
 $doc-&gt;addField($field);
 $index-&gt;addDocument($doc);
@@ -346,7 +346,7 @@ $index-&gt;addDocument($doc);
 <p>Before updating an entry you have to delete any entry that has been
 indexed before:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$hits = $index-&gt;find('id:'.md5($articleID));
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$hits = $index-&gt;find('id:'.md5($articleID));
 foreach($hits AS $hit) {
     $index-&gt;delete($hit-&gt;id);
 }

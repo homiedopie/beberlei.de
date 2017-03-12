@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Zend Helper for jQuery UI Widgets Demo" href="../22/zend-helper-for-jquery-ui-widgets-demo.html" /><link rel="prev" title="Wrestling with Dojo" href="../02/wrestling-with-dojo.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Zend Helper for jQuery UI Widgets Demo" href="../22/zend-helper-for-jquery-ui-widgets-demo.html" /><link rel="prev" title="Wrestling with Dojo" href="../02/wrestling-with-dojo.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -84,24 +84,24 @@ return types is an important task.</p>
 automatically by reflecting on the given Service Class methods. This
 works as follows. We setup a simple service:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class HelloWorldService
-{
-    /**
-     * @return string
-     */
-    public function helloWorld()
-    {
-        return &quot;Hello World!&quot;;
-    }
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">HelloWorldService</span>
+<span class="p">{</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">string</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">function</span> <span class="n">helloWorld</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s2">&quot;Hello World!&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    /**
-     * @return array
-     */
-    public function getFruits()
-    {
-        return array(&#39;apple&#39;, &#39;orange&#39;, &#39;banana&#39;);
-    }
-}
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">array</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">function</span> <span class="n">getFruits</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="s1">&#39;banana&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -111,7 +111,7 @@ cannot be resolved. We will now setup a simple SOAP Server access point,
 that will also generate our WSDL file for description of this HelloWorld
 service:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once &quot;HelloWorldService.php&quot;;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>require_once &quot;HelloWorldService.php&quot;;
 require_once &quot;Zend/Soap/Server.php&quot;;
 require_once &quot;Zend/Soap/AutoDiscover.php&quot;;
 
@@ -132,7 +132,7 @@ if(isset($_GET[&#39;wsdl&#39;])) {
 the HelloWorldService class from a remote or local location with just
 this simple lines:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once &quot;Zend/Exception.php&quot;;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>require_once &quot;Zend/Exception.php&quot;;
 require_once &quot;Zend/Soap/Client.php&quot;;
 
 try {

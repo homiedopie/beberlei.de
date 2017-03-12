@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="jQuery Component approved for extras library" href="../../09/05/jquery-component-approved-for-extras-library.html" /><link rel="prev" title="My recent ZF ongoings: JQuery, Action Controller, CouchDb" href="../../10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="jQuery Component approved for extras library" href="../../09/05/jquery-component-approved-for-extras-library.html" /><link rel="prev" title="My recent ZF ongoings: JQuery, Action Controller, CouchDb" href="../../10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -77,43 +77,43 @@ quarters.</p>
 calculate cross-correlation coefficients for two vectors for a specified
 lag length:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>#include &lt;oxfloat.h&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#include &lt;oxfloat.h&gt;</span>
 
-/**
- * Computes the cross-correlation coefficient for two vector series allowing
- * to optionally specify the number of positive and negative lags the ccc
- * should be calculated for.
- *
- * @author Benjamin Eberlei (kontakt at beberlei dot de)
- * @param vVarY Tx1 vector of variable related to
- * @param vVarX Tx1 vector of variable which is tested in different lags
- * @param lags Integer indicating the number of negative and positive lags.
- * @returns (1+lags*2)*1 vector of correlations from -lags to lags
- **/
-ccf(const vVarY, const vVarX, const lags)
-{
-    // Generate positive and negative lags of given length and fill with NaN, so
-    // that rows with not available numbers can be dropped from calculating the CCF later on.
-    decl mXLag = lag0(vVarX, range(lags, -lags), M_NAN);
+<span class="o">/**</span>
+ <span class="o">*</span> <span class="n">Computes</span> <span class="n">the</span> <span class="n">cross</span><span class="o">-</span><span class="n">correlation</span> <span class="n">coefficient</span> <span class="k">for</span> <span class="n">two</span> <span class="n">vector</span> <span class="n">series</span> <span class="n">allowing</span>
+ <span class="o">*</span> <span class="n">to</span> <span class="n">optionally</span> <span class="n">specify</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">positive</span> <span class="ow">and</span> <span class="n">negative</span> <span class="n">lags</span> <span class="n">the</span> <span class="n">ccc</span>
+ <span class="o">*</span> <span class="n">should</span> <span class="n">be</span> <span class="n">calculated</span> <span class="k">for</span><span class="o">.</span>
+ <span class="o">*</span>
+ <span class="o">*</span> <span class="nd">@author</span> <span class="n">Benjamin</span> <span class="n">Eberlei</span> <span class="p">(</span><span class="n">kontakt</span> <span class="n">at</span> <span class="n">beberlei</span> <span class="n">dot</span> <span class="n">de</span><span class="p">)</span>
+ <span class="o">*</span> <span class="nd">@param</span> <span class="n">vVarY</span> <span class="n">Tx1</span> <span class="n">vector</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">related</span> <span class="n">to</span>
+ <span class="o">*</span> <span class="nd">@param</span> <span class="n">vVarX</span> <span class="n">Tx1</span> <span class="n">vector</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">tested</span> <span class="ow">in</span> <span class="n">different</span> <span class="n">lags</span>
+ <span class="o">*</span> <span class="nd">@param</span> <span class="n">lags</span> <span class="n">Integer</span> <span class="n">indicating</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">negative</span> <span class="ow">and</span> <span class="n">positive</span> <span class="n">lags</span><span class="o">.</span>
+ <span class="o">*</span> <span class="nd">@returns</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">lags</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span> <span class="n">vector</span> <span class="n">of</span> <span class="n">correlations</span> <span class="kn">from</span> <span class="o">-</span><span class="n">lags</span> <span class="n">to</span> <span class="n">lags</span>
+ <span class="o">**/</span>
+<span class="n">ccf</span><span class="p">(</span><span class="n">const</span> <span class="n">vVarY</span><span class="p">,</span> <span class="n">const</span> <span class="n">vVarX</span><span class="p">,</span> <span class="n">const</span> <span class="n">lags</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="o">//</span> <span class="n">Generate</span> <span class="n">positive</span> <span class="ow">and</span> <span class="n">negative</span> <span class="n">lags</span> <span class="n">of</span> <span class="n">given</span> <span class="n">length</span> <span class="ow">and</span> <span class="n">fill</span> <span class="k">with</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">so</span>
+    <span class="o">//</span> <span class="n">that</span> <span class="n">rows</span> <span class="k">with</span> <span class="ow">not</span> <span class="n">available</span> <span class="n">numbers</span> <span class="n">can</span> <span class="n">be</span> <span class="n">dropped</span> <span class="kn">from</span> <span class="nn">calculating</span> <span class="n">the</span> <span class="n">CCF</span> <span class="n">later</span> <span class="n">on</span><span class="o">.</span>
+    <span class="n">decl</span> <span class="n">mXLag</span> <span class="o">=</span> <span class="n">lag0</span><span class="p">(</span><span class="n">vVarX</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="o">-</span><span class="n">lags</span><span class="p">),</span> <span class="n">M_NAN</span><span class="p">);</span>
 
-    decl mCorr, sCov;
+    <span class="n">decl</span> <span class="n">mCorr</span><span class="p">,</span> <span class="n">sCov</span><span class="p">;</span>
 
-    // initialize result vector holding one crosscorrelation per lag
-    decl vCorrLags = zeros(1+lags*2, 1);
+    <span class="o">//</span> <span class="n">initialize</span> <span class="n">result</span> <span class="n">vector</span> <span class="n">holding</span> <span class="n">one</span> <span class="n">crosscorrelation</span> <span class="n">per</span> <span class="n">lag</span>
+    <span class="n">decl</span> <span class="n">vCorrLags</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">lags</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 
-    // sadly there are no matrix operations to ease this computation, loop over all lags
-    for(decl i = 0; i &lt; 1+lags*2; i++) {
-        mCorr = deleter(vVarY ~ mXLag[][i]); // stick y and current lagged x together and delete NaN rows
+    <span class="o">//</span> <span class="n">sadly</span> <span class="n">there</span> <span class="n">are</span> <span class="n">no</span> <span class="n">matrix</span> <span class="n">operations</span> <span class="n">to</span> <span class="n">ease</span> <span class="n">this</span> <span class="n">computation</span><span class="p">,</span> <span class="n">loop</span> <span class="n">over</span> <span class="nb">all</span> <span class="n">lags</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">decl</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">+</span><span class="n">lags</span><span class="o">*</span><span class="mi">2</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mCorr</span> <span class="o">=</span> <span class="n">deleter</span><span class="p">(</span><span class="n">vVarY</span> <span class="o">~</span> <span class="n">mXLag</span><span class="p">[][</span><span class="n">i</span><span class="p">]);</span> <span class="o">//</span> <span class="n">stick</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">current</span> <span class="n">lagged</span> <span class="n">x</span> <span class="n">together</span> <span class="ow">and</span> <span class="n">delete</span> <span class="n">NaN</span> <span class="n">rows</span>
 
-        // calculate covariance of both time series
-        sCov = 1/(rows(mCorr)-1) * sumc( (mCorr[][0]-meanc(mCorr[][0]))&#39; * (mCorr[][1]-meanc(mCorr[][1])) );
+        <span class="o">//</span> <span class="n">calculate</span> <span class="n">covariance</span> <span class="n">of</span> <span class="n">both</span> <span class="n">time</span> <span class="n">series</span>
+        <span class="n">sCov</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">mCorr</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sumc</span><span class="p">(</span> <span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">meanc</span><span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">0</span><span class="p">]))</span><span class="s1">&#39; * (mCorr[][1]-meanc(mCorr[][1])) );</span>
 
-        // calculate correlation coefficient
-        vCorrLags[i][0] = sCov / ( sqrt(varc(mCorr[][0])) * sqrt(varc(mCorr[][1])) );
-    }
+        <span class="o">//</span> <span class="n">calculate</span> <span class="n">correlation</span> <span class="n">coefficient</span>
+        <span class="n">vCorrLags</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sCov</span> <span class="o">/</span> <span class="p">(</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">varc</span><span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">0</span><span class="p">]))</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">varc</span><span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">1</span><span class="p">]))</span> <span class="p">);</span>
+    <span class="p">}</span>
 
-    return vCorrLags;
-}
+    <span class="k">return</span> <span class="n">vCorrLags</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div></blockquote>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page21.html" /><link rel="prev" title="Newer" href="page19.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page21.html" /><link rel="prev" title="Newer" href="page19.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -92,7 +92,7 @@ macStyle = false and you have your menubars back.</p>
 <p>This is a simple example how you would use DojoX Django Template
 Language component filled with data from a JSON GET Response:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>&lt;script type="text/javascript" src="/development/dojo-release-1.1.1/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span/>&lt;script type="text/javascript" src="/development/dojo-release-1.1.1/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;
 
 &lt;script language="javascript" type="text/javascript"&gt;&lt;!--
 dojo.require("dojox.dtl");
@@ -202,24 +202,24 @@ return types is an important task.</p>
 automatically by reflecting on the given Service Class methods. This
 works as follows. We setup a simple service:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class HelloWorldService
-{
-    /**
-     * @return string
-     */
-    public function helloWorld()
-    {
-        return "Hello World!";
-    }
+<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="k">class</span> <span class="nc">HelloWorldService</span>
+<span class="p">{</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">string</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">function</span> <span class="n">helloWorld</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s2">"Hello World!"</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    /**
-     * @return array
-     */
-    public function getFruits()
-    {
-        return array('apple', 'orange', 'banana');
-    }
-}
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">array</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">function</span> <span class="n">getFruits</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'apple'</span><span class="p">,</span> <span class="s1">'orange'</span><span class="p">,</span> <span class="s1">'banana'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -229,7 +229,7 @@ cannot be resolved. We will now setup a simple SOAP Server access point,
 that will also generate our WSDL file for description of this HelloWorld
 service:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once "HelloWorldService.php";
+<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "HelloWorldService.php";
 require_once "Zend/Soap/Server.php";
 require_once "Zend/Soap/AutoDiscover.php";
 
@@ -250,7 +250,7 @@ if(isset($_GET['wsdl'])) {
 the HelloWorldService class from a remote or local location with just
 this simple lines:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>require_once "Zend/Exception.php";
+<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "Zend/Exception.php";
 require_once "Zend/Soap/Client.php";
 
 try {

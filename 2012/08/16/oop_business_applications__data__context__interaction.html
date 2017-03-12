@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="OOP Business Applications: Entity, Boundary, Interactor" href="../13/oop_business_applications_entity_boundary_interactor.html" /><link rel="prev" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="OOP Business Applications: Entity, Boundary, Interactor" href="../13/oop_business_applications_entity_boundary_interactor.html" /><link rel="prev" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -111,7 +111,7 @@ or by building two traits. I will go down the route with traits, to show
 one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">trait</span> <span class="nx">TransferMoneySource</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
@@ -136,7 +136,7 @@ here. The <span class="docutils literal"><span class="pre">withdraw</span></span
 dumb as possible, so that their implementation does not cause any side-effects
 on the execution of this use-case.</p>
 <p>The bank account would then be modified to look:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
@@ -144,7 +144,7 @@ on the execution of this use-case.</p>
 
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="p">}</span>
@@ -171,13 +171,13 @@ have to know about how to bind roles to data, you could use GUIDs in your
 application and fetch all objects from one data store. Another way would be to
 implement data access objects for roles, that then know how to retrieve their
 corresponding data.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransfer</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
     <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
@@ -201,7 +201,7 @@ implications.</p>
 traits.</p>
 </div>
 <p>Here is an example of how the bank application service could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>

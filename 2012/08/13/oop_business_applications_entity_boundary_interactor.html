@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="OOP Business Applications: Trying to escape the mess" href="../11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="prev" title="OOP Business Applications: Data, Context, Interaction" href="../16/oop_business_applications__data__context__interaction.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="OOP Business Applications: Trying to escape the mess" href="../11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="prev" title="OOP Business Applications: Data, Context, Interaction" href="../16/oop_business_applications__data__context__interaction.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -99,12 +99,12 @@ throughout all blog posts, the usual Bank Account/Money Transfer. The use case
 is the money transfer from one bank account (source) to another one
 (destination).</p>
 <p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="p">}</span>
@@ -125,7 +125,7 @@ is the money transfer from one bank account (source) to another one
 functionality. The Money object implementation is omitted here.</p>
 <p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -160,7 +160,7 @@ php objects (so called data-transfer objects, DTO).</p>
 source and destination account entities from some storage subsystem. To follow the EBI
 design pattern, we have to decouple this data access object from the model,
 by offering a port (Interface):</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
@@ -172,7 +172,7 @@ by offering a port (Interface):</p>
 the bank account sample. We need to wrap the whole MoneyTransfer use-case in
 a transaction. Lets say the invocation of our Use-Case is controlled through
 some kind of application boundary object:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
@@ -211,7 +211,7 @@ that transforms the request and response and also handles transactions and
 such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
 <p>With context you would do something like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
 
 <span class="c1">// 1. direct invocation</span>
@@ -251,7 +251,7 @@ as you need to map the request objects to your entities.</li>
 mapping API. This way you can make it look as if you would map a DTO onto
 an object, but in this case you are using the Form API as the mapper.</li>
 </ul>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components" href="../07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html" /><link rel="prev" title="New Netbeans PHP CodeSniffer Plugin Version" href="../../04/18/new-netbeans-php-codesniffer-plugin-version.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components" href="../07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html" /><link rel="prev" title="New Netbeans PHP CodeSniffer Plugin Version" href="../../04/18/new-netbeans-php-codesniffer-plugin-version.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -66,7 +66,7 @@
 <p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
 <p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
 <p>I haven&#8217;t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <span class="docutils literal"><span class="pre">include()</span></span>. The client code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nb">stream_wrapper_register</span><span class="p">(</span><span class="s2">&quot;dc2proxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Doctrine\ORM\Proxy\ProxyStreamWrapper&quot;</span><span class="p">);</span>
 
 <span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">&quot;dc2proxy:///proxies&quot;</span><span class="p">;</span>
@@ -81,7 +81,7 @@
 </div>
 <p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
 The stream wrapper to make this work looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Assert v2.0: Fluent API and Lazy Assertions" href="../26/assert_v2_0__fluent_api_and_lazy_assertions.html" /><link rel="prev" title="Symfony2: A Simple Hello World" href="../../04/24/symfony_hello_world.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Assert v2.0: Fluent API and Lazy Assertions" href="../26/assert_v2_0__fluent_api_and_lazy_assertions.html" /><link rel="prev" title="Symfony2: A Simple Hello World" href="../../04/24/symfony_hello_world.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -114,7 +114,7 @@ Servers both written in PHP. You can use the non-WSDL mode to expose an object
 from the server and use a non-wsdl client to talk to it. The PHP <span class="docutils literal"><span class="pre">SOAPClient</span></span>
 and <span class="docutils literal"><span class="pre">SOAPServer</span></span> have a common exchange format that is used in this case
 and replaces WSDL entirely.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// server.php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
@@ -135,7 +135,7 @@ and replaces WSDL entirely.</p>
 </pre></div>
 </div>
 <p>The client is as simple as the following lines of code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// client.php</span>
 <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://server/namespace&#39;</span><span class="p">,</span>
@@ -176,7 +176,7 @@ the client only sees &#8220;Internal Server Error&#8221; messages.</li>
 </ol>
 <p>You can easily solve the <span class="docutils literal"><span class="pre">SOAPFault</span></span> problem by decorating your service with an exception handler,
 and also logging the errors yourself.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">SoapExceptionHandler</span>
 <span class="p">{</span>
@@ -186,12 +186,12 @@ and also logging the errors yourself.</p>
 
     <span class="k">private</span> <span class="nv">$service</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span> <span class="o">=</span> <span class="nv">$service</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">try</span> <span class="p">{</span>
             <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span>
@@ -232,7 +232,7 @@ from code.</p>
 you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
 By default it uses the docblocks <span class="docutils literal"><span class="pre">&#64;param</span></span> and <span class="docutils literal"><span class="pre">&#64;return</span></span> to generate
 the correct WSDL for a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;MyService&#39;</span><span class="p">)</span>
              <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://server/namespace&#39;</span><span class="p">)</span> <span class="c1">// same as server &#39;uri&#39;</span>
@@ -245,7 +245,7 @@ the correct WSDL for a service:</p>
 <p>You can now place that WSDL file in any public location and then point both
 <span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> at the file using the first constructor
 argument:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">&#39;http://server/path/wsdl&#39;</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="s1">&#39;http://server/path/wsdl&#39;</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 </pre></div>
@@ -269,7 +269,7 @@ which are used by default.</p>
 a little to adjust for correct namespace generation and code-style adjustments,
 but it works quite well by default. Here is an example of a generated class
 for the DHL Intraship SOAP API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">DHL\Intraship</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ComplexType</span>
@@ -313,7 +313,7 @@ for the DHL Intraship SOAP API:</p>
 </div>
 <p>The next thing you can generate is a classmap, that maps every WSDL Type to
 your newly generated code, in the above example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">&#39;classmap&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
@@ -345,14 +345,14 @@ class in Zend Framework 2. It has no external dependencies, so you can just
 copy it into your project if you want.</p>
 <p>To generate a WSDL for document/literal mode, use the following methods
 on Zend Autodiscovery:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;style&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;document&#39;</span><span class="p">))</span>
              <span class="o">-&gt;</span><span class="na">setOperationStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;use&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;literal&#39;</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>Then use the wrapper like such:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -377,7 +377,7 @@ certainly want to Integration test your clients and servers.</p>
 <p>You can do that in PHPUnit by using a client, that wraps a Server directly
 and doesn&#8217;t require a Webserver. Zend Framework 2 already has such an object,
 named <cite>ZendSoapClientLocal</cite>. Its usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>

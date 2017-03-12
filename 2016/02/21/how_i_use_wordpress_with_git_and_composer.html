@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Monolithic Repositories with Composer and Relative Autoloading" href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html" /><link rel="prev" title="Composer Monorepo Plugin (previously called Fiddler)" href="../../05/28/composer_monorepo_plugin_previously_called_fiddler.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Monolithic Repositories with Composer and Relative Autoloading" href="../../../2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html" /><link rel="prev" title="Composer Monorepo Plugin (previously called Fiddler)" href="../../05/28/composer_monorepo_plugin_previously_called_fiddler.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -75,35 +75,35 @@ Wordpress and Composer.</p>
 <div class="section" id="initialize-repository">
 <h2>Initialize Repository</h2>
 <p>As a first step, create a new directory and git repository for your blog:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ mkdir myblog
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkdir myblog
 $ cd myblog
 $ git init
 </pre></div>
 </div>
 <p>Create a docroot directory that is publicly available for the webserver:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ mkdir htdocs
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkdir htdocs
 </pre></div>
 </div>
 <p>Place the index.php file in it that delegates to Wordpress (installed later):</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// htdocs/index.php</span>
 <span class="c1">// Front to the WordPress application. This file doesn&#39;t do anything, but loads</span>
 <span class="c1">// wp-blog-header.php which does and tells WordPress to load the theme.</span>
 
 <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_USE_THEMES&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-<span class="k">require</span><span class="p">(</span> <span class="nb">dirname</span><span class="p">(</span> <span class="k">__FILE__</span> <span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/wordpress/wp-blog-header.php&#39;</span> <span class="p">);</span>
+<span class="k">require</span><span class="p">(</span> <span class="nb">dirname</span><span class="p">(</span> <span class="no">__FILE__</span> <span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/wordpress/wp-blog-header.php&#39;</span> <span class="p">);</span>
 </pre></div>
 </div>
 <p>Create the wp-content directory inside the docroot, it will be configured to
 live <em>outside</em> the Wordpress installation.</p>
-<div class="highlight-python"><div class="highlight"><pre>$ mkdir htdocs/wp-content -p
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkdir htdocs/wp-content -p
 </pre></div>
 </div>
 <p>And then create a <cite>.gitignore</cite> file with the following ignore paths:</p>
-<div class="highlight-python"><div class="highlight"><pre>/htdocs/wordpress/
-/htdocs/wp-content/uploads
-/htdocs/wp-content/plugins
-/htdocs/wp-content/themes
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wordpress</span><span class="o">/</span>
+<span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wp</span><span class="o">-</span><span class="n">content</span><span class="o">/</span><span class="n">uploads</span>
+<span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wp</span><span class="o">-</span><span class="n">content</span><span class="o">/</span><span class="n">plugins</span>
+<span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wp</span><span class="o">-</span><span class="n">content</span><span class="o">/</span><span class="n">themes</span>
 </pre></div>
 </div>
 <p>If you want to add a custom theme or plugin you need to use <cite>git add -f</cite> to
@@ -111,7 +111,7 @@ force the ignored path into Git.</p>
 <p>Don&#8217;t forget to include the uploads directory in your backup, when deploying
 this blog to production.</p>
 <p>You directory tree should now look like this:</p>
-<div class="highlight-python"><div class="highlight"><pre>.
+<div class="highlight-default"><div class="highlight"><pre><span></span>.
 ├── .git
 ├── .gitignore
 └── htdocs
@@ -128,7 +128,7 @@ themes on Wordpress.org available through Composer. To utilize this work we
 create a composer.json file inside our repository root. There the file is
 outside of the webservers reach, users of your blog cannot download the
 composer.json.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;ext-gd&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
         <span class="s2">&quot;wpackagist-plugin/easy-media-gallery&quot;</span><span class="p">:</span> <span class="s2">&quot;1.3.*&quot;</span><span class="p">,</span>
@@ -158,7 +158,7 @@ Wordpress Core and all plugins in the correct directories. As you can see we
 put core into <cite>htdocs/wordpress</cite> and plugins into <cite>htdocs/wp-content/plugins</cite>.</p>
 <p>Now run the Composer install command to see the intallation output similar
 to the next excerpt:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ composer install
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ composer install
 Loading composer repositories with package information
 Installing dependencies (including require-dev)
   - Installing composer/installers (v1.0.23)
@@ -186,16 +186,16 @@ will create the neccessary database tables and give you <cite>wp-config.php</cit
 to download. Copy this file to <cite>htdocs/wp-config.php</cite> and modify it slightly,
 it is necessary to adjust the <span class="docutils literal"><span class="pre">WP_CONTENT_DIR</span></span>, <span class="docutils literal"><span class="pre">WP_CONTENT_URL</span></span> and
 <span class="docutils literal"><span class="pre">ABSPATH</span></span> constants:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="c1">// generated contents of wp-config.php, salts, database and so on</span>
 
-<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_CONTENT_DIR&#39;</span><span class="p">,</span>    <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/wp-content&#39;</span><span class="p">);</span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_CONTENT_DIR&#39;</span><span class="p">,</span>    <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/wp-content&#39;</span><span class="p">);</span>
 <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_CONTENT_URL&#39;</span><span class="p">,</span>    <span class="nx">WP_HOME</span> <span class="o">.</span> <span class="s1">&#39;/wp-content&#39;</span><span class="p">);</span>
 
 <span class="sd">/** Absolute path to the WordPress directory. */</span>
 <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;ABSPATH&#39;</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;ABSPATH&#39;</span><span class="p">,</span> <span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/wordpress&#39;</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;ABSPATH&#39;</span><span class="p">,</span> <span class="nb">dirname</span><span class="p">(</span><span class="no">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/wordpress&#39;</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="sd">/** Sets up WordPress vars and included files. */</span>
@@ -223,13 +223,13 @@ exporting and importing a MySQL dump.</p>
 <p>For development I rely on the built-in PHP Webserver that is available since
 PHP 5.4 with a custom router-script (I found this on a blog a long time ago,
 but cannot find the source anymore):</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">//htdocs/router.php</span>
 
 <span class="nv">$root</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;DOCUMENT_ROOT&#39;</span><span class="p">];</span>
 <span class="nb">chdir</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
 <span class="nv">$path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nb">ltrim</span><span class="p">(</span><span class="nb">parse_url</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">])[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
-<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">get_include_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="nx">__DIR__</span><span class="p">);</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">get_include_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="no">__DIR__</span><span class="p">);</span>
 
 <span class="k">if</span><span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$root</span><span class="o">.</span><span class="nv">$path</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!==</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="p">{</span>
@@ -250,7 +250,7 @@ but cannot find the source anymore):</p>
 <p>To make your blog run flawlessly on your dev machine, open up
 <span class="docutils literal"><span class="pre">htdocs/wp-config.php</span></span> and add the following if statement to rewrite
 <span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> config variables:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// htdocs/wp-config.php</span>
 
 <span class="c1">// ... salts, DB user, password etc.</span>
@@ -270,7 +270,7 @@ but cannot find the source anymore):</p>
 </div>
 <p>You can now run your Wordpress blog locally using the following command-line
 arguments:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 -t htdocs/ htdocs/router.php
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ php -S localhost:8000 -t htdocs/ htdocs/router.php
 </pre></div>
 </div>
 <p>Keep this command running and visit <cite>localhost:8000</cite>.</p>

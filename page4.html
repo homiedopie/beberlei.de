@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page5.html" /><link rel="prev" title="Newer" href="page3.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page5.html" /><link rel="prev" title="Newer" href="page3.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -113,7 +113,7 @@ Servers both written in PHP. You can use the non-WSDL mode to expose an object
 from the server and use a non-wsdl client to talk to it. The PHP <span class="docutils literal"><span class="pre">SOAPClient</span></span>
 and <span class="docutils literal"><span class="pre">SOAPServer</span></span> have a common exchange format that is used in this case
 and replaces WSDL entirely.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// server.php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
@@ -134,7 +134,7 @@ and replaces WSDL entirely.</p>
 </pre></div>
 </div>
 <p>The client is as simple as the following lines of code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// client.php</span>
 <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">'uri'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/namespace'</span><span class="p">,</span>
@@ -175,7 +175,7 @@ the client only sees “Internal Server Error” messages.</li>
 </ol>
 <p>You can easily solve the <span class="docutils literal"><span class="pre">SOAPFault</span></span> problem by decorating your service with an exception handler,
 and also logging the errors yourself.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">SoapExceptionHandler</span>
 <span class="p">{</span>
@@ -185,12 +185,12 @@ and also logging the errors yourself.</p>
 
     <span class="k">private</span> <span class="nv">$service</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span> <span class="o">=</span> <span class="nv">$service</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">try</span> <span class="p">{</span>
             <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span>
@@ -231,7 +231,7 @@ from code.</p>
 you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
 By default it uses the docblocks <span class="docutils literal"><span class="pre">@param</span></span> and <span class="docutils literal"><span class="pre">@return</span></span> to generate
 the correct WSDL for a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">'MyService'</span><span class="p">)</span>
              <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">'http://server/namespace'</span><span class="p">)</span> <span class="c1">// same as server 'uri'</span>
@@ -244,7 +244,7 @@ the correct WSDL for a service:</p>
 <p>You can now place that WSDL file in any public location and then point both
 <span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> at the file using the first constructor
 argument:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 </pre></div>
@@ -268,7 +268,7 @@ which are used by default.</p>
 a little to adjust for correct namespace generation and code-style adjustments,
 but it works quite well by default. Here is an example of a generated class
 for the DHL Intraship SOAP API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">DHL\Intraship</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ComplexType</span>
@@ -312,7 +312,7 @@ for the DHL Intraship SOAP API:</p>
 </div>
 <p>The next thing you can generate is a classmap, that maps every WSDL Type to
 your newly generated code, in the above example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">'classmap'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
@@ -344,14 +344,14 @@ class in Zend Framework 2. It has no external dependencies, so you can just
 copy it into your project if you want.</p>
 <p>To generate a WSDL for document/literal mode, use the following methods
 on Zend Autodiscovery:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'style'</span> <span class="o">=&gt;</span> <span class="s1">'document'</span><span class="p">))</span>
              <span class="o">-&gt;</span><span class="na">setOperationStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'use'</span> <span class="o">=&gt;</span> <span class="s1">'literal'</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>Then use the wrapper like such:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -376,7 +376,7 @@ certainly want to Integration test your clients and servers.</p>
 <p>You can do that in PHPUnit by using a client, that wraps a Server directly
 and doesn’t require a Webserver. Zend Framework 2 already has such an object,
 named <cite>ZendSoapClientLocal</cite>. Its usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -455,7 +455,7 @@ functionalities and I am releasing a new version 2.0 of Assert today.</p>
 a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
 and then all the assertions you want to call on that value.</p>
 <p>Here are some examples:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
@@ -471,7 +471,7 @@ the user only exactly one error message. Because every assertion fails
 with an Exception, there was no way to execute multiple assertions and
 collect the errors. This has changed with the new lazy assertion API,
 that is similar to the Fluent API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nx">\Assert\lazy</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
@@ -484,10 +484,10 @@ that you know how to differentiate the errors afterwards.</p>
 <p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
 <span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
 <span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
-<div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
-1) foo: Value "10" expected to be string, type integer given.
-2) bar: Value "&lt;NULL&gt;" is empty, but non empty value was expected.
-3) baz: Value "string" is not an array.
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">The</span> <span class="n">following</span> <span class="mi">3</span> <span class="n">assertions</span> <span class="n">failed</span><span class="p">:</span>
+<span class="mi">1</span><span class="p">)</span> <span class="n">foo</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"10"</span> <span class="n">expected</span> <span class="n">to</span> <span class="n">be</span> <span class="n">string</span><span class="p">,</span> <span class="nb">type</span> <span class="n">integer</span> <span class="n">given</span><span class="o">.</span>
+<span class="mi">2</span><span class="p">)</span> <span class="n">bar</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"&lt;NULL&gt;"</span> <span class="ow">is</span> <span class="n">empty</span><span class="p">,</span> <span class="n">but</span> <span class="n">non</span> <span class="n">empty</span> <span class="n">value</span> <span class="n">was</span> <span class="n">expected</span><span class="o">.</span>
+<span class="mi">3</span><span class="p">)</span> <span class="n">baz</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"string"</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">array</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
@@ -499,7 +499,7 @@ useable for the frontend.</p>
 <p>In version 1.0 Assert did not have default error messages when failures
 occured. This has changed and now every assertion has a default failure
 message, as well as access to the value and constraints of an exception:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
 
@@ -612,7 +612,7 @@ being rolled out for some days/weeks. Doctrine requires the database to look
 exactly like the metadata specifies it.</p>
 <p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
 easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
@@ -622,7 +622,7 @@ easily:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
     <span class="p">}</span>
@@ -716,14 +716,14 @@ compared to Puppet modules + DSL.</p>
 <p>For demonstration I have converted the puppet examples from my blog post on
 Puppet to Ansible.  To start we have to create a folder and create a new file
 <cite>inventory</cite> in it containing our local machine:</p>
-<div class="highlight-python"><div class="highlight"><pre>localhost   ansible_connection=local
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">localhost</span>   <span class="n">ansible_connection</span><span class="o">=</span><span class="n">local</span>
 </pre></div>
 </div>
 <p>This is necessary to convince the remote task execution part of Ansible that
 localhost exists and there is no SSH necessary to get into that machine.</p>
 <p>Now I can create playbooks for the different tools I might want to install and
 setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre>---
+<div class="highlight-default"><div class="highlight"><pre><span/>---
 - hosts: localhost
   tasks:
     - name: Install VIM
@@ -751,7 +751,7 @@ puppet you try to make those tasks idempotent through flags such as <cite>create
 signaling when a task needs to be or was already executed. I can optionally
 use sudo to run commands such as installing packages.</p>
 <p>To execute the playbook I call:</p>
-<div class="highlight-python"><div class="highlight"><pre>$&gt; ansible-playbook -K -i inventory vim.yml
+<div class="highlight-default"><div class="highlight"><pre><span/>$&gt; ansible-playbook -K -i inventory vim.yml
 </pre></div>
 </div>
 <p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the

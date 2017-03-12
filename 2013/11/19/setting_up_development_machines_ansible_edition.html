@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" /><link rel="prev" title="Feature Flags and Doctrine Entities" href="../../12/05/feature_flags_and_doctrine_entities.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" /><link rel="prev" title="Feature Flags and Doctrine Entities" href="../../12/05/feature_flags_and_doctrine_entities.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -103,14 +103,14 @@ compared to Puppet modules + DSL.</p>
 <p>For demonstration I have converted the puppet examples from my blog post on
 Puppet to Ansible.  To start we have to create a folder and create a new file
 <cite>inventory</cite> in it containing our local machine:</p>
-<div class="highlight-python"><div class="highlight"><pre>localhost   ansible_connection=local
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">localhost</span>   <span class="n">ansible_connection</span><span class="o">=</span><span class="n">local</span>
 </pre></div>
 </div>
 <p>This is necessary to convince the remote task execution part of Ansible that
 localhost exists and there is no SSH necessary to get into that machine.</p>
 <p>Now I can create playbooks for the different tools I might want to install and
 setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre>---
+<div class="highlight-default"><div class="highlight"><pre><span></span>---
 - hosts: localhost
   tasks:
     - name: Install VIM
@@ -138,7 +138,7 @@ puppet you try to make those tasks idempotent through flags such as <cite>create
 signaling when a task needs to be or was already executed. I can optionally
 use sudo to run commands such as installing packages.</p>
 <p>To execute the playbook I call:</p>
-<div class="highlight-python"><div class="highlight"><pre>$&gt; ansible-playbook -K -i inventory vim.yml
+<div class="highlight-default"><div class="highlight"><pre><span></span>$&gt; ansible-playbook -K -i inventory vim.yml
 </pre></div>
 </div>
 <p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the

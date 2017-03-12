@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Babysteps with Fortrabbit PHP Cloud" href="../../10/27/babysteps_with_fortrabbit_php_cloud.html" /><link rel="prev" title="Doctrine and SOLID" href="../../../2013/02/04/doctrine_and_solid.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Babysteps with Fortrabbit PHP Cloud" href="../../10/27/babysteps_with_fortrabbit_php_cloud.html" /><link rel="prev" title="Doctrine and SOLID" href="../../../2013/02/04/doctrine_and_solid.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -89,7 +89,7 @@ to the document root.</p>
 currently running version and you don&#8217;t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[config]</span>
 <span class="na">command</span> <span class="o">=</span> <span class="s">&quot;D:\Program Files (x86)\PHP\v5.3\php.exe&quot; build_azure.php</span>
 </pre></div>
 </div>
@@ -98,7 +98,7 @@ name to &#8220;v5.4&#8221;, but I haven&#8217;t tested this.</p>
 <p>Then you need to create the <span class="docutils literal"><span class="pre">build_azure.php</span></span> file that is referenced in the
 deployment command. The actual implementation is up to you, my version is
 the most simple one:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">))</span> <span class="p">{</span>
     <span class="nv">$url</span> <span class="o">=</span> <span class="s1">&#39;https://getcomposer.org/composer.phar&#39;</span><span class="p">;</span>
     <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">&quot;composer.phar&quot;</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>

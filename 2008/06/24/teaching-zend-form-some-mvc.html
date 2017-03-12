@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Overwrite ezcMvcController - A bit more rapid" href="../../11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html" /><link rel="prev" title="Simplifying ZF: Scope of Variables in View and Controller" href="../21/simplifying-zf-scope-of-variables-in-view-and-controller.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Overwrite ezcMvcController - A bit more rapid" href="../../11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html" /><link rel="prev" title="Simplifying ZF: Scope of Variables in View and Controller" href="../21/simplifying-zf-scope-of-variables-in-view-and-controller.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -87,7 +87,7 @@ array_merge() solution is not the correct way of how this snippet
 should work. Any merge operation of the messages and errors has to be on
 a field key level, which is not currently done.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_Form_Mvc extends Zend_Form
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class WW_Form_Mvc extends Zend_Form
 {
     protected $model = null;
 
@@ -161,7 +161,7 @@ a field key level, which is not currently done.</p>
 loading of decorators in the Constructor and additionally allow to
 pass a Model to the constructor as second argument:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_Form_Mvc
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class WW_Form_Mvc
 {
     protected $model = null;
 
@@ -196,7 +196,7 @@ displaying of the form</strong>. For each different style of form
 displaying, we can generate different helpers. For example a helper
 that would only apply the default decorators would look like this:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WW_View_Helper_FormDefault
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class WW_View_Helper_FormDefault
 {
     /**
      * Load only default decorators on this Zend_Form object
@@ -219,7 +219,7 @@ $this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
 controller action that implements this form and we will see that it
 does not look different from what we would have done before:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>function formAction()
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>function formAction()
 {
     $model = new SomeModel();
 

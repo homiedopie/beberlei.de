@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page10.html" /><link rel="prev" title="Newer" href="page8.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page10.html" /><link rel="prev" title="Newer" href="page8.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -94,7 +94,7 @@ actual storage. Something that object-orientation was suppose to avoid.</p>
 of every task that is performed in an application and add a method that
 changes all the affected fields at once, to perform this task. In the famous
 blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">compose</span><span class="p">(</span><span class="nv">$headline</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$tags</span><span class="p">)</span>
@@ -131,7 +131,7 @@ not worth the trouble anymore.</p>
 models directly in the view or for testing purposes. There is another way
 to get rid of all the getters that you don’t need explicitly in a domain
 model, using the visitor pattern in combination with view models:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nx">PostView</span> <span class="nv">$view</span><span class="p">)</span>
@@ -182,7 +182,7 @@ kind of form framework on entities is a huge no go anyways.</p>
 <p>Both tasks allow only a subset of the properties to be modified. For each of
 these tasks we need a custom form “model”. Think of these models as command
 objects:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">EditPostCommand</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
@@ -195,7 +195,7 @@ objects:</p>
 <p>In our application we could attach these form models to our form framework and
 then pass these as commands into our “real model” through a service layer,
 <a class="reference external" href="http://www.eaipatterns.com/MessageBus.html">message bus</a> or something equivalent:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">PostController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
@@ -297,11 +297,11 @@ mess</a></li>
 the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-python"><div class="highlight"><pre>Command-Query-Separation states that every method should either be a
-command that performs an action, or a query that returns data to the
-caller, but not both. In other words, asking a question should not change
-the answer. More formally, methods should return a value only if they are
-referentially transparent and hence possess no side effects.
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Command</span><span class="o">-</span><span class="n">Query</span><span class="o">-</span><span class="n">Separation</span> <span class="n">states</span> <span class="n">that</span> <span class="n">every</span> <span class="n">method</span> <span class="n">should</span> <span class="n">either</span> <span class="n">be</span> <span class="n">a</span>
+<span class="n">command</span> <span class="n">that</span> <span class="n">performs</span> <span class="n">an</span> <span class="n">action</span><span class="p">,</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">query</span> <span class="n">that</span> <span class="n">returns</span> <span class="n">data</span> <span class="n">to</span> <span class="n">the</span>
+<span class="n">caller</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="n">both</span><span class="o">.</span> <span class="n">In</span> <span class="n">other</span> <span class="n">words</span><span class="p">,</span> <span class="n">asking</span> <span class="n">a</span> <span class="n">question</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">change</span>
+<span class="n">the</span> <span class="n">answer</span><span class="o">.</span> <span class="n">More</span> <span class="n">formally</span><span class="p">,</span> <span class="n">methods</span> <span class="n">should</span> <span class="k">return</span> <span class="n">a</span> <span class="n">value</span> <span class="n">only</span> <span class="k">if</span> <span class="n">they</span> <span class="n">are</span>
+<span class="n">referentially</span> <span class="n">transparent</span> <span class="ow">and</span> <span class="n">hence</span> <span class="n">possess</span> <span class="n">no</span> <span class="n">side</span> <span class="n">effects</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>CQRS is an OOP architecture design pattern building on that imperative
@@ -368,7 +368,7 @@ route a command to its appropriate command handler.</p>
 <h2>Example</h2>
 <p>Here is the most simple implementation of the Command Bus, just holds a hash map
 mapping command class names to command handlers:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Handler</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
@@ -391,7 +391,7 @@ mapping command class names to command handlers:</p>
 <p>In your code you would always pass Commands to the bus. That way the command
 bus is a central entry point to any write operation. With this we can rewrite the
 TransferMoney service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">TransferMoneyCommand</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -426,7 +426,7 @@ oriented.</p>
 </ul>
 <p>The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
@@ -541,7 +541,7 @@ or by building two traits. I will go down the route with traits, to show
 one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">trait</span> <span class="nx">TransferMoneySource</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
@@ -566,7 +566,7 @@ here. The <span class="docutils literal"><span class="pre">withdraw</span></span
 dumb as possible, so that their implementation does not cause any side-effects
 on the execution of this use-case.</p>
 <p>The bank account would then be modified to look:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
@@ -574,7 +574,7 @@ on the execution of this use-case.</p>
 
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="p">}</span>
@@ -601,13 +601,13 @@ have to know about how to bind roles to data, you could use GUIDs in your
 application and fetch all objects from one data store. Another way would be to
 implement data access objects for roles, that then know how to retrieve their
 corresponding data.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransfer</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
     <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
@@ -631,7 +631,7 @@ implications.</p>
 traits.</p>
 </div>
 <p>Here is an example of how the bank application service could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
@@ -748,12 +748,12 @@ throughout all blog posts, the usual Bank Account/Money Transfer. The use case
 is the money transfer from one bank account (source) to another one
 (destination).</p>
 <p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="p">}</span>
@@ -774,7 +774,7 @@ is the money transfer from one bank account (source) to another one
 functionality. The Money object implementation is omitted here.</p>
 <p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -809,7 +809,7 @@ php objects (so called data-transfer objects, DTO).</p>
 source and destination account entities from some storage subsystem. To follow the EBI
 design pattern, we have to decouple this data access object from the model,
 by offering a port (Interface):</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
@@ -821,7 +821,7 @@ by offering a port (Interface):</p>
 the bank account sample. We need to wrap the whole MoneyTransfer use-case in
 a transaction. Lets say the invocation of our Use-Case is controlled through
 some kind of application boundary object:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
@@ -860,7 +860,7 @@ that transforms the request and response and also handles transactions and
 such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
 <p>With context you would do something like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
 
 <span class="c1">// 1. direct invocation</span>
@@ -900,7 +900,7 @@ as you need to map the request objects to your entities.</li>
 mapping API. This way you can make it look as if you would map a DTO onto
 an object, but in this case you are using the Form API as the mapper.</li>
 </ul>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>

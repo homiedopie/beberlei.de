@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Building an Object Model: No setters allowed" href="../22/building_an_object_model__no_setters_allowed.html" /><link rel="prev" title="FrOSCon 2012" href="../26/froscon_2012.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Building an Object Model: No setters allowed" href="../22/building_an_object_model__no_setters_allowed.html" /><link rel="prev" title="FrOSCon 2012" href="../26/froscon_2012.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -97,14 +97,14 @@ mailer and so on. We could inject the authentication and account generation
 services into the Import Service, but with rising complexity this will lead to
 a lasagna of services and the execution path will dig deep into this and this
 is not nearly as tasty as eating real lasagna.</p>
-<div class="highlight-python"><div class="highlight"><pre>ImportService
-|_AuthenticationService
-| |_Mailer
-| |_Database
-|_AccountGenerationService
-| |_Database
-| \_RemoteFacade
-\_Database
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ImportService</span>
+<span class="o">|</span><span class="n">_AuthenticationService</span>
+<span class="o">|</span> <span class="o">|</span><span class="n">_Mailer</span>
+<span class="o">|</span> <span class="o">|</span><span class="n">_Database</span>
+<span class="o">|</span><span class="n">_AccountGenerationService</span>
+<span class="o">|</span> <span class="o">|</span><span class="n">_Database</span>
+<span class="o">|</span> \<span class="n">_RemoteFacade</span>
+\<span class="n">_Database</span>
 </pre></div>
 </div>
 <p>This becomes more complicated when transaction semantics need to be taken care
@@ -113,16 +113,16 @@ have to take into account that the code in entities and value objects
 participating in this use-case.</p>
 <p>What we want instead is a sequential execution of those nested services, but
 only if the parent service executed successfully:</p>
-<div class="highlight-python"><div class="highlight"><pre>ImportService
-\_Database
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ImportService</span>
+\<span class="n">_Database</span>
 
-AuthenticationService
-|_Mailer
-\_Database
+<span class="n">AuthenticationService</span>
+<span class="o">|</span><span class="n">_Mailer</span>
+\<span class="n">_Database</span>
 
-AccountGenerationService
-|_Database
-\_RemoteFacade
+<span class="n">AccountGenerationService</span>
+<span class="o">|</span><span class="n">_Database</span>
+\<span class="n">_RemoteFacade</span>
 </pre></div>
 </div>
 <p>We could use an event dispatcher in all of the services to notify each other,
@@ -133,7 +133,7 @@ is committed and an hence an operation is completed successfully, we take all
 the events emitted from all entities (looking at the identity map for example)
 and trigger observing event handlers. However if the operation fails, we do not
 trigger these event handlers.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
 <span class="p">{</span>
@@ -159,7 +159,7 @@ trigger these event handlers.</p>
 </div>
 <p>The Event provider trait aggregates all the events, and offers
 and API for external services to pull them from the entity:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">trait</span> <span class="nx">EventProvider</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>

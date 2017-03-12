@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Integrate Symfony and Webpack" href="../../02/26/integrate_symfony_and_webpack.html" /><link rel="prev" title="The ContainerTest" href="../../06/12/the_containertest.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Integrate Symfony and Webpack" href="../../02/26/integrate_symfony_and_webpack.html" /><link rel="prev" title="The ContainerTest" href="../../06/12/the_containertest.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -189,7 +189,7 @@ dependencies.</p>
 <p>Say you have three packages in your application, Library_1, Project_A
 and Project_B and both projects depend on the library which in turn depends
 on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
-<div class="highlight-python"><div class="highlight"><pre>projects
+<div class="highlight-default"><div class="highlight"><pre><span></span>projects
 ├── components
 │   ├── Project_A
 │   │   └── fiddler.json
@@ -201,21 +201,21 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Library1</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;src/&quot;</span><span class="p">}},</span>
     <span class="s2">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;vendor/symfony/dependency-injection&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ProjectA</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;src/&quot;</span><span class="p">}},</span>
     <span class="s2">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;components/Library_1&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;symfony/dependency-injection&quot;</span><span class="p">:</span> <span class="s2">&quot;~2.6&quot;</span>
     <span class="p">}</span>
@@ -229,7 +229,7 @@ together. Dropping the need for explicit versions when specifying internal
 dependencies.</p>
 <p>With this setup you can now generate the autoloading files for each package
 exactly like Composer would by calling:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php fiddler.phar build
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ php fiddler.phar build
 Building fiddler.json projects.
  [Build] components/Library_1
  [Build] components/Project_A
@@ -239,7 +239,7 @@ Building fiddler.json projects.
 <p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">&quot;vendor/autoload.php&quot;;</span></span> and it loads an
 autoloader with all the dependencies specified for each component, for example
 in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">require_once</span> <span class="s2">&quot;vendor/autoload.php&quot;</span><span class="p">;</span>
 

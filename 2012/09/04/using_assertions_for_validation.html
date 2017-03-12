@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Symfony, Monolog and different log types" href="../../08/26/symfony__monolog_and_different_log_types.html" /><link rel="prev" title="A tent.io app: Zelten Bookmarks" href="../../10/22/a_tent_io_app__zelten_bookmarks.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Symfony, Monolog and different log types" href="../../08/26/symfony__monolog_and_different_log_types.html" /><link rel="prev" title="A tent.io app: Zelten Bookmarks" href="../../10/22/a_tent_io_app__zelten_bookmarks.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -71,7 +71,7 @@ cluttering the whole code-base.</p>
 <p>Take <a class="reference external" href="http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935">this example</a> from
 the old deprecated Windows Azure SDK, a method for putting a binary file into
 Azures blob storage:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
@@ -103,7 +103,7 @@ and almost take up half the screen without even getting to the actual code.</p>
 <p>The assertion pattern is really helpful here to reduce the complexity of this
 code and hide the <span class="docutils literal"><span class="pre">if/throw</span></span> conditions into little helper methods. Have a
 look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="s1">&#39;Container name is not specified&#39;</span><span class="p">);</span>
@@ -126,7 +126,7 @@ unit-tested.</p>
 <p>That is why you should extend from <span class="docutils literal"><span class="pre">Assertion</span></span> and use your own class when
 using the Assert library. This returns some control in your hands and even
 allows you to overwrite the exception class:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Util</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Assert\Assertion</span> <span class="k">as</span> <span class="nx">BaseAssertion</span><span class="p">;</span>

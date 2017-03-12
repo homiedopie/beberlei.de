@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page24.html" /><link rel="prev" title="Newer" href="page22.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page24.html" /><link rel="prev" title="Newer" href="page22.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -64,7 +64,7 @@
             <h1><a href="2008/01/28/linux-style-mysql-shell-prompt.html">Linux style MySQL Shell prompt</a></h1>
 <dl class="docutils">
 <dt>Just add the following to the [mysql] section in your .my.cnf file:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre>prompt=\u@\h [\d]&gt;\
+<dd><div class="first last highlight-default"><div class="highlight"><pre><span/><span class="n">prompt</span><span class="o">=</span>\<span class="n">u</span><span class="o">@</span>\<span class="n">h</span> <span class="p">[</span>\<span class="n">d</span><span class="p">]</span><span class="o">&gt;</span>\
 </pre></div>
 </div>
 </dd>
@@ -138,11 +138,11 @@ playing. I will elaborate on that soon.</p>
 <p>Using Zend_View for your site and want to implement an RSS Feed? You
 might run into the problem that the XML header definition is interpreted
 as PHP code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">"1.0"</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="cp">?&gt;</span><span class="x"/>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">"1.0"</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="cp">?&gt;</span><span class="x"/>
 </pre></div>
 </div>
 <p>Before you start cursing the world try this (rather obvious) workaround:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="s1">'&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;'</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"/>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="s1">'&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;'</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"/>
 </pre></div>
 </div>
 
@@ -176,7 +176,7 @@ autoload paths too.</p>
 a config File using the Zend_Config class, and completely frees you of
 thinking about includes.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class WWLoader extends Zend_Loader
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WWLoader extends Zend_Loader
 {
     private static $dirs = NULL;
 
@@ -232,12 +232,12 @@ thinking about includes.</p>
 <p>ZEND_CONFIG_PATH is the only constant I use in my application. I
 initialize the following at the beginning of my bootstrap file:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>define('ZEND_CONFIG_PATH', dirname(__FILE__)."/../application/config/");
+<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="n">define</span><span class="p">(</span><span class="s1">'ZEND_CONFIG_PATH'</span><span class="p">,</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s2">"/../application/config/"</span><span class="p">);</span>
 
-require_once 'Zend/Loader.php';
-require_once dirname(__FILE__).'/../application/include/WWLoader.php';
-Zend_Loader::registerAutoload();
-Zend_Loader::registerAutoload('WWLoader');
+<span class="n">require_once</span> <span class="s1">'Zend/Loader.php'</span><span class="p">;</span>
+<span class="n">require_once</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s1">'/../application/include/WWLoader.php'</span><span class="p">;</span>
+<span class="n">Zend_Loader</span><span class="p">::</span><span class="n">registerAutoload</span><span class="p">();</span>
+<span class="n">Zend_Loader</span><span class="p">::</span><span class="n">registerAutoload</span><span class="p">(</span><span class="s1">'WWLoader'</span><span class="p">);</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -269,7 +269,7 @@ errors</a>
 due to missing modules or actions is wrong. It is not enough to replace
 Zend::loadClass with Zend_Loader::loadClass. Other functions have been
 renamed, my current snippet is:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">/**</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">/**</span>
 <span class="x"> * Original Snippet from: http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework</span>
 <span class="x"> */</span>
 <span class="x">    class NoroutePlugin extends Zend_Controller_Plugin_Abstract</span>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="next" title="Older" href="page6.html" /><link rel="prev" title="Newer" href="page4.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page6.html" /><link rel="prev" title="Newer" href="page4.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/disqus.js"></script></head>
@@ -97,7 +97,7 @@ In this example we could create two entities <span class="docutils literal"><spa
 </ol>
 <p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
 <p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
 
 <span class="k">namespace</span> <span class="nx">MyProject\UserBundle\Entity</span><span class="p">;</span>
@@ -124,7 +124,7 @@ In this example we could create two entities <span class="docutils literal"><spa
 on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
 <p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
 correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
 
 <span class="k">namespace</span> <span class="nx">MyProject\ShopBundle\Entity</span><span class="p">;</span>
@@ -225,7 +225,7 @@ NFS share. I actually tried this before, but since I forgot the log directory,
 this felt equally slow and I reverted the change.</p>
 <p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
 considerable performance boost on a Vagrant box:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
 <span class="p">{</span>
@@ -302,7 +302,7 @@ is about finding a maintainable solution to handle them.</p>
 <p>As a practical example I will pick the classical user registration example,
 starting with a service-layer that implements the cross-cutting
 concerns inside the service method:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserService</span>
 <span class="p">{</span>
@@ -343,7 +343,7 @@ can already see this leads to lots of spagetti-code.</p>
 into their own services. This requires to introduce an interface for <span class="docutils literal"><span class="pre">UserService</span></span>
 and then building decorators for the different concerns. Then the service
 can be built as a decorator chain:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$userService</span> <span class="o">=</span>
     <span class="k">new</span> <span class="nx">LogUserService</span><span class="p">(</span>
@@ -372,7 +372,7 @@ to registered services, we add all the cross-cutting concerns our application
 needs. Note: This is <strong>deliberatly written without further abstraction</strong>, just
 to show the concept. The real thing would propably seperate the
 responsibilities from each other.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">CommandDispatcher</span>
 <span class="p">{</span>
@@ -416,7 +416,7 @@ that when they send emails, those only get send when the transaction was
 successful. It checks if the user has the correct access
 controls/authentication and performs some generic logging.</p>
 <p>And using the dispatcher in your code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
 <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">'user'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
 
@@ -438,7 +438,7 @@ adding a new method or service.</p>
 you actually call methods on the service-layer.</p>
 <p>There are two ways to make this call nicer. The first is use magic <span class="docutils literal"><span class="pre">__call</span></span> and some
 clever duck-typing to create an API similar to this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
 <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">'user'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
@@ -448,7 +448,7 @@ clever duck-typing to create an API similar to this:</p>
 </div>
 <p>The second approach does not require magic <span class="docutils literal"><span class="pre">__call</span></span>, but requires you to write a class for each
 command. We map the command class name to a callback:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$userService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">();</span>
 
@@ -556,7 +556,7 @@ but you can try the full code by checking out <a class="reference external" href
 <span class="docutils literal"><span class="pre">composer</span> <span class="pre">install</span></span> and then <span class="docutils literal"><span class="pre">php</span> <span class="pre">domain_events.php</span></span>.</p>
 <p>Lets look at the following entity, an <span class="docutils literal"><span class="pre">InventoryItem</span></span> tracking the number
 we have this item in stock:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Domain</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
@@ -580,7 +580,7 @@ we have this item in stock:</p>
 <span class="sd">     */</span>
     <span class="k">private</span> <span class="nv">$counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="s1">'InventoryItemCreated'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">));</span>
@@ -596,7 +596,7 @@ we have this item in stock:</p>
 </div>
 <p>We want this entity to raise two domain events using the <span class="docutils literal"><span class="pre">raise($eventName,</span>
 <span class="pre">array</span> <span class="pre">$properties)</span></span> method.  Our preferred use case for this code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$item</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InventoryItem</span><span class="p">(</span><span class="s1">'Cookies'</span><span class="p">);</span>
 <span class="nv">$item</span><span class="o">-&gt;</span><span class="na">checkIn</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 
@@ -605,7 +605,7 @@ we have this item in stock:</p>
 </pre></div>
 </div>
 <p>One or many listeners should react to the events being fired, for example print their contents to the screen:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">EchoInventoryListener</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">onInventoryItemCreated</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
@@ -622,7 +622,7 @@ we have this item in stock:</p>
 </div>
 <p>As the first building block, we need a <a class="reference external" href="http://martinfowler.com/eaaCatalog/layerSupertype.html">Layer Supertype</a> for our entities,
 called <span class="docutils literal"><span class="pre">AggregateRoot</span></span> adding the event raising capabilities to all entities that need it:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainSuperTypes</span><span class="p">;</span>
 
 <span class="k">abstract</span> <span class="k">class</span> <span class="nc">AggregateRoot</span>
@@ -653,7 +653,7 @@ of the domain events pattern, because it guarantees every listener that the
 state leading to the event is already in the database.</p>
 <p>Technically we implement this with a Doctrine EventListener that listeners for
 the <span class="docutils literal"><span class="pre">postFlush</span></span>, <span class="docutils literal"><span class="pre">postPersist</span></span>, <span class="docutils literal"><span class="pre">postUpdate</span></span> and <span class="docutils literal"><span class="pre">postRemove</span></span> events:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainEvents</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
@@ -708,7 +708,7 @@ the <span class="docutils literal"><span class="pre">postFlush</span></span>, <s
 </pre></div>
 </div>
 <p>Now we only need to put this code together with Doctrine to get it working:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$evm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">();</span>
 <span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">addEventListener</span><span class="p">(</span>
     <span class="k">array</span><span class="p">(</span><span class="s1">'postInsert'</span><span class="p">,</span> <span class="s1">'postUpdate'</span><span class="p">,</span> <span class="s1">'postRemove'</span><span class="p">,</span> <span class="s1">'postFlush'</span><span class="p">),</span>
@@ -770,7 +770,7 @@ less to write. But less to write is not necessarily true.</p>
 <h2>The problem: Injecting tons of services</h2>
 <p>The Symfony controller base class uses quite a lot of services, if
 you need them in your controller as a service, you have to inject them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
@@ -807,13 +807,13 @@ or just use the <span class="docutils literal"><span class="pre">ContainerAware<
 <h2>The solution: Introduce a Utilities Service</h2>
 <p>To avoid the mentioned problems with controller as a service, introduce a
 controller utilities service and register it as <span class="docutils literal"><span class="pre">controller_utils</span></span> service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">ControllerUtils</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$container</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
     <span class="p">}</span>
@@ -835,7 +835,7 @@ controller utilities service and register it as <span class="docutils literal"><
 <span class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></span> all the methods you
 need.</p>
 <p>Then you can simplify the controller as a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>

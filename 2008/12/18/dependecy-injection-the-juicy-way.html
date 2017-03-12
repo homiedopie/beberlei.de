@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="ezComponents View Handler for Zend_Pdf" href="../03/ezcomponents-view-handler-for-zend-pdf.html" /><link rel="prev" title="Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill" href="../01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="ezComponents View Handler for Zend_Pdf" href="../03/ezcomponents-view-handler-for-zend-pdf.html" /><link rel="prev" title="Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill" href="../01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -93,13 +93,13 @@ functionality for PHP and an example would work as follows.</p>
 <p>We first have to implement a <strong>module</strong>, which defines which concrete
 implementation should be injected as a placeholder for which interface.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind(&quot;Service&quot;)-&gt;to(&quot;ConcreteService&quot;);  $b-&gt;bind(&quot;Add&quot;)-&gt;to(&quot;ConcreteAdd&quot;);  $b-&gt;bind(&quot;Sub&quot;)-&gt;to(&quot;ConcreteSub&quot;); }}
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind(&quot;Service&quot;)-&gt;to(&quot;ConcreteService&quot;);  $b-&gt;bind(&quot;Add&quot;)-&gt;to(&quot;ConcreteAdd&quot;);  $b-&gt;bind(&quot;Sub&quot;)-&gt;to(&quot;ConcreteSub&quot;); }}
 </pre></div>
 </div>
 </div></blockquote>
 <p>We can now use this module to instantiate an injector object:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance(&quot;Service&quot;);
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance(&quot;Service&quot;);
 </pre></div>
 </div>
 </div></blockquote>

@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Finally: Zend_Mail charset and/or long lines header encoding bug fixed" href="../14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html" /><link rel="prev" title="Enums in PHP" href="../../08/31/enums-in-php.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Finally: Zend_Mail charset and/or long lines header encoding bug fixed" href="../14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html" /><link rel="prev" title="Enums in PHP" href="../../08/31/enums-in-php.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -102,7 +102,7 @@ mediator code. This code is very simple and might produce maintenance
 overhead fast, but I propose some refactoring enhancements later in the
 discussion.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>interface WW_Model_AcceptFormRequest
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>interface WW_Model_AcceptFormRequest
 {
     /**
      * Acceept a form request
@@ -154,7 +154,7 @@ internal state. Our BankAccountModel implements the
 <strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
 BankAccount. If found the given amount is withdrawn.</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class BankAccountModel implements WW_Model_AcceptFormRequest {
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class BankAccountModel implements WW_Model_AcceptFormRequest {
     public function acceptFormRequest($values)
     {
         $bankAccount = $this-&gt;getBankAccountBy($values[&#39;bankAccountNumber&#39;], $values[&#39;pin&#39;]);
@@ -194,7 +194,7 @@ displayed again for the client showing the new error message that was
 returned from the model. The controller handling this process would look
 like this:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre>class BankAccountController extends Zend_Controller_Action {
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>class BankAccountController extends Zend_Controller_Action {
     public function performWithdrawlAction() {
         $form = new BankAccountWithdrawlForm(); // extends Zend_Form and builds the form
 

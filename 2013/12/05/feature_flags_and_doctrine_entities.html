@@ -27,13 +27,13 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="next" title="Setting up development machines: Ansible edition" href="../../11/19/setting_up_development_machines_ansible_edition.html" /><link rel="prev" title="2013 and 2014" href="../31/2013_and_2014.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Setting up development machines: Ansible edition" href="../../11/19/setting_up_development_machines_ansible_edition.html" /><link rel="prev" title="2013 and 2014" href="../31/2013_and_2014.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        SOURCELINK_SUFFIX: '',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/disqus.js"></script></head>
@@ -72,7 +72,7 @@ being rolled out for some days/weeks. Doctrine requires the database to look
 exactly like the metadata specifies it.</p>
 <p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
 easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
@@ -82,7 +82,7 @@ easily:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
     <span class="p">}</span>

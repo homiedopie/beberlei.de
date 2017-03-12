@@ -139,7 +139,7 @@ dependencies.</p>
 <p>Say you have three packages in your application, Library_1, Project_A
 and Project_B and both projects depend on the library which in turn depends
 on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
-<div class="highlight-python"><div class="highlight"><pre>projects
+<div class="highlight-default"><div class="highlight"><pre><span/>projects
 ├── components
 │   ├── Project_A
 │   │   └── fiddler.json
@@ -151,21 +151,21 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Library1</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
     <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ProjectA</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
     <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"components/Library_1"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s2">"~2.6"</span>
     <span class="p">}</span>
@@ -179,7 +179,7 @@ together. Dropping the need for explicit versions when specifying internal
 dependencies.</p>
 <p>With this setup you can now generate the autoloading files for each package
 exactly like Composer would by calling:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php fiddler.phar build
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php fiddler.phar build
 Building fiddler.json projects.
  [Build] components/Library_1
  [Build] components/Project_A
@@ -189,7 +189,7 @@ Building fiddler.json projects.
 <p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">"vendor/autoload.php";</span></span> and it loads an
 autoloader with all the dependencies specified for each component, for example
 in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
 
@@ -244,7 +244,7 @@ PHP’s current approach is one of the main benefits of the language.</p>
 <p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
 Code</a> to
 support my case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
@@ -295,16 +295,16 @@ having the right types inside the service:</p>
 <li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
 <li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre>Catchable fatal error: Argument 1 passed to UserService::fetchUsers() must
-be of the type integer, string given, called in /tmp/hints.php on line 22
-and defined in /tmp/hints.php on line 37
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Argument</span> <span class="mi">1</span> <span class="n">passed</span> <span class="n">to</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchUsers</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">given</span><span class="p">,</span> <span class="n">called</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">22</span>
+<span class="ow">and</span> <span class="n">defined</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">37</span>
 
-Catchable fatal error: Return value of UserService::fetchTotalCount() must
-be of the type integer, string returned in /tmp/hints.php on line 48
+<span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Return</span> <span class="n">value</span> <span class="n">of</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchTotalCount</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">returned</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">48</span>
 </pre></div>
 </div>
 <p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function listAction(Request $request)</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">public function listAction(Request $request)</span>
 <span class="x">{</span>
 <span class="x">    $status = (int)$request-&gt;get('status'); // this is a string</span>
 
@@ -316,7 +316,7 @@ be of the type integer, string returned in /tmp/hints.php on line 48
 </pre></div>
 </div>
 <p>and:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function fetchTotalCount(int $status): int</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">public function fetchTotalCount(int $status): int</span>
 <span class="x">{</span>
 <span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
 
@@ -450,7 +450,7 @@ one file”</a>.</p>
 <p>This blog post is about a truely minimal Symfony edition to start learning
 about the framework.  The first thing I like to show is a really simple Hello
 World controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
 
@@ -467,10 +467,10 @@ World controller:</p>
 </div>
 <p>What is the necessary framework glue code to support this Hello World? Lets start
 from the index file <cite>web/index.php</cite>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
 
@@ -481,7 +481,7 @@ from the index file <cite>web/index.php</cite>:</p>
 </div>
 <p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
 at them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">{</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">{</span>
 <span class="x">    "require": {</span>
 <span class="x">        "symfony/symfony": "@stable"</span>
 <span class="x">    },</span>
@@ -495,7 +495,7 @@ at them:</p>
 adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
 <p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
 and the minimal version of this looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
@@ -530,7 +530,7 @@ technically not necessary by using the <span class="docutils literal"><span clas
 component has no such closure loader, so its not possible to avoid
 YAML in the first minutes of Symfony2 exposure and we reference
 the <cite>app/config/routing.yml</cite>:</p>
-<div class="highlight-yaml"><div class="highlight"><pre>hello:
+<div class="highlight-yaml"><div class="highlight"><pre><span/>hello:
   pattern: /
   defaults:
     _controller: "Acme\TrainingBundle\Controller\HelloController::helloAction"
@@ -550,7 +550,7 @@ bitten by that.</li>
 introduces yet another ambiguity.</li>
 </ul>
 <p>Run this application with the build in webserver:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php -S localhost:8000 web/index.php
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php -S localhost:8000 web/index.php
 </pre></div>
 </div>
 <p>Hello World!</p>
@@ -559,7 +559,7 @@ World. To avoid another confusing convention at the beginning, the <span class="
 template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
 that is automatically registered in the Twig Bundle. Just create
 a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
 
@@ -642,7 +642,7 @@ Servers both written in PHP. You can use the non-WSDL mode to expose an object
 from the server and use a non-wsdl client to talk to it. The PHP <span class="docutils literal"><span class="pre">SOAPClient</span></span>
 and <span class="docutils literal"><span class="pre">SOAPServer</span></span> have a common exchange format that is used in this case
 and replaces WSDL entirely.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// server.php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
@@ -663,7 +663,7 @@ and replaces WSDL entirely.</p>
 </pre></div>
 </div>
 <p>The client is as simple as the following lines of code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// client.php</span>
 <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">'uri'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/namespace'</span><span class="p">,</span>
@@ -704,7 +704,7 @@ the client only sees “Internal Server Error” messages.</li>
 </ol>
 <p>You can easily solve the <span class="docutils literal"><span class="pre">SOAPFault</span></span> problem by decorating your service with an exception handler,
 and also logging the errors yourself.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">SoapExceptionHandler</span>
 <span class="p">{</span>
@@ -714,12 +714,12 @@ and also logging the errors yourself.</p>
 
     <span class="k">private</span> <span class="nv">$service</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$service</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span> <span class="o">=</span> <span class="nv">$service</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="k">try</span> <span class="p">{</span>
             <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span>
@@ -760,7 +760,7 @@ from code.</p>
 you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
 By default it uses the docblocks <span class="docutils literal"><span class="pre">@param</span></span> and <span class="docutils literal"><span class="pre">@return</span></span> to generate
 the correct WSDL for a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">'MyService'</span><span class="p">)</span>
              <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">'http://server/namespace'</span><span class="p">)</span> <span class="c1">// same as server 'uri'</span>
@@ -773,7 +773,7 @@ the correct WSDL for a service:</p>
 <p>You can now place that WSDL file in any public location and then point both
 <span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> at the file using the first constructor
 argument:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 </pre></div>
@@ -797,7 +797,7 @@ which are used by default.</p>
 a little to adjust for correct namespace generation and code-style adjustments,
 but it works quite well by default. Here is an example of a generated class
 for the DHL Intraship SOAP API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">DHL\Intraship</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ComplexType</span>
@@ -841,7 +841,7 @@ for the DHL Intraship SOAP API:</p>
 </div>
 <p>The next thing you can generate is a classmap, that maps every WSDL Type to
 your newly generated code, in the above example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">'classmap'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
@@ -873,14 +873,14 @@ class in Zend Framework 2. It has no external dependencies, so you can just
 copy it into your project if you want.</p>
 <p>To generate a WSDL for document/literal mode, use the following methods
 on Zend Autodiscovery:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'style'</span> <span class="o">=&gt;</span> <span class="s1">'document'</span><span class="p">))</span>
              <span class="o">-&gt;</span><span class="na">setOperationStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'use'</span> <span class="o">=&gt;</span> <span class="s1">'literal'</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>Then use the wrapper like such:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -905,7 +905,7 @@ certainly want to Integration test your clients and servers.</p>
 <p>You can do that in PHPUnit by using a client, that wraps a Server directly
 and doesn’t require a Webserver. Zend Framework 2 already has such an object,
 named <cite>ZendSoapClientLocal</cite>. Its usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -972,7 +972,7 @@ functionalities and I am releasing a new version 2.0 of Assert today.</p>
 a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
 and then all the assertions you want to call on that value.</p>
 <p>Here are some examples:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
@@ -988,7 +988,7 @@ the user only exactly one error message. Because every assertion fails
 with an Exception, there was no way to execute multiple assertions and
 collect the errors. This has changed with the new lazy assertion API,
 that is similar to the Fluent API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nx">\Assert\lazy</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
@@ -1001,10 +1001,10 @@ that you know how to differentiate the errors afterwards.</p>
 <p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
 <span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
 <span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
-<div class="highlight-python"><div class="highlight"><pre>The following 3 assertions failed:
-1) foo: Value "10" expected to be string, type integer given.
-2) bar: Value "&lt;NULL&gt;" is empty, but non empty value was expected.
-3) baz: Value "string" is not an array.
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">The</span> <span class="n">following</span> <span class="mi">3</span> <span class="n">assertions</span> <span class="n">failed</span><span class="p">:</span>
+<span class="mi">1</span><span class="p">)</span> <span class="n">foo</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"10"</span> <span class="n">expected</span> <span class="n">to</span> <span class="n">be</span> <span class="n">string</span><span class="p">,</span> <span class="nb">type</span> <span class="n">integer</span> <span class="n">given</span><span class="o">.</span>
+<span class="mi">2</span><span class="p">)</span> <span class="n">bar</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"&lt;NULL&gt;"</span> <span class="ow">is</span> <span class="n">empty</span><span class="p">,</span> <span class="n">but</span> <span class="n">non</span> <span class="n">empty</span> <span class="n">value</span> <span class="n">was</span> <span class="n">expected</span><span class="o">.</span>
+<span class="mi">3</span><span class="p">)</span> <span class="n">baz</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"string"</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">array</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
@@ -1016,7 +1016,7 @@ useable for the frontend.</p>
 <p>In version 1.0 Assert did not have default error messages when failures
 occured. This has changed and now every assertion has a default failure
 message, as well as access to the value and constraints of an exception:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
 
@@ -1054,7 +1054,7 @@ being rolled out for some days/weeks. Doctrine requires the database to look
 exactly like the metadata specifies it.</p>
 <p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
 easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
@@ -1064,7 +1064,7 @@ easily:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
     <span class="p">}</span>
@@ -1141,7 +1141,7 @@ In this example we could create two entities <span class="docutils literal"><spa
 </ol>
 <p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
 <p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
 
 <span class="k">namespace</span> <span class="nx">MyProject\UserBundle\Entity</span><span class="p">;</span>
@@ -1168,7 +1168,7 @@ In this example we could create two entities <span class="docutils literal"><spa
 on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
 <p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
 correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
 
 <span class="k">namespace</span> <span class="nx">MyProject\ShopBundle\Entity</span><span class="p">;</span>
@@ -1260,7 +1260,7 @@ NFS share. I actually tried this before, but since I forgot the log directory,
 this felt equally slow and I reverted the change.</p>
 <p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
 considerable performance boost on a Vagrant box:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
 <span class="p">{</span>
@@ -1326,7 +1326,7 @@ but you can try the full code by checking out <a class="reference external" href
 <span class="docutils literal"><span class="pre">composer</span> <span class="pre">install</span></span> and then <span class="docutils literal"><span class="pre">php</span> <span class="pre">domain_events.php</span></span>.</p>
 <p>Lets look at the following entity, an <span class="docutils literal"><span class="pre">InventoryItem</span></span> tracking the number
 we have this item in stock:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Domain</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
@@ -1350,7 +1350,7 @@ we have this item in stock:</p>
 <span class="sd">     */</span>
     <span class="k">private</span> <span class="nv">$counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="s1">'InventoryItemCreated'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">));</span>
@@ -1366,7 +1366,7 @@ we have this item in stock:</p>
 </div>
 <p>We want this entity to raise two domain events using the <span class="docutils literal"><span class="pre">raise($eventName,</span>
 <span class="pre">array</span> <span class="pre">$properties)</span></span> method.  Our preferred use case for this code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$item</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InventoryItem</span><span class="p">(</span><span class="s1">'Cookies'</span><span class="p">);</span>
 <span class="nv">$item</span><span class="o">-&gt;</span><span class="na">checkIn</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 
@@ -1375,7 +1375,7 @@ we have this item in stock:</p>
 </pre></div>
 </div>
 <p>One or many listeners should react to the events being fired, for example print their contents to the screen:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">EchoInventoryListener</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">onInventoryItemCreated</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span>
@@ -1392,7 +1392,7 @@ we have this item in stock:</p>
 </div>
 <p>As the first building block, we need a <a class="reference external" href="http://martinfowler.com/eaaCatalog/layerSupertype.html">Layer Supertype</a> for our entities,
 called <span class="docutils literal"><span class="pre">AggregateRoot</span></span> adding the event raising capabilities to all entities that need it:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainSuperTypes</span><span class="p">;</span>
 
 <span class="k">abstract</span> <span class="k">class</span> <span class="nc">AggregateRoot</span>
@@ -1423,7 +1423,7 @@ of the domain events pattern, because it guarantees every listener that the
 state leading to the event is already in the database.</p>
 <p>Technically we implement this with a Doctrine EventListener that listeners for
 the <span class="docutils literal"><span class="pre">postFlush</span></span>, <span class="docutils literal"><span class="pre">postPersist</span></span>, <span class="docutils literal"><span class="pre">postUpdate</span></span> and <span class="docutils literal"><span class="pre">postRemove</span></span> events:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\DomainEvents</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
@@ -1478,7 +1478,7 @@ the <span class="docutils literal"><span class="pre">postFlush</span></span>, <s
 </pre></div>
 </div>
 <p>Now we only need to put this code together with Doctrine to get it working:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$evm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">();</span>
 <span class="nv">$evm</span><span class="o">-&gt;</span><span class="na">addEventListener</span><span class="p">(</span>
     <span class="k">array</span><span class="p">(</span><span class="s1">'postInsert'</span><span class="p">,</span> <span class="s1">'postUpdate'</span><span class="p">,</span> <span class="s1">'postRemove'</span><span class="p">,</span> <span class="s1">'postFlush'</span><span class="p">),</span>
@@ -1544,13 +1544,13 @@ inclusion into the Azure PHP SDK itself.</li>
 </ul>
 <p>You can install both the Bundle or the Demo application via Composer.
 For the Demo application call:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ php composer.phar create-project beberlei/symfony-azure-edition
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php composer.phar create-project beberlei/symfony-azure-edition
 </pre></div>
 </div>
 <p>The README includes more information about how to deploy the demo
 to your Azure websites account.</p>
 <p>The bundle can be installed using the following <span class="docutils literal"><span class="pre">composer.json</span></span>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">"beberlei/azure-distribution-bundle"</span><span class="p">:</span> <span class="s2">"*"</span>
     <span class="p">},</span>
@@ -1602,14 +1602,14 @@ problems on their own:</p>
 </ul>
 <p>Take the following code, which tries to implement reusable
 controller code through traits:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyController</span>
 <span class="p">{</span>
     <span class="k">use</span> <span class="nx">Redirector</span><span class="p">;</span>
 
     <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
     <span class="p">}</span>
@@ -1682,12 +1682,12 @@ functionality.</p>
 just static access in disguise.</p>
 <p>To see this argument a bit more drastically, you can “rewrite” a PHP 5.4 trait
 into “pseudo” static code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
     <span class="p">}</span>
@@ -1721,12 +1721,12 @@ into “pseudo” static code:</p>
 <span class="docutils literal"><span class="pre">$this</span></span> of the parent class will luckily be removed in PHP 5.5). Let’s
 reformulate it into something that is actually using static methods and
 will work on 5.5, requires changes to the visibility of properties though:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
     <span class="p">}</span>
@@ -1808,7 +1808,7 @@ changes to affect the whole system.</p>
 <h2>Introduce Criteria Objects</h2>
 <p>Instead of using the <span class="docutils literal"><span class="pre">QueryBuilder</span></span> outside of the Repository, lets start with an
 alternative refactoring. I will introduce a <span class="docutils literal"><span class="pre">Criteria</span></span> class for the <span class="docutils literal"><span class="pre">User</span></span>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserCriteria</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$groupId</span><span class="p">;</span>
@@ -1822,7 +1822,7 @@ factory methods that create a criteria do make sense however.</p>
 <p>Now we can introduce a <span class="docutils literal"><span class="pre">match</span></span> method on the <span class="docutils literal"><span class="pre">UserRepository</span></span>. Lets see
 that on an interface level first, to see how simple usage is for the client
 side of the repository:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">UserRepository</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
@@ -1835,7 +1835,7 @@ side of the repository:</p>
 </div>
 <p>Put in a <span class="docutils literal"><span class="pre">$criteria</span></span> get back users or array data. Very nice and simple!
 The implementation would look like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="sd">/**</span>
 <span class="sd"> * @param UserCriteria $criteria</span>
 <span class="sd"> * @return array&lt;User&gt;</span>
@@ -1863,7 +1863,7 @@ this inside <span class="docutils literal"><span class="pre">UserRepository#matc
 in the session, or even in the database to that users can “save filter” or return
 to a search overview, with the previous criteria still known.</p>
 <p>The client code now looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$criteria</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserCriteria</span><span class="p">();</span>
 <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">=</span> <span class="nv">$groupId</span><span class="p">;</span>
 <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">hydrateMode</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">HYDRATE_ARRAY</span><span class="p">;</span>
@@ -1881,7 +1881,7 @@ original EasyBib solution, then you are missing the point.  We have factored
 away a violation of the Law Of Demeter and calls on an API (Doctrine)
 that should be implementation detail of the repository.</p>
 <p>Lets try this by adding a new filter criteria, for example permissions I mentioned before:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserCriteria</span>
 <span class="p">{</span>
     <span class="k">const</span> <span class="no">PERMISSION_READ</span> <span class="o">=</span> <span class="s1">'read'</span><span class="p">;</span>
@@ -1924,7 +1924,7 @@ approach it from our existing Criteria.</p>
 <p>Lets move the QueryBuilder code from the repository, into the Criteria object and
 rename it <span class="docutils literal"><span class="pre">UserSpecification</span></span>. Its important here to change the query builder
 code to use expressions that can be composed.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserSpecification</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$groupId</span><span class="p">;</span>
@@ -1967,7 +1967,7 @@ code to use expressions that can be composed.</p>
 </div>
 <p>The repository is then delegating the expression generation
 and puts the result into the <span class="docutils literal"><span class="pre">where()</span></span> method of the builder</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserRepository</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">UserSpecification</span> <span class="nv">$specification</span><span class="p">)</span>
@@ -1990,7 +1990,7 @@ different repositories. This is apparent by the <span class="docutils literal"><
 required to make the combination of conditions possible.
 Lets factor away the violation of the single
 responsibility principle by introducing three specifications:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
@@ -2011,7 +2011,7 @@ responsibility principle by introducing three specifications:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$parent</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$parent</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">Specification</span> <span class="nv">$parent</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">parent</span> <span class="o">=</span> <span class="nv">$parent</span><span class="p">;</span>
     <span class="p">}</span>
@@ -2031,7 +2031,7 @@ responsibility principle by introducing three specifications:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$group</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$group</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$group</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">group</span> <span class="o">=</span> <span class="nv">$group</span><span class="p">;</span>
     <span class="p">}</span>
@@ -2050,7 +2050,7 @@ responsibility principle by introducing three specifications:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$permissions</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$permissions</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$permissions</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">permissions</span> <span class="o">=</span> <span class="nv">$permissions</span><span class="p">;</span>
     <span class="p">}</span>
@@ -2067,12 +2067,12 @@ responsibility principle by introducing three specifications:</p>
 <p>Now we need a new And-Specification to combine this in our code. This
 looks rather abstract and complex on the inside, but for clients
 of this object, the usage is simple and obvious.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">AndX</span> <span class="k">implements</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$children</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">children</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
     <span class="p">}</span>
@@ -2099,7 +2099,7 @@ of this object, the usage is simple and obvious.</p>
 <p>Assuming we import all specifications
 from a common namespace <span class="docutils literal"><span class="pre">Spec</span></span>, our client code will look
 like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$specification</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spec\AsArray</span><span class="p">(</span><span class="k">new</span> <span class="nx">Spec\AndX</span><span class="p">(</span>
     <span class="k">new</span> <span class="nx">Spec\FilterGroup</span><span class="p">(</span><span class="nv">$groupId</span><span class="p">),</span>
     <span class="k">new</span> <span class="nx">Spec\FilterPermission</span><span class="p">(</span><span class="nv">$permission</span><span class="p">)</span>
@@ -2117,7 +2117,7 @@ or and not specifications to enhance query capabilities.</p>
 <h2>Improving Specifications</h2>
 <p>You can now introduce reusability across different repositories by adding
 functionality to check if a specification supports a given entity.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="c1">// ..</span>
@@ -2132,7 +2132,7 @@ functionality to check if a specification supports a given entity.</p>
 <p>Every composite can delegate this operation to its children, and every leaf of
 the tree can return true or false. The Repository can then check for a valid
 specification in its match method:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">abstract</span> <span class="k">class</span> <span class="nc">EntitySpecificationRepository</span>
 <span class="p">{</span>
@@ -2157,12 +2157,12 @@ specification in its match method:</p>
 <p>Now we can introduce very generic specifications, such as <cite>OnlyPage($page, Specification $spec)`</cite>
 for limit queries, or <span class="docutils literal"><span class="pre">Equals($field,</span> <span class="pre">$value)</span></span>. For more readable code, you can then create
 a domain language for your specifications that is composed of more simple specifications:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">PowerUsers</span> <span class="k">implements</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$spec</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">spec</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OnlyPage</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">new</span> <span class="nx">AndX</span><span class="p">(</span>
             <span class="k">new</span> <span class="nx">UsersWithInteraction</span><span class="p">(),</span>
@@ -2256,7 +2256,7 @@ with use-case driven methods.  These state transformations can be part of
 different responsibilities, specifically when properties belong to different
 groups of concepts.</p>
 <p>Take a very simple entity that contains updated/created at logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
 
 <span class="sd">/**</span>
@@ -2274,7 +2274,7 @@ groups of concepts.</p>
 <span class="sd">     **/</span>
     <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
@@ -2297,13 +2297,13 @@ traits are not perfect even for this very simple example, because its very
 likely that you cannot override the constructor of every entity.</p>
 <p>The solution is to extract a value object <span class="docutils literal"><span class="pre">Timestamped</span></span> that contains
 all the logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Timestamped</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
     <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
@@ -2319,7 +2319,7 @@ all the logic:</p>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$timestamped</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">timestamped</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamped</span><span class="p">();</span>
     <span class="p">}</span>
@@ -2343,7 +2343,7 @@ To separate calculations from state transformations you can extract
 method objects instead of inlining the code into the <span class="docutils literal"><span class="pre">Order</span></span> object.</p>
 <p>For this kind of extraction I create a folder <span class="docutils literal"><span class="pre">Order</span></span> and put all
 the extracted method objects in the <span class="docutils literal"><span class="pre">Order</span></span> subnamespace.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
 
     <span class="k">class</span> <span class="nc">Order</span>
@@ -2370,7 +2370,7 @@ the extracted method objects in the <span class="docutils literal"><span class="
 </div>
 <p>From this step its easy to make the code reusable by passing the shipping cost
 calculator:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Order</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>
@@ -2430,7 +2430,7 @@ to the document root.</p>
 currently running version and you don’t have to face unexpected downtime.</p>
 <p>To actually run Composer as a post-deployment tool you have to do some manual
 work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[config]</span>
+<div class="highlight-ini"><div class="highlight"><pre><span/><span class="k">[config]</span>
 <span class="na">command</span> <span class="o">=</span> <span class="s">"D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php</span>
 </pre></div>
 </div>
@@ -2439,7 +2439,7 @@ name to “v5.4”, but I haven’t tested this.</p>
 <p>Then you need to create the <span class="docutils literal"><span class="pre">build_azure.php</span></span> file that is referenced in the
 deployment command. The actual implementation is up to you, my version is
 the most simple one:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">))</span> <span class="p">{</span>
     <span class="nv">$url</span> <span class="o">=</span> <span class="s1">'https://getcomposer.org/composer.phar'</span><span class="p">;</span>
     <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
@@ -2479,7 +2479,7 @@ cluttering the whole code-base.</p>
 <p>Take <a class="reference external" href="http://phpazure.codeplex.com/SourceControl/changeset/view/67037#840935">this example</a> from
 the old deprecated Windows Azure SDK, a method for putting a binary file into
 Azures blob storage:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nv">$containerName</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
@@ -2511,7 +2511,7 @@ and almost take up half the screen without even getting to the actual code.</p>
 <p>The assertion pattern is really helpful here to reduce the complexity of this
 code and hide the <span class="docutils literal"><span class="pre">if/throw</span></span> conditions into little helper methods. Have a
 look at a refactored method using my <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> micro-library.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">public</span> <span class="k">function</span> <span class="nf">putBlob</span><span class="p">(</span><span class="nv">$containerName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$blobName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$localFileName</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$metadata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$leaseId</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$additionalHeaders</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="nx">Assertion</span><span class="o">::</span><span class="na">notEmpty</span><span class="p">(</span><span class="nv">$containerName</span><span class="p">,</span> <span class="s1">'Container name is not specified'</span><span class="p">);</span>
@@ -2534,7 +2534,7 @@ unit-tested.</p>
 <p>That is why you should extend from <span class="docutils literal"><span class="pre">Assertion</span></span> and use your own class when
 using the Assert library. This returns some control in your hands and even
 allows you to overwrite the exception class:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Util</span><span class="p">;</span>
 
 <span class="k">use</span> <span class="nx">Assert\Assertion</span> <span class="k">as</span> <span class="nx">BaseAssertion</span><span class="p">;</span>
@@ -2588,7 +2588,7 @@ actual storage. Something that object-orientation was suppose to avoid.</p>
 of every task that is performed in an application and add a method that
 changes all the affected fields at once, to perform this task. In the famous
 blog example the <span class="docutils literal"><span class="pre">Post</span></span> object may look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">compose</span><span class="p">(</span><span class="nv">$headline</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$tags</span><span class="p">)</span>
@@ -2625,7 +2625,7 @@ not worth the trouble anymore.</p>
 models directly in the view or for testing purposes. There is another way
 to get rid of all the getters that you don’t need explicitly in a domain
 model, using the visitor pattern in combination with view models:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Post</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nx">PostView</span> <span class="nv">$view</span><span class="p">)</span>
@@ -2676,7 +2676,7 @@ kind of form framework on entities is a huge no go anyways.</p>
 <p>Both tasks allow only a subset of the properties to be modified. For each of
 these tasks we need a custom form “model”. Think of these models as command
 objects:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">EditPostCommand</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
@@ -2689,7 +2689,7 @@ objects:</p>
 <p>In our application we could attach these form models to our form framework and
 then pass these as commands into our “real model” through a service layer,
 <a class="reference external" href="http://www.eaipatterns.com/MessageBus.html">message bus</a> or something equivalent:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">PostController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
@@ -2781,11 +2781,11 @@ mess</a></li>
 the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-python"><div class="highlight"><pre>Command-Query-Separation states that every method should either be a
-command that performs an action, or a query that returns data to the
-caller, but not both. In other words, asking a question should not change
-the answer. More formally, methods should return a value only if they are
-referentially transparent and hence possess no side effects.
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Command</span><span class="o">-</span><span class="n">Query</span><span class="o">-</span><span class="n">Separation</span> <span class="n">states</span> <span class="n">that</span> <span class="n">every</span> <span class="n">method</span> <span class="n">should</span> <span class="n">either</span> <span class="n">be</span> <span class="n">a</span>
+<span class="n">command</span> <span class="n">that</span> <span class="n">performs</span> <span class="n">an</span> <span class="n">action</span><span class="p">,</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">query</span> <span class="n">that</span> <span class="n">returns</span> <span class="n">data</span> <span class="n">to</span> <span class="n">the</span>
+<span class="n">caller</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="n">both</span><span class="o">.</span> <span class="n">In</span> <span class="n">other</span> <span class="n">words</span><span class="p">,</span> <span class="n">asking</span> <span class="n">a</span> <span class="n">question</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">change</span>
+<span class="n">the</span> <span class="n">answer</span><span class="o">.</span> <span class="n">More</span> <span class="n">formally</span><span class="p">,</span> <span class="n">methods</span> <span class="n">should</span> <span class="k">return</span> <span class="n">a</span> <span class="n">value</span> <span class="n">only</span> <span class="k">if</span> <span class="n">they</span> <span class="n">are</span>
+<span class="n">referentially</span> <span class="n">transparent</span> <span class="ow">and</span> <span class="n">hence</span> <span class="n">possess</span> <span class="n">no</span> <span class="n">side</span> <span class="n">effects</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>CQRS is an OOP architecture design pattern building on that imperative
@@ -2852,7 +2852,7 @@ route a command to its appropriate command handler.</p>
 <h2>Example</h2>
 <p>Here is the most simple implementation of the Command Bus, just holds a hash map
 mapping command class names to command handlers:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Handler</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
@@ -2875,7 +2875,7 @@ mapping command class names to command handlers:</p>
 <p>In your code you would always pass Commands to the bus. That way the command
 bus is a central entry point to any write operation. With this we can rewrite the
 TransferMoney service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">TransferMoneyCommand</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -2910,7 +2910,7 @@ oriented.</p>
 </ul>
 <p>The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
@@ -3015,7 +3015,7 @@ or by building two traits. I will go down the route with traits, to show
 one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">trait</span> <span class="nx">TransferMoneySource</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
@@ -3040,7 +3040,7 @@ here. The <span class="docutils literal"><span class="pre">withdraw</span></span
 dumb as possible, so that their implementation does not cause any side-effects
 on the execution of this use-case.</p>
 <p>The bank account would then be modified to look:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
@@ -3048,7 +3048,7 @@ on the execution of this use-case.</p>
 
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="p">}</span>
@@ -3075,13 +3075,13 @@ have to know about how to bind roles to data, you could use GUIDs in your
 application and fetch all objects from one data store. Another way would be to
 implement data access objects for roles, that then know how to retrieve their
 corresponding data.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransfer</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
     <span class="k">private</span> <span class="nv">$destination</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$moneySource</span><span class="p">,</span> <span class="nv">$moneySink</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">source</span> <span class="o">=</span> <span class="nv">$moneySource</span><span class="p">;</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">destination</span> <span class="o">=</span> <span class="nv">$moneySink</span><span class="p">;</span>
@@ -3105,7 +3105,7 @@ implications.</p>
 traits.</p>
 </div>
 <p>Here is an example of how the bank application service could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
@@ -3212,12 +3212,12 @@ throughout all blog posts, the usual Bank Account/Money Transfer. The use case
 is the money transfer from one bank account (source) to another one
 (destination).</p>
 <p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
     <span class="p">{</span>
         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="p">}</span>
@@ -3238,7 +3238,7 @@ is the money transfer from one bank account (source) to another one
 functionality. The Money object implementation is omitted here.</p>
 <p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -3273,7 +3273,7 @@ php objects (so called data-transfer objects, DTO).</p>
 source and destination account entities from some storage subsystem. To follow the EBI
 design pattern, we have to decouple this data access object from the model,
 by offering a port (Interface):</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
@@ -3285,7 +3285,7 @@ by offering a port (Interface):</p>
 the bank account sample. We need to wrap the whole MoneyTransfer use-case in
 a transaction. Lets say the invocation of our Use-Case is controlled through
 some kind of application boundary object:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
@@ -3324,7 +3324,7 @@ that transforms the request and response and also handles transactions and
 such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
 <p>With context you would do something like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
 
 <span class="c1">// 1. direct invocation</span>
@@ -3364,7 +3364,7 @@ as you need to map the request objects to your entities.</li>
 mapping API. This way you can make it look as if you would map a DTO onto
 an object, but in this case you are using the Form API as the mapper.</li>
 </ul>
-<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>
