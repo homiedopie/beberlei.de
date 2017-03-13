@@ -61,6 +61,51 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2012/10/27/babysteps_with_fortrabbit_php_cloud.html">Babysteps with Fortrabbit PHP Cloud</a></h1>
+<p>I wanted to host a simple application to play around with the <a class="reference external" href="https://tent.io">Tent Protocol</a> (see <a class="reference external" href="http://whitewashing.de/2012/10/22/a_tent_io_app__zelten_bookmarks.html">my last blogpost</a>), so
+I checked through some of the PHP Cloud providers again for the fun of it. One
+requirement was to deploy from Git and update dependencies from Composer. I
+found a new provider that i haven’t heard of before, <a class="reference external" href="http://www.fortrabbit.com/">Fortrabbit</a> that supports this so I had to check it out.
+It has some more features that I really dig:</p>
+<p>Fortrabbit provides you with a Git url where you can push your repository.
+It is directly deployed during the push operation. You can trigger composer
+updates by having a special syntax in the commit message. The push
+output informs you about all the steps performed during deployment.</p>
+<p>Additionally you can configure environment variables in the web-administration
+interface that are available in the application through <span class="docutils literal"><span class="pre">$_SERVER</span></span>. You
+can easily use them to configure your application, if its hosted in a public
+repository. Great to share sample applications on Github and host them from
+there.</p>
+<p>You get SSH access to the machines, where you can take a look at the apache
+and php error log files. You have vim available. Quite cool and very helpful
+for any kind of debugging necessary. Deployments overwrite every change you
+make, so its still a save environment.</p>
+<p>The composer support allows for post install scripts, which is cool to perform
+all sorts of cache warmup and other deployment tasks.</p>
+<p>You can host one application for free, however they shutdown after 48 hours if
+you don’t regularly click on a reset button. Its definitely enough to get small
+prototypes up and running. From there you can upgrade in many small steps from
+small plans (10€/month) to bigger ones (80€/month).</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/clouds.html">Clouds</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on October 27, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/10/22/a_tent_io_app__zelten_bookmarks.html">A tent.io app: Zelten Bookmarks</a></h1>
 <p>Over the weekend I built a <a class="reference external" href="http://zelten.eu1.frbit.net">very simple bookmarking application</a> for <a class="reference external" href="http://tent.io">tent.io</a>. I wanted to try the tent functionality to create
 arbitrary entities of data using something as simple as a “Bookmark”.</p>
@@ -333,167 +378,6 @@ to the next FrOSCon 2013.</p>
         <p>
             <small>
                 Posted on August 26, 2012
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2012/08/25/decoupling_applications_with_domain_events.html">Decoupling applications with Domains Events</a></h1>
-<p>In the <a class="reference external" href="http://whitewashing.de/2012/08/18/oop_business_applications__command_query_responsibility_seggregation.html">previous posts</a>
-I have described 3 architectural patterns for business applications. Applying
-them to your software helps you decouple the business logic from the
-application/framework/UI. However given sufficient complexity, you will want to
-decouple different parts of your business model from each other as well.</p>
-<p>As an example, lets think of a batch process in your application that updates
-orders from a CRM or logistics system:</p>
-<ul class="simple">
-<li>You receive an XML with full users and order representations</li>
-<li>You need to update certain user fields</li>
-<li>You need to update certain order fields</li>
-<li>Some orders require creating accounts in different remote systems</li>
-<li>If the user has not confirmed his email yet he should receive an opt-in
-mail instead.</li>
-<li>If the user confirms his opt-in mail, all outstanding remote accounts are
-created.</li>
-</ul>
-<p>You can build all the steps into a single batch processing service. This will
-be a particularly huge service and in violation of the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility
-principle</a>.</p>
-<p>the part with updating of users and fields has nothing to with the sending of
-mails and creation of remote accounts.  We want to decouple them from each
-other.</p>
-<p>The first obvious choice is to decouple them into distinct services:</p>
-<ul class="simple">
-<li>Import Service</li>
-<li>Authentication Service</li>
-<li>Account Generation Service</li>
-</ul>
-<p>All these services have dependencies on infrastructure objects, database,
-mailer and so on. We could inject the authentication and account generation
-services into the Import Service, but with rising complexity this will lead to
-a lasagna of services and the execution path will dig deep into this and this
-is not nearly as tasty as eating real lasagna.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">ImportService</span>
-<span class="o">|</span><span class="n">_AuthenticationService</span>
-<span class="o">|</span> <span class="o">|</span><span class="n">_Mailer</span>
-<span class="o">|</span> <span class="o">|</span><span class="n">_Database</span>
-<span class="o">|</span><span class="n">_AccountGenerationService</span>
-<span class="o">|</span> <span class="o">|</span><span class="n">_Database</span>
-<span class="o">|</span> \<span class="n">_RemoteFacade</span>
-\<span class="n">_Database</span>
-</pre></div>
-</div>
-<p>This becomes more complicated when transaction semantics need to be taken care
-of. For example dependencies between mailer and database services. Also you
-have to take into account that the code in entities and value objects
-participating in this use-case.</p>
-<p>What we want instead is a sequential execution of those nested services, but
-only if the parent service executed successfully:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">ImportService</span>
-\<span class="n">_Database</span>
-
-<span class="n">AuthenticationService</span>
-<span class="o">|</span><span class="n">_Mailer</span>
-\<span class="n">_Database</span>
-
-<span class="n">AccountGenerationService</span>
-<span class="o">|</span><span class="n">_Database</span>
-\<span class="n">_RemoteFacade</span>
-</pre></div>
-</div>
-<p>We could use an event dispatcher in all of the services to notify each other,
-but the <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">DomainEvent pattern</a> does this more in a much
-cleaner way:</p>
-<p>Every entity is an event provider and can emit events. Whenever a transaction
-is committed and an hence an operation is completed successfully, we take all
-the events emitted from all entities (looking at the identity map for example)
-and trigger observing event handlers. However if the operation fails, we do not
-trigger these event handlers.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">Order</span> <span class="k">implements</span> <span class="nx">EventProviderInterface</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">EventProvider</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">importData</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// 1. do something with $data</span>
-
-        <span class="c1">// 2. raise event</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">raise</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderImportCompleted</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-            <span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
-            <span class="s2">"data"</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
-        <span class="p">)));</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">interface</span> <span class="nx">EventProviderInterface</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The Event provider trait aggregates all the events, and offers
-and API for external services to pull them from the entity:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">trait</span> <span class="nx">EventProvider</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">raise</span><span class="p">(</span><span class="nx">DomainEvent</span> <span class="nx">Event</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getMessageHeader</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setEntity</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$event</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">dequeueEmittedEvents</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$events</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">emittedEvents</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-        <span class="k">return</span> <span class="nv">$events</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Our infrastructure must then trigger event handlers, based
-on the event names. It will use <span class="docutils literal"><span class="pre">dequeueEmittedEvents</span></span> and making
-sure the events are not emitted multiple times.</p>
-<p>For reasons described below, we want the following command/event chain to happen in our system:</p>
-<ul class="simple">
-<li>Command executes</li>
-<li>Entities emit events</li>
-<li>Command transaction succeeds</li>
-<li>Events trigger event handlers</li>
-<li>Event handlers execute more commands</li>
-<li>Restart from 1.</li>
-</ul>
-<p>With this approach we can decouple all services from each other and avoid
-deep nesting in each other. Yet we still have transactional dependencies,
-by dropping all events when the parent command fails. Transactions over
-multiple commands will not have ACID properties though, instead you will have
-to look into <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">BASE transactions</a>
-that are important in systems with eventual consistency. This is one downside
-that you need to take into account.</p>
-<p>The Domain Event pattern is a prerequisite for full blown <a class="reference external" href="http://queue.acm.org/detail.cfm?id=1394128">CQRS</a>. My <a class="reference external" href="https://github.com/beberlei/litecqrs-php">LiteCQRS</a> library includes a simple
-implementation of DomainEvent and EventProvider classes and integration into
-Symfony and Doctrine ORM. Generally this pattern is very easy to implement
-though, so that you can just have a look at the implementation and take the
-best parts for your own.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 25, 2012
                  by Benjamin Eberlei
             </small>
         </p>

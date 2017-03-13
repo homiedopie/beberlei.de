@@ -61,6 +61,92 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
+<p>Yesterday I finally had the time to setup my first continuous
+integration environment. Possible solutions for CI are
+<a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
+<a class="reference external" href="http://www.hudson-ci.org">Hudson</a> or
+<a class="reference external" href="http://www.arbitracker.org">Arbit</a>. Although phpUnderControl is the
+most wide-spread, but from I heard complex to setup/maintain, solution
+[STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
+to give Hudson a shoot. Another reason for this decision, I heard it has
+a simple plugin architecture and is easy to install and use.
+Additionally Hudson is easily integrated into
+<a class="reference external" href="http://www.netbeans.org">Netbeans</a> and
+<a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
+development.</p>
+<p>My motivation to dive into CI is easily explained. I just never felt it
+was necessary to add a continuous integration environment to my projects,
+since I had one or two simple bash scripts that did the job. In general
+this is rather annoying, because they mostly only run PHPUnit and have
+to be done using a cronjob or manually, without any real process of
+notification. Additionally you have no way to navigate the test-results,
+code-coverage and no history of the last builds. For projects like
+<a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> we have the additional
+requirement to support 4 different database platforms, i.e. 4 different
+PHPUnit configurations. Currently that is solved by me using a Bash
+script that iterates over the configuration file names and invokes
+PHPUnit.</p>
+<p>There are already some awesome sources how to get Hudson and PHP
+working. I’ll list them here:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
+Screenshots</a></li>
+<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
+Hudson</a></li>
+<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
+Screenshots)</a></li>
+</ul>
+<p>All those guides are already awesome and I would recommend choosing one
+of those to install Hudson, I think i can’t add anything new to those. I
+have used Sebastians Howto, however i also like the third one. David
+Luhmans guide adds lots of details that are important to get the
+different parts of a build process to work.</p>
+<p>Now what these tutorials all do is that they use a bash command to
+execute the build process or specify an Ant Build file. However there
+is also a Phing Build process plugin for Hudson that allows to specify
+the build.xml targets to execute in the process. From the “Available
+Plugins” list you can choose the “Phing plugin”.</p>
+<p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
+Plugin Wiki
+Page</a> shows how
+to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
+look for Phing. There you find the dialog to configure your phing
+installations.</p>
+<p>In the context of choosing a build script for your project you can now
+choose “Phing” instead of Ant:</p>
+<div class="figure align-center">
+<img alt="" src="http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849"/>
+</div>
+<p>You can enter the targets to build, for example on my local Hudson
+instance I only execute “test” for Doctrine 2, since I am not interested
+in the building and deployment onto the PEAR channel at this development
+stage.</p>
+<p>From inside Netbeans you can then start builds by pointing to the Hudson
+instance. See this tutorial by one of the <a class="reference external" href="http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6">Hudson + Netbeans
+Developers</a>.
+You can then start all the builds from inside Netbeans and be notified
+of the success or failure.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/continouosintegration.html">ContinouosIntegration</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 07, 2010
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
 <p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
 2</a> we plan to integrate pessimistic
@@ -619,41 +705,6 @@ come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
         <p>
             <small>
                 Posted on April 27, 2010
-                 by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a></h1>
-<p>This morning I took the time to merge several changes by <a class="reference external" href="http://manuel-pichler.de/">Manuel
-Piechler</a> into <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">my Github
-branch</a> of the
-CodeSniffer Plugin and released a new NBM file for you to
-<a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">download</a>.
-Here are the changes done by Manuel:</p>
-<ul class="simple">
-<li>Ability to specify the path to CodeSniffer Binary</li>
-<li>Automatic Detection of all the installed Coding Standards</li>
-<li>Fixed Automatic Binary Detection on Windows</li>
-</ul>
-<p>The only open TODO for this project is the possibility to specify
-different standards on a per project basis, currently you can only
-choose a global standard.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/netbeans.html">Netbeans</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on April 18, 2010
                  by beberlei <kontakt@beberlei.de>
             </small>
         </p>

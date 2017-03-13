@@ -61,6 +61,85 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/17/zf-managing-404-errors-with-version-1-0-3.html">ZF: Managing 404 Errors with Version 1.0.3</a></h1>
+<p>Ok, the description of the Link referring to the <a class="reference external" href="http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework">version 0.9 solution
+for Managing 404
+errors</a>
+due to missing modules or actions is wrong. It is not enough to replace
+Zend::loadClass with Zend_Loader::loadClass. Other functions have been
+renamed, my current snippet is:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">/**</span>
+<span class="x"> * Original Snippet from: http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework</span>
+<span class="x"> */</span>
+<span class="x">    class NoroutePlugin extends Zend_Controller_Plugin_Abstract</span>
+<span class="x">    {</span>
+<span class="x">        public function preDispatch(Zend_Controller_Request_Abstract $request )</span>
+<span class="x">        {</span>
+<span class="x">            $dispatcher = Zend_Controller_Front::getInstance()-&gt;getDispatcher();</span>
+
+<span class="x">            $controllerName = $request-&gt;getControllerName();</span>
+<span class="x">            if (empty($controllerName)) {</span>
+<span class="x">                $controllerName = $dispatcher-&gt;getDefaultControllerClass($request);</span>
+<span class="x">            }</span>
+<span class="x">            $className = $dispatcher-&gt;formatControllerName($controllerName);</span>
+<span class="x">            if ($className)</span>
+<span class="x">            {</span>
+<span class="x">                try</span>
+<span class="x">                {</span>
+<span class="x">                    // if this fails, an exception will be thrown and</span>
+<span class="x">                    // caught below, indicating that the class can't</span>
+<span class="x">                    // be loaded.</span>
+<span class="x">                    Zend_Loader::loadClass($className, $dispatcher-&gt;getControllerDirectory());</span>
+<span class="x">                    $actionName = $request-&gt;getActionName();</span>
+<span class="x">                    if (empty($actionName)) {</span>
+<span class="x">                        $actionName = $dispatcher-&gt;getDefaultAction();</span>
+<span class="x">                    }</span>
+<span class="x">                    $methodName = $dispatcher-&gt;formatActionName($actionName);</span>
+
+<span class="x">                    $class = new ReflectionClass( $className );</span>
+<span class="x">                    if( $class-&gt;hasMethod( $methodName ) )</span>
+<span class="x">                    {</span>
+<span class="x">                        // all is well - exit now</span>
+<span class="x">                        return;</span>
+<span class="x">                    }</span>
+<span class="x">                }</span>
+<span class="x">                catch (Zend_Exception $e)</span>
+<span class="x">                {</span>
+<span class="x">                    // Couldn't load the class. No need to act yet,</span>
+<span class="x">                    // just catch the exception and fall out of the</span>
+<span class="x">                    // if</span>
+<span class="x">                }</span>
+<span class="x">            }</span>
+
+<span class="x">            // we only arrive here if can't find controller or action</span>
+<span class="x">            $request-&gt;setControllerName( 'blog' );</span>
+<span class="x">            $request-&gt;setActionName( 'noroute' );</span>
+<span class="x">            $request-&gt;setDispatched( false );</span>
+<span class="x">        }</span>
+<span class="x">    }</span>
+</pre></div>
+</div>
+<p>I hope someone needs this as much as me.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 17, 2008
+                 by beberlei <kontakt@beberlei.de>
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/24/complaining-about-zend-filter-input.html">Complaining about Zend_Filter_Input</a></h1>
 <p>Zend_Filter_Input is really nice to be sure form data is filtered
 correctly, but i have some serious complaints: Why the hell are the
@@ -299,82 +378,6 @@ integrates lots of stuff of the Zym component).</p>
             <small>
                 Posted on October 01, 2008
                 
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/04/27/ox-cross-correlation-coefficients-with-lags.html">Ox: Cross-correlation coefficients with lags</a></h1>
-<p>Working on the homework for my <a class="reference external" href="http://mueller.gernot.googlepages.com/monetaryeconomics">Monetary Economics
-class</a> I
-realized that <a class="reference external" href="http://www.doornik.com">Ox</a> has different mechanisms to
-calculate correlation coefficients like Mathlab has.</p>
-<p>Our assignment was to replicate the Dynamic Correlations graph in
-<a class="reference external" href="http://www.amazon.de/gp/redirect.html?ie=UTF8&amp;location=http://www.amazon.de/Monetary-Theory-Policy-Carl-Walsh/dp/0262232316?ie=UTF8&amp;s=books-intl-de&amp;qid=1209289935&amp;sr=8-1&amp;site-redirect=de&amp;tag=economystuden-21&amp;linkCode=ur2&amp;camp=1638&amp;creative=6742">Walshs’ Monetary Theory and
-Policy</a>
-for European Data, which shows the cross-correlation of different
-monetary aggregates (M0,M1,M2) with GDP over lagging periods of -8 to +8
-quarters.</p>
-<p>What was missing for me to do that assignment in Ox was a function to
-calculate cross-correlation coefficients for two vectors for a specified
-lag length:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="c1">#include &lt;oxfloat.h&gt;</span>
-
-<span class="o">/**</span>
- <span class="o">*</span> <span class="n">Computes</span> <span class="n">the</span> <span class="n">cross</span><span class="o">-</span><span class="n">correlation</span> <span class="n">coefficient</span> <span class="k">for</span> <span class="n">two</span> <span class="n">vector</span> <span class="n">series</span> <span class="n">allowing</span>
- <span class="o">*</span> <span class="n">to</span> <span class="n">optionally</span> <span class="n">specify</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">positive</span> <span class="ow">and</span> <span class="n">negative</span> <span class="n">lags</span> <span class="n">the</span> <span class="n">ccc</span>
- <span class="o">*</span> <span class="n">should</span> <span class="n">be</span> <span class="n">calculated</span> <span class="k">for</span><span class="o">.</span>
- <span class="o">*</span>
- <span class="o">*</span> <span class="nd">@author</span> <span class="n">Benjamin</span> <span class="n">Eberlei</span> <span class="p">(</span><span class="n">kontakt</span> <span class="n">at</span> <span class="n">beberlei</span> <span class="n">dot</span> <span class="n">de</span><span class="p">)</span>
- <span class="o">*</span> <span class="nd">@param</span> <span class="n">vVarY</span> <span class="n">Tx1</span> <span class="n">vector</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">related</span> <span class="n">to</span>
- <span class="o">*</span> <span class="nd">@param</span> <span class="n">vVarX</span> <span class="n">Tx1</span> <span class="n">vector</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">tested</span> <span class="ow">in</span> <span class="n">different</span> <span class="n">lags</span>
- <span class="o">*</span> <span class="nd">@param</span> <span class="n">lags</span> <span class="n">Integer</span> <span class="n">indicating</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">negative</span> <span class="ow">and</span> <span class="n">positive</span> <span class="n">lags</span><span class="o">.</span>
- <span class="o">*</span> <span class="nd">@returns</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">lags</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span> <span class="n">vector</span> <span class="n">of</span> <span class="n">correlations</span> <span class="kn">from</span> <span class="o">-</span><span class="n">lags</span> <span class="n">to</span> <span class="n">lags</span>
- <span class="o">**/</span>
-<span class="n">ccf</span><span class="p">(</span><span class="n">const</span> <span class="n">vVarY</span><span class="p">,</span> <span class="n">const</span> <span class="n">vVarX</span><span class="p">,</span> <span class="n">const</span> <span class="n">lags</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="o">//</span> <span class="n">Generate</span> <span class="n">positive</span> <span class="ow">and</span> <span class="n">negative</span> <span class="n">lags</span> <span class="n">of</span> <span class="n">given</span> <span class="n">length</span> <span class="ow">and</span> <span class="n">fill</span> <span class="k">with</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">so</span>
-    <span class="o">//</span> <span class="n">that</span> <span class="n">rows</span> <span class="k">with</span> <span class="ow">not</span> <span class="n">available</span> <span class="n">numbers</span> <span class="n">can</span> <span class="n">be</span> <span class="n">dropped</span> <span class="kn">from</span> <span class="nn">calculating</span> <span class="n">the</span> <span class="n">CCF</span> <span class="n">later</span> <span class="n">on</span><span class="o">.</span>
-    <span class="n">decl</span> <span class="n">mXLag</span> <span class="o">=</span> <span class="n">lag0</span><span class="p">(</span><span class="n">vVarX</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="o">-</span><span class="n">lags</span><span class="p">),</span> <span class="n">M_NAN</span><span class="p">);</span>
-
-    <span class="n">decl</span> <span class="n">mCorr</span><span class="p">,</span> <span class="n">sCov</span><span class="p">;</span>
-
-    <span class="o">//</span> <span class="n">initialize</span> <span class="n">result</span> <span class="n">vector</span> <span class="n">holding</span> <span class="n">one</span> <span class="n">crosscorrelation</span> <span class="n">per</span> <span class="n">lag</span>
-    <span class="n">decl</span> <span class="n">vCorrLags</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">lags</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-
-    <span class="o">//</span> <span class="n">sadly</span> <span class="n">there</span> <span class="n">are</span> <span class="n">no</span> <span class="n">matrix</span> <span class="n">operations</span> <span class="n">to</span> <span class="n">ease</span> <span class="n">this</span> <span class="n">computation</span><span class="p">,</span> <span class="n">loop</span> <span class="n">over</span> <span class="nb">all</span> <span class="n">lags</span>
-    <span class="k">for</span><span class="p">(</span><span class="n">decl</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">+</span><span class="n">lags</span><span class="o">*</span><span class="mi">2</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">mCorr</span> <span class="o">=</span> <span class="n">deleter</span><span class="p">(</span><span class="n">vVarY</span> <span class="o">~</span> <span class="n">mXLag</span><span class="p">[][</span><span class="n">i</span><span class="p">]);</span> <span class="o">//</span> <span class="n">stick</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">current</span> <span class="n">lagged</span> <span class="n">x</span> <span class="n">together</span> <span class="ow">and</span> <span class="n">delete</span> <span class="n">NaN</span> <span class="n">rows</span>
-
-        <span class="o">//</span> <span class="n">calculate</span> <span class="n">covariance</span> <span class="n">of</span> <span class="n">both</span> <span class="n">time</span> <span class="n">series</span>
-        <span class="n">sCov</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">mCorr</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sumc</span><span class="p">(</span> <span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">meanc</span><span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">0</span><span class="p">]))</span><span class="s1">' * (mCorr[][1]-meanc(mCorr[][1])) );</span>
-
-        <span class="o">//</span> <span class="n">calculate</span> <span class="n">correlation</span> <span class="n">coefficient</span>
-        <span class="n">vCorrLags</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sCov</span> <span class="o">/</span> <span class="p">(</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">varc</span><span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">0</span><span class="p">]))</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">varc</span><span class="p">(</span><span class="n">mCorr</span><span class="p">[][</span><span class="mi">1</span><span class="p">]))</span> <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">vCorrLags</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>It may prove useful to someone.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/ox.html">Ox</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on April 27, 2008
-                 by beberlei <kontakt@beberlei.de>
             </small>
         </p>
     </div>

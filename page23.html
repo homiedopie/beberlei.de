@@ -61,6 +61,40 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html">A knight’s tour solver in pascal - supplement</a></h1>
+<p>Following my <a class="reference external" href="http://www.whitewashing.de/blog/articles/6">earlier post on the Knights
+tour</a>: It seems it is
+crucial for a backtracking algorithm what the knights starting position
+is, and even more important in what order the jumps are tried. Because
+there are 8 possible moves for a knight, you have to decide in which
+order they should be performed. If there is not a deviation when
+backtracking the algorithm gets stuck in almost the same positions very
+very often.</p>
+<p>I rewrote the order of jumps for my 7x7 board and found a solution in
+seconds. Using the same order for an 8x8 board gets me stuck in endless
+tries again. I see its important to implement the <a class="reference external" href="http://en.wikipedia.org/wiki/Warnsdorff's_algorithm">Warnsdorff’s
+algorithm</a>,
+perhaps I will do so.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/algorithms.html">Algorithms</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 22, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/28/linux-style-mysql-shell-prompt.html">Linux style MySQL Shell prompt</a></h1>
 <dl class="docutils">
 <dt>Just add the following to the [mysql] section in your .my.cnf file:</dt>
@@ -257,85 +291,6 @@ initialize the following at the beginning of my bootstrap file:</p>
         <p>
             <small>
                 Posted on January 20, 2008
-                 by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/01/17/zf-managing-404-errors-with-version-1-0-3.html">ZF: Managing 404 Errors with Version 1.0.3</a></h1>
-<p>Ok, the description of the Link referring to the <a class="reference external" href="http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework">version 0.9 solution
-for Managing 404
-errors</a>
-due to missing modules or actions is wrong. It is not enough to replace
-Zend::loadClass with Zend_Loader::loadClass. Other functions have been
-renamed, my current snippet is:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">/**</span>
-<span class="x"> * Original Snippet from: http://www.bigroom.co.uk/blog/managing-404-errors-in-the-zend-framework</span>
-<span class="x"> */</span>
-<span class="x">    class NoroutePlugin extends Zend_Controller_Plugin_Abstract</span>
-<span class="x">    {</span>
-<span class="x">        public function preDispatch(Zend_Controller_Request_Abstract $request )</span>
-<span class="x">        {</span>
-<span class="x">            $dispatcher = Zend_Controller_Front::getInstance()-&gt;getDispatcher();</span>
-
-<span class="x">            $controllerName = $request-&gt;getControllerName();</span>
-<span class="x">            if (empty($controllerName)) {</span>
-<span class="x">                $controllerName = $dispatcher-&gt;getDefaultControllerClass($request);</span>
-<span class="x">            }</span>
-<span class="x">            $className = $dispatcher-&gt;formatControllerName($controllerName);</span>
-<span class="x">            if ($className)</span>
-<span class="x">            {</span>
-<span class="x">                try</span>
-<span class="x">                {</span>
-<span class="x">                    // if this fails, an exception will be thrown and</span>
-<span class="x">                    // caught below, indicating that the class can't</span>
-<span class="x">                    // be loaded.</span>
-<span class="x">                    Zend_Loader::loadClass($className, $dispatcher-&gt;getControllerDirectory());</span>
-<span class="x">                    $actionName = $request-&gt;getActionName();</span>
-<span class="x">                    if (empty($actionName)) {</span>
-<span class="x">                        $actionName = $dispatcher-&gt;getDefaultAction();</span>
-<span class="x">                    }</span>
-<span class="x">                    $methodName = $dispatcher-&gt;formatActionName($actionName);</span>
-
-<span class="x">                    $class = new ReflectionClass( $className );</span>
-<span class="x">                    if( $class-&gt;hasMethod( $methodName ) )</span>
-<span class="x">                    {</span>
-<span class="x">                        // all is well - exit now</span>
-<span class="x">                        return;</span>
-<span class="x">                    }</span>
-<span class="x">                }</span>
-<span class="x">                catch (Zend_Exception $e)</span>
-<span class="x">                {</span>
-<span class="x">                    // Couldn't load the class. No need to act yet,</span>
-<span class="x">                    // just catch the exception and fall out of the</span>
-<span class="x">                    // if</span>
-<span class="x">                }</span>
-<span class="x">            }</span>
-
-<span class="x">            // we only arrive here if can't find controller or action</span>
-<span class="x">            $request-&gt;setControllerName( 'blog' );</span>
-<span class="x">            $request-&gt;setActionName( 'noroute' );</span>
-<span class="x">            $request-&gt;setDispatched( false );</span>
-<span class="x">        }</span>
-<span class="x">    }</span>
-</pre></div>
-</div>
-<p>I hope someone needs this as much as me.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 17, 2008
                  by beberlei <kontakt@beberlei.de>
             </small>
         </p>

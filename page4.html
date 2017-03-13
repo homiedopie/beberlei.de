@@ -61,6 +61,184 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a></h1>
+<p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
+I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
+to start with a very simple “Hello World” example.</p>
+<p>The Symfony2 Standard Edition already contains a huge burden of concepts,
+assumptions and conventions that can be confusing for a beginner.</p>
+<ul class="simple">
+<li>YAML</li>
+<li>Twig</li>
+<li>Environments and Dependency Injection Container</li>
+<li>Various weird and magic syntaxes for bundles, <span class="docutils literal"><span class="pre">_controller</span></span> and template names</li>
+<li>Various files to open and poke around in</li>
+<li>Composer</li>
+<li>Maybe even Doctrine</li>
+</ul>
+<p>As a trainer it is very hard to explain all this at the same time.
+It makes a lot of sense to avoid as many of them as possible.</p>
+<p>That is why the Standard Edition is not the best way to start teaching Symfony,
+but one should actually consider a much lighter version of the framework and
+then gradually add more and more features until you end up with the standard
+edition.</p>
+<p>Fabien discussed the simplification of the Symfony Standard Edition from
+another angle before, considering the minimum necessary code to use when
+reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">“Packing a Symfony Full-Stack Application in
+one file”</a>.</p>
+<p>This blog post is about a truely minimal Symfony edition to start learning
+about the framework.  The first thing I like to show is a really simple Hello
+World controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Response</span><span class="p">(</span><span class="s1">'Hello World!'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What is the necessary framework glue code to support this Hello World? Lets start
+from the index file <cite>web/index.php</cite>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
+<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
+at them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">{</span>
+<span class="x">    "require": {</span>
+<span class="x">        "symfony/symfony": "@stable"</span>
+<span class="x">    },</span>
+<span class="x">    "autoload": {</span>
+<span class="x">        "psr-0": { "Acme": "src/" }</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The <cite>composer.json</cite> file installs the latest stable Symfony release and
+adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
+<p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
+and the minimal version of this looks like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
+            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'framework'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">'secret'</span> <span class="o">=&gt;</span> <span class="s1">'some secret here'</span><span class="p">,</span>
+                <span class="s1">'router'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">'resource'</span> <span class="o">=&gt;</span> <span class="s1">'%kernel.root_dir%/config/routing.yml'</span>
+                <span class="p">),</span>
+                <span class="s1">'templating'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'engines'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'twig'</span><span class="p">))</span>
+            <span class="p">));</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In trainings we are starting with a single <span class="docutils literal"><span class="pre">config.yml</span></span> file but that is
+technically not necessary by using the <span class="docutils literal"><span class="pre">ClosureLoader</span></span>. The routing
+component has no such closure loader, so its not possible to avoid
+YAML in the first minutes of Symfony2 exposure and we reference
+the <cite>app/config/routing.yml</cite>:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span/>hello:
+  pattern: /
+  defaults:
+    _controller: "Acme\TrainingBundle\Controller\HelloController::helloAction"
+</pre></div>
+</div>
+<p>Did you know that you can specify controllers in Symfony by using the static callback
+syntax? It has disadvantages when considering bundle inheritance, but why
+bother a beginner with this feature and confuse him with the convention of
+<span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello"</span></span>.</p>
+<p>There are still lots of trip wires to stumble upon in this simple piece of <span class="docutils literal"><span class="pre">routing.yml</span></span>:</p>
+<ul class="simple">
+<li>Tabs are not allowed in YAML, in every training at least one person gets
+bitten by that.</li>
+<li>2 vs 4 spaces ambiguity.</li>
+<li>What is this magic <span class="docutils literal"><span class="pre">_controller</span></span> key?</li>
+<li>I carefully avoid the <span class="docutils literal"><span class="pre">{}</span></span> inline syntax of YAML here as well as it
+introduces yet another ambiguity.</li>
+</ul>
+<p>Run this application with the build in webserver:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php -S localhost:8000 web/index.php
+</pre></div>
+</div>
+<p>Hello World!</p>
+<p>The next step for a beginner is his first twig template to print the Hello
+World. To avoid another confusing convention at the beginning, the <span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello.html.twig"</span></span>
+template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
+that is automatically registered in the Twig Bundle. Just create
+a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'hello.html.twig'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The total number of files is 5 (6 with template) for this example. Note that we
+haven’t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
+the static syntax we don’t need it.</p>
+<p>This is a very good starting point to start exploring more features of Symfony
+and gradually add the required configuration and files for this.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/symfony.html">Symfony</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on April 24, 2014
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2014/01/31/soap_and_php_in_2014.html">SOAP and PHP in 2014</a></h1>
 <blockquote>
 <div>“The SOAP stack is generally regarded as an embarrassing failure these days.”
@@ -670,122 +848,6 @@ Entities metadata.</p>
         <p>
             <small>
                 Posted on December 05, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/11/19/setting_up_development_machines_ansible_edition.html">Setting up development machines: Ansible edition</a></h1>
-<p>A little over a year ago I posted on using <a class="reference external" href="http://www.whitewashing.de/2012/06/03/setting_up_development_machines_with_puppet.html">Puppet for setting up development
-machines</a>.
-This approach prooved useful as during that time I did setup a new machine
-several times and benefited from the mostly automatic installation with Puppet.
-Github is thinking the same on a bigger scale. Earlier this year they
-introduced <a class="reference external" href="https://github.com/blog/1345-introducing-boxen">Boxen</a> which is
-using Puppet to setup mac-development machines.</p>
-<p>The space of deployment- and configuration management tools
-is exploding these last years and it is not always feasible to evaluate all of
-them. The benefit of Puppet over all these tools is its huge userbase and
-online resources. However the steep learning curve can be a huge pain coupled
-with the fact that most of the modules online are not reusable at all and
-mostly serve a documentation for “how not to work with Puppet”. On top of that
-Puppet is only for configuration management and not suitable for deployment
-of applications.</p>
-<div class="section" id="introduction-to-ansible">
-<h2>Introduction to Ansible</h2>
-<p>I came across a <a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible/">blog post on Ansible</a> by the
-awesome guys at Qandidate.com which lead me to investigate <a class="reference external" href="http://ansibleworks.com">Ansible</a>. It is essentially a hybrid between Capistrano and Puppet,
-solving both the deployment and configuration management problems with a focus
-on simplicity. In fact the learning curve of Ansible is much more flat than
-that of Puppet and you can read the whole documentation and understand even the
-advanced concepts in a few hours.</p>
-<p>Ansible is used from a developer- or continuous-integration-machine, which
-executes tasks on hosts from an inventory. You only need SSH servers running
-and private keys to connect to them to get it working. With the inventory of
-hosts to operate on, you can chose to execute ad-oc commands using the
-<cite>ansible</cite> command or playbooks using the <cite>ansible-playbook</cite> command. Playbooks
-are files written in YAML.</p>
-<p><a class="reference external" href="http://labs.qandidate.com/blog/2013/11/15/first-steps-with-ansible">Read Sanders post on the Qandidate blog</a> to get an introduction to Ansible.</p>
-</div>
-<div class="section" id="development-machine-setup">
-<h2>Development-Machine Setup</h2>
-<p>Using Ansible to setup a development machine is a bit pointless, given that
-Ansible excels at remote task execution and distribution. The benefit in
-development-machine setup over Puppet is the simplicity of configuration
-compared to Puppet modules + DSL.</p>
-<p>For demonstration I have converted the puppet examples from my blog post on
-Puppet to Ansible.  To start we have to create a folder and create a new file
-<cite>inventory</cite> in it containing our local machine:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">localhost</span>   <span class="n">ansible_connection</span><span class="o">=</span><span class="n">local</span>
-</pre></div>
-</div>
-<p>This is necessary to convince the remote task execution part of Ansible that
-localhost exists and there is no SSH necessary to get into that machine.</p>
-<p>Now I can create playbooks for the different tools I might want to install and
-setup, such as Vim in a <cite>vim.yml</cite>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>---
-- hosts: localhost
-  tasks:
-    - name: Install VIM
-      apt: pkg=vim state=present
-      sudo: yes
-    - name: Install Dotfiles
-      git: &gt;
-        repo=git@github.com/beberlei/vim-dotfiles.git
-        dest=/home/${ansible_user_id}/.vim
-    - name: Create .vimrc Symlink
-      file: &gt;
-        src=/home/${ansible_user_id}/.vim/vimrc
-        dest=/home/${ansible_user_id}/.vimrc
-        state=symlink
-    - name: Compile and Install Command-T plugin
-      command: &gt;
-        rake make
-        chdir=/home/${ansible_user_id}/.vim/bundle/Command-T
-        creates=/home/${ansible_uesr_id}/.vim/bundle/Command-T/command-t.recipe
-</pre></div>
-</div>
-<p>You can see here, tasks are a list of commands to execute. They are always
-executed in order and stop when the first task in the chain fails. Like in
-puppet you try to make those tasks idempotent through flags such as <cite>creates</cite>,
-signaling when a task needs to be or was already executed. I can optionally
-use sudo to run commands such as installing packages.</p>
-<p>To execute the playbook I call:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$&gt; ansible-playbook -K -i inventory vim.yml
-</pre></div>
-</div>
-<p>With the <span class="docutils literal"><span class="pre">-i</span></span> flag I define the pool of hosts to run on, in our case the
-local machine and the playbook applies the <cite>hosts</cite> filter to that inventory.
-The <cite>-K</cite> parameter prompts me to enter the sudo password for my Ubuntu machine,
-otherwise the tasks will fail.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>Compared to Puppet, the configuration management of Ansible simplifies a lot of
-the assumptions for example on ordering and reusability of tasks. For a
-part-time “devop” like me this is great news, as I don’t need to understand a
-complex tool and can focus on solving problems.</p>
-<p>On top of that the deployment features of Ansible with parallel remote
-execution over SSH make Ansible a powerful tool that I hope to use much more in
-the future.</p>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/ansible.html">Ansible</a>
-                 / 
-                <a href="tags/automation.html">Automation</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on November 19, 2013
                  by Benjamin Eberlei
             </small>
         </p>

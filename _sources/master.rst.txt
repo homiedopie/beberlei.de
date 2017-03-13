@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1
    2017/03/12/explicit_global_state_with_context_objects
    2016/05/28/composer_monorepo_plugin_previously_called_fiddler
    2016/02/21/how_i_use_wordpress_with_git_and_composer

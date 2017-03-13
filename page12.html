@@ -61,6 +61,41 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a></h1>
+<p>This morning I took the time to merge several changes by <a class="reference external" href="http://manuel-pichler.de/">Manuel
+Piechler</a> into <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">my Github
+branch</a> of the
+CodeSniffer Plugin and released a new NBM file for you to
+<a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">download</a>.
+Here are the changes done by Manuel:</p>
+<ul class="simple">
+<li>Ability to specify the path to CodeSniffer Binary</li>
+<li>Automatic Detection of all the installed Coding Standards</li>
+<li>Fixed Automatic Binary Detection on Windows</li>
+</ul>
+<p>The only open TODO for this project is the possibility to specify
+different standards on a per project basis, currently you can only
+choose a global standard.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/netbeans.html">Netbeans</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on April 18, 2010
+                 by beberlei <kontakt@beberlei.de>
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
 <p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
 <p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
@@ -322,55 +357,6 @@ page</a>.</p>
         <p>
             <small>
                 Posted on February 08, 2009
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/02/13/update-on-unittest-and-metrics-tool.html">Update on Unittest and Metrics Tool</a></h1>
-<p>Some days ago i posted about the <a class="reference external" href="http://github.com/beberlei/puma/tree/master">PHP Unittest and Metrics
-Aggregator</a> tool that i
-have written on (and which I have dubbed PUMA). Discussing it with
-people I came to the conclusion that the approach using
-<a class="reference external" href="http://ezcomponents.org">ezcMvcTools</a> is quite problematic that it
-forces to use this application, although the reporting and the
-application are quite separate. This is not against ezcMvcTools: I love
-it, its just the wrong type of support.</p>
-<p>I began to split up the aggregator into some sort of importing-exporting
-tool. You can specify library-, test- and output-directory of your
-application and it will use the tools at hand
-(<a class="reference external" href="http://www.phpunit.de">PHPUnit</a>, <a class="reference external" href="http://www.pdepend.org">PDepend</a>
-and CodeSniffer currently) to generate their XML formatted reports. It
-then parses those XML outputted files and combines their result to give
-a consistent view on your application.</p>
-<p>The Import-To-Output generator uses a three-step approach. An importer
-emits signals to report observers, which will then hand over their
-collected data to specific html pages that are then generated to the
-disc. This is a very flexible approach that allows anyone to extend and
-re-use the tool to generate project metrics, unittest overview and other
-interesting details on your application.</p>
-<p><a class="reference external" href="http://github.com/beberlei/puma/tree/master">Have a look at the tool on
-Github</a> and play with it.
-I would really like to hear your thoughts.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/puma.html">PUMA</a>
-                 / 
-                <a href="tags/testing.html">Testing</a>
-                 / 
-                <a href="tags/metrics.html">Metrics</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 13, 2009
                 
             </small>
         </p>

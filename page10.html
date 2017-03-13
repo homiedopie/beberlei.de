@@ -61,6 +61,152 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">tl;dr Version: I present a list of problems with OOP business applications from
+my personal experience and then introduce 3 approaches that I was put in
+contact with over the last year, DCI, EBI and CQRS. This post is an
+introduction to a series about this approaches.</p>
+</div>
+<p>I mentally divide the world of programming into two large parts:</p>
+<ol class="arabic simple">
+<li>Library and system programming</li>
+<li>business applications</li>
+</ol>
+<p>The first produces code solving technical problems, often in a beautiful and
+dedicated way. The second regularly produces mess, hopefully still
+serving customers by optimizing their business. This differentiation is an
+exaggeration, but from my experience its far easier to run a greenfield business
+project into the ground than a new library.</p>
+<p>There has to be a reason why so many programmers dedicate much free time to
+open source projects. It might be empirical prove, that all our business
+projects don’t make us happy at the end of the day and we have to show
+ourselves that we can do better.</p>
+<p>I enjoy writing business applications more than libraries, but they are also
+much more difficult to get right in both social and technical dimensions.  One
+motivational driver of <a class="reference external" href="https://github.com/beberlei">my open source activities</a> always was to simplify the technical dimension
+of OOP business applications.</p>
+<div class="section" id="my-personal-list-of-annoyances">
+<h2>My Personal List of Annoyances</h2>
+<p>This blog post is not about blaming customers (as the usual suspect), its about
+finding the problems in usual OOP code of business systems from my experience
+with PHP projects. To keep things short, I will list my <em>personal</em> list of
+technical annoyances in business projects in no particular order. These are
+highly subjective points.</p>
+<ul class="simple">
+<li>Getter/Setter Madness of Objects that are used to store data into
+databases. Leading to huge objects that are essentially just meaningless
+stores of data.</li>
+<li>Updating complex object graphs from user input.</li>
+<li>Separation of model, controller and views, especially when dealing with
+forms. This is very complicated to achieve.</li>
+<li>Lazy Loading and Query performance problems when using an ORM. Additionally
+replacing parts of the views with hand-crafted SQL is often difficult and/or
+time intensive, when already using an ORM.</li>
+<li>Inability to decouple code that was written with CRUD (generators and
+utilities) in mind towards more domain driven code, when the requirements
+change.</li>
+<li>Dependency mess leading to hard to test code, generally leading to untested
+applications. Too often frameworks create huge dependencies that
+make your domain model messy and complex to mock in tests.</li>
+<li>Focus on synchronous request/response handling makes later usage of message
+queues very complicated and expensive to refactor towards.</li>
+<li>Tight coupling of model against the framework code.</li>
+<li>Junior developers have too much freedom, when there is not much structure in
+the code, but rather just a big ball of mud. Additionally with the tight
+coupling of so many components, junior developers get easily lost in the code
+and produce unexpected side-effects.</li>
+<li>Use-cases easily span more than 5 classes. To grasp the interaction you have
+to keep lots of code in your head, especially complicated for junior
+developers again. As they cannot really work on a problem in isolation.</li>
+<li>Constant violations of <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29">SOLID</a> principles
+due to framework or persistence requirements.</li>
+<li>Compared to library development, user-facing applications often have much
+higher coupling between classes and namespaces. In libraries its often easy
+to find different concerns, but in applications they seem hard to divide for
+developers.</li>
+<li>In combination with a rich javascript client, requirements to update objects
+through their CRUD API produces concurrency and lost-update hell, that
+dynamic server-side applications could mostly avoid before.</li>
+</ul>
+<p>Essentially if you work in a tight schedule, project based environment where
+the decision makers sell rapid application development and prototyping, then you
+often have only one, maybe one and a half attempts to get the big picture
+right. From that moment on you have to build on that decision and hope for the
+best.</p>
+<p>We have tried not to go the RAD+CRUD tools ways in several projects, to escape
+the problems listed above. But without changes in your mindest you end up with
+hand written mess, compared to getting there with tools.</p>
+<p>Specifically <a class="reference external" href="http://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> applied naively can make
+the problem even worse. It easily leads to lasagna code, where you have layers
+of layers that are very hard to understand. Personally I prefer spaghetti code
+over lasagna code, because its comparatively simpler to understand.</p>
+</div>
+<div class="section" id="finding-new-approaches">
+<h2>Finding new Approaches</h2>
+<p>Rather than to embrace the suck and dive deeper into CRUD architectures, I felt
+there has to be some solution to organize business models structurally to avoid
+all (or most) of these problems. In the PHP world with <a class="reference external" href="http://www.symfony.com">Symfony2</a> and <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a>
+you have a powerful toolbox to avoid many of the problems above, but it is
+still not simple to write clean object oriented applications.</p>
+<p>After years of participation in both open source projects I still feel there is
+a missing puzzle piece, to reach a clean separation of all the model concerns
+from framework and persistence.</p>
+<p>At some point I would really like to close the gap between desired technical
+state of a project and the state it is actually in. I know there is no size
+fits all solution, but I fell a checklist of architectural patterns with pro
+and con arguments allows me to adjust the expectations about how a system looks
+in the end.</p>
+<p>Thanks to <a class="reference external" href="https://twitter.com/go_oh">Gordon</a>, <a class="reference external" href="https://twitter.com/spriebsch">Stefan</a> and <a class="reference external" href="https://twitter.com/tom_noise">Thomas</a>
+I was introduced to several approaches to OO application design that I
+started to explore in the past last months:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Data,_context_and_interaction">Data, Context, Interaction (DCI)</a> - which Gordon
+studied a lot</li>
+<li><a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Entity, Boundary, Interactor (EBI)</a>, also called Hexagonal
+architecture or “Ports and adapters”. Gained popularity after <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">Uncle Bobs talk
+at Ruby Midwest</a>
+last year.</li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">Command-Query-Responsibility-Segregation (CQRS)</a> well described in a
+<a class="reference external" href="http://www.udidahan.com/2009/12/09/clarified-cqrs/">blog post by Udi Dahan</a> and in a hands on <a class="reference external" href="http://www.viddler.com/v/dc528842">one
+day video class</a> by Greg Young.</li>
+</ul>
+<p>They are not new and have all been around for several years already. I would
+describe all three of them as architectural design patterns, though some people
+might probably disagree with this classification. All three approaches make
+you think about application development beyond just “service layers” in
+radically new ways. All three have helped me rethink business applications in
+different ways.</p>
+<p>In the next weeks I will talk about each of these approaches individually, show
+some examples and then wrap up my thoughts about all of them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Gordon and I will talk about this topic on the <a class="reference external" href="http://www.froscon.de/en/home/">Free and Open Source
+Conference</a> in Sankt Augustin Germany on
+25th/26th August of 2012. Feel free to drop by and discuss this topic!</p>
+</div>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 11, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
 <p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
 mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
@@ -510,92 +656,6 @@ control ignore files.</p>
         <p>
             <small>
                 Posted on February 25, 2012
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/02/07/resources-for-a-php-and-hudson-ci-integration.html">Resources for a PHP and Hudson CI Integration</a></h1>
-<p>Yesterday I finally had the time to setup my first continuous
-integration environment. Possible solutions for CI are
-<a class="reference external" href="http://phpundercontrol.org/about.html">phpUnderControl</a>,
-<a class="reference external" href="http://www.hudson-ci.org">Hudson</a> or
-<a class="reference external" href="http://www.arbitracker.org">Arbit</a>. Although phpUnderControl is the
-most wide-spread, but from I heard complex to setup/maintain, solution
-[STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
-to give Hudson a shoot. Another reason for this decision, I heard it has
-a simple plugin architecture and is easy to install and use.
-Additionally Hudson is easily integrated into
-<a class="reference external" href="http://www.netbeans.org">Netbeans</a> and
-<a class="reference external" href="http://www.redmine.org">Redmine</a>, and I use both tools regularly in
-development.</p>
-<p>My motivation to dive into CI is easily explained. I just never felt it
-was necessary to add a continuous integration environment to my projects,
-since I had one or two simple bash scripts that did the job. In general
-this is rather annoying, because they mostly only run PHPUnit and have
-to be done using a cronjob or manually, without any real process of
-notification. Additionally you have no way to navigate the test-results,
-code-coverage and no history of the last builds. For projects like
-<a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> we have the additional
-requirement to support 4 different database platforms, i.e. 4 different
-PHPUnit configurations. Currently that is solved by me using a Bash
-script that iterates over the configuration file names and invokes
-PHPUnit.</p>
-<p>There are already some awesome sources how to get Hudson and PHP
-working. I’ll list them here:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
-Screenshots</a></li>
-<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
-Hudson</a></li>
-<li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
-Screenshots)</a></li>
-</ul>
-<p>All those guides are already awesome and I would recommend choosing one
-of those to install Hudson, I think i can’t add anything new to those. I
-have used Sebastians Howto, however i also like the third one. David
-Luhmans guide adds lots of details that are important to get the
-different parts of a build process to work.</p>
-<p>Now what these tutorials all do is that they use a bash command to
-execute the build process or specify an Ant Build file. However there
-is also a Phing Build process plugin for Hudson that allows to specify
-the build.xml targets to execute in the process. From the “Available
-Plugins” list you can choose the “Phing plugin”.</p>
-<p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
-Plugin Wiki
-Page</a> shows how
-to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
-look for Phing. There you find the dialog to configure your phing
-installations.</p>
-<p>In the context of choosing a build script for your project you can now
-choose “Phing” instead of Ant:</p>
-<div class="figure align-center">
-<img alt="" src="http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849"/>
-</div>
-<p>You can enter the targets to build, for example on my local Hudson
-instance I only execute “test” for Doctrine 2, since I am not interested
-in the building and deployment onto the PEAR channel at this development
-stage.</p>
-<p>From inside Netbeans you can then start builds by pointing to the Hudson
-instance. See this tutorial by one of the <a class="reference external" href="http://blogs.sun.com/joshis/entry/hudson_integration_in_netbeans_6">Hudson + Netbeans
-Developers</a>.
-You can then start all the builds from inside Netbeans and be notified
-of the success or failure.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/continouosintegration.html">ContinouosIntegration</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 07, 2010
                 
             </small>
         </p>
