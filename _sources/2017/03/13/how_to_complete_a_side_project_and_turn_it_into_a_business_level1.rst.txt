@@ -6,7 +6,7 @@ Almost four years ago I wrote about `Lessons learned: A failed side project
 across the post `How to *never* complete anything
 <http://ewanvalentine.io/how-to-never-complete-anything/>`_ several days ago I
 felt it was time for an update. Ewan's post covers similar lessons learned that I
-wrote about in my post and I heard about many side projects since that failed
+wrote about in my post and I heard about many side projects that failed
 because of similar mistakes.
 
 There was an argument on HackerNews what a side project is, so I want to
@@ -46,7 +46,7 @@ Not wanting to make the same mistakes, I have applied all the lessons learned fr
   companies that are now our biggest customers and re-sellers.
 
 - **I did not keep the idea secret**, when I announced our beta program
-  publically in June 2015 the launch newsletter list received 250 sign ups and 60
+  publically in June 2014 the launch newsletter list received 250 sign ups and 60
   Twitter followers in a few hours.
 
 - **I choose boring technology**, using a monolithic Symfony, PHP, MySQL
