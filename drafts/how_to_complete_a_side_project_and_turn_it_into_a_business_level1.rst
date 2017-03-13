@@ -15,12 +15,12 @@ of turning them into a business, as opposed to side-projects that are started fo
 learning new technical skills.
 
 Three years ago I have started working on a PHP profiling and monitoring
-side-project, which is now a successful business called `Tideways
-<https://tideways.io>`_ and I wanted
-to share some of the reasons why I think this project was successful (so far).
+side-project, which I turned into a business called `Tideways
+<https://tideways.io>`_. In this post I wanted to share some of the reasons why
+I think this project was successful.
 
 The idea for "XHProf as a Service" was on my "Side Project Ideas" trello board,
-where I write everything down that I want to try or experiment with.  I have
+where I write everything down that I want to try or experiment with. I have
 picked it out for implementation as my new side project, because that month I
 would have needed this for a large scale load-testing project at my job with
 `Qafoo <https://qafoo.com>`_. It was not the first time I needed this for
@@ -66,7 +66,7 @@ for two years, until the project generated enough revenue after all other costs
 to pay my full time salary.
 
 This felt like passing level 1 in getting a bootstrapped side project of the
-ground (Yeah, there are many more levels after that).
+ground (there are many more levels after that).
 
 .. author:: default
 .. categories:: none
