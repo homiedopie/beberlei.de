@@ -61,6 +61,97 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/01/12/on-publishing-webservices-within-mvc-frameworks.html">On Publishing Webservices within MVC Frameworks</a></h1>
+<p>Webservices are a very important part in today’s enterprise applications.
+They tie applications of different age or programming languages together
+or allow applications of different subcontracters to speak to each
+other. Because they use HTTP, a stateless network protocol, considerable
+overhead floods the pipes when you use them, which should be minimized.</p>
+<p><a class="reference external" href="http://martinfowler.com">Martin Fowler</a> writes in his <a class="reference external" href="http://martinfowler.com/eaaCatalog/">PEAA
+book</a>, that if you have the
+option not to use distributed objects (which are implemented via
+webservice) you should not distribute them. Considerable effort has to
+be brought into keeping complex webservices performant.</p>
+<p>Still people make mistakes about webservices all the time (me included
+for example proposing a dispatcher for the ZF that could be used for
+webservices).</p>
+<p>When people report problems with the Zend Soap component they often post
+a stripped down example that involes their webservice being instantiated
+within a controller. This is a very bad decision based on different
+arguments:</p>
+<ul class="simple">
+<li><strong>Dispatching overhead</strong>: Dispatching, Routing, Pre- and
+Postfiltering is costly in all frameworks. You give up the
+performance of having numerous PHP scripts that act as controller on
+their own. You get centralized filtering, authentication and other
+benefits. But those benefits generally do not aply to XML, JSON or
+SOAP requests, because you cannot parse them or access their
+properties. You give up the performance of a page controller for
+webservices to gain mostly nothing.</li>
+<li><strong>HTTP Request uselessness</strong>: Web frameworks work with HTTP request
+objects. The request of webservices facilitates HTTP to act as a far
+more complex request. No framework I know off, allows to work with
+the webservice requests outside the Webservice handler. What a SOAP
+or XML-RPC request does in your MVC is only get passed through
+numerous costly stages that offer no benefit, before it hits the
+target. Only the parsing of HTTP-Headers might offer additional
+benefit, but the gain is low, since they are available to PHP scripts
+at no cost.</li>
+<li><strong>Webservices already seperate concerns</strong>: Take the PHP SOAPServer as
+an example. It is an MVC application on its own, the controlling
+aspect of the SOAPServer parses the SOAP Request and sends it to the
+model, a class given by the user, which in turn works and returns the
+result as an SOAP Response View. You have to decouple model and view
+for a webservice handler otherwise it would generate invalid
+responses. Why nest a perfectly separated operation into another one?
+You gain no more of this additional separation, except performance
+decrease.</li>
+</ul>
+<p>So what are good practices to implement webservices?</p>
+<ul class="simple">
+<li>Use a page controller that generates no MVC overhead. In context of
+the Zend Framework: Add a new php script to your web root and add a
+new route into your .htaccess file that redirectes the desired
+location of the webservice to the script that overwrites the standard
+catch-all incoming requests to the front controller script.</li>
+<li>Use the proxy pattern and the invaluable __call() method to
+implement wrapper objects for authentication and session management
+of the webservice. These classes can easily be reused by all
+webservice page controllers of your site. If you do your homework you
+can even share parts of these objects inside your Web-MVC application
+to keep the code DRY. Those proxies keep authentication logic out of
+your service class.</li>
+<li>Use the remote facade pattern to implement a few, powerful methods
+that delegate the service request to underlying domain objects. Never
+ever publish direct access to domain objects with your webservices.
+As a rule of thumb, talking to a webservice during a logical
+operation should never involve more than one or two calls. The first
+call is for data fetching, the second for data saving. Authentication
+should be handled via HTTP Authentication to save an additional call.</li>
+</ul>
+<p>If you follow these simple rules, you should get around the performance
+issues that generally come with webservices, without loosing flexibility
+at all.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 12, 2009
+                 by beberlei <kontakt@beberlei.de>
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/01/07/seven-things.html">Seven Things</a></h1>
 <p>I have been tagged by
 <a class="reference external" href="http://dolfschimmel.freeaqingme.com/?p=78">Freeaqingme</a> and the blog
@@ -328,53 +419,6 @@ looking forward to see you at IPC.</p>
             <small>
                 Posted on March 10, 2009
                 
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
-<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/">PHP CodeSniffer for
-Netbeans
-plugin</a>.
-Previously the plugin used an unnecessary API which restricted the use
-to Netbeans 6.7.0 only. This API was removed so that the plugin should
-now work with all Netbeans Versions &gt;= 6.7.0.</p>
-<p>Additionally when working the previous version would scan every PHP
-script on a file per file basis when the all projects or main projects
-filters were activated. This rendered made the plugin almost useless. In
-the current version scans of filters that contain more than one file are
-blocked. That means you will only see Coding Violations when you enable
-the “Current File” filter. Using any other filter will just do nothing
-and won’t put your Netbeans in permanent hibernation mode (aka useless
-mode).</p>
-<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
-<strong>`NbPreferences
-API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
-which allows to configure the coding standard. [STRIKEOUT:However this
-feature was contributed by <a class="reference external" href="http://manuel-pichler.de/">Manuel
-Piechler</a> and I don’t yet understand how I
-can manipulate it. Maybe someone knows how (*Looking in Mapis general
-direction*)?] By default the Zend Coding Standard is used.</p>
-<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
-file .netbeans/6.7/config/Preferences.properties setting
-“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
-inline highlighting that did not refresh when lines in the file changed.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/netbeans.html">Netbeans</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on October 05, 2009
-                 by beberlei <kontakt@beberlei.de>
             </small>
         </p>
     </div>

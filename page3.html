@@ -61,6 +61,172 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
+<p>I have written about why I think <a class="reference external" href="http://www.whitewashing.de/2013/04/12/traits_are_static_access.html">traits should be avoided</a>. There
+is a practical use-case that serves me well however: Extending PHPUnit tests.</p>
+<p>The PHPUnit TestCase is not very extendable except through inheritance. This
+often leads to a weird, deep inheritance hierachy in testsuites to achieve code
+reuse. For example the Doctrine ORM testsuite having <span class="docutils literal"><span class="pre">OrmFunctionalTestCase</span></span>
+extending from <span class="docutils literal"><span class="pre">OrmTestCase</span></span> extending from PHPUnits testcase.</p>
+<p>Dependency Injection is something that is not possible easily in a PHPUnit
+testcase, but could be solved using an additional listener and some
+configuration in <span class="docutils literal"><span class="pre">phpunit.xml</span></span>.</p>
+<p>This leaves traits as a simple mechanism that doesn’t require writing an
+extension for PHPUnit and allows “multiple inheritance” to compose different
+features for our test cases.</p>
+<p>See this simple example that is adding some more assertions:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">trait</span> <span class="nx">MyAssertions</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">assertIsNotANumber</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nb">is_nan</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MathTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">MyAssertions</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testIsNotANumber</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertIsNotANumber</span><span class="p">(</span><span class="nb">acos</span><span class="p">(</span><span class="mi">8</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When you have more complex requirements, you might need the trait to implement
+<span class="docutils literal"><span class="pre">setUp()</span></span> method. This will prevent you from using multiple traits that all
+need to invoke <span class="docutils literal"><span class="pre">setUp()</span></span>. You could use the trait conflict resolution, but
+then the renamed setup methods do not get called anymore.</p>
+<p>Fortunately PHPUnit 3.8+ comes to the rescue with new <span class="docutils literal"><span class="pre">@before</span></span> and
+<span class="docutils literal"><span class="pre">@beforeClass</span></span> annotations.</p>
+<p>See this trait I use for making sure my database is using the
+most current database version by invoking migrations in <span class="docutils literal"><span class="pre">@beforeClass</span></span></p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\DBAL\DriverManager</span><span class="p">;</span>
+
+<span class="k">trait</span> <span class="nx">DatabaseSetup</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var bool</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="nv">$initialized</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @beforeClass</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">initializeDatabase</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+        <span class="nv">$conn</span> <span class="o">=</span> <span class="nx">DriverManager</span><span class="o">::</span><span class="na">getConnection</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'TEST_DATABASE_DSN'</span><span class="p">]</span>
+        <span class="p">));</span>
+
+        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/../../src/schema'</span><span class="p">));</span>
+        <span class="nv">$dbDeploy</span><span class="o">-&gt;</span><span class="na">migrate</span><span class="p">();</span>
+        <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>I could mix this with a second trait <span class="docutils literal"><span class="pre">SymfonySetup</span></span> that makes the DIC
+container available for my integration tests:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
+
+<span class="k">trait</span> <span class="nx">SymfonySetup</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$kernel</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @before</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">setupKernel</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createKernel</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">boot</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">getContainer</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">createKernel</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">\AppKernel</span><span class="p">(</span><span class="s1">'test'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @after</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">tearDownSymfonyKernel</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">!==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">shutdown</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The Symfony setup trait uses <span class="docutils literal"><span class="pre">@before</span></span> and <span class="docutils literal"><span class="pre">@after</span></span> to setup and cleanup
+without clashing with the traditional PHPUnit <span class="docutils literal"><span class="pre">setUp</span></span> method.</p>
+<p>Combining all this we could write a testcase like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserRepositoryTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">DatabaseSetup</span><span class="p">;</span>
+    <span class="k">use</span> <span class="nx">SymfonySetup</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// do setup here</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testNotFindUserReturnsNull</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$userRepository</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'user_repository'</span><span class="p">);</span>
+        <span class="nv">$unusedId</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">;</span>
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$userRepository</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$unusedId</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Sadly the <span class="docutils literal"><span class="pre">@before</span></span> calls are invoced <em>after</em> the original <span class="docutils literal"><span class="pre">setup()</span></span> method
+so we cannot access the Symfony container here already. Maybe it would be more
+practical to have it work the other way around. I have <a class="reference external" href="https://github.com/sebastianbergmann/phpunit/issues/1616">opened an issue on
+PHPUnit</a> for that.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/testing.html">Testing</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 14, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a></h1>
 <p>TL;DR: I was one voice for having strict type hints until I tried the current
 patch. From both a library and application developer POV they don’t bring much
@@ -829,102 +995,6 @@ in new 2.0 version of the bundle.</p>
         <p>
             <small>
                 Posted on October 14, 2014
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a></h1>
-<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki’s</a> on the
-<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
-conference last week about Legacy Code and Refactoring. In the session a piece
-of real-world code was shown that contained one of most common code smells in
-LegacyCode: Feature Envy.</p>
-<p>Martin Fowler describes this smell as “a method that seems more interested in
-a class other than the one it is in. The most common focus of the envy is the
-data.”</p>
-<p>This code smell causes two very similar problems in a code base:</p>
-<ul class="simple">
-<li>Duplication of rules related to their data throughout the code base.</li>
-<li>Spreading domain concepts throughout the whole code-base.</li>
-</ul>
-<p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
-PHP projects. We often see code such as the following computation to
-create a range of dates for a reporting function:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$start</span><span class="p">;</span>
-    <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
-
-    <span class="c1">// calculation code here</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This is a really simple example for Feature Envy: The computation and
-validation of creating an end date some days in the future of a start date
-can easily be duplicated throughout the whole code base and implements
-business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">DateTime</span>
-<span class="p">{</span>
-    <span class="c1">// ... other methods</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-        <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="nv">$endDate</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$endDate</span> <span class="o">=</span> <span class="nv">$start</span><span class="o">-&gt;</span><span class="na">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
-
-    <span class="c1">// calculation code here.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>(Note: You cant extend the builtin DateTime this way and need to subclass).</p>
-<p>This is a great way to improve your code base massively and achieve what
-Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
-domain by encapsulating data and behavior.</p>
-<p>Learning to spot this kind of Feature Envy is a very good way to incrementally
-improve your legacy code base towards better models. I find it very interesting
-that the focus on fixing technical code-smells duplication and feature envy
-actually leads to a better domain model. As a side effect it massively
-deemphasizes DDD building blocks like Entity or Value Object, which in my
-opinion are a big cause for confusion. Testability increases as well, because
-data objects with behavior are much simpler to setup for testing.</p>
-<p>That is why I recommend learning about Feature Envy. For me it is a very simple
-approach to find improvements.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/codequality.html">CodeQuality</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 11, 2014
                  by Benjamin Eberlei
             </small>
         </p>

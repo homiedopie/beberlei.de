@@ -61,6 +61,53 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/10/05/php-codesniffer-for-netbeans-v0-2.html">PHP CodeSniffer for Netbeans v0.2</a></h1>
+<p>I finally found some time to spend some time on the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/">PHP CodeSniffer for
+Netbeans
+plugin</a>.
+Previously the plugin used an unnecessary API which restricted the use
+to Netbeans 6.7.0 only. This API was removed so that the plugin should
+now work with all Netbeans Versions &gt;= 6.7.0.</p>
+<p>Additionally when working the previous version would scan every PHP
+script on a file per file basis when the all projects or main projects
+filters were activated. This rendered made the plugin almost useless. In
+the current version scans of filters that contain more than one file are
+blocked. That means you will only see Coding Violations when you enable
+the “Current File” filter. Using any other filter will just do nothing
+and won’t put your Netbeans in permanent hibernation mode (aka useless
+mode).</p>
+<p>There is also some preference <strong>“phpcs.codingStandard”</strong> using the
+<strong>`NbPreferences
+API &lt;http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html&gt;`_</strong>
+which allows to configure the coding standard. [STRIKEOUT:However this
+feature was contributed by <a class="reference external" href="http://manuel-pichler.de/">Manuel
+Piechler</a> and I don’t yet understand how I
+can manipulate it. Maybe someone knows how (*Looking in Mapis general
+direction*)?] By default the Zend Coding Standard is used.</p>
+<p><strong>Update:</strong> Coding Standard can be changed by hacking into the config
+file .netbeans/6.7/config/Preferences.properties setting
+“phpcs.CodingStandard=”. Additionally I fixed several bugs with the
+inline highlighting that did not refresh when lines in the file changed.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/netbeans.html">Netbeans</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on October 05, 2009
+                 by beberlei <kontakt@beberlei.de>
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html">Trying a Two Step PEAR/PHAR approach to develop and deploy</a></h1>
 <p>With PHP 5.3 the PHAR extension is a pretty powerful concept for all
 your deployment needs, however it does not tell the complete story.
@@ -435,111 +482,6 @@ development. At least it has all the features I need for now.</p>
         <p>
             <small>
                 Posted on February 12, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/05/25/introducing-zend-controller-scaffolding.html">Introducing: Zend Controller Scaffolding</a></h1>
-<p>In the last couple of weeks I <a class="reference external" href="http://codecaine.co.za/posts/form-generation-with-zend-form-part-2/">came across the
-idea</a>
-of building a little component for scaffolding in Zend Framework. After
-playing around with this idea a little I came up with an
-Zend_Controller_Scaffolding object, which extends the
-Zend_Controller_Action object.</p>
-<p>It takes any Zend_Db_Table_Abstract object and generates create and
-update forms using Zend_Form and displays them in the Controller. The
-component is very easy to use, as this example shows:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class SomeController extends WW_Controller_Scaffolding {
-    public function init() {
-        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>You now have access to the following actions of the controller:
-some/create some/edit some/delete and some/index (some/list). They
-handle all your model editing dreams.</p>
-<p>All you have to own is the WW_Controller_Scaffolding Library Class and
-a folder of scaffolding view templates both of which are <a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">bundled in an
-archive you can
-download</a>.</p>
-<p><strong>Download</strong></p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">Download Version
-0.5.5</a></li>
-</ul>
-<p><strong>Changes</strong></p>
-<ul class="simple">
-<li>0.5.5: Put Component into own Namespace (WW = Whitewashing). Make it
-possible to hide fields in the list via the options. Allow to specify
-scaffolding view scripts folder via options.</li>
-</ul>
-<p><strong>Install &amp; Usage</strong></p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>Untar the two folders include/ and views/ into your
-Zend Framework project application directory.
-
-Make sure the include folder is in your Zend_Loader
-include path or move the Scaffolding.php so that it
-is placed in your library include path.
-
-Define each Controller that should be a Scaffolding Interface
-as:
-
-class SomeController extends WW_Controller_Scaffolding {
-    public function init() {
-        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
-    }
-}
-
-Where $options is an array or Zend_Config object with any of the following keys:
-
-  'allow_edit_primary_key' True/false - Whether the form allows you to set the
-                          Primary Key fields or not
-
- 'field_names' an Array of the Database Tables field names mapped to Label Names
-
- 'hide_list_fields' Array of database table field names that should not be displayed in the list overview.
-
- 'checkbox' an Array of Database Table field names that should be represented
-            as Checkbox. Useful for TINYINT(1) fields that represent boolean decisions.
-
- 'view_folder' Sometimes you want to use different views for scaffolding in one project. Use
-               this variable and copy the scaffolding folder for each component you want to
-               change the view basics for.
-</pre></div>
-</div>
-</div></blockquote>
-<p><strong>Todos &amp; Problems:</strong></p>
-<ul class="simple">
-<li>Many To Many Relationships are not implemented yet (Using
-MultiSelec).</li>
-<li>Compound Keys are probably not working correctly</li>
-<li>Relationships on non-primary key fields probably don’t work as
-expected</li>
-<li>Relationships with lots of data are not scaled down for easy
-administration.</li>
-</ul>
-<p>Please report any bugs and feature requests or recommendations to
-<strong>kontakt at beberlei dot de</strong>.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on May 25, 2008
                 
             </small>
         </p>

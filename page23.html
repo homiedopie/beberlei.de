@@ -61,6 +61,34 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/22/knights-tour-using-warndorff-s-rule.html">Knights Tour using Warndorff’s rule</a></h1>
+<p>When using <a class="reference external" href="http://web.telia.com/~u85905224/knight/eWarnsd.htm">Warndorff’s
+rule</a> for solving
+the Knights Tour problem, the solution is found within a second. It took
+some time for me to realize it in PASCAL though using a <strong>RECORD</strong> type
+to match the jumps to the number of free fields and then sort them. You
+can view my source code
+<a class="reference external" href="http://www.beberlei.de/sources/knightstour.txt">here</a>.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/algorithms.html">Algorithms</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 22, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal-supplement.html">A knight’s tour solver in pascal - supplement</a></h1>
 <p>Following my <a class="reference external" href="http://www.whitewashing.de/blog/articles/6">earlier post on the Knights
 tour</a>: It seems it is
@@ -195,103 +223,6 @@ as PHP code:</p>
             <small>
                 Posted on January 20, 2008
                 
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
-<p>When you start writing with a Framework like Zend like I did in the last
-weeks, you probably are still haunted by all the bad habits of pseudo
-object orientated PHP design, using lots of require and include’s.
-Zend_Loader doesn’t seem to help at first, its just another command
-(Zend_Loader::loadClass or ::loadFile). It sucks to register lots of
-autoload paths too.</p>
-<p>I wrote my own Zend_Loader child class. It grabs all include paths from
-a config File using the Zend_Config class, and completely frees you of
-thinking about includes.</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class WWLoader extends Zend_Loader
-{
-    private static $dirs = NULL;
-
-    public static function loadClass($class)
-    {
-        if(self::$dirs===NULL) {
-            //
-            // Include directories of this application are saved in a configuration file. If it has not been
-            // loaded before do so now and safe everything to the private static variable $dirs which will
-            // then be used in further loadings
-            //
-            $dirs = array();
-            $conf_app_path = new Zend_Config_Ini(sprintf('%s%s', constant('ZEND_CONFIG_PATH'), 'application.ini'), 'appincludepath');
-            self::extractPaths($conf_app_path-&gt;toArray(), $dirs);
-            self::$dirs = $dirs;
-        }
-
-        parent::loadClass($class, self::$dirs, true);
-    }
-
-    public static function autoload($class)
-    {
-        try {
-            self::loadClass($class);
-            return $class;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Given an array with subkeys of include paths this function unifies this array to
-     * a single one and returns the result in the second argument $dirs which is given
-     * by reference.
-     *
-     * @param Array $array
-     * @param Array $dirs
-     */
-    public static function extractPaths($array, &amp;$dirs)
-    {
-        foreach($array AS $k =&gt; $v) {
-            if(is_array($v)) {
-                self::extractPaths($v, $dirs);
-            } else {
-                $dirs[] = $v;
-            }
-        }
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>ZEND_CONFIG_PATH is the only constant I use in my application. I
-initialize the following at the beginning of my bootstrap file:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="n">define</span><span class="p">(</span><span class="s1">'ZEND_CONFIG_PATH'</span><span class="p">,</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s2">"/../application/config/"</span><span class="p">);</span>
-
-<span class="n">require_once</span> <span class="s1">'Zend/Loader.php'</span><span class="p">;</span>
-<span class="n">require_once</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s1">'/../application/include/WWLoader.php'</span><span class="p">;</span>
-<span class="n">Zend_Loader</span><span class="p">::</span><span class="n">registerAutoload</span><span class="p">();</span>
-<span class="n">Zend_Loader</span><span class="p">::</span><span class="n">registerAutoload</span><span class="p">(</span><span class="s1">'WWLoader'</span><span class="p">);</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>After that, its just Objects.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 20, 2008
-                 by beberlei <kontakt@beberlei.de>
             </small>
         </p>
     </div>

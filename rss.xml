@@ -5,8 +5,40 @@
         <link>https://beberlei.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Mon, 13 Mar 2017 00:00:00 +0100</pubDate>
+        <pubDate>Wed, 29 Mar 2017 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>https://beberlei.de/2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html</link>
+            <guid>https://beberlei.de/2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html</guid>
+            <title><![CDATA[Why does the PHP extension fail to load with _zval_ptr_dtor_wrapper error]]></title>
+            <description><![CDATA[<h1>Why does the PHP extension fail to load with _zval_ptr_dtor_wrapper error</h1>
+<p>I sometimes come across this error when loading an extension in PHP</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">PHP</span> <span class="ne">Warning</span><span class="p">:</span>  <span class="n">PHP</span> <span class="n">Startup</span><span class="p">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">load</span> <span class="n">dynamic</span> <span class="n">library</span>
+<span class="s1">'/usr/lib64/php-zts/5.5/modules/myext.so'</span> <span class="o">-</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">php</span><span class="o">-</span><span class="n">zts</span><span class="o">/</span><span class="mf">5.5</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">myext</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="n">undefined</span> <span class="n">symbol</span><span class="p">:</span>
+<span class="n">_zval_ptr_dtor_wrapper</span> <span class="ow">in</span> <span class="n">Unknown</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>From the Google results it is not very easy to find out what this means.</p>
+<p>Technically the extension was compiled with a PHP version using the
+<span class="docutils literal"><span class="pre">-enable-debug</span></span> flag, which wraps all calls to <span class="docutils literal"><span class="pre">zval_ptr_dtor</span></span> in a wrapper
+macro that does not exist in a regular, non-debug build.</p>
+<p>But a debug extension and non-debug PHP are incompatible.</p>
+<p>PHP extensions are only compatible between different installations if the
+following constraints are the same for the compiling and the executing PHP
+binary:</p>
+<ul class="simple">
+<li>OS (Linux, Mac)</li>
+<li>libc (glibc or musl for Alpine)</li>
+<li>PHP version up to the minor level (5.5, 5.6, 7.0, 7.1)</li>
+<li>extension version (20151012 for PHP 7.0)</li>
+<li>thread-safety (ZTS) or non-thread-safety (NTS)</li>
+<li>debug or non-debug (<span class="docutils literal"><span class="pre">--enable-debug</span></span> flag during compile).</li>
+</ul>
+]]></description>
+             <pubDate>Wed, 29 Mar 2017 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>https://beberlei.de/2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1.html</link>
             <guid>https://beberlei.de/2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1.html</guid>

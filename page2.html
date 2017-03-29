@@ -61,6 +61,62 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
+<p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
+is a way for monolithic PHP repositories with multiple components
+that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
+<p>It relies on a new composer.json for each component and uses
+the autoloading capabilities of Composer in a hackish way.</p>
+<p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
+<span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
+its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"Foo"</span><span class="p">:</span> <span class="s2">"../foo/src/"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This approach is very simple to start with, however it has some downsides
+you must take into account:</p>
+<ul class="simple">
+<li>you have to redefine dependencies in every composer.json that relies
+on another component.</li>
+<li>if foo and bar depend on different versions of some third library <span class="docutils literal"><span class="pre">baz</span></span>
+that are not compatible, then composer will not realize this and your
+code will break at runtime.</li>
+<li>if you want to generate deployable units (tarballs, debs, ..) then
+you will have a hard time to collect all the implicit dependencies
+by traversing the autoloader for relative definitions.</li>
+<li>A full checkout has multiple vendor directories with a lot of duplicated
+code.</li>
+</ul>
+<p>I think this approach is ok, if you are only sharing a small number of
+components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
+problems by forcing to rely on the same dependencies in a project globally and
+only once.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/monorepos.html">Monorepos</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 08, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/06/12/the_containertest.html">The ContainerTest</a></h1>
 <p>This is a short post before the weekend about testing in applications with
 dependency injection container (DIC). This solution helps me with a problem
@@ -629,172 +685,6 @@ outside when invoking the role:</p>
         <p>
             <small>
                 Posted on February 19, 2015
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
-<p>I have written about why I think <a class="reference external" href="http://www.whitewashing.de/2013/04/12/traits_are_static_access.html">traits should be avoided</a>. There
-is a practical use-case that serves me well however: Extending PHPUnit tests.</p>
-<p>The PHPUnit TestCase is not very extendable except through inheritance. This
-often leads to a weird, deep inheritance hierachy in testsuites to achieve code
-reuse. For example the Doctrine ORM testsuite having <span class="docutils literal"><span class="pre">OrmFunctionalTestCase</span></span>
-extending from <span class="docutils literal"><span class="pre">OrmTestCase</span></span> extending from PHPUnits testcase.</p>
-<p>Dependency Injection is something that is not possible easily in a PHPUnit
-testcase, but could be solved using an additional listener and some
-configuration in <span class="docutils literal"><span class="pre">phpunit.xml</span></span>.</p>
-<p>This leaves traits as a simple mechanism that doesn’t require writing an
-extension for PHPUnit and allows “multiple inheritance” to compose different
-features for our test cases.</p>
-<p>See this simple example that is adding some more assertions:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">trait</span> <span class="nx">MyAssertions</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">assertIsNotANumber</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nb">is_nan</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">class</span> <span class="nc">MathTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">MyAssertions</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">testIsNotANumber</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertIsNotANumber</span><span class="p">(</span><span class="nb">acos</span><span class="p">(</span><span class="mi">8</span><span class="p">));</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>When you have more complex requirements, you might need the trait to implement
-<span class="docutils literal"><span class="pre">setUp()</span></span> method. This will prevent you from using multiple traits that all
-need to invoke <span class="docutils literal"><span class="pre">setUp()</span></span>. You could use the trait conflict resolution, but
-then the renamed setup methods do not get called anymore.</p>
-<p>Fortunately PHPUnit 3.8+ comes to the rescue with new <span class="docutils literal"><span class="pre">@before</span></span> and
-<span class="docutils literal"><span class="pre">@beforeClass</span></span> annotations.</p>
-<p>See this trait I use for making sure my database is using the
-most current database version by invoking migrations in <span class="docutils literal"><span class="pre">@beforeClass</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Doctrine\DBAL\DriverManager</span><span class="p">;</span>
-
-<span class="k">trait</span> <span class="nx">DatabaseSetup</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @var bool</span>
-<span class="sd">     */</span>
-    <span class="k">private</span> <span class="k">static</span> <span class="nv">$initialized</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @beforeClass</span>
-<span class="sd">     */</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">initializeDatabase</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span><span class="p">;</span>
-        <span class="p">}</span>
-
-        <span class="nx">self</span><span class="o">::</span><span class="nv">$initialized</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-
-        <span class="nv">$conn</span> <span class="o">=</span> <span class="nx">DriverManager</span><span class="o">::</span><span class="na">getConnection</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-            <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'TEST_DATABASE_DSN'</span><span class="p">]</span>
-        <span class="p">));</span>
-
-        <span class="nv">$dbDeploy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DbDeploy</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/../../src/schema'</span><span class="p">));</span>
-        <span class="nv">$dbDeploy</span><span class="o">-&gt;</span><span class="na">migrate</span><span class="p">();</span>
-        <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>I could mix this with a second trait <span class="docutils literal"><span class="pre">SymfonySetup</span></span> that makes the DIC
-container available for my integration tests:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Xhprof</span><span class="p">;</span>
-
-<span class="k">trait</span> <span class="nx">SymfonySetup</span>
-<span class="p">{</span>
-    <span class="k">protected</span> <span class="nv">$kernel</span><span class="p">;</span>
-    <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @before</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">setupKernel</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createKernel</span><span class="p">();</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">boot</span><span class="p">();</span>
-
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">getContainer</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">createKernel</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="nx">\AppKernel</span><span class="p">(</span><span class="s1">'test'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @after</span>
-<span class="sd">     */</span>
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">tearDownSymfonyKernel</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">!==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span><span class="o">-&gt;</span><span class="na">shutdown</span><span class="p">();</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The Symfony setup trait uses <span class="docutils literal"><span class="pre">@before</span></span> and <span class="docutils literal"><span class="pre">@after</span></span> to setup and cleanup
-without clashing with the traditional PHPUnit <span class="docutils literal"><span class="pre">setUp</span></span> method.</p>
-<p>Combining all this we could write a testcase like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">UserRepositoryTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">DatabaseSetup</span><span class="p">;</span>
-    <span class="k">use</span> <span class="nx">SymfonySetup</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="c1">// do setup here</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">testNotFindUserReturnsNull</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$userRepository</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'user_repository'</span><span class="p">);</span>
-        <span class="nv">$unusedId</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">;</span>
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$userRepository</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$unusedId</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Sadly the <span class="docutils literal"><span class="pre">@before</span></span> calls are invoced <em>after</em> the original <span class="docutils literal"><span class="pre">setup()</span></span> method
-so we cannot access the Symfony container here already. Maybe it would be more
-practical to have it work the other way around. I have <a class="reference external" href="https://github.com/sebastianbergmann/phpunit/issues/1616">opened an issue on
-PHPUnit</a> for that.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/testing.html">Testing</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 14, 2015
                  by Benjamin Eberlei
             </small>
         </p>

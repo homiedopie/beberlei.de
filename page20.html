@@ -61,6 +61,40 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/11/01/performance-in-calypso-and-bugs.html">Performance in Calypso (and Bugs)</a></h1>
+<p>I have tested Calypso performance some weeks ago and have not been able
+to write on it before. Don’t use it please its fucking slow and cannot
+be optimized in the current architecture, because the template will NOT
+be parsed into intermediate PHP code.</p>
+<p>Additionally there are some bugs:</p>
+<ol class="arabic simple">
+<li>You cannot currently use UTF8 encoding since htmlentities deep in the
+escape mechanism cannot be given the utf-8 specification.</li>
+<li>Triple or higher inheritance may not work under some circumstances.
+Which sucks.</li>
+</ol>
+<p>I sadly have no time currently to fix any of the issues poping up with
+Calypso, so please don’t use it for anything production.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on November 01, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/11/29/encouraging-forks-for-calypso-dtl.html">Encouraging forks for Calypso DTL</a></h1>
 <p>I still get a bunch of emails regarding the <a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template
 engine</a> that I have written some month
@@ -207,123 +241,6 @@ accessible!</p>
             <small>
                 Posted on August 02, 2008
                  by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html">First impressions on Zend_Soap and a basic implementation</a></h1>
-<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> release candidate for
-version 1.6 includes a new component for SOAP operations.
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.html">Zend_Soap_Server/Client</a>
-extend the PHP functionality of the SOAPClient and SOAPServer objects,
-which by itself is trivial. The more important functionality it ads to
-the package is the <a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.autodiscovery.introduction.html">AutoDiscovery
-Component</a>.</p>
-<p>Generally you can use <a class="reference external" href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> in the
-so called “non-wsdl” mode, that is if you specify the correct options
-like the soap service location and uri, you don’t need any description
-of the service for the clients. This is only useful if you’re using the
-SOAP Service internally since you then know about all the available
-functions and methods. If you want to offer the Service for external
-users you want to use the WSDL-mode: Generate a
-<a class="reference external" href="http://en.wikipedia.org/wiki/Web_Services_Description_Language">WSDL</a>
-that describes the services available methods, their parameters and
-return types is an important task.</p>
-<p>Using Zend_Soap_AutoDiscover you can generate your WSDL file
-automatically by reflecting on the given Service Class methods. This
-works as follows. We setup a simple service:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="k">class</span> <span class="nc">HelloWorldService</span>
-<span class="p">{</span>
-    <span class="o">/**</span>
-     <span class="o">*</span> <span class="nd">@return</span> <span class="n">string</span>
-     <span class="o">*/</span>
-    <span class="n">public</span> <span class="n">function</span> <span class="n">helloWorld</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="s2">"Hello World!"</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="o">/**</span>
-     <span class="o">*</span> <span class="nd">@return</span> <span class="n">array</span>
-     <span class="o">*/</span>
-    <span class="n">public</span> <span class="n">function</span> <span class="n">getFruits</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'apple'</span><span class="p">,</span> <span class="s1">'orange'</span><span class="p">,</span> <span class="s1">'banana'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>It is important that you specify the Doc Comments @param and @return
-otherwise the AutoDiscovery of the correct parameter and return types
-cannot be resolved. We will now setup a simple SOAP Server access point,
-that will also generate our WSDL file for description of this HelloWorld
-service:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "HelloWorldService.php";
-require_once "Zend/Soap/Server.php";
-require_once "Zend/Soap/AutoDiscover.php";
-
-if(isset($_GET['wsdl'])) {
-    $autodiscover = new Zend_Soap_AutoDiscover();
-    $autodiscover-&gt;setClass('HelloWorldService');
-    $autodiscover-&gt;handle();
-} else {
-
-    $soap = new Zend_Soap_Server("http://localhost/soapserver.php?wsdl"); // this current file here
-    $soap-&gt;setClass('HelloWorldService');
-    $soap-&gt;handle();
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now we have our SOAP Service up and running and any client can access
-the HelloWorldService class from a remote or local location with just
-this simple lines:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "Zend/Exception.php";
-require_once "Zend/Soap/Client.php";
-
-try {
-    $client = new Zend_Soap_Client("http://localhost/soapserver.php?wsdl"); // Servers WSDL Location
-    $string =  $client-&gt;helloWorld();
-    $fruits = $client-&gt;getFruits();
-
-    var_dump($string);
-    var_dump($fruits);
-} catch(Zend_Exception $e) {
-    echo $e-&gt;getMessage();
-}
-</pre></div>
-</div>
-<p>This is easy. Additionally Zend_Soap offers a WSDL class to
-generate your own WSDL file based on your special preferences, which
-is a nice feature. I guess only some people can write a correct WSDL
-XML specification file on their own from scratch, so using a
-powerful helper is reasonable.</p>
-<p>The usage of Zend_Soap is quite simple and straightforward as is
-PHP5’s internal SOAP Service and might therefore gain widespread
-use. I have never tested PEAR’s WSDL Autodiscovery, so i cannot draw
-comparisons.</p>
-</div></blockquote>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/soap.html">SOAP</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 08, 2008
-                
             </small>
         </p>
     </div>

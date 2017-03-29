@@ -61,6 +61,111 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/05/25/introducing-zend-controller-scaffolding.html">Introducing: Zend Controller Scaffolding</a></h1>
+<p>In the last couple of weeks I <a class="reference external" href="http://codecaine.co.za/posts/form-generation-with-zend-form-part-2/">came across the
+idea</a>
+of building a little component for scaffolding in Zend Framework. After
+playing around with this idea a little I came up with an
+Zend_Controller_Scaffolding object, which extends the
+Zend_Controller_Action object.</p>
+<p>It takes any Zend_Db_Table_Abstract object and generates create and
+update forms using Zend_Form and displays them in the Controller. The
+component is very easy to use, as this example shows:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You now have access to the following actions of the controller:
+some/create some/edit some/delete and some/index (some/list). They
+handle all your model editing dreams.</p>
+<p>All you have to own is the WW_Controller_Scaffolding Library Class and
+a folder of scaffolding view templates both of which are <a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">bundled in an
+archive you can
+download</a>.</p>
+<p><strong>Download</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.beberlei.de/sources/zend_controller_scaffolding-0.5.5.tar.gz">Download Version
+0.5.5</a></li>
+</ul>
+<p><strong>Changes</strong></p>
+<ul class="simple">
+<li>0.5.5: Put Component into own Namespace (WW = Whitewashing). Make it
+possible to hide fields in the list via the options. Allow to specify
+scaffolding view scripts folder via options.</li>
+</ul>
+<p><strong>Install &amp; Usage</strong></p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>Untar the two folders include/ and views/ into your
+Zend Framework project application directory.
+
+Make sure the include folder is in your Zend_Loader
+include path or move the Scaffolding.php so that it
+is placed in your library include path.
+
+Define each Controller that should be a Scaffolding Interface
+as:
+
+class SomeController extends WW_Controller_Scaffolding {
+    public function init() {
+        $this-&gt;setScaffolding(new ZendDbTableModel(), $options);
+    }
+}
+
+Where $options is an array or Zend_Config object with any of the following keys:
+
+  'allow_edit_primary_key' True/false - Whether the form allows you to set the
+                          Primary Key fields or not
+
+ 'field_names' an Array of the Database Tables field names mapped to Label Names
+
+ 'hide_list_fields' Array of database table field names that should not be displayed in the list overview.
+
+ 'checkbox' an Array of Database Table field names that should be represented
+            as Checkbox. Useful for TINYINT(1) fields that represent boolean decisions.
+
+ 'view_folder' Sometimes you want to use different views for scaffolding in one project. Use
+               this variable and copy the scaffolding folder for each component you want to
+               change the view basics for.
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Todos &amp; Problems:</strong></p>
+<ul class="simple">
+<li>Many To Many Relationships are not implemented yet (Using
+MultiSelec).</li>
+<li>Compound Keys are probably not working correctly</li>
+<li>Relationships on non-primary key fields probably don’t work as
+expected</li>
+<li>Relationships with lots of data are not scaled down for easy
+administration.</li>
+</ul>
+<p>Please report any bugs and feature requests or recommendations to
+<strong>kontakt at beberlei dot de</strong>.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 25, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/05/18/my-2-cents-on-zend-search-lucene-update-problems.html">My 2 cents on Zend_Search_Lucene Update Problems</a></h1>
 <p><a class="reference external" href="http://framework.zend.com">Zend_Search_Lucene</a> (or Lucene in
 general) does not support an update statement, therefore we must check
@@ -273,65 +378,6 @@ Zend is not taking part).</p>
         <p>
             <small>
                 Posted on May 07, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/06/30/implementing-zend-auth-acl-and-caching.html">Implementing Zend Auth, Acl and Caching</a></h1>
-<p>I managed to work a bit on the blog, enabling me to have new instance in
-the series, How to refactor and extend your own blog software using
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a>. This time: Implementing
-meaningful Auth and ACL mechanisms and <a class="reference external" href="http://www.whitewashing.de/blog/articles/41">fixing view
-caching</a>, which did not
-work in its original implementation due to different users groups
-sharing the same cached views.</p>
-<p>In the last days I came across two in depth tutorials on Zend_Acl and
-Zend_Auth integration to MVC. Most people probably saw the DevZone
-article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
-1)</a>”
-by Aldemar Bernal on the Frameworks Frontpage. Another good article was
-written by Frank Ruske in the latest german <a class="reference external" href="http://www.phpmagazin.de">PHP
-Magazin</a> (<a class="reference external" href="http://it-republik.de/zonen/magazine/ausgaben/psfile/source_file/14/Seite_80__482a98c572a5c.zip">Zipped Source Code of the
-Example</a>).
-I took the best ideas of both articles and merged them into the existing
-components of my blog.</p>
-<p>This now enables me to cache the site depending on the Auth status of
-the page user agent. The blog is now caching all views that are
-generated for guest users. Since there is no “registered” or “member”
-account yet, this means the blogs content is cached and served from
-cache for everyone except me when I am logged in. To get this work I
-added some simple additional check in <a class="reference external" href="http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Framework">Matthews Cache View Controller
-Plugin</a>:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
-{
-    $auth = Zend_Auth::getInstance();
-    if($auth-&gt;hasIdentity()) {
-        self::$doNotCache = true;
-        return;
-    }
-    [..]
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>This prevents caching for registered identities.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on June 30, 2008
                 
             </small>
         </p>

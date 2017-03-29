@@ -61,6 +61,112 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a></h1>
+<p>Side projects have always been an important part of how I learn new skills and
+technologies. This usually ends with me dumping some prototype on <a class="reference external" href="https://github.com/beberlei?tab=repositories">Github</a>, sometimes even with an open
+source project that I commit to maintain over a long time.</p>
+<p>Two years ago, for the first time, I pursued a project idea which should
+not be open-source but a commercial SAAS product. It grew out of the
+<a class="reference external" href="http://www.doctrine-project.org">Doctrine</a> teams desire to synchronize
+Github Pull Requests with our Jira instance: A workflow engine for HTTP
+services. <a class="reference external" href="https://ifttt.com/">If this, then that (IFTTT)</a> already existed at
+that point, but was far too limited for my use-case. I wanted something to
+allow:</p>
+<ul class="simple">
+<li>Accept a Github Pull Request Event</li>
+<li>Open a Jira Ticket</li>
+<li>Comment back on the Pull Request with a link to the Pull Request</li>
+<li>Optionally mention that the Pull Request should be made to master, instead of
+<span class="docutils literal"><span class="pre">$BRANCH</span></span></li>
+</ul>
+<p>I started developing this in my free time based on PHP, Symfony2, CouchDB,
+PostgreSQL and Backbone.js and got a prototype working early. However
+instead of reaching the state where I could release the project to others I
+hit some hurdles:</p>
+<ol class="arabic simple">
+<li>The project had a UI where you could add/remove and reconnect tasks through
+a graphical workflow editor. The javascript became very messy fast, because
+I didn’t understand Backbone fully and also didn’t know patterns for
+decoupling and testing Javascript code.</li>
+<li>I had to restart with the core domain service side code, because I based it
+on the Zeta Components workflow library and it was too unflexible for my
+special requirements, messing the code up.</li>
+<li>I wanted to implement way too many features and had a huge backlog of
+issues to implement before “beta”.</li>
+</ol>
+<p>Last year in July, when I finally had something remotely usable <a class="reference external" href="https://zapier.com/">Zapier</a> hit the market with a beautiful product and support
+for gazillions of services. At that point my service just had support for
+Github, Twitter and Jira and for generic HTTP POST requests and a UI that
+could not be operated by anyone else but me. I was quite demotivated
+that day I found out about Zapier.</p>
+<p>Nevertheless I continued to work on the project and tried to make it even more
+powerful than Zapier, by introducing more features that neither IFTTT nor
+Zapier had. Adding this complexity ended up being the nail into the coffin of
+the project.</p>
+<p>Each week I worked less and less on the project, because I couldn’t find the
+motivation. When Zapier got funded in October I was both sad and happy:
+Apparently my idea was a good one, however somebody else executed this idea
+much better than myself. I stopped working on the project that week.</p>
+<p>Today I took the day to migrate the Doctrine Pull Request workflow to a
+<a class="reference external" href="https://github.com/beberlei/githubpr_to_jira">simple hardcoded application</a>
+and disabled my projects website entirely.</p>
+<p>I want to use this moment to share my personal lessons learned:</p>
+<ul>
+<li><p class="first">Choosing a scope that allows you to finish a working prototype within 1-2 months
+is an important key to success.</p>
+<p>The longer it takes to get something working and useable for others, the less
+motivation you have. I know from my open-source experience that people using your project
+is a huge motivation boost.</p>
+<p>The side projects I started since last October are much smaller in scope.</p>
+</li>
+<li><p class="first">You can actually get burned out by a side project: by designing its scope
+way too big.</p>
+</li>
+<li><p class="first">You cannot compete feature-wise with startups that put their full attention into
+a project from morning to night. Either make something small working better
+than commercial products or quit your job and put your full time into this.</p>
+</li>
+<li><p class="first">Side projects are either about learning new technologies or about trying
+to build something commercially successful. Don’t try to combine this or
+you might get frustrated by choosing the wrong technology for the job.</p>
+</li>
+<li><p class="first">Never ever use an existing open-source library as the core of your
+complicated business domain. If your domain is something remotely interesting
+you will fail to achieve your goals with the restrictions of the library.</p>
+</li>
+<li><p class="first">Starting a big project alone is not a good idea. I found out that
+discussing ideas with people is very valuable and at the point where I
+started sharing my idea with others I was already too far into the project
+to be able to take most of the advice into account.</p>
+</li>
+<li><p class="first">Keeping a project idea secret is completely useless. Others will come up with the
+same idea regardless. People have ideas all the day, however nobody ever has
+time to implement them. When they do, execution is even more important than
+the idea itself.</p>
+</li>
+</ul>
+<p>What are your lessons learned from failed side projects? I would be happy to
+hear other stories.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/sideprojects.html">SideProjects</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on April 06, 2013
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/03/12/code_coffee_bonn.html">Code &amp; Coffee Bonn</a></h1>
 <p>On last years <a class="reference external" href="http://www.socrates-conference.de/">SoCraTes Conference</a> I had
 the pleasure to meet <a class="reference external" href="https://twitter.com/sandromancuso">Sandro Mancuso</a> from
@@ -924,85 +1030,6 @@ Doctrine to make this possible.</p>
         <p>
             <small>
                 Posted on February 04, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2012/11/19/composer_and_azure_websites_git_deployment.html">Composer and Azure Websites Git Deployment</a></h1>
-<p>Continuing my series on PHP PaaS Clouds (<a class="reference external" href="http://fortrabbit.com/">Fortrabbit</a>), I turn to Microsoft Azure today. After some
-research I found out Azure supports post deployment hooks to run
-Composer and allows you to configure environment variables from the Management
-console.</p>
-<p>Microsoft launched <a class="reference external" href="https://www.windowsazure.com/en-us/home/scenarios/web-sites/">Azure Websites</a> in June this
-year.  It is a platform as a service solution where you can deploy your
-websites via FTP or Git. With Azure Websites you can avoid having to deal with
-the complex deployment automation that is necessary for <a class="reference external" href="https://www.windowsazure.com/en-us/home/features/cloud-services/">Azure Hosted Cloud
-Services</a>.
-As long as your website only requires an SQLServer, MySQL or external APIs you
-can actually achieve quite a lot already.</p>
-<p>For a <a class="reference external" href="http://www.symfony.com">Symfony2</a>, <a class="reference external" href="http://www.silex-project.org">Silex</a> or any other modern project however you want
-<a class="reference external" href="http://www.getcomposer.org">Composer</a> support during the deployment as
-long as failures with Composer don’t break your site.</p>
-<p>It turns out that Azure Websites - to support other platforms that require
-compiling - actually has an extremely robust deployment system (as far as I
-understood its internals). The Git repository is separated from the actual code
-that is served from the webserver and a number of old checkouts is kept to
-allow rollbacks through the Web interface. Once a Git push was recognized,
-Azure websites will execute a build step, and then copy all the files over to a
-directory with the name of the Git SHA hash. This directory is then symlinked
-to the document root.</p>
-<p>If Composer fails during this step, the website will still be served from the
-currently running version and you don’t have to face unexpected downtime.</p>
-<p>To actually run Composer as a post-deployment tool you have to do some manual
-work. Create a <span class="docutils literal"><span class="pre">.deployment</span></span> file in your project root folder:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span/><span class="k">[config]</span>
-<span class="na">command</span> <span class="o">=</span> <span class="s">"D:\Program Files (x86)\PHP\v5.3\php.exe" build_azure.php</span>
-</pre></div>
-</div>
-<p>If you are using PHP 5.4, then you probably have to change the command version
-name to “v5.4”, but I haven’t tested this.</p>
-<p>Then you need to create the <span class="docutils literal"><span class="pre">build_azure.php</span></span> file that is referenced in the
-deployment command. The actual implementation is up to you, my version is
-the most simple one:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nv">$url</span> <span class="o">=</span> <span class="s1">'https://getcomposer.org/composer.phar'</span><span class="p">;</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s2">"composer.phar"</span><span class="p">,</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$url</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"update"</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"--prefer-dist"</span><span class="p">;</span>
-<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'argv'</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"-v"</span><span class="p">;</span>
-<span class="k">require</span> <span class="s2">"composer.phar"</span><span class="p">;</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This currently only works with a Composer version, where
-<a class="reference external" href="https://github.com/composer/composer/pull/1341">PR-1341</a> is applied.
-You can check out <a class="reference external" href="https://github.com/beberlei/composer/tree/GH-1339">my Composer fork</a> and run
-<span class="docutils literal"><span class="pre">./bin/compile</span></span> to generate a composer.phar that works.</p>
-</div>
-<p>Instead of using this approach, you could ship <span class="docutils literal"><span class="pre">composer.phar</span></span> with your repository for example.
-You can of course execute additional steps in the <span class="docutils literal"><span class="pre">build_azure.php</span></span>, for example warmup caches.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/azure.html">Azure</a>
-                 / 
-                <a href="tags/composer.html">Composer</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on November 19, 2012
                  by Benjamin Eberlei
             </small>
         </p>

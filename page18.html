@@ -61,6 +61,65 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/06/30/implementing-zend-auth-acl-and-caching.html">Implementing Zend Auth, Acl and Caching</a></h1>
+<p>I managed to work a bit on the blog, enabling me to have new instance in
+the series, How to refactor and extend your own blog software using
+<a class="reference external" href="http://framework.zend.com">Zend Framework</a>. This time: Implementing
+meaningful Auth and ACL mechanisms and <a class="reference external" href="http://www.whitewashing.de/blog/articles/41">fixing view
+caching</a>, which did not
+work in its original implementation due to different users groups
+sharing the same cached views.</p>
+<p>In the last days I came across two in depth tutorials on Zend_Acl and
+Zend_Auth integration to MVC. Most people probably saw the DevZone
+article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
+1)</a>”
+by Aldemar Bernal on the Frameworks Frontpage. Another good article was
+written by Frank Ruske in the latest german <a class="reference external" href="http://www.phpmagazin.de">PHP
+Magazin</a> (<a class="reference external" href="http://it-republik.de/zonen/magazine/ausgaben/psfile/source_file/14/Seite_80__482a98c572a5c.zip">Zipped Source Code of the
+Example</a>).
+I took the best ideas of both articles and merged them into the existing
+components of my blog.</p>
+<p>This now enables me to cache the site depending on the Auth status of
+the page user agent. The blog is now caching all views that are
+generated for guest users. Since there is no “registered” or “member”
+account yet, this means the blogs content is cached and served from
+cache for everyone except me when I am logged in. To get this work I
+added some simple additional check in <a class="reference external" href="http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Framework">Matthews Cache View Controller
+Plugin</a>:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
+{
+    $auth = Zend_Auth::getInstance();
+    if($auth-&gt;hasIdentity()) {
+        self::$doNotCache = true;
+        return;
+    }
+    [..]
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>This prevents caching for registered identities.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 30, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/06/14/exim4-and-virtual-users-forward-files.html">Exim4 and Virtual Users .forward Files</a></h1>
 <p>Some days ago I began to wonder why some mails in mail account were
 filtered by Exims .forward file why some are not. It took until today
@@ -296,69 +355,6 @@ that save time on integration after the first initial setup.</p>
                 <a href="tags/zendframework.html">ZendFramework</a>
                  / 
                 <a href="tags/javascript.html">Javascript</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on June 21, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html">Simplifying ZF: Scope of Variables in View and Controller</a></h1>
-<p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
-Ass!</a>
-article referenced earlier I came up with some simplifications of the Zend
-View and Controller variable coupling.</p>
-<p>Using some code in the article I created a new Zend_View_Extended
-class which offers the possibility to circumvent the access of variables
-via $this and directly registers each variable key of the Zend_View
-object as an own variable in the script template:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class Zend_View_Extended extends Zend_View_Abstract
-{
-    protected function _run()
-    {
-        while( list( $k, $v ) = each( $this ) ) ${$k} = $v;
-
-        include func_get_arg(0);
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now rather than calling $this-&gt;data you can call $data in a script
-template. Of course this comes with additional overhead of each variable
-being registered twice. I don’t know how this handles performance wise,
-but maybe unsetting $this variables after copying solves this. Also you
-have to overwrite the initView() method of your base Controller Action
-class.</p>
-<p>Another simplification would be to allow for the following direct
-variable settings in any Controller Action, which would shorten the
-$this-&gt;view-&gt;variable call, to derive the same functionality via
-$this-&gt;variable. I haven’t tested this though.</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class Zend_Controller_SimpleAction extends Zend_Controller_Action
-{
-    function __set($name, $value)
-    {
-        $this-&gt;view-&gt;{$name} = $value;
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
                 
                 
             </div>

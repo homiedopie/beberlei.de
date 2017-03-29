@@ -61,6 +61,102 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a></h1>
+<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki’s</a> on the
+<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
+conference last week about Legacy Code and Refactoring. In the session a piece
+of real-world code was shown that contained one of most common code smells in
+LegacyCode: Feature Envy.</p>
+<p>Martin Fowler describes this smell as “a method that seems more interested in
+a class other than the one it is in. The most common focus of the envy is the
+data.”</p>
+<p>This code smell causes two very similar problems in a code base:</p>
+<ul class="simple">
+<li>Duplication of rules related to their data throughout the code base.</li>
+<li>Spreading domain concepts throughout the whole code-base.</li>
+</ul>
+<p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
+PHP projects. We often see code such as the following computation to
+create a range of dates for a reporting function:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$start</span><span class="p">;</span>
+    <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
+
+    <span class="c1">// calculation code here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a really simple example for Feature Envy: The computation and
+validation of creating an end date some days in the future of a start date
+can easily be duplicated throughout the whole code base and implements
+business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">DateTime</span>
+<span class="p">{</span>
+    <span class="c1">// ... other methods</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+        <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$endDate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$endDate</span> <span class="o">=</span> <span class="nv">$start</span><span class="o">-&gt;</span><span class="na">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+
+    <span class="c1">// calculation code here.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>(Note: You cant extend the builtin DateTime this way and need to subclass).</p>
+<p>This is a great way to improve your code base massively and achieve what
+Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
+domain by encapsulating data and behavior.</p>
+<p>Learning to spot this kind of Feature Envy is a very good way to incrementally
+improve your legacy code base towards better models. I find it very interesting
+that the focus on fixing technical code-smells duplication and feature envy
+actually leads to a better domain model. As a side effect it massively
+deemphasizes DDD building blocks like Entity or Value Object, which in my
+opinion are a big cause for confusion. Testability increases as well, because
+data objects with behavior are much simpler to setup for testing.</p>
+<p>That is why I recommend learning about Feature Envy. For me it is a very simple
+approach to find improvements.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/codequality.html">CodeQuality</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 11, 2014
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a></h1>
 <p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
 I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
@@ -775,79 +871,6 @@ discussions that the new year will bring.</p>
         <p>
             <small>
                 Posted on December 31, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a></h1>
-<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
-Doctrine Entities, Metadata Mapping and their database.</p>
-<p>The problem of feature flags with Doctrine is easily explained: If you add
-properties for a new feature that is disabled in the Doctrine metadata, then you
-need to upgrade the database before deployment, even when the feature is not
-being rolled out for some days/weeks. Doctrine requires the database to look
-exactly like the metadata specifies it.</p>
-<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
-easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User"</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
-                    <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
-                <span class="p">));</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something"</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// more mapping</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
-<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
-<p>Then if the feature is enabled fore some time and accepted into the pool of
-permanent features, you can remove the listener and move the mapping onto the
-Entities metadata.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/doctrine.html">Doctrine</a>
-                 / 
-                <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on December 05, 2013
                  by Benjamin Eberlei
             </small>
         </p>

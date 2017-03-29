@@ -61,6 +61,50 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html">Why does the PHP extension fail to load with _zval_ptr_dtor_wrapper error</a></h1>
+<p>I sometimes come across this error when loading an extension in PHP</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">PHP</span> <span class="ne">Warning</span><span class="p">:</span>  <span class="n">PHP</span> <span class="n">Startup</span><span class="p">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">load</span> <span class="n">dynamic</span> <span class="n">library</span>
+<span class="s1">'/usr/lib64/php-zts/5.5/modules/myext.so'</span> <span class="o">-</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">php</span><span class="o">-</span><span class="n">zts</span><span class="o">/</span><span class="mf">5.5</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">myext</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="n">undefined</span> <span class="n">symbol</span><span class="p">:</span>
+<span class="n">_zval_ptr_dtor_wrapper</span> <span class="ow">in</span> <span class="n">Unknown</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>From the Google results it is not very easy to find out what this means.</p>
+<p>Technically the extension was compiled with a PHP version using the
+<span class="docutils literal"><span class="pre">-enable-debug</span></span> flag, which wraps all calls to <span class="docutils literal"><span class="pre">zval_ptr_dtor</span></span> in a wrapper
+macro that does not exist in a regular, non-debug build.</p>
+<p>But a debug extension and non-debug PHP are incompatible.</p>
+<p>PHP extensions are only compatible between different installations if the
+following constraints are the same for the compiling and the executing PHP
+binary:</p>
+<ul class="simple">
+<li>OS (Linux, Mac)</li>
+<li>libc (glibc or musl for Alpine)</li>
+<li>PHP version up to the minor level (5.5, 5.6, 7.0, 7.1)</li>
+<li>extension version (20151012 for PHP 7.0)</li>
+<li>thread-safety (ZTS) or non-thread-safety (NTS)</li>
+<li>debug or non-debug (<span class="docutils literal"><span class="pre">--enable-debug</span></span> flag during compile).</li>
+</ul>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/phpextension.html">PHPExtension</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on March 29, 2017
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1.html">How to complete a side project and turn it into a business (Level 1)</a></h1>
 <p>Almost four years ago I wrote about <a class="reference external" href="https://beberlei.de/2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a> and when I stumbled
 across the post <a class="reference external" href="http://ewanvalentine.io/how-to-never-complete-anything/">How to *never* complete anything</a> several days ago I
@@ -606,62 +650,6 @@ arguments:</p>
         <p>
             <small>
                 Posted on February 21, 2016
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
-<p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
-is a way for monolithic PHP repositories with multiple components
-that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
-<p>It relies on a new composer.json for each component and uses
-the autoloading capabilities of Composer in a hackish way.</p>
-<p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
-<span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
-its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"Foo"</span><span class="p">:</span> <span class="s2">"../foo/src/"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This approach is very simple to start with, however it has some downsides
-you must take into account:</p>
-<ul class="simple">
-<li>you have to redefine dependencies in every composer.json that relies
-on another component.</li>
-<li>if foo and bar depend on different versions of some third library <span class="docutils literal"><span class="pre">baz</span></span>
-that are not compatible, then composer will not realize this and your
-code will break at runtime.</li>
-<li>if you want to generate deployable units (tarballs, debs, ..) then
-you will have a hard time to collect all the implicit dependencies
-by traversing the autoloader for relative definitions.</li>
-<li>A full checkout has multiple vendor directories with a lot of duplicated
-code.</li>
-</ul>
-<p>I think this approach is ok, if you are only sharing a small number of
-components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
-problems by forcing to rely on the same dependencies in a project globally and
-only once.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/monorepos.html">Monorepos</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 08, 2015
                  by Benjamin Eberlei
             </small>
         </p>

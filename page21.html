@@ -61,6 +61,123 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/08/08/first-impressions-on-zend-soap-and-a-basic-implementation.html">First impressions on Zend_Soap and a basic implementation</a></h1>
+<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> release candidate for
+version 1.6 includes a new component for SOAP operations.
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.html">Zend_Soap_Server/Client</a>
+extend the PHP functionality of the SOAPClient and SOAPServer objects,
+which by itself is trivial. The more important functionality it ads to
+the package is the <a class="reference external" href="http://framework.zend.com/manual/en/zend.soap.autodiscovery.introduction.html">AutoDiscovery
+Component</a>.</p>
+<p>Generally you can use <a class="reference external" href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> in the
+so called “non-wsdl” mode, that is if you specify the correct options
+like the soap service location and uri, you don’t need any description
+of the service for the clients. This is only useful if you’re using the
+SOAP Service internally since you then know about all the available
+functions and methods. If you want to offer the Service for external
+users you want to use the WSDL-mode: Generate a
+<a class="reference external" href="http://en.wikipedia.org/wiki/Web_Services_Description_Language">WSDL</a>
+that describes the services available methods, their parameters and
+return types is an important task.</p>
+<p>Using Zend_Soap_AutoDiscover you can generate your WSDL file
+automatically by reflecting on the given Service Class methods. This
+works as follows. We setup a simple service:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="k">class</span> <span class="nc">HelloWorldService</span>
+<span class="p">{</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">string</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">function</span> <span class="n">helloWorld</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s2">"Hello World!"</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">array</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">function</span> <span class="n">getFruits</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'apple'</span><span class="p">,</span> <span class="s1">'orange'</span><span class="p">,</span> <span class="s1">'banana'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>It is important that you specify the Doc Comments @param and @return
+otherwise the AutoDiscovery of the correct parameter and return types
+cannot be resolved. We will now setup a simple SOAP Server access point,
+that will also generate our WSDL file for description of this HelloWorld
+service:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "HelloWorldService.php";
+require_once "Zend/Soap/Server.php";
+require_once "Zend/Soap/AutoDiscover.php";
+
+if(isset($_GET['wsdl'])) {
+    $autodiscover = new Zend_Soap_AutoDiscover();
+    $autodiscover-&gt;setClass('HelloWorldService');
+    $autodiscover-&gt;handle();
+} else {
+
+    $soap = new Zend_Soap_Server("http://localhost/soapserver.php?wsdl"); // this current file here
+    $soap-&gt;setClass('HelloWorldService');
+    $soap-&gt;handle();
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now we have our SOAP Service up and running and any client can access
+the HelloWorldService class from a remote or local location with just
+this simple lines:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "Zend/Exception.php";
+require_once "Zend/Soap/Client.php";
+
+try {
+    $client = new Zend_Soap_Client("http://localhost/soapserver.php?wsdl"); // Servers WSDL Location
+    $string =  $client-&gt;helloWorld();
+    $fruits = $client-&gt;getFruits();
+
+    var_dump($string);
+    var_dump($fruits);
+} catch(Zend_Exception $e) {
+    echo $e-&gt;getMessage();
+}
+</pre></div>
+</div>
+<p>This is easy. Additionally Zend_Soap offers a WSDL class to
+generate your own WSDL file based on your special preferences, which
+is a nice feature. I guess only some people can write a correct WSDL
+XML specification file on their own from scratch, so using a
+powerful helper is reasonable.</p>
+<p>The usage of Zend_Soap is quite simple and straightforward as is
+PHP5’s internal SOAP Service and might therefore gain widespread
+use. I have never tested PEAR’s WSDL Autodiscovery, so i cannot draw
+comparisons.</p>
+</div></blockquote>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+                <a href="tags/soap.html">SOAP</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 08, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/08/22/zend-helper-for-jquery-ui-widgets-demo.html">Zend Helper for jQuery UI Widgets Demo</a></h1>
 <p>I finished <a class="reference external" href="http://www.beberlei.de/jquery/demo">a pretty demo</a> for all
 the <a class="reference external" href="http://ui.jquery.com">jQuery UI widgets</a> view helpers for my
@@ -314,52 +431,6 @@ preferences. This simplifies the execution even more.</p>
             <small>
                 Posted on August 10, 2008
                 
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html">Complete Django Template Engine Implementation for PHP5 - Downloadable Now</a></h1>
-<p>I prepared a downloadable version of my <a class="reference external" href="http://www.djangoproject.com">Django Template
-Language</a> Engine Clone for PHP5 and the
-Zend Framework (although it can easily be used Standalone). It also
-implements two helpers that aid in rapid ajax/Dojox deployment. You can
-easily specify template blocks that should be rendered by Javascript via
-DojoX DTL, which are then marked, compiled and shown by the client using
-JSON data from the server. I included a demo to show this feature.</p>
-<p>You can grab the
-<a class="reference external" href="http://www.beberlei.de/sources/calypso-dtl-0.1.tar.gz">Tarball</a> and
-there is also a
-<a class="reference external" href="http://www.beberlei.de/sources/README_Dtl.txt">README</a> with some
-information. I would appreciate if anybody would test the lib and gave
-some feedback.</p>
-<p>I will soon start to push this component in the ZF proposal process. I
-still have to finish the class structure before I can move to the Ready
-for Review stage. The library will max end up in Zend Extras. Therefore
-I will have to say again: This View Renderer shall be no replacement for
-the current Zend View. It is only an alternative which allows for some
-neat functionality and stricter View / Controller logic separation.</p>
-<p><strong>UPDATE:</strong> I finished a little page for what I call the Calypso DTL.
-See it here: <a class="reference external" href="http://www.beberlei.de/calypso/">Calypso Site</a>. I have
-put up a little tutorial how to get the Template Engine running with
-Zend Framework and as a standalone component.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 04, 2008
-                 by beberlei <kontakt@beberlei.de>
             </small>
         </p>
     </div>
