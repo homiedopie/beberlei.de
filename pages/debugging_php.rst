@@ -1,5 +1,8 @@
+Debugging 
+=========
+
 Leveling up your PHP debugging skills
-=====================================
+-------------------------------------
 
 Are you feeling terribly unproductive when trying to fix bugs in your program?
 
