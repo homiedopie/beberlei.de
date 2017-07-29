@@ -61,6 +61,47 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/08/10/import-and-pythonpath-problems-with-pydev-and-linux.html">Import and PYTHONPATH Problems with PyDev and Linux</a></h1>
+<p>Today is began to configure my <a class="reference external" href="http://pydev.sf.net">PyDev</a> Eclipse
+environment since I want to learn Python and need it for a programming
+aspect of my forthcoming diploma thesis. I ran into several difficulties
+getting the plugins run dialog to work. It seems that configuring the
+python interpreter under linux and adding all the correct include paths
+is not enough, even when following the <a class="reference external" href="http://pydev.sourceforge.net/faq.html#how_do_i_configure_my_pythonpath">PyDev
+FAQ</a>.</p>
+<p>Nearly giving up I came up with sort of a hack to get it running.
+Eclipse can execute arbitrary “External Tools” (Find it at: “<strong>Run -&gt;
+External Tools -&gt; Open External Tools Dioalog</strong>”). I used this facility
+to integrate an external tool “Python” with path “<strong>/usr/bin/python</strong>”.
+Now to automatically execute the currently active python script, you can
+specify the line: “<strong>${resource_loc}</strong>” in the arguments field of the
+dialog and you’re good to go.</p>
+<p>You now circumvented the PyDev internal execution scheme and work with
+the pure command line interpreter. This way all the problems of PyDev
+with the PythonPath, Symlinks and whatever are gone.</p>
+<p><strong>Update:</strong> Another note maybe, you can also add the action “running the
+last used external tool again” as keyboard shortcut in the Eclipse
+preferences. This simplifies the execution even more.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/python.html">Python</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 10, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/08/04/complete-django-template-engine-implementation-for-php5-downloadable-now.html">Complete Django Template Engine Implementation for PHP5 - Downloadable Now</a></h1>
 <p>I prepared a downloadable version of my <a class="reference external" href="http://www.djangoproject.com">Django Template
 Language</a> Engine Clone for PHP5 and the
@@ -217,44 +258,6 @@ Zend_Controller_Action you have to do something like this:</p>
         <p>
             <small>
                 Posted on January 14, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal.html">A knight’s tour solver in pascal</a></h1>
-<p>My professor has a task on the current problem set of my pascal
-programming course to program, demanding a recursive program finding a
-solution to the <a class="reference external" href="http://en.wikipedia.org/wiki/Knight's_tour">knights tour problem</a> on a chess board
-of size n&gt;=3 given a starting position. I used a backtracking algorithm
-(at least that is what wikipedia tells me it is), by trying all possible
-combinations and setting steps back, when they do not lead to a
-solution.</p>
-<p>Beginning with n = 7 my algorithms gets very slow, caused by the
-backtracking algorithm which is not very efficient. I found some
-interesting articles regarding this problem using graph theory to solve
-it. Some pretty big minds have thought about the problem, I guess its
-not for me to find such an solution for a little task of the weekly
-problem set.</p>
-<ul class="simple">
-<li><a class="reference external" href="http://mathworld.wolfram.com/KnightsTour.html">Wolfram MathWorld: Knights Tour</a></li>
-<li><a class="reference external" href="http://www.zaik.uni-koeln.de/AFS/teachings/ss07/InfoSeminar/handout/leonid_torgovitski_nknighttours.pdf">Presentation Knights Tour (German Language)</a></li>
-</ul>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/algorithms.html">Algorithms</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 22, 2008
                 
             </small>
         </p>

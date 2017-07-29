@@ -5,8 +5,36 @@
         <link>https://beberlei.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Wed, 29 Mar 2017 00:00:00 +0200</pubDate>
+        <pubDate>Sat, 29 Jul 2017 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>https://beberlei.de/2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux.html</link>
+            <guid>https://beberlei.de/2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux.html</guid>
+            <title><![CDATA[Hide Slack unread and highlight Tray Icon on Ubuntu/Linux]]></title>
+            <description><![CDATA[<h1>Hide Slack unread and highlight Tray Icon on Ubuntu/Linux</h1>
+<p>The Slack Ubuntu/Linux application doesn’t provide a way to disable the tray
+icon and that means the unread or highlight notification bubbles will distract
+you whenever somebody writes something in ANY channel that you are in, even
+when the messages are not even interesting for you.</p>
+<p>I wrote to Slack support to make a feature request and they suggested to make
+clever use of an upstream Electron bug that makes the tray icon disappear in
+17.04 as a workaround. This gave me the idea for a  more stable workaround.</p>
+<p>I poked around in the list of files of the <cite>slack-desktop</cite> package and found
+out that you can just exchange the files for the tray icons , so that the Slack
+app is fooled into thinking it is showing the unread or highlight icons.</p>
+<blockquote>
+<div>sudo -i
+cd /usr/lib/slack/resources/app.asar.unpacked/src/static
+mv slack-taskbar-highlight.png slack-taskbar-highlight-backup.png
+mv slack-taskbar-unread.png slack-taskbar-unread-backup.png
+cp slack-taskbar-rest.png slack-taskbar-highlight.png
+cp slack-taskbar-rest.png slack-taskbar-unread.png</div></blockquote>
+<p>Since I probably need to re-run this after every update to the Slack app, I
+packed this into a shell script <cite>slack-quiet</cite>.</p>
+]]></description>
+             <pubDate>Sat, 29 Jul 2017 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>https://beberlei.de/2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html</link>
             <guid>https://beberlei.de/2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html</guid>

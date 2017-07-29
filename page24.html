@@ -61,6 +61,37 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html">Zend_View Hack for implementation of RSS Feed</a></h1>
+<p>Using Zend_View for your site and want to implement an RSS Feed? You
+might run into the problem that the XML header definition is interpreted
+as PHP code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">"1.0"</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">"ISO-8859-1"</span><span class="cp">?&gt;</span><span class="x"/>
+</pre></div>
+</div>
+<p>Before you start cursing the world try this (rather obvious) workaround:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="s1">'&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;'</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"/>
+</pre></div>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 20, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/20/using-a-self-defined-zend-loader.html">Using a self defined Zend_Loader</a></h1>
 <p>When you start writing with a Framework like Zend like I did in the last
 weeks, you probably are still haunted by all the bad habits of pseudo
@@ -342,81 +373,6 @@ result that looks like a join.</p>
         <p>
             <small>
                 Posted on January 24, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
-<p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
-Mainz, Germany was the first php conference I have been to. It ended
-some hours ago and i am quite happy to have been there. I had several
-great discussions which pointed me to new stuff (to follow) and also met
-great people.</p>
-<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
-support</a>. It feels much
-more easy to use than Eclipse PDT. Its faster (from the little tests i
-could make) and does not strike when you add several large libraries
-into the include path. It offers much more help on refactoring and
-organizing than Eclipse PDT does, for example it offers to generate
-getter/setter, constructor, inheritance methods. Much thanks to Petr who
-explained to me in detail how NetBeans works.</p>
-<p>Ez had lots of people at the conference (to Kore and Tobias i spoke in
-more detail) and I had some talks with them about
-<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a>. This was especially
-interesting after the great session on object persistence in ez, as well
-when I heard that ezcMvc, a model-view-controller component, wil be
-included in the next release of ezc in December 2008. ezComponents has a
-Database layer, that does not seem to enforce too much overhead on you
-but still offers great extensibility through a persistence layer and a
-library that offers to build Database Diffs. The latter feature is
-really great and I will definitely have a look at this.</p>
-<p>Sebastian Bergmann had a great talk on MapReduce which is an old LISP
-programming paradigm to work with huge datasets. This style was recently
-<a class="reference external" href="http://labs.google.com/papers/mapreduce.html">revived by Google</a>
-because tasks can easily be split and distributed for computing on
-different nodes with hundreds of threads. Implementing a working example
-in PHP is really easy, just finding a good way to process your large
-data seems to be a topic that needs lots of thinking.</p>
-<p>Additional great things:</p>
-<ul class="simple">
-<li>Meet Thomas, the guy that wrote Weaverslave (I use it for years to
-build simple php applications).</li>
-<li>He is working on a cool open source project <a class="reference external" href="http://sourceforge.net/projects/ccg/">Carica
-Cachegrind</a> with Bastian
-Feder that will process xdebug cachegrind files via a webinterface
-(They told me webgrind is actually calculating the numbers wrong).</li>
-<li>Jan Lehnhart and Kore Nordmann had some great things to say about
-<a class="reference external" href="http://incubator.apache.org/couchdb/">CouchDB</a>.</li>
-<li>Brian Acker talked about <a class="reference external" href="https://launchpad.net/drizzle">Drizzle</a>,
-which is a forked MySQL that throws out lots of legacy stuff from
-MySQL out, to build a micro-kernel database server that suites the
-web.</li>
-<li>Ulf Wendel talked about Mysqli + Mysqlnd.
-<a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd/">Mysqlnd</a>
-will be a new internal driver for PHP to access MySQL through Mysqli
-and optimizes processing and memory consumption. Additionally Mysqli
-will be extended to offer asynchronous queries that can be fired at
-the database and polled latter. To be included in PHP 5.3</li>
-</ul>
-<p>Not so good things: There were absolutely to few power lines. People
-using their notebooks were packed on hotspots where power was available.
-Please more power plug possibilities next time!</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/conferences.html">Conferences</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on October 30, 2008
                 
             </small>
         </p>

@@ -61,6 +61,216 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a></h1>
+<p>In a Twitter discussion yesterday I formulated my negative opinion
+about traits and Matthew asked me to clarify it:</p>
+<img alt="http://www.whitewashing.de/_static/traits_are_static_access.png" src="http://www.whitewashing.de/_static/traits_are_static_access.png"/>
+<p>I used to look forward to traits as a feature in PHP 5.4, but after discussions
+with <a class="reference external" href="http://twitter.com/koredn">Kore</a> I came to the conclusion that traits
+are nothing else than static access in disguise. They actually lead to the
+exact same code smells. Familiar with the outcome of too much static use,
+we should reject traits as just another way of statically coupling your code
+to other classes.</p>
+<p>Let’s step back and take a look at the code smells that Static code produces:</p>
+<ul class="simple">
+<li>Tight coupling, no way to exchange at runtime</li>
+<li>Not mockable</li>
+<li>Static code cannot be overwritten through inheritance</li>
+<li>Global state (increases likelihood of unwanted side effects)</li>
+</ul>
+<p>This blog post shows that Traits actually have the first three problems
+themselves and exhibit the same code smells. But they even have some additional
+problems on their own:</p>
+<ul class="simple">
+<li>Not testable in isolation</li>
+<li>Theoretically stateless, but not enforced in PHP</li>
+<li>Very high impact on the code base (Code-Rank)</li>
+</ul>
+<p>Take the following code, which tries to implement reusable
+controller code through traits:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyController</span>
+<span class="p">{</span>
+    <span class="k">use</span> <span class="nx">Redirector</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">(</span><span class="s2">"route_xyz"</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">trait</span> <span class="nx">Redirector</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectResponse</span><span class="p">(</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'router'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span>
+            <span class="nv">$routeName</span><span class="p">,</span>
+            <span class="nv">$parameters</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Lets spot the problems:</p>
+<ol class="arabic">
+<li><p class="first"><span class="docutils literal"><span class="pre">Redirector</span></span> is tightly coupled to <span class="docutils literal"><span class="pre">MyController</span></span>. There is no way to
+change this during runtime, by using a different type of redirector, it has
+to be exactly the trait used at compile time. This is exactly what static
+access enforces as well.</p>
+</li>
+<li><p class="first">The trait accesses <span class="docutils literal"><span class="pre">$this-&gt;container</span></span> without defining it and couples itself against
+the implementing classes. We can actually refactor this to include an
+abstract method <span class="docutils literal"><span class="pre">getContainer()</span></span> in the trait. But if we have multiple
+traits now, all having a <span class="docutils literal"><span class="pre">getContainer()</span></span> method then we run into method
+class problems that cannot be solved. We could pass the container as an
+argument to the method, but that actually defeats the purpose of the
+abstraction here.</p>
+<p>Traits using state of their “parents” usually create bidirectional
+coupling between classes, something which should be avoided for good
+software design.</p>
+</li>
+<li><p class="first">No way to overwrite subset of functionality. If I want to use only one
+method of a trait and a second one slighty different, then I cannot
+overwrite this function of <span class="docutils literal"><span class="pre">Redirector</span></span> for example in <span class="docutils literal"><span class="pre">MyController</span></span>.</p>
+</li>
+<li><p class="first">I cannot mock the traits functionality, therefore I cannot test
+<span class="docutils literal"><span class="pre">MyController</span></span> as a unit only in combination with a trait.</p>
+</li>
+<li><p class="first">I cannot test the trait as a unit, I always have to create a class
+that uses the trait to be able to write a test for it.
+This prevents me from testing traits in isolation.</p>
+</li>
+<li><p class="first">Once you start using <span class="docutils literal"><span class="pre">Redirector</span></span> in many controllers, its impact
+on your code base (see <a class="reference external" href="http://pdepend.org/documentation/software-metrics/index.html">Code Rank</a>) increases
+a lot. Traits are concrete implementations and therefore violate the
+Dependency Inversion SOLID principle: Changes in the trait require adoptions
+in all the implementing classes.</p>
+<p>With aggregation you could depend on an abstraction <span class="docutils literal"><span class="pre">Redirector</span></span> or
+turn it into an abstraction in the moment that you need different
+functionality.</p>
+</li>
+</ol>
+<p>The discovery of this properties of traits me to the conclusion that traits are
+just static access in disguise.</p>
+<p>To see this argument a bit more drastically, you can “rewrite” a PHP 5.4 trait
+into “pseudo” static code:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="s2">"route_xyz"</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Redirector</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectResponse</span><span class="p">(</span>
+            <span class="nx">self</span><span class="o">::</span><span class="na">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">generateUrl</span><span class="p">(</span><span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'router'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span>
+            <span class="nv">$routeName</span><span class="p">,</span>
+            <span class="nv">$parameters</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Calling dynamic methods statically actually works right now (and access to
+<span class="docutils literal"><span class="pre">$this</span></span> of the parent class will luckily be removed in PHP 5.5). Let’s
+reformulate it into something that is actually using static methods and
+will work on 5.5, requires changes to the visibility of properties though:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">someAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">Redirector</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s2">"route_xyz"</span><span class="p">,</span> <span class="k">array</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Redirector</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nv">$thiz</span><span class="p">,</span> <span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectResponse</span><span class="p">(</span>
+            <span class="nx">self</span><span class="o">::</span><span class="na">generateUrl</span><span class="p">(</span><span class="nv">$thiz</span><span class="p">,</span> <span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">generateUrl</span><span class="p">(</span><span class="nv">$thiz</span><span class="p">,</span> <span class="nv">$routeName</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$thiz</span><span class="o">-&gt;</span><span class="na">container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'router'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">generateUrl</span><span class="p">(</span>
+            <span class="nv">$routeName</span><span class="p">,</span>
+            <span class="nv">$parameters</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Can you see the familiarity? If Traits can be rewritten as calls to static methods,
+how can they be any better than static methods? They exhibit the exact same
+problems and produce the same code smells.</p>
+<p>Conclusion: Traits should be avoided at all costs, just like static methods.</p>
+<p>Rule of Thumb: If you want to use a trait, try to think how to solve the
+problem with aggregation.</p>
+<p>If you want to read more about problems with traits,
+<a class="reference external" href="http://blog.ircmaxell.com/2011/07/are-traits-new-eval.html">Anthony</a> wrote
+about them quite a while ago.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/codequality.html">CodeQuality</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on April 12, 2013
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a></h1>
 <p>Side projects have always been an important part of how I learn new skills and
 technologies. This usually ends with me dumping some prototype on <a class="reference external" href="https://github.com/beberlei?tab=repositories">Github</a>, sometimes even with an open
@@ -852,184 +1062,6 @@ post in this series.</p>
         <p>
             <small>
                 Posted on February 19, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/02/04/doctrine_and_solid.html">Doctrine and SOLID</a></h1>
-<p>I often get asked how you can use <a class="reference external" href="http://www.doctrine-project.org">Doctrine2</a> and implement <a class="reference external" href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">the SOLID principles</a> at the same
-time. It bugs me having to reply: It is not really possible.  Because Doctrine2
-does not support value-objects (or embedded-objects), it is very hard to pull
-the <a class="reference external" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> off.</p>
-<p>These problems are related to the inability to share behavioral code through
-aggregation and the complexity of state transformations. Combining both, your
-average entity with 5-15 fields can end up with hundreds or thousands lines of
-code. The solutions to both problems boil down to <a class="reference external" href="http://www.jbrains.ca/permalink/the-four-elements-of-simple-design">minimizing duplication and
-maximizing clarity</a>.</p>
-<div class="section" id="extracting-value-objects-minimize-duplication">
-<h2>Extracting Value Objects: Minimize Duplication</h2>
-<p>Entity classes responsibility are the state transformations of their internal
-fields.  This can simply be done by using setter methods or <a class="reference external" href="http://whitewashing.de/2012/08/22/building_an_object_model__no_setters_allowed.html">when avoiding
-setters</a>,
-with use-case driven methods.  These state transformations can be part of
-different responsibilities, specifically when properties belong to different
-groups of concepts.</p>
-<p>Take a very simple entity that contains updated/created at logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * @ORM\Entity</span>
-<span class="sd"> * @ORM\HasLifecycleCallbacks</span>
-<span class="sd"> **/</span>
-<span class="k">class</span> <span class="nc">Person</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type="datetime")</span>
-<span class="sd">     **/</span>
-    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\Column(type="datetime")</span>
-<span class="sd">     **/</span>
-    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @ORM\PreUpdate</span>
-<span class="sd">     **/</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>If you want to duplicate this logic to another second entity, then in Doctrine
-the solution for this is using traits. <a class="reference external" href="http://kore-nordmann.de/blog.html">Kore</a> will dismiss this solution, because
-traits create a hard dependency. Even if we accept the static dependency,
-traits are not perfect even for this very simple example, because its very
-likely that you cannot override the constructor of every entity.</p>
-<p>The solution is to extract a value object <span class="docutils literal"><span class="pre">Timestamped</span></span> that contains
-all the logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">Timestamped</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nv">$updatedAt</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">updatedAt</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\DateTime</span><span class="p">(</span><span class="s2">"now"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">class</span> <span class="nc">Person</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$timestamped</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">timestamped</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Timestamped</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>See how all the code could be moved into <span class="docutils literal"><span class="pre">Timestamped</span></span> and is now reusable
-in other entities.</p>
-<p>Doctrine has no support for embedded objects, which is very sad. I am working
-very hard to get this feature into Doctrine as soon as possible. You can use
-the “object” type as a workaround and <span class="docutils literal"><span class="pre">serialize()</span></span> the value object into
-the database. However this is beyond ugly in my opinion.</p>
-</div>
-<div class="section" id="extract-method-objects-maximizing-clarity">
-<h2>Extract Method Objects: Maximizing clarity</h2>
-<p>Once you have identified groups of fields that are modified, then the
-complexity of the state transformations can attract lots of code.</p>
-<p>Take an <span class="docutils literal"><span class="pre">Order</span></span> object that has a method for calculating the shipping costs,
-depending all the order items and products.
-To separate calculations from state transformations you can extract
-method objects instead of inlining the code into the <span class="docutils literal"><span class="pre">Order</span></span> object.</p>
-<p>For this kind of extraction I create a folder <span class="docutils literal"><span class="pre">Order</span></span> and put all
-the extracted method objects in the <span class="docutils literal"><span class="pre">Order</span></span> subnamespace.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
-
-    <span class="k">class</span> <span class="nc">Order</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">()</span>
-        <span class="p">{</span>
-            <span class="nv">$calculator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ShippingCostCalculator</span><span class="p">();</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">namespace</span> <span class="nx">MyProject\Entity\Order</span> <span class="p">{</span>
-
-    <span class="k">class</span> <span class="nc">ShippingCostCalculator</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nx">Order</span> <span class="nv">$order</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>From this step its easy to make the code reusable by passing the shipping cost
-calculator:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">Order</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">shippingCosts</span> <span class="o">=</span> <span class="nv">$calculator</span><span class="o">-&gt;</span><span class="na">calculate</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Another benefit is that you can test the shipping cost calculator directly in a
-unit-test and avoid checking for the correctness indirectly through a getter
-method for the shipping costs.</p>
-<p>Extracting every method of an entity into a method object is obviously
-overkill. You should exercise caution and common sense when performing this
-refactoring.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>Not all the techniques to implement SOLID code can be exploited when using Doctrine
-for technical reasons. In the future I hope to support value objects in
-Doctrine to make this possible.</p>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/doctrine.html">Doctrine</a>
-                 / 
-                <a href="tags/codequality.html">CodeQuality</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 04, 2013
                  by Benjamin Eberlei
             </small>
         </p>

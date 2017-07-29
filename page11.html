@@ -61,6 +61,68 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
+<blockquote>
+<div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
+successfully in roughly 4 weeks. For that we used a small web-based tool to
+ask the permission of 358 authors that contributed in the last 6 years.</div></blockquote>
+<p>The <a class="reference external" href="http://www.doctrine-project.org">Doctrine project</a> has been LGPL
+licensed since it was started in 2006. When I first started contributing in the
+project late in 2009 we were constantly asked about changing the license to a
+permissive license such as <a class="reference external" href="http://en.wikipedia.org/wiki/MIT_License">MIT</a> or
+New-BSD.  My subjective feeling is that there are much more libraries with
+permissive licenses than 10 years ago. And there are others that <a class="reference external" href="http://news.cnet.com/8301-13556_3-20071811-61/the-open-source-license-landscape-is-changing/">back my
+feeling up with facts</a>.
+The fear of getting screwed when using a permissive license has probably
+declined in favor of the benefits. <a class="reference external" href="http://pooteeweet.org/blog/2084">As Lukas puts it</a>:</p>
+<blockquote>
+<div>Maybe with enough experience you start to realize that it happens close to
+never that a proprietary fork of an open source project ends up outpacing
+the original project.</div></blockquote>
+<p>We wanted all the benefits of permissive licenses as well.  So at the beginning
+of this year we as Doctrine project first started to investigate how the task
+of switching the license could be done. After a short email with the <a class="reference external" href="http://www.fsf.org">FSF</a> it was clear that we had to get the approval of every
+single committer or remove their code.</p>
+<p>VLC <a class="reference external" href="http://www.videolan.org/press/lgpl.html">successfully attempted a license change</a> last year from GPL to LGPL, so we
+we’re hopeful to get this done. After discussing with Lukas we came up with the
+idea of a tool that helps this process, so <a class="reference external" href="http://dlm.beberlei.de">I wrote it</a>. It features:</p>
+<ul class="simple">
+<li>Import of all commits from one or many Github projects</li>
+<li>Aggregation of commits to authors based on e-mail address from Git log</li>
+<li>Status approved/not-approved for every author.</li>
+<li>An e-mail engine to send a request for approval to every author using
+<a class="reference external" href="http://www.mailgun.net">the awesome Mailgun service</a>, who has not approved
+yet. We use Mailgun for fun and to have a way to act on bounces easily.</li>
+<li>Admin functionality to mark commits as “trivial or deleted”.</li>
+<li>An audit trail to account for all changes and who has done them.</li>
+<li>Symfony2/Doctrine2 application with debian packaging using FPM.</li>
+</ul>
+<p>This project is not yet open-sourced but will be when I have some time to clean
+up the hardcoded passwords and write a small README on how to adjust the
+templates.</p>
+<p>After importing the commits of all the LGPL licensed Doctrine projects we
+realized that we have 358 unique committers and about 40-50 without an e-mail
+address (from the old SVN days). So we started googling for nicknames and
+eventually collected all e-mail addresses except maybe 6-8 missing ones.</p>
+<p>Now after 4 weeks of bi-weekly e-mail reminders, everyone except 16 committers have
+accepted the license change. No single person refused the change. All commits
+of the 16 people left we’re luckily not part of the code base anymore when we
+completely rewrote Doctrine 2 or trivial one-line changes.</p>
+<p>I am very happy to announce that Doctrine is now an MIT licensed project. Have
+fun with it.</p>
+
+
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 26, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
 <p>Controller testing using the WebTestCase requires a Symfony Kernel and with
 that a complete application. However you can just ship your own simple kernel
@@ -590,163 +652,6 @@ used.</p>
         <p>
             <small>
                 Posted on January 08, 2010
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></a></h1>
-<p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
-article</a> on using PEAR
-and PHAR for application lifecycle management and deployment. Since then
-I have gotten some feedback through comments, but also discussed the
-topic with colleagues. I have also optimized the approach quite
-considerably and even <a class="reference external" href="http://github.com/beberlei/pearanha">made an open-source project out of parts of
-it</a> and I want to share all that
-is new with you. First of all, yes the presented solution was somewhat
-complex, partly because it is still a proposed idea and definitely up
-for optimizations. However I am still very convinced of my approach,
-something I should discuss in more detail.</p>
-<p>The only other two languages I have ever programmed something in with
-more than 50 lines of code are Java and C#. In both languages you can
-explicitly import different dependencies like libraries and frameworks
-by adding them to your application, i.e. in java you would add for
-example Spring as an MVC Web layer, Hibernate as an ORM and several
-other things to your project and directly bundle them in your
-executable. This is very easy to configure and maintain in IDEs like
-Netbeans or Eclipse (C# has the same with allowing you to attach DDLs of
-libraries to your project). It also makes for a much more
-straightforward deployment.</p>
-<p>In the PHP world this situation was quite different (up to PHP 5.3) for
-several reasons:</p>
-<ul class="simple">
-<li>You could not package a library into a single distributable file.</li>
-<li>The PEAR installer as the only tool for updating and managing
-dependencies of your application by default installs into a
-system/global directory. This means dependencies your application
-uses are located in a completely different location than your
-application code.</li>
-<li>You can’t manage multiple versions of the same package with PEAR in
-this system directory, making it very hard to control servers with
-different applications.</li>
-<li>The global directory with your application dependencies is most often
-not under version control, which makes deployment of applications
-with PEAR dependencies somewhat difficult.</li>
-</ul>
-<p>There are some solutions to this problems:</p>
-<ul class="simple">
-<li>Don’t use PEAR, but put all dependencies in your version control
-system.</li>
-<li>Don’t use PEAR, and bundle dependencies to your code in the
-build/deployment process.</li>
-<li>Use PEAR like in the article described, on a per project basis.</li>
-</ul>
-<p>The solutions that don’t use PEAR suffer from the disadvantage that you
-need to keep track of all the library and framework dependencies
-yourself and upgrade them yourself. This might not be such a huge
-problem from a first glance, but in my opinion many PHP applications and
-projects suffer from using either no framework/library or just exactly
-one. There is no real cherry-picking going on the PHP world, for example
-I would really like to use Zend Framework for the general application
-layout, but still use Doctrine for the Modelling and HTML Purifier for
-the Output Escaping. Certain tasks might then only be solvable with the
-help of eZ Components, all of which are then to some extend dependencies
-of my application. With <a class="reference external" href="http://pearhub.org/">PEARHUB</a> and
-<a class="reference external" href="http://pearfarm.org/">PEARFARM</a> on the horizon (<a class="reference external" href="http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html">Read Padraic on this
-topic</a>)
-even more PHP code will be distributed using PEAR channels in the near
-future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
-DateTime</a> code for
-example makes for a great little open source library that could be
-distributed via PEAR, as well as
-<a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
-container I am using extensively.</p>
-<p>Question: Are you really going to manage all these dependencies
-correctly manually? Is everything up to date all the time, and
-upgradeable with ease?</p>
-<p>The PEAR driven solution then begins to look very desirable in this
-light, however it has a considerable disadvantage: The PEAR installer
-itself works on a system-wide/user-centric basis, making it impossible
-to manage dependencies of several applications using only one linux
-user. My little <a class="reference external" href="http://github.com/beberlei/pearanha">Pearanha</a> to the
-rescue: I have taken the PEAR installer code (which is distributed with
-all PHP installations across all systems) and put a new CLI tool on top
-of it. Its a very simple code-generator that allows to generate a
-re-configured PEAR installer script which only manages a single
-application in a given directory. This approach is also used by the
-symfony plugin mechanism, which internally uses the PEAR installer (did
-you know?).</p>
-<p>Lets revisit my blog application example <a class="reference external" href="%3Ca%20href=">from my previous PEAR
-post</a>, first install from
-<a class="reference external" href="http://github.com/beberlei/pearanha">Github</a> and make the “pearanha”
-file executable and put it in your PATH (A PEAR Server Channel will
-follow any time soon).</p>
-<p>Now we need to have an existing application directory somewhere, for
-example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
-with:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="n">benny</span><span class="nd">@desktop</span><span class="p">:</span> <span class="n">pearanha</span> <span class="n">generate</span><span class="o">-</span><span class="n">project</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>You then need to specify the project base dir and then the project
-style (for example Zend Framework or Manual) which prompts your for the
-directory that should be used for as the vendor/library directory that
-PEAR will install all the code in. You will also be prompted for a
-binary/scripts directory which will then hold a new PHP file for you,
-the file <strong>my_phpiranha</strong>.</p>
-<p><strong>Pro Argument:</strong> Switching to Pearanha can be done at any point in your
-application lifecycle. Just define an additional vendor directory for
-all the dependencies to go in and generate the applications pear
-installer and you are good to go.</p>
-<p>The generated script is your new application specific PEAR installer and
-you can begin to install all the required dependencies of your
-application:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>benny@desktop:~$ cd /var/www/blog
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.zfcampus.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install zfcampus/zf-alpha
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover htmlpurifier.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install hp/HTMLPurifier
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.phpdoctrine.org
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install pear.phpdoctrine.org/DoctrineORM-2.0.0
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover components.ez.no
-benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install ezc/ezcGraph
-</pre></div>
-</div>
-</div></blockquote>
-<p>All this stuff is now located in <strong>/var/www/blog/vendor</strong>. Again you can
-use PEARs complete upgrade, remove and install functionality for your
-application, now without the hazzle of having to create a linux user for
-each project you want to manage this way, which in my opinion is a
-considerable simplification. The complete application (including its
-dependencies) can then be put under version control and be readily
-packaged as a single executable PHAR file by your build process.</p>
-<p>As a side node, I did try Pyrus instead of PEAR for the same discussed
-purpose, however most of the current PEAR channels don’t validate
-against Pyrus strict standards for the package.xml file. In the future
-this might change and a Pyrus based application installer will then be
-integrated into Pearanha.</p>
-<p><strong>UPDATE:</strong> I renamed PHPiranha to Pearanha as its more appropriate.
-Also after apinsteins comment on “pear config-create” I rewrote the
-generate-project parts to use the config-create functionality
-internally, which allowed me to throw away half of the self-written
-code. Thanks!</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/deployment.html">Deployment</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 10, 2010
                 
             </small>
         </p>

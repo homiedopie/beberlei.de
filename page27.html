@@ -61,6 +61,72 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html">ezComponents 2008.2 Beta - Mvc separation for win</a></h1>
+<p><a class="reference external" href="http://www.whitewashing.de/blog/articles/88">I have written</a> on the
+<a class="reference external" href="http://ezcomponents.org">new ezComponents MvcTools</a> component before
+already. Just yesterday the beta of this component was released with the
+<a class="reference external" href="http://ezcomponents.org/resources/news/news-2008-12-01">general beta of the 2008.2
+version</a> of
+ezComponents. Several bugfixes and enhancements were included into the
+MvcTools which make it a perfect component for any Mvc based
+application.</p>
+<p>I reviewed lots of the code myself and can only say i love the beauty of
+the code. Its very simple but by default the most powerful mvc solution
+in the PHP market. People working with unittests will like it very much,
+since all the parts are perfectly separated from each other allowing to
+test controllers, views, routers and filters in complete separation.</p>
+<p>To show one very simple example howto benefit of the separation of view
+and controllers. If we need a view in both html and pdf, this should
+generally make no difference for the controller. We add two routes, one
+for the pdf one for the html view that execute the same controller and
+action:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/><span class="k">class</span> <span class="nc">myRouter</span> <span class="n">extends</span> <span class="n">ezcMvcRouter</span><span class="p">{</span> <span class="n">public</span> <span class="n">function</span> <span class="n">createRoutes</span><span class="p">()</span> <span class="p">{</span>  <span class="k">return</span> <span class="n">array</span><span class="p">(</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">'/pdf'</span><span class="p">,</span> <span class="s1">'SomeController'</span><span class="p">,</span> <span class="s1">'index'</span><span class="p">),</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">'/'</span><span class="p">,</span> <span class="s1">'SomeController'</span><span class="p">,</span> <span class="n">index</span><span class="s1">' ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables['</span><span class="n">items</span><span class="s1">'] = Model::retrieveLotsOfItems();  return $result; }}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now howto decide between PDF and Html view? We use the createView method
+of our dispatcher configuration, but we still only need the http
+response writer, nothing more.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, "/pdf")) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now both <strong>myHtmlView</strong> and <strong>myPdfView</strong> can create their
+ezcMvcResponse objects that fill the response body depending on their
+type. Please note that overwriting createResponseBody() in myPdfView is
+a shortcut that circumvents me having to write a new PDF View Handler
+(which would be the way to go).</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( 'content', '../templates/index.phtml' );  $zones[] = new ezcMvcPhpViewHandler( 'page_layout', '../templates/layout.phtml' );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = "application/pdf";   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now all the the logic that is potentially in the controller is completely
+separated from the view handling that may depend on the routing
+information not on the controller. And views can be tested separately
+from the controller result. Testability is very high.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/ezcomponents.html">eZComponents</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on December 03, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/12/04/rest-and-ajax-aware-controllers-in-ezcmvctools.html">REST and Ajax Aware controllers in ezcMvcTools</a></h1>
 <p>There are essentially two major different ways to implement a restful
 application using a web framework. You either implement a router that
@@ -255,36 +321,6 @@ support:</p>
         <p>
             <small>
                 Posted on July 22, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/07/17/zf-jquery-helper-first-prototype-ready.html">ZF jQuery Helper - First Prototype Ready</a></h1>
-<p>I checked in the first implementation of my jQuery Helper into my <a class="reference external" href="http://www.beberlei.de/dev/svn">dev
-svn</a>. It follows my suggested
-<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">proposal in the Zend Framework Dev
-Wiki</a>
-and implements all the advertised features. I also implemented 2 demos
-that nicely present the functionality.</p>
-<p>Please test and comment!</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/jquery.html">jQuery</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on July 17, 2008
                 
             </small>
         </p>

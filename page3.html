@@ -61,6 +61,101 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2015/02/19/vagrant_nfs_and_npm.html">Vagrant, NFS and NPM</a></h1>
+<p>I have ranted about Node.JS and NPM on Twitter before, costing me lots of time,
+so I have to make up for this now and offer some solutions.</p>
+<p>One problem I regularly have is the following: I have a Vagrant/Virtualbox
+using NFS and want to run NPM inside of that. Running it inside the box
+is necessary, because I don’t want everyone using the box have to setup the
+node stack.</p>
+<p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn’t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
+#3565</a> because a chmod fails and
+apparently from the ticket, this is not going to be fixed.</p>
+<p>I finally got it working with a <a class="reference external" href="https://gist.github.com/kevinastone/8790717">workaround script</a> by <a class="reference external" href="https://github.com/kevinastone">Kevin
+Stone</a> that mimics NPM, but
+moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>#!/bin/bash
+# roles/nodejs/files/tmpnpm.sh
+
+BASE_DIR=${TMPDIR:-/var/tmp}
+ORIG_DIR=$PWD
+HASH_CMD="md5sum"
+
+DIR_NAME=`echo $PWD | $HASH_CMD | cut -f1 -d " "`
+
+TMP_DIR=$BASE_DIR/$DIR_NAME
+mkdir -p $TMP_DIR
+
+pushd $TMP_DIR
+
+ln -sf $ORIG_DIR/package.json
+npm $1
+
+# Can't use archive mode cause of the permissions
+rsync --recursive --links --times node_modules $ORIG_DIR
+
+popd
+</pre></div>
+</div>
+<p>Integrating this into my Ansible setup of the machine it looked like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># roles/nodejs/tasks/main.yml</span>
+<span class="c1"># More tasks here before this...</span>
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"Install npm workaround"</span>
+  <span class="n">copy</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="n">src</span><span class="o">=</span><span class="n">tmpnpm</span><span class="o">.</span><span class="n">sh</span>
+      <span class="n">dest</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span>
+      <span class="n">mode</span><span class="o">=</span><span class="s2">"0755"</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"Install Global Dependencies"</span>
+  <span class="n">command</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="p">{{</span> <span class="n">item</span> <span class="p">}}</span>
+  <span class="n">with_items</span><span class="p">:</span> <span class="n">global_packages</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"Install Package Dependencies"</span>
+  <span class="n">command</span><span class="p">:</span> <span class="o">&gt;</span>
+      <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">tmpnpm</span> <span class="n">install</span>
+      <span class="n">chdir</span><span class="o">=</span><span class="p">{{</span> <span class="n">item</span> <span class="p">}}</span>
+  <span class="n">with_items</span><span class="p">:</span> <span class="n">package_dirs</span>
+</pre></div>
+</div>
+<p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
+outside when invoking the role:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># deploy.yml</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="p">:</span> <span class="nb">all</span>
+  <span class="n">roles</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">nodejs</span>
+      <span class="n">global_packages</span><span class="p">:</span>
+        <span class="o">-</span> <span class="n">grunt</span><span class="o">-</span><span class="n">cli</span>
+      <span class="n">package_dirs</span><span class="p">:</span>
+        <span class="o">-</span> <span class="s2">"/var/www/project"</span>
+</pre></div>
+</div>
+<p>This way the Ansible Node.JS role is reusable in different projects.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/vagrant.html">Vagrant</a>
+                 / 
+                <a href="tags/ansible.html">Ansible</a>
+                 / 
+                <a href="tags/javascript.html">Javascript</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 19, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">PHPunit @before Annotations and traits for code-reuse</a></h1>
 <p>I have written about why I think <a class="reference external" href="http://www.whitewashing.de/2013/04/12/traits_are_static_access.html">traits should be avoided</a>. There
 is a practical use-case that serves me well however: Extending PHPUnit tests.</p>
@@ -845,156 +940,6 @@ anything on top this foundation from simple CRUD, APIs, hexagonal- or CQRS-archi
         <p>
             <small>
                 Posted on October 26, 2014
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2014/10/14/lightweight_symfony2_controllers.html">Lightweight Symfony2 Controllers</a></h1>
-<p>For quite some time I have been experimenting how to best implement Symfony 2
-controllers to avoid depending on the framework. I have discussed many of these
-insights here in my blog.</p>
-<p>There are three reasons for my quest:</p>
-<p>Simplicity: Solutions to avoid the dependencies between framework
-and your model typically introduce layers of abstraction that produce
-complexity. Service layers, CQRS and various design patterns are useful
-tools, but developing every application with this kind of abstraction screams
-over-engineering.</p>
-<p>While the Domain-Driven Design slogan is “Tackling complexity in software”,
-there are many abstractions out there that can better be described as “Causing
-complexity in software”. I have written some of them myself.</p>
-<p>Testability: There is a mantra “Don’t unit-test your controllers” that arose
-because controllers in most frameworks are just not testable. They have many
-dependencies on other framework classes and cannot be created in a test
-environment. This lead many teams to use slow and brittle integration tests instead.</p>
-<p>But what if controllers were testable because they don’t depend on the
-framework anymore. We could avoid testing all the many layers that we
-have removed for the sake of simplicity and also reduce the number of
-slow integration tests.</p>
-<p>Refactorability: I found that when using service layer or CQRS, there is a
-tendency to use them for every use-case, because the abstraction is in place.
-Any use-case that is not written with those patterns is coupled against the
-framework again. Both development approaches are very different and refactoring
-from one to the other typically requires a rewrite.</p>
-<p>A good solution should allow refactoring from a lightweight controller to a
-service layer with a small number of extract method and extract class
-refactorings.</p>
-<p>While working on <a class="reference external" href="https://tideways.io/">Tideways Profiler</a> product I
-went to work on a solution that allowed for Simplicity, Testability and
-Refactorability and came up with the
-<a class="reference external" href="https://github.com/qafoolabs/QafooLabsNoFrameworkBundle">NoFrameworkBundle</a>.</p>
-<p>The design of the bundle is careful to extend Symfony in a way that is easy
-for Symfony developers to understand. To achieve this it heavily extends
-upon the FrameworkExtraBundle that is bundled with Symfony.</p>
-<p>The design goals are:</p>
-<ul class="simple">
-<li>Favour Controller as Services to decouple them from the Framework.</li>
-<li>Replace every functionality of the Symfony Base controller in a way
-that does not require injecting a service into your controller.</li>
-<li>Never fetch state from services and inject it into the controller instead.</li>
-<li>Avoid annotations</li>
-</ul>
-<p>The concepts are best explained by showing an example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">TaskController</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">TaskRepository</span> <span class="nv">$taskRepository</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span> <span class="o">=</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">Task</span> <span class="nv">$task</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">isGranted</span><span class="p">(</span><span class="s1">'ROLE_TASK'</span><span class="p">,</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">AccessDeniedHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'task'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This example demos the following features:</p>
-<ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">TokenContext</span></span> wraps access to the <span class="docutils literal"><span class="pre">security.context</span></span> service and is
-used for checking access permissions and retrieving the current User object.
-It is passed to the controller with the help of ParamConverter feature.</p>
-<p><span class="docutils literal"><span class="pre">TokenContext</span></span> here is just an interface and for testing you can
-use a very simple mock implementation to pass an authenticated user to your
-controller.</p>
-</li>
-<li><p class="first">View parameters are returned from the controller as an array, however
-without requiring the <span class="docutils literal"><span class="pre">@Template</span></span> annotation of the
-SensioFrameworkExtraBundle.</p>
-</li>
-</ul>
-<p>The next example demontrates the abstraction for form requests that help writing very
-concise form code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">QafooLabs\MVC\FormRequest</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">TaskController</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$taskRepository</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">newAction</span><span class="p">(</span><span class="nx">FormRequest</span> <span class="nv">$formRequest</span><span class="p">,</span> <span class="nx">TokenContext</span> <span class="nv">$context</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Task</span><span class="p">(</span><span class="nv">$context</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">());</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">new</span> <span class="nx">TaskType</span><span class="p">(),</span> <span class="nv">$task</span><span class="p">))</span> <span class="p">{</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">taskRepository</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$task</span><span class="p">);</span>
-
-            <span class="k">return</span> <span class="k">new</span> <span class="nx">RedirectRouteResponse</span><span class="p">(</span><span class="s1">'Task.show'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="nv">$task</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()));</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'form'</span> <span class="o">=&gt;</span> <span class="nv">$formRequest</span><span class="o">-&gt;</span><span class="na">createFormView</span><span class="p">());</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<ul>
-<li><p class="first">The <span class="docutils literal"><span class="pre">RedirectRouteResponse</span></span> is used to redirect to a route without
-a need for the <span class="docutils literal"><span class="pre">router</span></span> service.</p>
-</li>
-<li><p class="first">Usage of the <span class="docutils literal"><span class="pre">FormRequest</span></span> object that is a wrapper around FormFactory and
-Request object. It is passed by using a ParamConverter. The method
-<span class="docutils literal"><span class="pre">$formRequest-&gt;handle</span></span> combines binding the request and checking for valid
-data.</p>
-<p>Again there is a set of mock form request that allow you to simulate valid or
-invalid form requests for testing.</p>
-</li>
-</ul>
-<p>Writing controllers in this way addresses my requirements Simplicity,
-Testability and Refactorability. For simple CRUD controllers they only ever
-need access to a repository service. If one of your controllers grows too big,
-just refactor out its business logic into services and inject them.</p>
-<p>Check out the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">repository on Github</a> for some more
-features that we are using in <a class="reference external" href="https://tideways.io/">Tideways</a>.</p>
-<p>Update 1: Renamed <span class="docutils literal"><span class="pre">FrameworkContext</span></span> to <span class="docutils literal"><span class="pre">TokenContext</span></span> as done
-in new 2.0 version of the bundle.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/symfony.html">Symfony</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on October 14, 2014
                  by Benjamin Eberlei
             </small>
         </p>

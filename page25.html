@@ -61,6 +61,81 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
+<p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
+Mainz, Germany was the first php conference I have been to. It ended
+some hours ago and i am quite happy to have been there. I had several
+great discussions which pointed me to new stuff (to follow) and also met
+great people.</p>
+<p>First thing that completely fascinated me is <a class="reference external" href="http://download.netbeans.org/netbeans/6.5/rc/">NetBeans 6.5 with PHP
+support</a>. It feels much
+more easy to use than Eclipse PDT. Its faster (from the little tests i
+could make) and does not strike when you add several large libraries
+into the include path. It offers much more help on refactoring and
+organizing than Eclipse PDT does, for example it offers to generate
+getter/setter, constructor, inheritance methods. Much thanks to Petr who
+explained to me in detail how NetBeans works.</p>
+<p>Ez had lots of people at the conference (to Kore and Tobias i spoke in
+more detail) and I had some talks with them about
+<a class="reference external" href="http://www.ezcomponents.org">ezComponents</a>. This was especially
+interesting after the great session on object persistence in ez, as well
+when I heard that ezcMvc, a model-view-controller component, wil be
+included in the next release of ezc in December 2008. ezComponents has a
+Database layer, that does not seem to enforce too much overhead on you
+but still offers great extensibility through a persistence layer and a
+library that offers to build Database Diffs. The latter feature is
+really great and I will definitely have a look at this.</p>
+<p>Sebastian Bergmann had a great talk on MapReduce which is an old LISP
+programming paradigm to work with huge datasets. This style was recently
+<a class="reference external" href="http://labs.google.com/papers/mapreduce.html">revived by Google</a>
+because tasks can easily be split and distributed for computing on
+different nodes with hundreds of threads. Implementing a working example
+in PHP is really easy, just finding a good way to process your large
+data seems to be a topic that needs lots of thinking.</p>
+<p>Additional great things:</p>
+<ul class="simple">
+<li>Meet Thomas, the guy that wrote Weaverslave (I use it for years to
+build simple php applications).</li>
+<li>He is working on a cool open source project <a class="reference external" href="http://sourceforge.net/projects/ccg/">Carica
+Cachegrind</a> with Bastian
+Feder that will process xdebug cachegrind files via a webinterface
+(They told me webgrind is actually calculating the numbers wrong).</li>
+<li>Jan Lehnhart and Kore Nordmann had some great things to say about
+<a class="reference external" href="http://incubator.apache.org/couchdb/">CouchDB</a>.</li>
+<li>Brian Acker talked about <a class="reference external" href="https://launchpad.net/drizzle">Drizzle</a>,
+which is a forked MySQL that throws out lots of legacy stuff from
+MySQL out, to build a micro-kernel database server that suites the
+web.</li>
+<li>Ulf Wendel talked about Mysqli + Mysqlnd.
+<a class="reference external" href="http://dev.mysql.com/downloads/connector/php-mysqlnd/">Mysqlnd</a>
+will be a new internal driver for PHP to access MySQL through Mysqli
+and optimizes processing and memory consumption. Additionally Mysqli
+will be extended to offer asynchronous queries that can be fired at
+the database and polled latter. To be included in PHP 5.3</li>
+</ul>
+<p>Not so good things: There were absolutely to few power lines. People
+using their notebooks were packed on hotspots where power was available.
+Please more power plug possibilities next time!</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/conferences.html">Conferences</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on October 30, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/10/01/my-recent-zf-ongoings-jquery-action-controller-couchdb.html">My recent ZF ongoings: JQuery, Action Controller, CouchDb</a></h1>
 <p>In the last weeks lots of stuff came up for me regarding the Zend
 Framework. My <a class="reference external" href="http://jquery.com">jQuery</a> component is finished, i
@@ -261,106 +336,6 @@ fun.</p>
         <p>
             <small>
                 Posted on September 11, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/09/20/dependency-injection-via-interface-in-php-an-example.html">Dependency Injection via Interface in PHP: An example</a></h1>
-<p>Personal projects and work currently both force me to think about
-application design and I <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">came across dependency
-injection</a> the
-other day. Its quite a complex Design Pattern and hard to grasp, even
-with the number of examples you can find in the internet. Basically
-Dependency Injection means you register components that might be a
-dependency for other components and when loading new classes via the
-dependency injection framework, it knows of this relationships and
-assembles the object in need and all its dependencies and returns them
-fully initialized. This pattern leads to completely encapsulated objects
-where any class in the object graph can be exchanged for a new
-implementation without breaking all its dependencies. It also makes
-testing complex components and object relationships very easy.</p>
-<p>As far as I could find out, three different types of Dependency Injection
-implementations exist: Via Constructor, via Setter and via Interfaces.
-There exist implementations of Dependency Injection for Java (Spring)
-that are configured via XML config files and seem very complex. They are
-also hard to read in code I presume, since you always have to be aware
-of the current application configuration. There are also some more
-lightweight implementations (PicoContainer) that assemble their
-relationships in the application and work with config methods that act
-as configuration of the dependencies. <a class="reference external" href="http://www.martinfowler.com/articles/injection.html">Martin Folwer also discusses an
-implementation via
-interfaces</a>,
-which seems most accessible for me.</p>
-<p>All PHP clones of any dependency injection framework seem to go the
-complex way via configuration though. With traits and multiple class
-inheritance on the horizon, some kind of interface injection seems
-mighty powerful though. So I implemented a really lightweight
-implementation of Interface Dependency Injection for PHP. The Container
-works with static method only, is therefore in the global scope, such
-that configuration is reduced to a minimum. Generally you have to write
-interfaces for object injection, for example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">interface InjectDbAdapter</span>
-<span class="x">{</span>
-<span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>Other potential examples include “InjectLogger”, “InjectSoapClient”, or
-“InjectAppConfig”. You then have to register a component for usage with
-this interface:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">Whitewashing_Container::registerComponent('InjectDbAdapter', Zend_Db::factory($dbConfig));</span>
-</pre></div>
-</div>
-<p>Now any class that implements the InjectDbAdapter interface can be
-instantiated via:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">$obj = Whitewashing_Container::load('Class');</span>
-</pre></div>
-</div>
-<p>and the loader takes care of calling the ‘Class’ implementation of
-injectDbAdapter with the given Database Adapter. A negative consequence
-of this approach is that you have to implement the inject methods for
-all interfaces in your concrete class implementations. With Traits
-(multiple class inheritance) being a new feature in PHP soon, injection
-via parent classes seems to become a very powerful approach though,
-which can handle the concrete implementations.</p>
-<p>The Container takes care of all the dependency building, so when testing
-your components you can register lots of mock objects. You can also
-exchange dependencies for only a subset of objects very easily. I
-implemented a method “Whitewashing_Container::registerClassComponent”,
-which registers a dependency component that is used with higher priority
-in construction of the given class. You can also specify a third
-parameter $localInterfaceOverride for the highest priority:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">$obj = Whitewashing_Container::load('Class', null, array('InjectDbAdapter' =&gt; $newDbAdapter));</span>
-</pre></div>
-</div>
-<p>Speedwise the usage of the Container reduces class instantiation by about
-50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
-on my machine. But naturally only classes with dependencies and lots of
-them should be using this mechanism and with good application design,
-this shouldn’t be to many. You can download
-<a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
-and <a class="reference external" href="http://www.beberlei.de/sources/di.phps">Example</a> sourcecode, to
-take a look. Currently this Container is not really creating new
-dependencies for each new class generation but rather inverts the usage
-of a registry. It should be an easy task to extend the registering
-method to decide between new class generation and using the globally
-registered class instance.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/dependencyinjection.html">DependencyInjection</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on September 20, 2008
                 
             </small>
         </p>
