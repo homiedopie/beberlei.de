@@ -14,6 +14,8 @@ I poked around in the list of files of the `slack-desktop` package and found
 out that you can just exchange the files for the tray icons , so that the Slack
 app is fooled into thinking it is showing the unread or highlight icons.
 
+::
+
     sudo -i
     cd /usr/lib/slack/resources/app.asar.unpacked/src/static
     mv slack-taskbar-highlight.png slack-taskbar-highlight-backup.png
