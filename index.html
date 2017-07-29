@@ -72,13 +72,14 @@ clever use of an upstream Electron bug that makes the tray icon disappear in
 <p>I poked around in the list of files of the <cite>slack-desktop</cite> package and found
 out that you can just exchange the files for the tray icons , so that the Slack
 app is fooled into thinking it is showing the unread or highlight icons.</p>
-<blockquote>
-<div>sudo -i
-cd /usr/lib/slack/resources/app.asar.unpacked/src/static
-mv slack-taskbar-highlight.png slack-taskbar-highlight-backup.png
-mv slack-taskbar-unread.png slack-taskbar-unread-backup.png
-cp slack-taskbar-rest.png slack-taskbar-highlight.png
-cp slack-taskbar-rest.png slack-taskbar-unread.png</div></blockquote>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">sudo</span> <span class="o">-</span><span class="n">i</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">slack</span><span class="o">/</span><span class="n">resources</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">asar</span><span class="o">.</span><span class="n">unpacked</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">static</span>
+<span class="n">mv</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">-</span><span class="n">backup</span><span class="o">.</span><span class="n">png</span>
+<span class="n">mv</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">-</span><span class="n">backup</span><span class="o">.</span><span class="n">png</span>
+<span class="n">cp</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">rest</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">.</span><span class="n">png</span>
+<span class="n">cp</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">rest</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">.</span><span class="n">png</span>
+</pre></div>
+</div>
 <p>Since I probably need to re-run this after every update to the Slack app, I
 packed this into a shell script <cite>slack-quiet</cite>.</p>
 
