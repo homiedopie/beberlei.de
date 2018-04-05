@@ -58,7 +58,7 @@ installations.
 In the context of choosing a build script for your project you can now
 choose "Phing" instead of Ant:
 
-.. figure:: http://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849/
+.. figure:: https://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849/
    :align: center
    :alt: 
 You can enter the targets to build, for example on my local Hudson

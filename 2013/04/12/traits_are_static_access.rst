@@ -4,7 +4,7 @@ Traits are Static Access
 In a Twitter discussion yesterday I formulated my negative opinion
 about traits and Matthew asked me to clarify it:
 
-.. image:: http://www.whitewashing.de/_static/traits_are_static_access.png
+.. image:: https://beberlei.de/_static/traits_are_static_access.png
 
 I used to look forward to traits as a feature in PHP 5.4, but after discussions
 with `Kore <http://twitter.com/koredn>`_ I came to the conclusion that traits
