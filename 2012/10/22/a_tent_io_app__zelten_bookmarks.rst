@@ -28,8 +28,8 @@ for the users though. Compared to Diaspora it has the benefit of being a protoco
 an application first.
 
 Now two month later, there are `reference implementations <https://github.com/tent>`_
-for Server, Client and a Twitter like Status application. You can use `Tent.is
-<http://tent.is>`_ to create a free or payed tent account including access to
+for Server, Client and a Twitter like Status application. You can use Tent.is
+(Now defunct) to create a free or payed tent account including access to
 the status application or setup your own tentd server on Heroku.
 
 As a user I can connect any application to the tent server I have registered
@@ -48,7 +48,7 @@ Tent.io sounds awesome, how can I help?
 ---------------------------------------
 
 Right at the moment the tent software stack is developed by the team that also
-hosts `Tent.is <https://tent.is>`_. If all you can provide is money, then
+hosts Tent.is. If all you can provide is money, then
 signing up for the 12 USD per month is the way to go.
 
 If you are a developer, then take a look at the `Wiki
