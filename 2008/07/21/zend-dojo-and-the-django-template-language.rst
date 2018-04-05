@@ -5,8 +5,8 @@ With the Zend Framework `nearing its 1.6
 release <http://www.nabble.com/1.6-RC1-Schedule-tp18538148p18538148.html>`_
 and full `Dojo Toolkit <http://www.dojotoolkit.org>`_ support I took
 some time to look up what Dojo is actually capable of. I found the
-`DojoX Django Template
-Language <http://dojotoolkit.org/book/dojo-book-0-9/part-5-dojox/dojox-dtl>`_
+DojoX Django Template
+Language
 extension and remembered my neighbor talking about why Python + Django
 is so much better than PHP with any other framework. So I digged into
 the `Django template

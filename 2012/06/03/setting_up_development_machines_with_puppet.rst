@@ -126,8 +126,8 @@ Here A bunch of commands is executed unless some option is already set. At last
 the global .gitingore is filled with the patterns of Vim temporary files.
 
 I also automated all the other steps listed above, but will spare you the
-details. For the LAMP Stack + PHP I used `this following Github repository
-<https://github.com/dietervds/puppet-symfony2>`_ as an inspiration. It ships a
+details. For the LAMP Stack + PHP I used the now defunct
+dietervds/puppet-symfony2 repository as an inspiration. It ships a
 set of Puppet Modules. You can just put them into your ``~/.puppet/modules``
 folder and they are then available in any of your puppet files.
 

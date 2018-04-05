@@ -1,10 +1,9 @@
 New Netbeans PHP CodeSniffer Plugin Version
 ===========================================
 
-This morning I took the time to merge several changes by `Manuel
-Piechler <http://manuel-pichler.de/>`_ into `my Github
-branch <http://github.com/beberlei/netbeans-php-enhancements>`_ of the
-CodeSniffer Plugin and released a new NBM file for you to
+This morning I took the time to merge several changes by Manuel Piechler into
+`my Github branch <http://github.com/beberlei/netbeans-php-enhancements>`_ of
+the CodeSniffer Plugin and released a new NBM file for you to
 `download <http://github.com/beberlei/netbeans-php-enhancements/downloads>`_.
 Here are the changes done by Manuel:
 

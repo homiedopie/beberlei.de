@@ -14,10 +14,9 @@ year on Framework Quality and Unittests:
     big players in the PHP framework business - Zend Framework,
     ezComponents, Symfony and CakePHP - and reveal their hidden secrets.
 
-This talk will make heavy use of the `PHP Unittest and Metrics
-Aggregator tool <https://github.com/beberlei/puma/tree>`_, which i haven
-written on several times. For both CakePHP and Symfony extensions for
-their testtools may have to be written.
+This talk will make heavy use of the PHP Unittest and Metrics Aggregator tool,
+which i haven written on several times. For both CakePHP and Symfony extensions
+for their testtools may have to be written.
 
 I am really excited for my first time being speaker on a conference and
 looking forward to see you at IPC.

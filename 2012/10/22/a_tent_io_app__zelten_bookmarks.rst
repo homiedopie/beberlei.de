@@ -1,17 +1,15 @@
 A tent.io app: Zelten Bookmarks
 ===============================
 
-Over the weekend I built a `very simple bookmarking application
-<http://zelten.eu1.frbit.net>`_ for `tent.io
-<http://tent.io>`_. I wanted to try the tent functionality to create
-arbitrary entities of data using something as simple as a "Bookmark".
+Over the weekend I built a very simple bookmarking application for `tent.io
+<http://tent.io>`_. I wanted to try the tent functionality to create arbitrary
+entities of data using something as simple as a "Bookmark".
 
 The application retrieves and stores bookmarks on your own tent-server, nothing
 is kept on the applications server and as a user you keep full control over
 your content (bookmarks). 
 
-The `code for the application <https://github.com/beberlei/zelten-bookmarks>`_
-is on Github, as well as the `TentPHP library
+The code for the application is on Github, as well as the `TentPHP library
 <https://github.com/beberlei/TentPHP>`_ I have written to support the protocol.
 The application is using PHP, the Silex microframework and MySQL.
 

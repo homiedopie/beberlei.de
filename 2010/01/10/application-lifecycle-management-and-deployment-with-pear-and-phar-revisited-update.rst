@@ -2,7 +2,7 @@ Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) *
 =======================================================================================
 
 Some weeks ago `I posted an
-article <http://www.whitewashing.de/blog/articles/123>`_ on using PEAR
+article <https://beberlei.de/2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html>`_ on using PEAR
 and PHAR for application lifecycle management and deployment. Since then
 I have gotten some feedback through comments, but also discussed the
 topic with colleagues. I have also optimized the approach quite
@@ -58,16 +58,13 @@ I would really like to use Zend Framework for the general application
 layout, but still use Doctrine for the Modelling and HTML Purifier for
 the Output Escaping. Certain tasks might then only be solvable with the
 help of eZ Components, all of which are then to some extend dependencies
-of my application. With `PEARHUB <http://pearhub.org/>`_ and
-`PEARFARM <http://pearfarm.org/>`_ on the horizon (`Read Padraic on this
-topic <http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html>`_)
-even more PHP code will be distributed using PEAR channels in the near
-future. My `immutable
-DateTime <http://www.whitewashing.de/blog/articles/124>`_ code for
-example makes for a great little open source library that could be
-distributed via PEAR, as well as
-`Yadif <http://github.com/beberlei/yadif>`_ - a dependency injection
-container I am using extensively.
+of my application. With PEARHUB (defunct) and
+PEARFARM (defunct) on the horizon Read Padraic on this topic even more PHP code
+will be distributed using PEAR channels in the near future. My `immutable
+DateTime <https://beberlei.de/2010/01/08/immutable-datetime-objects.html>`_
+code for example makes for a great little open source library that could be
+distributed via PEAR, as well as Yadif - a dependency injection container I am
+using extensively.
 
 Question: Are you really going to manage all these dependencies
 correctly manually? Is everything up to date all the time, and
@@ -77,20 +74,18 @@ The PEAR driven solution then begins to look very desirable in this
 light, however it has a considerable disadvantage: The PEAR installer
 itself works on a system-wide/user-centric basis, making it impossible
 to manage dependencies of several applications using only one linux
-user. My little `Pearanha <http://github.com/beberlei/pearanha>`_ to the
-rescue: I have taken the PEAR installer code (which is distributed with
-all PHP installations across all systems) and put a new CLI tool on top
+user. My little Pearanha to the rescue: I have taken the PEAR installer code
+(which is distributed with all PHP installations across all systems) and put a
+new CLI tool on top
 of it. Its a very simple code-generator that allows to generate a
 re-configured PEAR installer script which only manages a single
 application in a given directory. This approach is also used by the
 symfony plugin mechanism, which internally uses the PEAR installer (did
 you know?).
 
-Lets revisit my blog application example `from my previous PEAR
-post <%3Ca%20href=>`_, first install from
-`Github <http://github.com/beberlei/pearanha>`_ and make the "pearanha"
-file executable and put it in your PATH (A PEAR Server Channel will
-follow any time soon).
+Lets revisit my blog application example from my previous PEAR post, first
+install from Github and make the "pearanha" file executable and put it in your
+PATH (A PEAR Server Channel will follow any time soon).
 
 Now we need to have an existing application directory somewhere, for
 example **/var/www/blog** and then we can put Pearanha on top of it
