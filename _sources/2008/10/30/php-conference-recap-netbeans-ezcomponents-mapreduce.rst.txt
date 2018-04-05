@@ -29,10 +29,9 @@ really great and I will definitely have a look at this.
 
 Sebastian Bergmann had a great talk on MapReduce which is an old LISP
 programming paradigm to work with huge datasets. This style was recently
-`revived by Google <http://labs.google.com/papers/mapreduce.html>`_
-because tasks can easily be split and distributed for computing on
-different nodes with hundreds of threads. Implementing a working example
-in PHP is really easy, just finding a good way to process your large
+revived by Google because tasks can easily be split and distributed for
+computing on different nodes with hundreds of threads. Implementing a working
+example in PHP is really easy, just finding a good way to process your large
 data seems to be a topic that needs lots of thinking.
 
 Additional great things:

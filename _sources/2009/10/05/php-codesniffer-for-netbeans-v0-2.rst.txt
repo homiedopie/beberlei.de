@@ -21,9 +21,8 @@ There is also some preference **"phpcs.codingStandard"** using the
 **`NbPreferences
 API <http://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/NbPreferences.html>`_**
 which allows to configure the coding standard. [STRIKEOUT:However this
-feature was contributed by `Manuel
-Piechler <http://manuel-pichler.de/>`_ and I don't yet understand how I
-can manipulate it. Maybe someone knows how (\*Looking in Mapis general
+feature was contributed by Manuel Pichler and I don't yet understand how I can
+manipulate it. Maybe someone knows how (\*Looking in Mapis general
 direction\*)?] By default the Zend Coding Standard is used.
 
 **Update:** Coding Standard can be changed by hacking into the config

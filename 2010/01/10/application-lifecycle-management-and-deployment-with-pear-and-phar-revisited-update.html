@@ -64,7 +64,7 @@
 							<div class="blog-post">
         <div class="section" id="application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update">
 <h1>Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></h1>
-<p>Some weeks ago <a class="reference external" href="http://www.whitewashing.de/blog/articles/123">I posted an
+<p>Some weeks ago <a class="reference external" href="https://beberlei.de/2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html">I posted an
 article</a> on using PEAR
 and PHAR for application lifecycle management and deployment. Since then
 I have gotten some feedback through comments, but also discussed the
@@ -119,16 +119,13 @@ I would really like to use Zend Framework for the general application
 layout, but still use Doctrine for the Modelling and HTML Purifier for
 the Output Escaping. Certain tasks might then only be solvable with the
 help of eZ Components, all of which are then to some extend dependencies
-of my application. With <a class="reference external" href="http://pearhub.org/">PEARHUB</a> and
-<a class="reference external" href="http://pearfarm.org/">PEARFARM</a> on the horizon (<a class="reference external" href="http://blog.astrumfutura.com/archives/431-The-Democratisation-Of-PEAR-By-Pearfarm-and-Pearhub-or-About-Bloody-Time!.html">Read Padraic on this
-topic</a>)
-even more PHP code will be distributed using PEAR channels in the near
-future. My <a class="reference external" href="http://www.whitewashing.de/blog/articles/124">immutable
-DateTime</a> code for
-example makes for a great little open source library that could be
-distributed via PEAR, as well as
-<a class="reference external" href="http://github.com/beberlei/yadif">Yadif</a> - a dependency injection
-container I am using extensively.</p>
+of my application. With PEARHUB (defunct) and
+PEARFARM (defunct) on the horizon Read Padraic on this topic even more PHP code
+will be distributed using PEAR channels in the near future. My <a class="reference external" href="https://beberlei.de/2010/01/08/immutable-datetime-objects.html">immutable
+DateTime</a>
+code for example makes for a great little open source library that could be
+distributed via PEAR, as well as Yadif - a dependency injection container I am
+using extensively.</p>
 <p>Question: Are you really going to manage all these dependencies
 correctly manually? Is everything up to date all the time, and
 upgradeable with ease?</p>
@@ -136,19 +133,17 @@ upgradeable with ease?</p>
 light, however it has a considerable disadvantage: The PEAR installer
 itself works on a system-wide/user-centric basis, making it impossible
 to manage dependencies of several applications using only one linux
-user. My little <a class="reference external" href="http://github.com/beberlei/pearanha">Pearanha</a> to the
-rescue: I have taken the PEAR installer code (which is distributed with
-all PHP installations across all systems) and put a new CLI tool on top
+user. My little Pearanha to the rescue: I have taken the PEAR installer code
+(which is distributed with all PHP installations across all systems) and put a
+new CLI tool on top
 of it. Its a very simple code-generator that allows to generate a
 re-configured PEAR installer script which only manages a single
 application in a given directory. This approach is also used by the
 symfony plugin mechanism, which internally uses the PEAR installer (did
 you know?).</p>
-<p>Lets revisit my blog application example <a class="reference external" href="%3Ca%20href=">from my previous PEAR
-post</a>, first install from
-<a class="reference external" href="http://github.com/beberlei/pearanha">Github</a> and make the &#8220;pearanha&#8221;
-file executable and put it in your PATH (A PEAR Server Channel will
-follow any time soon).</p>
+<p>Lets revisit my blog application example from my previous PEAR post, first
+install from Github and make the &#8220;pearanha&#8221; file executable and put it in your
+PATH (A PEAR Server Channel will follow any time soon).</p>
 <p>Now we need to have an existing application directory somewhere, for
 example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
 with:</p>

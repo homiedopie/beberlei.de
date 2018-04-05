@@ -1,14 +1,12 @@
 Update on Unittest and Metrics Tool
 ===================================
 
-Some days ago i posted about the `PHP Unittest and Metrics
-Aggregator <http://github.com/beberlei/puma/tree/master>`_ tool that i
-have written on (and which I have dubbed PUMA). Discussing it with
-people I came to the conclusion that the approach using
-`ezcMvcTools <http://ezcomponents.org>`_ is quite problematic that it
-forces to use this application, although the reporting and the
-application are quite separate. This is not against ezcMvcTools: I love
-it, its just the wrong type of support.
+Some days ago i posted about the PHP Unittest and Metrics Aggregator tool that
+i have written on (and which I have dubbed PUMA). Discussing it with people I
+came to the conclusion that the approach using `ezcMvcTools
+<http://ezcomponents.org>`_ is quite problematic that it forces to use this
+application, although the reporting and the application are quite separate.
+This is not against ezcMvcTools: I love it, its just the wrong type of support.
 
 I began to split up the aggregator into some sort of importing-exporting
 tool. You can specify library-, test- and output-directory of your
@@ -25,9 +23,8 @@ disc. This is a very flexible approach that allows anyone to extend and
 re-use the tool to generate project metrics, unittest overview and other
 interesting details on your application.
 
-`Have a look at the tool on
-Github <http://github.com/beberlei/puma/tree/master>`_ and play with it.
-I would really like to hear your thoughts.
+Have a look at the tool on Github and play with it.  I would really like to
+hear your thoughts.
 
 .. categories:: none
 .. tags:: PUMA, Testing, Metrics

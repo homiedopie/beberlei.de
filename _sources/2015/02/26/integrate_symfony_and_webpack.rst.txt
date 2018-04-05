@@ -42,7 +42,7 @@ requiring jQuery. The code is part of the Symfony2 document root in ``web/``:
            jquery.js
          app.js
 
-Then we can use `AMD-style <http://webpack.github.io/docs/amd.html>`_ modules
+Then we can use `AMD-style <https://github.com/webpack/docs/wiki/amd>`_ modules
 to resolve the dependencies in our code:
 
 .. code-block:: js
@@ -57,7 +57,7 @@ to resolve the dependencies in our code:
 You can compare this to PHPs ``require()`` and autoloading functionality,
 something that Javascript has historically been lacking and usually leads to
 javascript files with many thousands lines of code. You can also use
-`CommonJS-style <http://webpack.github.io/docs/commonjs.html>`_ module loading
+`CommonJS-style <https://github.com/webpack/docs/wiki/commonjs>`_ module loading
 if your prefer this approach.
 
 The downside of adding this functionality is that your code **always** has to
@@ -132,7 +132,7 @@ twig layout file:
 
 The ``webpack-dev-server.js`` file loaded only in development environment
 handles the `hot module reload
-<http://webpack.github.io/docs/hot-module-replacement-with-webpack.html>`_
+<https://webpack.js.org/concepts/hot-module-replacement/>`_
 exchanging, adding, or removing modules while an application is running without
 a page reload whenever possible.
 

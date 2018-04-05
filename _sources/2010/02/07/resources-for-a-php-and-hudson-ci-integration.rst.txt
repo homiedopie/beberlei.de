@@ -1,11 +1,9 @@
 Resources for a PHP and Hudson CI Integration
 =============================================
 
-Yesterday I finally had the time to setup my first continuous
-integration environment. Possible solutions for CI are
-`phpUnderControl <http://phpundercontrol.org/about.html>`_,
-`Hudson <http://www.hudson-ci.org>`_ or
-`Arbit <http://www.arbitracker.org>`_. Although phpUnderControl is the
+Yesterday I finally had the time to setup my first continuous integration
+environment. Possible solutions for CI are phpUnderControl, Hudson (now
+Jenkins CI) or Arbit. Although phpUnderControl is the
 most wide-spread, but from I heard complex to setup/maintain, solution
 [STRIKEOUT:supposedly a hack] and Arbit just in an early Alpha I decided
 to give Hudson a shoot. Another reason for this decision, I heard it has

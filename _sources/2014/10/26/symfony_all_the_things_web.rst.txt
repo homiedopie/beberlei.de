@@ -8,10 +8,10 @@ helps the participants understand of just how few parts a Symfony application
 contains. Sure, there are lots of classes participating under the hood, but
 I don't care about the internals only about the public API.
 
-We use microservice architectures for the `bepado <http://info.bepado.de>`_ and
-`PHP Profiler <https://qafoolabs.com>`_ projects that Qafoo is working on at
-the moment. For the different components a mix of Symfony Framework, Silex,
-Symfony Components and our own Rest-Microframework (RMF) are used. This zoo of
+We use microservice architectures for the bepado and `PHP Profiler
+<https://tideways.io>`_ projects that Qafoo is working on at the moment. For
+the different components a mix of Symfony Framework, Silex, Symfony Components
+and our own Rest-Microframework (RMF) are used. This zoo of
 different solutions sparked a recent discussion with `my colleague Manuel
 <https://twitter.com/manuelp>`_ about when we would want to use Symfony for a
 web application.

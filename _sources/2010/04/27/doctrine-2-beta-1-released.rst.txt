@@ -1,10 +1,8 @@
 Doctrine 2 Beta 1 released
 ==========================
 
-Today we are happy to announce that the first beta of `Doctrine
-2 <http://www.doctrine-project.org/blog/doctrine-2-0-0-beta1-released>`_
-has been released and we fixed 165 issues kindly reported by several
-early adopters.
+Today we are happy to announce that the first beta of Doctrine 2 has been
+released and we fixed 165 issues kindly reported by several early adopters.
 
 You can grab the code from the Github project:
 
