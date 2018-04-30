@@ -6,7 +6,7 @@ since 2005. Not all posts survived migrating through different blog engines
 since then, only those starting in 2008 and older. I
 am a `programmer <https://github.com/beberlei>`_, `trainer and consultant
 <https://qafoo.com>`_ and since recently also a `founder of the company
-Tideways <https://tideways.io>`_, where we trace, profile and monitor PHP applications. 
+Tideways <https://tideways.com>`_, where we trace, profile and monitor PHP applications. 
 
 I have blogged about a wide range of topics including programming, software
 architecture and craftsmanship, Symfony, Doctrine, Ansible, Zend Framework 1,
