@@ -20,7 +20,7 @@ tagline = ''
 author = 'Benjamin Eberlei'
 
 # Change this to your copyright string
-copyright = '2008-2017, ' + author
+copyright = '2008-2018, ' + author
 
 # Change this to your blog root URL (required for RSS feed)
 website = 'https://beberlei.de'
@@ -30,7 +30,7 @@ website = 'https://beberlei.de'
 # **************************************************************
 
 # Add your Disqus shortname to enable comments powered by Disqus
-disqus_shortname = 'whitewashing'
+#disqus_shortname = 'whitewashing'
 
 # Change your favicon (new favicon goes in _static directory)
 html_favicon = 'tinkerer.ico'
