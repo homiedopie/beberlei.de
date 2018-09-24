@@ -63,6 +63,110 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
+<p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
+VM management very efficiently. Being always late to new technologies
+investigating Vagrant now felt about right. I am using Virtualbox for
+virtualization for about a year now but have build all my boxes manually. I
+have these machines setup:</p>
+<ul class="simple">
+<li>Windows 7</li>
+<li>Ubuntu with lots of crazy PHP builds</li>
+<li>Ubuntu with Oracle, PostgreSQL for Doctrine Unit-Tests</li>
+</ul>
+<p>The main benefit from this is that I don’t have to clutter my main machine with
+packages and dependencies that might potentially break.</p>
+<p>To benefit from Virtualization on a larger scale I wanted to investigate
+automation of box-building and was pointed to <a class="reference external" href="http://www.vagrantup.com">Vagrant</a>. This is a ruby tool that allows to copy and
+modify virtualboxes on the fly. You define a basebox and inherit from this box
+in your projects. Whenever you work on the project you start a copy of this
+basebox and install more system-dependencies using Chef or Puppet.
+That allows you to put the VM into a defined state just for this project. No
+matter how many different and weird dependencies you need, they will always be
+in this VM that is just created for the project and destroyed at the end of the
+day.</p>
+<p>I am using Ubuntu (currently 12.04) and tried starting with the Vagrant
+example.  It fails, because their example box uses a more current Virtualbox
+Guest Additions. To be able to use vagrant, you need a basebox with the
+virtualbox and guest additions versions matching correctly.</p>
+<p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
+all the latest VM templates:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ git clone https://github.com/jedi4ever/veewee.git
+$ <span class="nb">cd</span> veewee
+$ sudo gem install bundler
+$ sudo bundle install
+$ <span class="nb">alias</span> <span class="nv">vagrant</span><span class="o">=</span><span class="s2">"bundle exec vagrant"</span>
+</pre></div>
+</div>
+<p>You need Ruby and Gems installed for this to work. Veewee can be installed
+using Gems, but this not necessarily gives you the version with the most recent
+templates that match your own operating system version.</p>
+<p>Now lets define our own basebox definition and copy from an existing template
+that Veewee provides:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
+</pre></div>
+</div>
+<p>This creates a copy from the default ubuntu server template into a folder
+<cite>definitions/beberlei-ubuntu-12.04-i386-php</cite>. You can start modifying the files
+in there to adjust the build process of the virtual machine image. For me its
+important to modify the definitions.rb and add the following, otherwise
+building the VMs fails:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
+</pre></div>
+</div>
+<p>You can then open up the postinstall.sh and install more packages that you need
+in your personal basebox. For example a LAMP stack. Do this right after the
+lines that do <cite>apt-get install -y</cite>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
+</pre></div>
+</div>
+<p>If you are done you can start building a virtualbox image with:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ vagrant basebox build
+</pre></div>
+</div>
+<p>Make sure not to start typing in the console window that open ups. It is
+automatically controlled from a ruby script and every change to the keysequence
+breaks the building. This step takes a while. (Enough to write a blog post
+while watching a boring football game for example).</p>
+<p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant basebox <span class="nb">export</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant box add <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php.box'</span>
+</pre></div>
+</div>
+<p>Now this box is also available as Vagrant base box. For example in a project
+that we want to use with vagrant, do:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span/>$ <span class="nb">cd</span> myproject/
+$ vagrant init <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+$ vagrant up
+$ vagrant ssh
+</pre></div>
+</div>
+<p>Although the blog-title suggests it, Puppet hasn’t been used much up to this
+point. The use of puppet with Vagrant will be part of a next blog post.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/vagrant.html">Vagrant</a>
+                 / 
+                <a href="tags/automation.html">Automation</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 31, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/05/26/doctrine_goes_mit.html">Doctrine switches from LGPL to MIT</a></h1>
 <blockquote>
 <div>tl;dr We moved all the Doctrine PHP projects from LGPL to MIT license
@@ -501,157 +605,6 @@ test and get a green bar for a working lock support.</p>
         <p>
             <small>
                 Posted on May 02, 2010
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
-<p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
-extension</a> is the mutability of its
-instances. It can lead to serious bugs if a DateTime instance is passed
-between different functions and is modified at unexpected places.
-Additionally this possibly rules out several optimizations for scripts
-that make very heavy use of dates and could share references to equal
-timestamps.</p>
-<p><strong>Warning:</strong> All the code assumes that you work with one timezone only!</p>
-<p>The following code is an immutable version of PHP’s DateTime. All setter
-methods throw an exception and add(),sub() and modify() clone the
-current instance, apply the operation and return the new instance.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">Whitewashing\DateTime</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">DateTime</span> <span class="k">extends</span> <span class="nx">\DateTime</span>
-<span class="p">{</span>
-    <span class="sd">/**</span>
-<span class="sd">     * To prevent infinite recursions</span>
-<span class="sd">     *</span>
-<span class="sd">     * @var bool</span>
-<span class="sd">     */</span>
-    <span class="k">private</span> <span class="k">static</span> <span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
-            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$month</span><span class="p">,</span> <span class="nv">$day</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setISODate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$week</span><span class="p">,</span> <span class="nv">$day</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTime</span><span class="p">(</span><span class="nv">$hour</span><span class="p">,</span> <span class="nv">$minute</span><span class="p">,</span> <span class="nv">$second</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimestamp</span><span class="p">(</span><span class="nv">$timestamp</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimezone</span><span class="p">(</span><span class="nv">$timezone</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-<span class="k">class</span> <span class="nc">ImmutableException</span> <span class="k">extends</span> <span class="nx">\Exception</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">"Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Its not the prettiest code, but it works.</p>
-<p>A next optimization would be a <strong>DateFactory</strong> that manages DateTime
-instances by returning already existing instances for specific dates.
-This is not a perfect solution, since you won’t be able to enforce a
-single instance when you are using the relative descriptive dates or
-when calculating with dates using add(), sub() and modify(), however for
-lots of dates created from a database or other external source it might
-be quite a powerful optimization depending on your use-case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">namespace Whitewashing\DateTime;</span>
-
-<span class="x">class DateFactory</span>
-<span class="x">{</span>
-<span class="x">    static private $_dates = array();</span>
-
-<span class="x">    static public function create($hour, $minute, $second, $month, $day, $year)</span>
-<span class="x">    {</span>
-<span class="x">        $ts = mktime($hour, $minute, $second, $month, $day, $year);</span>
-<span class="x">        if (!isset(self::$_dates[$ts])) {</span>
-<span class="x">            self::$_dates[$ts] = new DateTime('@'.$ts);</span>
-<span class="x">        }</span>
-<span class="x">        return self::$_dates[$ts];</span>
-<span class="x">    }</span>
-
-<span class="x">    static public function createFromMysqlDate($mysqlDate)</span>
-<span class="x">    {</span>
-<span class="x">        list($date, $time) = explode(" ", $mysqlDate);</span>
-<span class="x">        if($time == null) {</span>
-<span class="x">            $hour = $minute = $second = 0;</span>
-<span class="x">        } else {</span>
-<span class="x">            list($hour, $minute, $second) = explode(":", $time);</span>
-<span class="x">        }</span>
-<span class="x">        list($year, $month, $day) = explode("-", $mysqlDate);</span>
-<span class="x">        return self::create($hour, $minute, $second, $month, $day, $year);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>This includes some date time calculations and date creation with
-mktime() and DateTimes unix timestamp capabilities to be able to work.
-Otherwise the sharing of instances could not be implemented. If you need
-to create shareable instances from other formats you could just create
-another creation method for it and convert the format for create() to be
-used.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 08, 2010
                 
             </small>
         </p>

@@ -63,6 +63,58 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
+<p>I am not too happy with the ZF Frameworks Table access solution. Not
+that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
+pattern</a>,
+but in most web applications you almost always have to join data some
+way or another. Even this rather simple application, a blog, needs joins
+for displaying articles so that category, comment count and tags can be
+displayed. Therefore I use an instance of Zend_Db_Table_Abstract only
+for the simplest purposes and pimp it by using lots of public methods
+and
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.db.select.html">Zend_Db_Select</a>.
+An example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class SomeModel extends Zend_Db_Table_Abstract</span>
+<span class="x">{</span>
+<span class="x">  $_name = "someTable";</span>
+<span class="x">  $_primary = "id";</span>
+
+<span class="x">  public function getSomethingByJoin($param1, $param2)</span>
+<span class="x">  {</span>
+<span class="x">     $db = $this-&gt;getAdapter();</span>
+<span class="x">     $select = $db-&gt;select();</span>
+<span class="x">     ...[build select]</span>
+<span class="x">     $result = $db-&gt;query($select);</span>
+
+<span class="x">     return $result;</span>
+<span class="x">  }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>That way you still follow the MVC pattern and don’t have to take one
+compromise after another for getting the Table Gateway to reproduce a
+result that looks like a join.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 24, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/10/30/php-conference-recap-netbeans-ezcomponents-mapreduce.html">PHP Conference Recap: NetBeans, ezComponents, MapReduce..</a></h1>
 <p>This years october edition of <a class="reference external" href="http://www.phpconference.de">IPC</a> in
 Mainz, Germany was the first php conference I have been to. It ended
@@ -311,32 +363,6 @@ release is in the Google CDN, when ZF 1.7 comes out.</p>
         <p>
             <small>
                 Posted on September 05, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/09/11/new-calypso-dtl-version-0-2.html">New Calypso DTL Version 0.2</a></h1>
-<p>I have got some hints about bugs and optimized the performance of loops
-a little bit, so that you can now <a class="reference external" href="http://www.beberlei.de/sources/calypso-dtl-0.2.tar.gz">download version
-0.2</a> of the
-<a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template engine</a>. Have
-fun.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on September 11, 2008
                 
             </small>
         </p>

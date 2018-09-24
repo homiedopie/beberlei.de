@@ -16,7 +16,7 @@
         <meta name="description" content="Blog of Benjamin Eberlei, covering a wide range of programming, bootstrapping and entrepreneurial topics">
         <meta name="viewport" content="width=device-width">
         <meta name="google-site-verification" content="mycr8JCbLYq9QcOyh4Ub1esAdN-awH9ut6nyTKUTgE4">
-        <title>Hide Slack unread and highlight Tray Icon on Ubuntu/Linux &mdash; beberlei.de</title>
+        <title>Proofing the Pythagorean theorem and what this means for Domain-Driven Design &mdash; beberlei.de</title>
             <link rel="stylesheet" href="/_static/pygments.css" type="text/css" />
             <link rel="stylesheet" href="/_static/css/bootstrap.min.css" type="text/css" />
             <link rel="stylesheet" href="/_static/blog.css" type="text/css" />
@@ -27,7 +27,7 @@
         <script>window.jQuery || document.write('<script src="../../../_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../../_static/plugins.js"></script>
         <script src="../../../_static/main.js"></script>
-        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Why does the PHP extension fail to load with _zval_ptr_dtor_wrapper error" href="../../03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html" /><link rel="prev" title="Proofing the Pythagorean theorem and what this means for Domain-Driven Design" href="../../../2018/09/24/proofing_the_pythagorean_theorem_and_what_this_means_for_domain_driven_design.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Hide Slack unread and highlight Tray Icon on Ubuntu/Linux" href="../../../2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
         VERSION:     '1.5.1',
@@ -63,28 +63,39 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="blog-post">
-        <div class="section" id="hide-slack-unread-and-highlight-tray-icon-on-ubuntu-linux">
-<h1>Hide Slack unread and highlight Tray Icon on Ubuntu/Linux</h1>
-<p>The Slack Ubuntu/Linux application doesn&#8217;t provide a way to disable the tray
-icon and that means the unread or highlight notification bubbles will distract
-you whenever somebody writes something in ANY channel that you are in, even
-when the messages are not even interesting for you.</p>
-<p>I wrote to Slack support to make a feature request and they suggested to make
-clever use of an upstream Electron bug that makes the tray icon disappear in
-17.04 as a workaround. This gave me the idea for a  more stable workaround.</p>
-<p>I poked around in the list of files of the <cite>slack-desktop</cite> package and found
-out that you can just exchange the files for the tray icons , so that the Slack
-app is fooled into thinking it is showing the unread or highlight icons.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">i</span>
-<span class="n">cd</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">slack</span><span class="o">/</span><span class="n">resources</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">asar</span><span class="o">.</span><span class="n">unpacked</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">static</span>
-<span class="n">mv</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">-</span><span class="n">backup</span><span class="o">.</span><span class="n">png</span>
-<span class="n">mv</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">-</span><span class="n">backup</span><span class="o">.</span><span class="n">png</span>
-<span class="n">cp</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">rest</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">.</span><span class="n">png</span>
-<span class="n">cp</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">rest</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">.</span><span class="n">png</span>
-</pre></div>
-</div>
-<p>Since I probably need to re-run this after every update to the Slack app, I
-packed this into a shell script <cite>slack-quiet</cite>.</p>
+        <div class="section" id="proofing-the-pythagorean-theorem-and-what-this-means-for-domain-driven-design">
+<h1>Proofing the Pythagorean theorem and what this means for Domain-Driven Design</h1>
+<p>According to Wikipedia the <a class="reference external" href="https://en.wikipedia.org/wiki/Pythagorean_theorem#Other_proofs_of_the_theorem">Pythagoraen theorem</a>
+is the theorem with the highest number of known proofs, citing a book
+containing over 370 of them.</p>
+<p>What does this mean for modelling under the Domain-Driven Design paradigm?</p>
+<p>In discussions with other developers I often hear the opinion, that you should
+develop the model of a software entirely disconnected from technical decisions
+as long as possible and fully abstracted from the choices.</p>
+<p>I held this opinion myself for a long time.</p>
+<p>Discussing this with a colleague today I found a nice analogy to describe my
+growing pain with this approach, something I wasn&#8217;t able to formulate before.</p>
+<p>Maybe the analogy is a bit of a stretch.</p>
+<p>The Pythagoraen theorem shows that you can find an entirely different solution
+for the same problem by using a different toolbox. Finding one or more proofs
+for the theorem depends on your knowledge of different fields of mathematics.
+And depending on the toolbox, the solution is simple and elegant, or complex
+and theoretical.</p>
+<p>The reverse conclusion could be, that if you develop a model (theorem) entirely
+abstracted from the future implementation and toolbox, then it must increase in
+generality and complexity to take into account the potential implementation
+with any kind of toolbox. Or the problem space is simple like the Pythagoraen
+theorem that its description allows many implementations.</p>
+<p>Consequently, if you make technical decisions and restrict yourself to fewer
+approaches/toolboxes before building the model, then the resulting model can be
+simpler under the assumption that you only need it to be solved under the given
+technical constraints.</p>
+<p>For example, take Redis as a choice of database. Its built in support for more
+complex data-types allows to implement extremely simple abstractions directly
+on top of Redis. If you know you use Redis up front for a problem that can be
+solved with lists, sets or maps, then the model and code describing this domain
+logic could be extremely simplified compared a solution that makes no
+assumptions about the data storage.</p>
 </div>
 
 
@@ -94,7 +105,7 @@ packed this into a shell script <cite>slack-quiet</cite>.</p>
         <div class="metadata">
         <p>
             <small>
-                Posted on July 29, 2017
+                Posted on September 24, 2018
                  by Benjamin Eberlei
             </small>
         </p>

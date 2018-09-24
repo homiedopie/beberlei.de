@@ -63,6 +63,59 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html">DojoX Django Template Language Example with Data from PHP/JSON</a></h1>
+<p>This is a simple example how you would use DojoX Django Template
+Language component filled with data from a JSON GET Response:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>&lt;script type="text/javascript" src="/development/dojo-release-1.1.1/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;
+
+&lt;script language="javascript" type="text/javascript"&gt;&lt;!--
+dojo.require("dojox.dtl");
+dojo.require("dojox.dtl.Context");
+dojo.require("dojox.dtl.ext-dojo.NodeList");
+dojo.addOnLoad(
+    dojo.xhrGet({url: "dojotest.php", handleAs: "json", handle: function(data,ioArgs){
+        if(typeof data == "error"){
+            console.log("error?",data);
+        } else {
+            dojo.query("#test").dtl("I am eating {{food.fruit}} and {{food.meat}}", data);
+        }
+    }
+}));
+--&gt;&lt;/script&gt;
+
+::
+
+    &lt;?php
+    header('Content-type: text/json');
+    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
+    echo json_encode($food);
+    ?&gt;
+</pre></div>
+</div>
+</div></blockquote>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/javascript.html">Javascript</a>
+                 / 
+                <a href="tags/dojo.html">Dojo</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 02, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/08/02/wrestling-with-dojo.html">Wrestling with Dojo</a></h1>
 <p>I have to complain about the <a class="reference external" href="http://www.dojotoolkit.org">Dojo
 Toolkit</a> (Considering the <a class="reference external" href="http://www.whitewashing.de/blog/articles/50">project I am
@@ -393,43 +446,6 @@ files.</p>
         <p>
             <small>
                 Posted on August 28, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/08/16/zendx-jquery-is-ready-for-recommendation.html">ZendX_JQuery is Ready for Recommendation</a></h1>
-<p>Yesterday night I finished the <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">proposal for
-ZendX_JQuery</a>,
-a View Helper and an Ajax Helper hopefully to be included in the <a class="reference external" href="http://framework.zend.com">Zend
-Framework</a> Extras Library in the next
-release after 1.6. I moved the proposal to the “Ready for
-Recommendation” section now, so it can be reviewed a last time by the
-community and by the Zend people.</p>
-<p>For those people already using an earlier version, i have squashed about
-4-5 bugs I found writing the Unit-Tests for this component. The test
-coverage for both helpers is 100% although the jQLink Helper might need
-some additional Use-Case scenarios to ensure proper working. You can
-<a class="reference external" href="http://www.beberlei.de/dev/svn/ZendX_JQuery">find the current
-version</a> at my SVN
-repository.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/jquery.html">jQuery</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 16, 2008
                 
             </small>
         </p>

@@ -63,6 +63,147 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/06/16/using-a-dependency-injection-container-with-zend-application.html">Using a Dependency Injection Container with Zend_Application</a></h1>
+<p>Much has been written on Dependency Injection lately, mostly by Padraic
+Brady
+(<a class="reference external" href="http://blog.astrumfutura.com/archives/394-The-Case-For-Dependency-Injection-Part-1.html">1</a>,
+<a class="reference external" href="http://blog.astrumfutura.com/archives/395-The-Case-For-Dependency-Injection-Part-2.html">2</a>)
+and Fabien Potencier
+(<a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">1</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/12/do-you-need-a-dependency-injection-container">2</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/13/introduction-to-the-symfony-service-container">3</a>,
+<a class="reference external" href="http://fabien.potencier.org/article/14/symfony-service-container-using-a-builder-to-create-services">4</a>,
+<a class="reference external" href="http://github.com/fabpot/Pimple/tree/master">5</a>). My subjective
+feeling tells me there are now more PHP DI containers out there than CMS
+or ORMs implemented in PHP, including two written by myself (an
+<a class="reference external" href="http://www.beberlei.de/sphicy/">overengineered</a> and <a class="reference external" href="http://github.com/beberlei/yadif/tree/master">a useful
+one</a>). Its an awesome
+pattern if used on a larger scale and can (re-) wire a complex business
+application according to a clients needs without having to change much
+of the domain code. It aims at a complete separation of object
+instantiation and dependency tracking from the business logic.</p>
+<p>Beginning with version 1.8 Zend Framework is able to integrate any of
+these DI containers into its <strong>Zend_Application</strong> component easily. The
+Application component initializes a set of common resources and pushes
+them into the MVC stack as additional Front Controller parameters.
+Technically a <strong>Zend_Registry</strong> instance holds all these resources with
+their respective resource names as keys. The resources are accessible
+inside the Front Controller and the Action Controller classes. Assume
+the resource ‘Db’ is initialized in your application, you can access it
+with:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$front = Zend_Controller_Front::getInstance();
+$container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
+$db = $container-&gt;db;
+
+// or:
+class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $db = $container-&gt;db;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>This is pretty much dependency injection already, but the default
+registry approach suffers from two serious problem: New instances can
+only be added to the Container by implementing new Zend_Application
+resources and these instances cannot be lazy loaded. All resources used
+by Zend_Application are always loaded on every request. But the
+application container implementation was developed with Dependency
+Injection in mind and is not tied to the use of Zend_Registry. Only
+three magic methods are required by any container that wants to be
+Zend_Application compliant: __get(), __set() and __isset(). Each
+instantiated resource is pushed via __set() into the container. If
+required by another resource, __isset() is used to check whether a
+resource with the given name exists inside the container and __get()
+is used to retrieve the instances from the container.</p>
+<p>Some month ago I extended
+<a class="reference external" href="http://github.com/beberlei/yadif/tree/master">Yadif</a>, a lightweight
+PicoContainer-like DI container for PHP written by Thomas McKelvey, with
+several features that make it a very powerful DI container in my
+opinion. It has a detailed documentation and examples on the GitHub Page
+if you want to check it out. I extended Yadif to be Zend_Application
+compliant in a way that the application-wide Zend_Application resources
+can be used as dependencies for objects that are lazy-loaded from the
+container. Skipping the tech-talk, here is an example. First we have to
+replace the default Container with Yadif:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
+$container = new Yadif_Container($objects);
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+// Set Yadif as Container
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();
+</pre></div>
+</div>
+</div></blockquote>
+<p>Assume you run Zend_Application with a “Db” and a “Cache” resource.
+These resources are loaded on every request. The objects configured in
+Yadif however are not instantiated until they are requested for the
+first time from the container. We can merge these two worlds and make
+use of the Application resources inside the Yadif Configuration
+“objects.xml”, which looks like:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>&lt;?xml version="1.0" ?&gt;
+&lt;objects&gt;
+    &lt;myModel&gt;
+        &lt;class&gt;MyModel&lt;/class&gt;
+        &lt;arguments arg1="db" arg2="cache" /&gt;
+    &lt;/myModel&gt;
+&lt;/objects&gt;
+</pre></div>
+</div>
+<p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
+the the Database and Cache resources as constructor arguments:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class FooController extends Zend_Controller_Action {
+    public function barAction()
+    {
+        $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
+        $myModel = $container-&gt;myModel;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Given the possibilites by the Yadif_Container you are now empowered
+to use Dependency Injection for all your application objects and
+make use of Zend_Applications resource system. Furthermore any
+other dependency injection container, simple or complex, can also be
+integrated easily.</p>
+</div></blockquote>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+                <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                 / 
+                <a href="tags/yadiflibrary.html">YadifLibrary</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 16, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html">Netbeans PHP CodeSniffer Plugin: Now with Options Dialog</a></h1>
 <p>Just two days before the <a class="reference external" href="http://www.phpconference.de">International PHP Conference
 09</a> will start I got an email from
@@ -440,77 +581,6 @@ subject with non-ASCII chars is displayed correctly.</p>
         <p>
             <small>
                 Posted on January 14, 2009
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html">Howto file a good bug report: Suggestions for framework users</a></h1>
-<p>I have fixed quite a number of bugs for the ZF lately, which lead me to
-this post about how to file a good bug report. There are many annoying
-bug reports out there, where the reporter of the bug withholds important
-information to the bugfixer unintended. This advice applies bug reports
-in general of course.</p>
-<p>What are the benefits of a good bug report? The bug generally gets fixed
-faster, when the developer has more information at hand. Additionally
-other developers might come to rescue since they can understand the
-issue faster. These benefits are good for both parties. If you take no
-time for a good bug report, your issue might risk to end up getting old
-or closed unfixed.</p>
-<ul class="simple">
-<li><strong>Post the whole Exception Stack Trace</strong>: If the library throws an
-Exception into your application that is unexpected and may indicate
-an bug: Do not post the Message or Exception name only. The exception
-may be thrown in many different places or due to different reasons.
-The PHP exception class offers the method <strong>getTraceAsString()</strong>,
-which offers many information to the developer what the cause of the
-exception might be. Please use it!</li>
-<li><strong>Post codefixes in a patch format</strong>: When you find a bug in the
-framework, it is quite possible that you can offer a fix directly.
-Writing “Replace x in line y with z” does not help very often. The
-component might be in flux and the line positions change more often
-than you think. Please create a diff file of this changes that
-indicate the precise position of the change. This diff also includes
-2 lines above and below the patched code for direction of the
-developer. SVN Diffs are even more useful since they include the
-revision where you fixed the bug in.</li>
-<li><strong>Post reproducible cases as PHPUnit Test</strong>: If you find a bug and
-can show how to reproduce it: Write a unittest to prove it. It is ZF
-policy to create a unittest for each bugfix showing that the bug was
-indeed fixed and previous functionality remains the same, so this
-unit-test has to be written anyways. Many show-offs rely on massive
-<strong>echo</strong> statements or <strong>var_dump</strong>, which render them almost
-useless for the developer.</li>
-<li><strong>Attach a unit-test to a submitted patch</strong>: This is related to the
-previous point. If you add a unit test your patch will get more
-attention. It will prove that you have thought about the patch, its
-consequences and that you might have checked it does not break
-backwards compatibility. This is worth a lot.</li>
-<li><strong>Run the test suite with your patch</strong>: If you want to provide a
-patch. Run the testsuite of the Zend Framework. It might break
-expected behaviour. When you post a patch that will break BC, it will
-be recognized. Your bug report might be closed, which helps nobody.</li>
-</ul>
-<p>When you find a bug you have probably thought about it and how to fix
-it. This is valuable information. Disregarding one of this points will
-lead to missing information on part of the developer that he has to
-“learn” again. This takes time, which may make your bug last longer than
-it should.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/opensourcecitizen.html">OpenSourceCitizen</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 11, 2009
                 
             </small>
         </p>

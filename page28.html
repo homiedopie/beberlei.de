@@ -63,6 +63,57 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
+<p>Per default any implementation of ArrayObject does not allow to use the
+object as multidimensional array. This snippet here implements the
+support:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class ArrayMultiObject extends ArrayObject</span>
+<span class="x">{</span>
+<span class="x">    function __construct($array, $flags = 0, $iterator_class = "ArrayIterator")</span>
+<span class="x">    {</span>
+<span class="x">        $objects = array();</span>
+<span class="x">        foreach($array AS $key =&gt; $value) {</span>
+<span class="x">            if(is_array($value)) {</span>
+<span class="x">                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);</span>
+<span class="x">            } else {</span>
+<span class="x">                $objects[$key] = $value;</span>
+<span class="x">            }</span>
+<span class="x">        }</span>
+
+<span class="x">        parent::__construct($objects, $flags, $iterator_class);</span>
+<span class="x">    }</span>
+
+<span class="x">    public function offsetSet($name, $value)</span>
+<span class="x">    {</span>
+<span class="x">        if(is_array($value)) {</span>
+<span class="x">            $value = new ArrayMultiObject($value);</span>
+<span class="x">        }</span>
+
+<span class="x">        return parent::offsetSet($name, $value);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/php.html">PHP</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on July 22, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/07/17/zf-jquery-helper-first-prototype-ready.html">ZF jQuery Helper - First Prototype Ready</a></h1>
 <p>I checked in the first implementation of my jQuery Helper into my <a class="reference external" href="http://www.beberlei.de/dev/svn">dev
 svn</a>. It follows my suggested

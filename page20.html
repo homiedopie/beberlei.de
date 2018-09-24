@@ -63,6 +63,36 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/11/25/next-zf-mini-release-1-7-1.html">Next ZF Mini Release: 1.7.1</a></h1>
+<p>In the next days the next mini release of the Zend Framework will be
+released and I want to keep you up to date of my progress on it.
+I got lots of feedback on the jQuery component and also had the
+possibility to fix some bugs and documentation issues. I also fixed some
+minor bugs that have been in the <span class="docutils literal"><span class="pre">Zend_Soap_Wsdl</span></span> stuff i added for the
+1.7 release.
+And a question for the 1.8 release that is due around February 2009:
+What do you think is missing in the jQuery support to ZF? Any widgets or
+stuff that you want to have included?</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on November 25, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/11/01/zf-1-7-jquery-is-in-zend-soap-with-lots-of-bugfixes.html">ZF 1.7: jQuery is in! Zend_Soap with lots of Bugfixes.</a></h1>
 <p>The next version of <a class="reference external" href="http://framework.zend.com">Zend Framework</a> will
 appear quite soon (16th November) and there will be lots of buzz about
@@ -189,59 +219,6 @@ macStyle = false and you have your menubars back.</p>
         <p>
             <small>
                 Posted on November 12, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/08/02/dojox-django-template-language-example-with-data-from-php-json.html">DojoX Django Template Language Example with Data from PHP/JSON</a></h1>
-<p>This is a simple example how you would use DojoX Django Template
-Language component filled with data from a JSON GET Response:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>&lt;script type="text/javascript" src="/development/dojo-release-1.1.1/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;
-
-&lt;script language="javascript" type="text/javascript"&gt;&lt;!--
-dojo.require("dojox.dtl");
-dojo.require("dojox.dtl.Context");
-dojo.require("dojox.dtl.ext-dojo.NodeList");
-dojo.addOnLoad(
-    dojo.xhrGet({url: "dojotest.php", handleAs: "json", handle: function(data,ioArgs){
-        if(typeof data == "error"){
-            console.log("error?",data);
-        } else {
-            dojo.query("#test").dtl("I am eating {{food.fruit}} and {{food.meat}}", data);
-        }
-    }
-}));
---&gt;&lt;/script&gt;
-
-::
-
-    &lt;?php
-    header('Content-type: text/json');
-    $food = array('food' =&gt; array('fruit' =&gt; 'apple', 'meat' =&gt; 'chicken'));
-    echo json_encode($food);
-    ?&gt;
-</pre></div>
-</div>
-</div></blockquote>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/javascript.html">Javascript</a>
-                 / 
-                <a href="tags/dojo.html">Dojo</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 02, 2008
                 
             </small>
         </p>

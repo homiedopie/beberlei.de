@@ -5,8 +5,48 @@
         <link>https://beberlei.de/</link>
         <description></description>
         <language>en-us</language>
-        <pubDate>Sat, 29 Jul 2017 00:00:00 +0200</pubDate>
+        <pubDate>Mon, 24 Sep 2018 00:00:00 +0200</pubDate>
         
+        <item>
+            <link>https://beberlei.de/2018/09/24/proofing_the_pythagorean_theorem_and_what_this_means_for_domain_driven_design.html</link>
+            <guid>https://beberlei.de/2018/09/24/proofing_the_pythagorean_theorem_and_what_this_means_for_domain_driven_design.html</guid>
+            <title><![CDATA[Proofing the Pythagorean theorem and what this means for Domain-Driven Design]]></title>
+            <description><![CDATA[<h1>Proofing the Pythagorean theorem and what this means for Domain-Driven Design</h1>
+<p>According to Wikipedia the <a class="reference external" href="https://en.wikipedia.org/wiki/Pythagorean_theorem#Other_proofs_of_the_theorem">Pythagoraen theorem</a>
+is the theorem with the highest number of known proofs, citing a book
+containing over 370 of them.</p>
+<p>What does this mean for modelling under the Domain-Driven Design paradigm?</p>
+<p>In discussions with other developers I often hear the opinion, that you should
+develop the model of a software entirely disconnected from technical decisions
+as long as possible and fully abstracted from the choices.</p>
+<p>I held this opinion myself for a long time.</p>
+<p>Discussing this with a colleague today I found a nice analogy to describe my
+growing pain with this approach, something I wasn’t able to formulate before.</p>
+<p>Maybe the analogy is a bit of a stretch.</p>
+<p>The Pythagoraen theorem shows that you can find an entirely different solution
+for the same problem by using a different toolbox. Finding one or more proofs
+for the theorem depends on your knowledge of different fields of mathematics.
+And depending on the toolbox, the solution is simple and elegant, or complex
+and theoretical.</p>
+<p>The reverse conclusion could be, that if you develop a model (theorem) entirely
+abstracted from the future implementation and toolbox, then it must increase in
+generality and complexity to take into account the potential implementation
+with any kind of toolbox. Or the problem space is simple like the Pythagoraen
+theorem that its description allows many implementations.</p>
+<p>Consequently, if you make technical decisions and restrict yourself to fewer
+approaches/toolboxes before building the model, then the resulting model can be
+simpler under the assumption that you only need it to be solved under the given
+technical constraints.</p>
+<p>For example, take Redis as a choice of database. Its built in support for more
+complex data-types allows to implement extremely simple abstractions directly
+on top of Redis. If you know you use Redis up front for a problem that can be
+solved with lists, sets or maps, then the model and code describing this domain
+logic could be extremely simplified compared a solution that makes no
+assumptions about the data storage.</p>
+]]></description>
+             <pubDate>Mon, 24 Sep 2018 00:00:00 +0200</pubDate>
+        </item>
+    
         <item>
             <link>https://beberlei.de/2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux.html</link>
             <guid>https://beberlei.de/2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux.html</guid>

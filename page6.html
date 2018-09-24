@@ -63,6 +63,107 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a></h1>
+<ul class="simple">
+<li><strong>Update:</strong> Added requirements to configure Vagrant and Virtualbox before
+trying my change.</li>
+<li><strong>Update 2:</strong> Added link to Virtualbox Guest Additions plugin for Vagrant,
+thanks Peter Kruithof for the hint.</li>
+</ul>
+<p>Using Symfony2 inside a Vagrant box is considered to be very slow (<a class="reference external" href="http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host">here</a>,
+<a class="reference external" href="https://twitter.com/spicy_sake/status/183135528567320576">here</a>), even when
+using NFS. I can confirm the experience and know many others that reported the
+same.</p>
+<p>Before doing this changes make sure:</p>
+<ul class="simple">
+<li>You are using Vagrant 1.2 (not sure that makes a difference though)</li>
+<li>You are using NFS with Vagrant (<a class="reference external" href="http://docs.vagrantup.com/v2/synced-folders/nfs.html">More</a>). If you are on
+Windows then this can already be the problem (Virtualbox FS is slow with
+Symfony, because of the large number of files.)</li>
+<li>You have the Vbox Guest Additions on the guest that match your system (<a class="reference external" href="https://github.com/dotless-de/vagrant-vbguest">Vagrant Plugin</a>, <a class="reference external" href="https://gist.github.com/fernandoaleman/5083680">Manual Update</a>)</li>
+<li>You have an opcode cache installed, either <cite>apc</cite> or <cite>opcache</cite>.</li>
+<li>You disable <cite>xdebug</cite> or <cite>xhprof</cite>.</li>
+</ul>
+<p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
+related to the huge number of files that a Symfony project normally ships with
+and the I/O that is generated from <span class="docutils literal"><span class="pre">filemtime</span></span> calls to check if the
+configuration files have changed.</p>
+<p>This is just a small part, there are other bottlenecks that I have found after
+finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
+<ol class="arabic simple">
+<li>Monolog logs to the NFS share and the huge number <span class="docutils literal"><span class="pre">fwrite</span></span> take their toll.</li>
+<li>Writing compiled Twig templates to the NFS share using <span class="docutils literal"><span class="pre">file_put_contents</span></span>.</li>
+<li>Assetic: Scanning for stylesheets and javascripts within templates is very
+slow, causing lots of I/O on the NFS share and CPU and changing it to using
+explicit bundling in the <span class="docutils literal"><span class="pre">app/config/config.yml</span></span> helps alot. You can use a
+cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
+a <cite>–watch</cite> flag in the background.</li>
+<li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
+<li><span class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></span> in Symfony DIC uses a set of
+recursive algorithms to replace aliases with the real services. That takes a
+huge amount of time in bigger applications including amounting calls to methods
+inside the pass over 100.000 times.</li>
+</ol>
+<p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
+To fix this just change the cache <strong>AND</strong> the log directory to
+<span class="docutils literal"><span class="pre">sys_get_temp_dir()</span></span> or shared memory (/dev/shm) instead of writing to the
+NFS share. I actually tried this before, but since I forgot the log directory,
+this felt equally slow and I reverted the change.</p>
+<p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
+considerable performance boost on a Vagrant box:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="s1">'/dev/shm/appname/cache/'</span> <span class="o">.</span>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getCacheDir</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLogDir</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="s1">'/dev/shm/appname/logs'</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getLogDir</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This brings the page rendering speeds down to between 0.5 and 1.5 seconds, which
+is quite normal for the development environment even outside a virtual machine.</p>
+<p>This tip obviously works for any kind of application that has a I/O intensive
+development environment: Don’t perform this operations on the NFS share unless
+you wan’t to suffer.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/vagrant.html">Vagrant</a>
+                 / 
+                <a href="tags/symfony.html">Symfony</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 19, 2013
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/08/09/your_service_layer_benefits_from_a_dispatcher.html">Your Service Layer benefits from a Dispatcher</a></h1>
 <p>One benefit of recent applications over old 90s, early 2000 style PHP is
 central dispatching of requests through one <span class="docutils literal"><span class="pre">Application</span></span> or <span class="docutils literal"><span class="pre">Dispatcher</span></span>
@@ -741,73 +842,6 @@ problem.</p>
         <p>
             <small>
                 Posted on June 24, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a></h1>
-<p>With the Windows Azure Websites platform-as-a-service (PaaS), which was
-released as a preview to a general audiance in June last year, PHP applications
-can be deployed to Azure with as much as a Git push to a remote repository. At
-the same time Microsoft released a new and much improved <a class="reference external" href="https://github.com/WindowsAzure/azure-sdk-for-php">PHP SDK</a>, which
-integrates with all the Azure webservices.</p>
-<p>I blogged about deployment with Composer on Azure Websites last November and
-since then I have been working with Microsoft to improve Symfony2 support on
-Windows Azure by developing and releasing the <a class="reference external" href="https://github.com/beberlei/AzureDistributionBundle">AzureDistributionBundle</a>. This is a new version
-of the bundle and contains the following improvements:</p>
-<ul class="simple">
-<li>Full support for the PHP SDK through the DependencyInjection container</li>
-<li>Installation of project dependendencies using Composer during deployment.
-I will blog about the Composer support in much more detail in the next
-days, because this information is not only valuable for Symfony2 projects.</li>
-<li>a <a class="reference external" href="https://github.com/beberlei/symfony-azure-edition">full demo application</a> (derived from
-symfony-standard) to show PHP, Symfony &amp; Azure integration</li>
-<li>documentation of the Windows Azure Websites deployment process and
-possiblities for PHP configuration</li>
-<li>a Stream Wrapper for Azure Blob Storage, currently being reviewed for
-inclusion into the Azure PHP SDK itself.</li>
-</ul>
-<p>You can install both the Bundle or the Demo application via Composer.
-For the Demo application call:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ php composer.phar create-project beberlei/symfony-azure-edition
-</pre></div>
-</div>
-<p>The README includes more information about how to deploy the demo
-to your Azure websites account.</p>
-<p>The bundle can be installed using the following <span class="docutils literal"><span class="pre">composer.json</span></span>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"beberlei/azure-distribution-bundle"</span><span class="p">:</span> <span class="s2">"*"</span>
-    <span class="p">},</span>
-    <span class="s2">"repositories"</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"pear"</span><span class="p">,</span>
-            <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"http://pear.php.net"</span>
-        <span class="p">}</span>
-    <span class="p">],</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Registering PEAR is necessary, because the Azure PHP SDK depends on some PEAR
-components.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/azure.html">Azure</a>
-                 / 
-                <a href="tags/symfony.html">Symfony</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on May 23, 2013
                  by Benjamin Eberlei
             </small>
         </p>

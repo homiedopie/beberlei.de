@@ -63,6 +63,157 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
+<p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
+extension</a> is the mutability of its
+instances. It can lead to serious bugs if a DateTime instance is passed
+between different functions and is modified at unexpected places.
+Additionally this possibly rules out several optimizations for scripts
+that make very heavy use of dates and could share references to equal
+timestamps.</p>
+<p><strong>Warning:</strong> All the code assumes that you work with one timezone only!</p>
+<p>The following code is an immutable version of PHP’s DateTime. All setter
+methods throw an exception and add(),sub() and modify() clone the
+current instance, apply the operation and return the new instance.</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Whitewashing\DateTime</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">DateTime</span> <span class="k">extends</span> <span class="nx">\DateTime</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * To prevent infinite recursions</span>
+<span class="sd">     *</span>
+<span class="sd">     * @var bool</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">add</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">modify</span><span class="p">(</span><span class="nv">$modify</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$newDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+            <span class="nv">$newDate</span><span class="o">-&gt;</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+            <span class="nx">self</span><span class="o">::</span><span class="nv">$_immutable</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$newDate</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">sub</span><span class="p">(</span><span class="nv">$interval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$month</span><span class="p">,</span> <span class="nv">$day</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setISODate</span><span class="p">(</span><span class="nv">$year</span><span class="p">,</span> <span class="nv">$week</span><span class="p">,</span> <span class="nv">$day</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTime</span><span class="p">(</span><span class="nv">$hour</span><span class="p">,</span> <span class="nv">$minute</span><span class="p">,</span> <span class="nv">$second</span><span class="o">=</span><span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimestamp</span><span class="p">(</span><span class="nv">$timestamp</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTimezone</span><span class="p">(</span><span class="nv">$timezone</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">ImmutableException</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">ImmutableException</span> <span class="k">extends</span> <span class="nx">\Exception</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">"Cannot modify Whitewashing\DateTime\DateTime instance, its immutable!"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Its not the prettiest code, but it works.</p>
+<p>A next optimization would be a <strong>DateFactory</strong> that manages DateTime
+instances by returning already existing instances for specific dates.
+This is not a perfect solution, since you won’t be able to enforce a
+single instance when you are using the relative descriptive dates or
+when calculating with dates using add(), sub() and modify(), however for
+lots of dates created from a database or other external source it might
+be quite a powerful optimization depending on your use-case:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">namespace Whitewashing\DateTime;</span>
+
+<span class="x">class DateFactory</span>
+<span class="x">{</span>
+<span class="x">    static private $_dates = array();</span>
+
+<span class="x">    static public function create($hour, $minute, $second, $month, $day, $year)</span>
+<span class="x">    {</span>
+<span class="x">        $ts = mktime($hour, $minute, $second, $month, $day, $year);</span>
+<span class="x">        if (!isset(self::$_dates[$ts])) {</span>
+<span class="x">            self::$_dates[$ts] = new DateTime('@'.$ts);</span>
+<span class="x">        }</span>
+<span class="x">        return self::$_dates[$ts];</span>
+<span class="x">    }</span>
+
+<span class="x">    static public function createFromMysqlDate($mysqlDate)</span>
+<span class="x">    {</span>
+<span class="x">        list($date, $time) = explode(" ", $mysqlDate);</span>
+<span class="x">        if($time == null) {</span>
+<span class="x">            $hour = $minute = $second = 0;</span>
+<span class="x">        } else {</span>
+<span class="x">            list($hour, $minute, $second) = explode(":", $time);</span>
+<span class="x">        }</span>
+<span class="x">        list($year, $month, $day) = explode("-", $mysqlDate);</span>
+<span class="x">        return self::create($hour, $minute, $second, $month, $day, $year);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>This includes some date time calculations and date creation with
+mktime() and DateTimes unix timestamp capabilities to be able to work.
+Otherwise the sharing of instances could not be implemented. If you need
+to create shareable instances from other formats you could just create
+another creation method for it and convert the format for create() to be
+used.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 08, 2010
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/01/10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html">Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) <em>UPDATE</em></a></h1>
 <p>Some weeks ago <a class="reference external" href="https://beberlei.de/2009/12/19/trying-a-two-step-pear-phar-approach-to-develop-and-deploy.html">I posted an
 article</a> on using PEAR
@@ -492,42 +643,6 @@ The stream wrapper to make this work looks like this:</p>
             <small>
                 Posted on December 18, 2010
                 
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a></h1>
-<p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
-<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">echo</span> <span class="s2">"hello world with ReST and Zeta Components!"</span><span class="p">;</span>
-</pre></div>
-</div>
-<p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home/">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
-<p>My next plans for the blog bundle are:</p>
-<ul class="simple">
-<li>WebDav support for authoring. All articles will be named “slug.inputformat”, for example “blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst”. For this I plan to write a custom backend for ezcWebdav.</li>
-<li>Making the Bundle simpler to re-use by others.</li>
-<li>More jQuery love to the backend.</li>
-<li>Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.</li>
-</ul>
-<p>Btw: This blog post is really just a bad excuse for me to test the ReST Editor in the backend. I hope you still enjoyed it ;)</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/thisblog.html">ThisBlog</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on December 07, 2010
-                 by beberlei <kontakt@beberlei.de>
             </small>
         </p>
     </div>

@@ -63,6 +63,73 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2013/05/23/symfony2_on_windows_azure_websites.html">Symfony2 on Windows Azure Websites</a></h1>
+<p>With the Windows Azure Websites platform-as-a-service (PaaS), which was
+released as a preview to a general audiance in June last year, PHP applications
+can be deployed to Azure with as much as a Git push to a remote repository. At
+the same time Microsoft released a new and much improved <a class="reference external" href="https://github.com/WindowsAzure/azure-sdk-for-php">PHP SDK</a>, which
+integrates with all the Azure webservices.</p>
+<p>I blogged about deployment with Composer on Azure Websites last November and
+since then I have been working with Microsoft to improve Symfony2 support on
+Windows Azure by developing and releasing the <a class="reference external" href="https://github.com/beberlei/AzureDistributionBundle">AzureDistributionBundle</a>. This is a new version
+of the bundle and contains the following improvements:</p>
+<ul class="simple">
+<li>Full support for the PHP SDK through the DependencyInjection container</li>
+<li>Installation of project dependendencies using Composer during deployment.
+I will blog about the Composer support in much more detail in the next
+days, because this information is not only valuable for Symfony2 projects.</li>
+<li>a <a class="reference external" href="https://github.com/beberlei/symfony-azure-edition">full demo application</a> (derived from
+symfony-standard) to show PHP, Symfony &amp; Azure integration</li>
+<li>documentation of the Windows Azure Websites deployment process and
+possiblities for PHP configuration</li>
+<li>a Stream Wrapper for Azure Blob Storage, currently being reviewed for
+inclusion into the Azure PHP SDK itself.</li>
+</ul>
+<p>You can install both the Bundle or the Demo application via Composer.
+For the Demo application call:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php composer.phar create-project beberlei/symfony-azure-edition
+</pre></div>
+</div>
+<p>The README includes more information about how to deploy the demo
+to your Azure websites account.</p>
+<p>The bundle can be installed using the following <span class="docutils literal"><span class="pre">composer.json</span></span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"beberlei/azure-distribution-bundle"</span><span class="p">:</span> <span class="s2">"*"</span>
+    <span class="p">},</span>
+    <span class="s2">"repositories"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"pear"</span><span class="p">,</span>
+            <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"http://pear.php.net"</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Registering PEAR is necessary, because the Azure PHP SDK depends on some PEAR
+components.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/azure.html">Azure</a>
+                 / 
+                <a href="tags/symfony.html">Symfony</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 23, 2013
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/04/12/traits_are_static_access.html">Traits are Static Access</a></h1>
 <p>In a Twitter discussion yesterday I formulated my negative opinion
 about traits and Matthew asked me to clarify it:</p>
@@ -880,190 +947,6 @@ tests.</p>
         <p>
             <small>
                 Posted on March 04, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/02/19/extending_symfony2__paramconverter.html">Extending Symfony2: ParamConverter</a></h1>
-<p>Symfony2 is an extremely extendable framework, everything is extendable or
-overwritable through the Dependency Injection Container. The problem developers
-face is knowing about the extension points and when to use them.  If you don’t
-know the extension points, your Symfony application will end up with code
-duplication, too much inheritance and very little unit-testable code.</p>
-<p>This blog post will be the first in a series, describing Symfony2 extension
-points that help you achieve clean and duplicateless code. In my experience,
-using Symfony extension points to avoid code duplication helps you avoid
-writing thousands of lines of code in your controllers.</p>
-<div class="section" id="the-problem-duplicate-finder-logic">
-<h2>The problem: Duplicate finder logic</h2>
-<p>Inside controllers you can easily end with lots of duplication using the same
-general finder logic again in several actions. Take this following example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">"SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1"</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>If we need this block of code in several actions of different controllers, we
-will end up with duplication that has to be eliminated.</p>
-</div>
-<div class="section" id="the-quick-and-dirty-solution">
-<h2>The Quick and Dirty Solution</h2>
-<p>One way of resolving the duplication appearing in this case, is moving the
-finder + not found logic into a common controller base class or into a trait.
-But this leaves us with a helper method buried in the code and a static
-dependency to a base class or a trait that we want to avoid.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">AbstractController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">protected</span> <span class="k">function</span> <span class="nf">findUser</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">"SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1"</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nv">$user</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>There are two problems with this sort of refactoring:</p>
-<ol class="arabic simple">
-<li>We are using inheritance for code-reuse.</li>
-<li>We hide the <span class="docutils literal"><span class="pre">findUser</span></span> behavior in an abstract class and make it hard to test.</li>
-</ol>
-</div>
-<div class="section" id="the-preferred-solution">
-<h2>The Preferred Solution</h2>
-<p>The <a class="reference external" href="http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html">SensioFrameworkExtraBundle</a>
-offers an extension hook called <strong>Parameter Converters</strong> to transform Request
-attributes to objects directly for controller method arguments. They hook into
-the <span class="docutils literal"><span class="pre">kernel.controller</span></span> event that you can use yourself to achieve the same
-goal.</p>
-<p>Lets see how the action will look like after our refactoring:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">User</span> <span class="nv">$user</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'user'</span> <span class="o">=&gt;</span> <span class="nv">$user</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Very concise and easy to read. The param converter doing the heavy lifting
-looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Request\ParamConverter</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Exception\NotFoundHttpException</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\EntityManager</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">UserParamConverter</span> <span class="k">implements</span> <span class="nx">ParamConverterInterface</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$entityManager</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">EntityManager</span> <span class="nv">$entityManager</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entityManager</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">apply</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$id</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
-
-        <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">"SELECT u, d, a</span>
-<span class="s2">                  FROM MyBundle\Entity\User u</span>
-<span class="s2">                  JOIN u.details d</span>
-<span class="s2">                  JOIN u.addresses a</span>
-<span class="s2">                  WHERE u.id = ?1"</span><span class="p">;</span>
-
-        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'doctrine.orm.default_entity_manager'</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
-            <span class="o">-&gt;</span><span class="na">getSingleResult</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundHttpException</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="nv">$param</span> <span class="o">=</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
-        <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">attributes</span><span class="p">(</span><span class="nv">$param</span><span class="p">,</span> <span class="nv">$user</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">supports</span><span class="p">(</span><span class="nx">ConfigurationInterface</span> <span class="nv">$configuration</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="s2">"MyProject\Entity\User"</span> <span class="o">===</span> <span class="nv">$configuration</span><span class="o">-&gt;</span><span class="na">getClass</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Now we only need to register this class in the dependency injection container:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span/><span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">"my_project.user_param_converter"</span>
-      <span class="na">class=</span><span class="s">"MyProject\Request\ParamConverter\UserParamConverter"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;argument</span> <span class="na">type=</span><span class="s">"service"</span> <span class="na">id=</span><span class="s">"doctrine.orm.default_entity_manager"</span> <span class="nt">/&gt;</span>
-
-    <span class="nt">&lt;tag</span> <span class="na">name=</span><span class="s">"request.param_converter"</span> <span class="na">converter=</span><span class="s">"user"</span> <span class="na">priority=</span><span class="s">"10"</span> <span class="nt">/&gt;</span>
-<span class="nt">&lt;/service&gt;</span>
-</pre></div>
-</div>
-<p>With the priority configuration the <span class="docutils literal"><span class="pre">User</span></span> entity is now always handled
-by our custom param converter and not by the default Doctrine converter.</p>
-<p>In a next step, we should extract the query logic from the ParamConverter
-into a custom Doctrine entity repository. But that is a task for another blog
-post in this series.</p>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/symfony.html">Symfony</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 19, 2013
                  by Benjamin Eberlei
             </small>
         </p>

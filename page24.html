@@ -63,6 +63,49 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/27/writing-a-game-for-kde4.html">Writing a Game for KDE4</a></h1>
+<p>I am writing PHP / Web Applications for about 8 years now, but I am not
+so much the pro in writing desktop applications. I know little or no
+C/C++/Java, but want to change that soon. Since I use KDE for both my
+desktop and laptop it seems reasonable to write a KDE 4 application.</p>
+<p>What about ideas? I wanted to write a game for so long and in the last
+years my girlfriend and I tried lots of 2 person player games. One of
+them I wanted to re-create as a computer game.</p>
+<p>The possibilities are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Game_of_the_Amazons">The Game of the
+Amazons</a></li>
+<li><a class="reference external" href="http://www.wikimanqala.org/wiki/Moruba">Moruba</a> - Oware or a
+variant.</li>
+</ul>
+<p>All 3 games are time intensive and very strategic. Moruba can be played
+for lots of hours (My gf and I played one game for about 5-6 hours). Its
+probably more easy to write algorithms for the computer player of Oware
+or Moruba than for Amazons, but that should not affect my decision. I
+will decide in the next weeks, but I should probably concentrate on my
+semesters final exams in the first place.</p>
+<p><strong>Update:</strong> Moruba seems to have different rules than the game we are
+playing. I will elaborate on that soon.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/kde4.html">KDE4</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 27, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/20/zend-view-hack-for-implementation-of-rss-feed.html">Zend_View Hack for implementation of RSS Feed</a></h1>
 <p>Using Zend_View for your site and want to implement an RSS Feed? You
 might run into the problem that the XML header definition is interpreted
@@ -308,58 +351,6 @@ friendly messages one had to make child objects of each of the
 Validators and edit the error messages accordingly. I avoid this by
 printing my own errors from outside the Zend_Filter_Input, rather than
 using the object for what it is probably supposed to do.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 24, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
-<p>I am not too happy with the ZF Frameworks Table access solution. Not
-that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
-pattern</a>,
-but in most web applications you almost always have to join data some
-way or another. Even this rather simple application, a blog, needs joins
-for displaying articles so that category, comment count and tags can be
-displayed. Therefore I use an instance of Zend_Db_Table_Abstract only
-for the simplest purposes and pimp it by using lots of public methods
-and
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.db.select.html">Zend_Db_Select</a>.
-An example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class SomeModel extends Zend_Db_Table_Abstract</span>
-<span class="x">{</span>
-<span class="x">  $_name = "someTable";</span>
-<span class="x">  $_primary = "id";</span>
-
-<span class="x">  public function getSomethingByJoin($param1, $param2)</span>
-<span class="x">  {</span>
-<span class="x">     $db = $this-&gt;getAdapter();</span>
-<span class="x">     $select = $db-&gt;select();</span>
-<span class="x">     ...[build select]</span>
-<span class="x">     $result = $db-&gt;query($select);</span>
-
-<span class="x">     return $result;</span>
-<span class="x">  }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>That way you still follow the MVC pattern and don’t have to take one
-compromise after another for getting the Table Gateway to reproduce a
-result that looks like a join.</p>
 
 
             

@@ -63,6 +63,59 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/14/helpers-in-zend-view-class-prefix.html">Helpers in Zend_View: Class Prefix</a></h1>
+<p>I have to say, the Zend Framework documentation is a bit imprecise
+sometimes. Regarding custom Helpers in Zend_View it states:</p>
+<blockquote>
+<div>The class name must, at the very minimum, end with the helper name
+itself, using CamelCaps. E.g., if you were writing a helper called
+“specialPurpose”, the class name would minimally need to be
+“SpecialPurpose”. You may, and should, give the class name a prefix,
+and it is recommended that you use ‘View_Helper’ as part of that
+prefix: “My_View_Helper_SpecialPurpose”. (You will need to pass
+in the prefix, with or without the trailing underscore, to
+addHelperPath() or setHelperPath()).</div></blockquote>
+<p>What does that mean regarding how your Helper has to be called? The
+default prefix for a Helper function that should be called foobar() is
+actually:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class Zend_View_Helper_Foobar()</span>
+<span class="x">{</span>
+<span class="x">    function foobar() { }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>It took me some time to realize that. Why doesn’t Zend just give an
+example like that? To change the prefix in a context of the
+Zend_Controller_Action you have to do something like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class SomeController extends Zend_Controller_Action</span>
+<span class="x">{</span>
+<span class="x">    function init() {</span>
+<span class="x">        $this-&gt;initView();</span>
+<span class="x">        $this-&gt;view-&gt;addHelperPath("pathtohelpers", "ClassPrefix");</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 14, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/22/a-knight-s-tour-solver-in-pascal.html">A knight’s tour solver in pascal</a></h1>
 <p>My professor has a task on the current problem set of my pascal
 programming course to program, demanding a recursive program finding a
@@ -188,49 +241,6 @@ perhaps I will do so.</p>
         <p>
             <small>
                 Posted on January 28, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/01/27/writing-a-game-for-kde4.html">Writing a Game for KDE4</a></h1>
-<p>I am writing PHP / Web Applications for about 8 years now, but I am not
-so much the pro in writing desktop applications. I know little or no
-C/C++/Java, but want to change that soon. Since I use KDE for both my
-desktop and laptop it seems reasonable to write a KDE 4 application.</p>
-<p>What about ideas? I wanted to write a game for so long and in the last
-years my girlfriend and I tried lots of 2 person player games. One of
-them I wanted to re-create as a computer game.</p>
-<p>The possibilities are:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://en.wikipedia.org/wiki/Game_of_the_Amazons">The Game of the
-Amazons</a></li>
-<li><a class="reference external" href="http://www.wikimanqala.org/wiki/Moruba">Moruba</a> - Oware or a
-variant.</li>
-</ul>
-<p>All 3 games are time intensive and very strategic. Moruba can be played
-for lots of hours (My gf and I played one game for about 5-6 hours). Its
-probably more easy to write algorithms for the computer player of Oware
-or Moruba than for Amazons, but that should not affect my decision. I
-will decide in the next weeks, but I should probably concentrate on my
-semesters final exams in the first place.</p>
-<p><strong>Update:</strong> Moruba seems to have different rules than the game we are
-playing. I will elaborate on that soon.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/kde4.html">KDE4</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 27, 2008
                 
             </small>
         </p>

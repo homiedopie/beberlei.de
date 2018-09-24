@@ -63,6 +63,51 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2018/09/24/proofing_the_pythagorean_theorem_and_what_this_means_for_domain_driven_design.html">Proofing the Pythagorean theorem and what this means for Domain-Driven Design</a></h1>
+<p>According to Wikipedia the <a class="reference external" href="https://en.wikipedia.org/wiki/Pythagorean_theorem#Other_proofs_of_the_theorem">Pythagoraen theorem</a>
+is the theorem with the highest number of known proofs, citing a book
+containing over 370 of them.</p>
+<p>What does this mean for modelling under the Domain-Driven Design paradigm?</p>
+<p>In discussions with other developers I often hear the opinion, that you should
+develop the model of a software entirely disconnected from technical decisions
+as long as possible and fully abstracted from the choices.</p>
+<p>I held this opinion myself for a long time.</p>
+<p>Discussing this with a colleague today I found a nice analogy to describe my
+growing pain with this approach, something I wasn’t able to formulate before.</p>
+<p>Maybe the analogy is a bit of a stretch.</p>
+<p>The Pythagoraen theorem shows that you can find an entirely different solution
+for the same problem by using a different toolbox. Finding one or more proofs
+for the theorem depends on your knowledge of different fields of mathematics.
+And depending on the toolbox, the solution is simple and elegant, or complex
+and theoretical.</p>
+<p>The reverse conclusion could be, that if you develop a model (theorem) entirely
+abstracted from the future implementation and toolbox, then it must increase in
+generality and complexity to take into account the potential implementation
+with any kind of toolbox. Or the problem space is simple like the Pythagoraen
+theorem that its description allows many implementations.</p>
+<p>Consequently, if you make technical decisions and restrict yourself to fewer
+approaches/toolboxes before building the model, then the resulting model can be
+simpler under the assumption that you only need it to be solved under the given
+technical constraints.</p>
+<p>For example, take Redis as a choice of database. Its built in support for more
+complex data-types allows to implement extremely simple abstractions directly
+on top of Redis. If you know you use Redis up front for a problem that can be
+solved with lists, sets or maps, then the model and code describing this domain
+logic could be extremely simplified compared a solution that makes no
+assumptions about the data storage.</p>
+
+
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on September 24, 2018
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux.html">Hide Slack unread and highlight Tray Icon on Ubuntu/Linux</a></h1>
 <p>The Slack Ubuntu/Linux application doesn’t provide a way to disable the tray
 icon and that means the unread or highlight notification bubbles will distract
@@ -388,69 +433,6 @@ maybe fetching expensive data that isn’t even used.</p>
         <p>
             <small>
                 Posted on March 12, 2017
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a></h1>
-<p>I have <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">written about monorepos</a>
-in this blog before, <a class="reference external" href="https://qafoo.com/resources/presentations/symfony_live_berlin_2015/monorepos.html">presented a talk</a>
-about this topic and released a standalone tool called “Fiddler” that helps
-integrating Composer with a monolithic repository.</p>
-<p>At the beginning of the year, somebody in <span class="docutils literal"><span class="pre">#composer-dev</span></span> IRC channel on
-Freenode pointed me in the direction of Composer plugins to use with Fiddler
-and it was an easy change to do so.</p>
-<p>With the help of a new Composer v1.1 feature to add custom commands from a
-plugin, Fiddler is now “gone” and I renamed the repository to the practical
-<strong>beberlei/composer-monorepo-plugin</strong> package name on <a class="reference external" href="https://github.com/beberlei/composer-monorepo-plugin">Github</a>. After you install
-this plugin, you have the possibility to maintain subpackages and their
-dependencies in a single repository.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ composer require beberlei/composer-monorepo-plugin
-</pre></div>
-</div>
-<p>To use the plugin add <strong>monorepo.json</strong> files into each directory of a
-subpackage and use a format similar to the <strong>composer.json</strong> to add
-dependencies to a.) external composer packages that you have listed in your
-global Composer file b.) other subpackages in the current monorepo.
-See this example for a demonstration:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s2">"vendor/symfony/http-foundation"</span><span class="p">,</span>
-        <span class="s2">"components/Foo"</span>
-    <span class="p">],</span>
-    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Bar"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This subpackage here defined in a hypothetical file
-<strong>components/Bar/monorepo.json</strong> has dependencies to Symfony HTTP foundation
-and another subpackage Foo with its own <strong>components/Foo/monnorepo.json</strong>.
-Notice how we don’t need to specify versions (they are implicit) and import
-other dependencies using the relative path from the global composer.json.</p>
-<p>The monorepo plugin is integrated with Composer, so every time you perform install,
-update or dump-autoload commands, the subpackages will be updated as well and
-each get their own autoloader that can be included from <span class="docutils literal"><span class="pre">vendor/autoload.php</span></span>
-relative to the subpackages root directory as usual.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/monorepos.html">Monorepos</a>
-                 / 
-                <a href="tags/composer.html">Composer</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on May 28, 2016
                  by Benjamin Eberlei
             </small>
         </p>

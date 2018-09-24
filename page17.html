@@ -63,6 +63,75 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
+<p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
+post</a> on Dependency
+Injection containers and Zend_Application I was eager to find out if
+its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
+Container</a>
+into the Zend Framework. To my surprise it’s possible without having to
+make any changes to one of the two components. An example use-case would
+look like:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$container = new sfServiceContainerBuilder();
+
+$loader = new sfServiceContainerLoaderFileXml($container);
+$loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
+
+$application = new Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/config/application.xml'
+);
+$application-&gt;getBootstrap()-&gt;setContainer($container);
+$application-&gt;bootstrap()
+            -&gt;run();
+</pre></div>
+</div>
+</div></blockquote>
+<p>Resources instantiated by Zend_Application are then injected into the
+container by the name of the resource and are given the resource
+instance. Any object from the Symfony container can then use these
+dependencies in their object setup. The only drawback of the integration
+is the fact that the Symfony Container is case-sensitive in regards to
+the service names but Zend_Application lower-cases all service before
+injecting them into the container. The following code is a restatement
+of my previous example of a <strong>MyModel</strong> class which requires a
+<strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$container-&gt;register('myModel', 'MyModel')
+          -&gt;addArgument(new sfServiceReference('db'))
+          -&gt;addArgument(new sfServiceReference('cache'));
+</pre></div>
+</div>
+</div></blockquote>
+<p>Access to a MyModel instance with its dependencies is then granted
+through the call <strong>$container-&gt;myModel</strong> throughout the application.
+Make sure to call this after running Zend_Application::bootstrap, so
+that the Resource dependencies are injected first.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+                <a href="tags/symfony.html">Symfony</a>
+                 / 
+                <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on July 04, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/02/12/pdt-back-to-easyeclipse-with-php-extension.html">PDT: Back to easyeclipse with PHP extension</a></h1>
 <p>I am disappointed by <a class="reference external" href="http://www.eclipse.org/pdt/">PDT</a> for Eclipse.
 The current version strikes my rather old machine with “just” 512mb to
@@ -313,56 +382,6 @@ Navigation Controller on the
 </div></blockquote>
 <p>The layout.pthml then just calls certain named sections, for example &lt;=?
 $this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on May 17, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/05/17/using-zend-http-client-to-ping-technorati.html">Using Zend_Http_Client to Ping Technorati</a></h1>
-<p>Send a ping to Technorati manually is a pain in the ass. Writing a
-little Method that handles this functionality for your own blog software
-is quite easy. Call the following method after you created or updated a
-post of yours:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>private function _pingTechnorati()
-{
-    $xml = $this-&gt;view-&gt;render('ping_technorati.phtml');
-
-    $httpclient = new Zend_Http_Client('http://rpc.technorati.com/rpc/ping');
-            $httpclient-&gt;setHeaders('User-Agent', 'PHP/Zend Framework/Zend_Http');
-
-    $httpclient-&gt;setRawData($xml, 'text/xml')-&gt;request('POST');
-
-    $response = $httpclient-&gt;request();
-
-    if($response-&gt;isSuccessful() === true) {
-        return true;
-    } else {
-        return false;
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>You also need a little view in XML format like it is described in the
-<a class="reference external" href="http://technorati.com/developers/ping/">Technorati Ping Configuration
-Guide</a> and ready to go you
-are!</p>
 
 
             

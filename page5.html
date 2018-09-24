@@ -63,6 +63,107 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2014/01/26/assert_v2_0__fluent_api_and_lazy_assertions.html">Assert v2.0: Fluent API and Lazy Assertions</a></h1>
+<p>Almost two years ago I started developing a small library <a class="reference external" href="https://github.com/beberlei/assert">Assert</a> (<a class="reference external" href="http://www.whitewashing.de/2012/09/04/using_assertions_for_validation.html">blog post</a>)
+which contained a set of assertion methods to use in production code. With
+18.000 installations from Packagist this is my most successful piece of open
+source software outside of the Doctrine universe. There is a fair number
+of contributors and I know several companies using the library in production.</p>
+<p>The API however didn’t make me too happy, using the static method calls
+made it impossible to collect multiple errors and also made the code
+more verbose than necessary when validating the same value with multiple
+assertions.</p>
+<p>Several weeks ago I stumbled across the Java library <a class="reference external" href="http://joel-costigliola.github.io/assertj/">AssertJ</a> that gave me the idea how to fix
+these problems. The last two days I had some time to implement those new
+functionalities and I am releasing a new version 2.0 of Assert today.</p>
+<div class="section" id="fluent-api">
+<h2>Fluent API</h2>
+<p>Instead of having to use the static assertion methods, there is now
+a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
+and then all the assertions you want to call on that value.</p>
+<p>Here are some examples:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
+<span class="nx">\Assert\that</span><span class="p">(</span><span class="k">null</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullOr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">boolean</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This new API allows for much shorter and compact assertions.</p>
+</div>
+<div class="section" id="lazy-assertions">
+<h2>Lazy Assertions</h2>
+<p>Using Assert with webforms was never possible unless you wanted to show
+the user only exactly one error message. Because every assertion fails
+with an Exception, there was no way to execute multiple assertions and
+collect the errors. This has changed with the new lazy assertion API,
+that is similar to the Fluent API:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="nx">\Assert\lazy</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="s1">'string'</span><span class="p">,</span> <span class="s1">'baz'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">verifyNow</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The method <span class="docutils literal"><span class="pre">that($value,</span> <span class="pre">$propertyPath)</span></span> requires a property path (name), so
+that you know how to differentiate the errors afterwards.</p>
+<p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
+<span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
+<span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">The</span> <span class="n">following</span> <span class="mi">3</span> <span class="n">assertions</span> <span class="n">failed</span><span class="p">:</span>
+<span class="mi">1</span><span class="p">)</span> <span class="n">foo</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"10"</span> <span class="n">expected</span> <span class="n">to</span> <span class="n">be</span> <span class="n">string</span><span class="p">,</span> <span class="nb">type</span> <span class="n">integer</span> <span class="n">given</span><span class="o">.</span>
+<span class="mi">2</span><span class="p">)</span> <span class="n">bar</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"&lt;NULL&gt;"</span> <span class="ow">is</span> <span class="n">empty</span><span class="p">,</span> <span class="n">but</span> <span class="n">non</span> <span class="n">empty</span> <span class="n">value</span> <span class="n">was</span> <span class="n">expected</span><span class="o">.</span>
+<span class="mi">3</span><span class="p">)</span> <span class="n">baz</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"string"</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">array</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>You can also call the method <span class="docutils literal"><span class="pre">getErrorExceptions()</span></span> to retrieve all the
+underyling <span class="docutils literal"><span class="pre">AssertionFailedException</span></span> objects and convert them something
+useable for the frontend.</p>
+</div>
+<div class="section" id="error-messages-values-and-constraints">
+<h2>Error Messages, Values and Constraints</h2>
+<p>In version 1.0 Assert did not have default error messages when failures
+occured. This has changed and now every assertion has a default failure
+message, as well as access to the value and constraints of an exception:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">AssertionFailedException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span> <span class="c1">// Value "10" is not between 100 and 1000.</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span> <span class="c1">// 10</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getConstraints</span><span class="p">();</span> <span class="c1">// array('min' =&gt; 100, 'max' =&gt; 1000)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This helps during development when the assertion exceptions occur and also
+allows to provide error messages to the user, by using the exception code and
+the value and constraint data for translating into human readable messages.</p>
+<p>You can find more information in the <a class="reference external" href="https://github.com/beberlei/assert#assert">README of Assert</a>.</p>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/assertlibrary.html">AssertLibrary</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 26, 2014
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/12/31/2013_and_2014.html">2013 and 2014</a></h1>
 <p>This year was amazing with my new job, various talks on conferences and also
 for this blog. A total of 15 new posts attracted more than 30.000 unique
@@ -428,107 +529,6 @@ the Symfony Security component or the huge FOSUserBundle dependency.</p>
         <p>
             <small>
                 Posted on September 04, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a></h1>
-<ul class="simple">
-<li><strong>Update:</strong> Added requirements to configure Vagrant and Virtualbox before
-trying my change.</li>
-<li><strong>Update 2:</strong> Added link to Virtualbox Guest Additions plugin for Vagrant,
-thanks Peter Kruithof for the hint.</li>
-</ul>
-<p>Using Symfony2 inside a Vagrant box is considered to be very slow (<a class="reference external" href="http://stackoverflow.com/questions/12161425/why-is-my-symfony-2-0-site-running-slowly-on-vagrant-with-linux-host">here</a>,
-<a class="reference external" href="https://twitter.com/spicy_sake/status/183135528567320576">here</a>), even when
-using NFS. I can confirm the experience and know many others that reported the
-same.</p>
-<p>Before doing this changes make sure:</p>
-<ul class="simple">
-<li>You are using Vagrant 1.2 (not sure that makes a difference though)</li>
-<li>You are using NFS with Vagrant (<a class="reference external" href="http://docs.vagrantup.com/v2/synced-folders/nfs.html">More</a>). If you are on
-Windows then this can already be the problem (Virtualbox FS is slow with
-Symfony, because of the large number of files.)</li>
-<li>You have the Vbox Guest Additions on the guest that match your system (<a class="reference external" href="https://github.com/dotless-de/vagrant-vbguest">Vagrant Plugin</a>, <a class="reference external" href="https://gist.github.com/fernandoaleman/5083680">Manual Update</a>)</li>
-<li>You have an opcode cache installed, either <cite>apc</cite> or <cite>opcache</cite>.</li>
-<li>You disable <cite>xdebug</cite> or <cite>xhprof</cite>.</li>
-</ul>
-<p>Without looking at an actual benchmark (mistake!) I always considered the problem to be
-related to the huge number of files that a Symfony project normally ships with
-and the I/O that is generated from <span class="docutils literal"><span class="pre">filemtime</span></span> calls to check if the
-configuration files have changed.</p>
-<p>This is just a small part, there are other bottlenecks that I have found after
-finally doing some benchmarking with <a class="reference external" href="https://github.com/facebook/xhprof">XHProf</a>, leading to a simple fix:</p>
-<ol class="arabic simple">
-<li>Monolog logs to the NFS share and the huge number <span class="docutils literal"><span class="pre">fwrite</span></span> take their toll.</li>
-<li>Writing compiled Twig templates to the NFS share using <span class="docutils literal"><span class="pre">file_put_contents</span></span>.</li>
-<li>Assetic: Scanning for stylesheets and javascripts within templates is very
-slow, causing lots of I/O on the NFS share and CPU and changing it to using
-explicit bundling in the <span class="docutils literal"><span class="pre">app/config/config.yml</span></span> helps alot. You can use a
-cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
-a <cite>–watch</cite> flag in the background.</li>
-<li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
-<li><span class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></span> in Symfony DIC uses a set of
-recursive algorithms to replace aliases with the real services. That takes a
-huge amount of time in bigger applications including amounting calls to methods
-inside the pass over 100.000 times.</li>
-</ol>
-<p>The slowest bottlenecks listed (1-4) are I/O bound, directly related to NFS.
-To fix this just change the cache <strong>AND</strong> the log directory to
-<span class="docutils literal"><span class="pre">sys_get_temp_dir()</span></span> or shared memory (/dev/shm) instead of writing to the
-NFS share. I actually tried this before, but since I forgot the log directory,
-this felt equally slow and I reverted the change.</p>
-<p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
-considerable performance boost on a Vagrant box:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
-<span class="p">{</span>
-    <span class="c1">// ...</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCacheDir</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="s1">'/dev/shm/appname/cache/'</span> <span class="o">.</span>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">;</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getCacheDir</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLogDir</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">)))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="s1">'/dev/shm/appname/logs'</span><span class="p">;</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getLogDir</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This brings the page rendering speeds down to between 0.5 and 1.5 seconds, which
-is quite normal for the development environment even outside a virtual machine.</p>
-<p>This tip obviously works for any kind of application that has a I/O intensive
-development environment: Don’t perform this operations on the NFS share unless
-you wan’t to suffer.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/vagrant.html">Vagrant</a>
-                 / 
-                <a href="tags/symfony.html">Symfony</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 19, 2013
                  by Benjamin Eberlei
             </small>
         </p>

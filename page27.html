@@ -63,6 +63,178 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/12/03/ezcomponents-view-handler-for-zend-pdf.html">ezComponents View Handler for Zend_Pdf</a></h1>
+<p><a class="reference external" href="http://www.whitewashing.de/blog/article/93">My previous posting</a>
+discussed different view handlers based on routing information. One
+example was the PDF View which was implemented rather hackish through
+overwriting the <strong>createResponseBody()</strong> function of <strong>ezcMvcView</strong>.
+<a class="reference external" href="http://www.derickrethans.nl/">Derick</a> told me the way to go would be
+writing my own PDF view handler. Since this is a rather lengthy topic I
+created this new post that only discusses using
+<a class="reference external" href="http://framework.zend.com/manual/en/zend.pdf.html">Zend_Pdf</a> as a
+View Handler in the new <a class="reference external" href="http://www.ezcomponents.org">ezComponents
+MvcTools</a>.</p>
+<p>The code for the View Handler would look like the following:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>abstract class myPdfViewHandler implements ezcMvcViewHandler
+{
+    /**
+     * Contains the zone name
+     *
+     * @var string
+     */
+    protected $zoneName;
+
+    /**
+     * Contains the variables that will be available in the template.
+     *
+     * @var array(mixed)
+     */
+    protected $variables = array();
+
+    /**
+     * Pdf object to be rendered.
+     *
+     * @var Zend_Pdf
+     */
+    protected $pdf;
+
+    /**
+     * Creates a new view handler, where $zoneName is the name of the block and
+     * $templateLocation the location of a view template.
+     *
+     * @var string $zoneName
+     * @var string $templateLocation
+     */
+    public function __construct( $zoneName, $templateLocation = null )
+    {
+        $this-&gt;zoneName = $zoneName;
+    }
+
+    /**
+     * Adds a variable to the template, which can then be used for rendering
+     * the view.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function send( $name, $value )
+    {
+        $this-&gt;variables[$name] = $value;
+    }
+
+    /**
+     * Processes the template with the variables added by the send() method.
+     * The result of this action should be retrievable through the getResult() method.
+     */
+    public function process( $last )
+    {
+        // template method
+    }
+
+    /**
+     * Returns the value of the property $name.
+     *
+     * @throws ezcBasePropertyNotFoundException if the property does not exist.
+     * @param string $name
+     * @ignore
+     */
+    public function __get( $name )
+    {
+        return $this-&gt;variables[$name];
+    }
+
+    /**
+     * Returns true if the property $name is set, otherwise false.
+     *
+     * @param string $name
+     * @return bool
+     * @ignore
+     */
+    public function __isset( $name )
+    {
+        return array_key_exists( $name, $this-&gt;variables );
+    }
+
+    /**
+     * Returns the name of the template, as set in the constructor.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this-&gt;zoneName;
+    }
+
+    /**
+     * Returns the result of the process() method.
+     *
+     * @return mixed
+     */
+    public function getResult()
+    {
+        if($this-&gt;pdf instanceof Zend_Pdf) {
+            return $this-&gt;pdf-&gt;render();
+        } else {
+            throw new Exception("Could not render PDF.");
+        }
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now you would implement a concrete PDF view handler by extending
+myPdfViewHandler.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myConcretePdfViewHandler extends myPdfViewHandler {
+    public function process( $last )
+    {
+        $pdf = new Zend_Pdf();
+        // do concrete PDF drawing stuff here
+
+        // save PDF here, will be rendered in getResult()
+        $this-&gt;pdf = $pdf;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>And your <strong>ezcMvcView</strong> implementation will make of <strong>createZones()</strong>
+and look like the following:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class myPdfView extends ezcMvcView {
+    function createZones( $layout )
+    {
+        $zones = array();
+        // A decision which concrete Pdf Handler should be used would be decided on here.
+        $zones[] = new myConcretePdfViewHandler( 'concreteA' );
+        return $zones;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>There you go!</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/ezcomponents.html">eZComponents</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on December 03, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/12/03/ezcomponents-2008-2-beta-mvc-separation-for-win.html">ezComponents 2008.2 Beta - Mvc separation for win</a></h1>
 <p><a class="reference external" href="http://www.whitewashing.de/blog/articles/88">I have written</a> on the
 <a class="reference external" href="http://ezcomponents.org">new ezComponents MvcTools</a> component before
@@ -272,57 +444,6 @@ the next couple of hours.</p>
         <p>
             <small>
                 Posted on July 14, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
-<p>Per default any implementation of ArrayObject does not allow to use the
-object as multidimensional array. This snippet here implements the
-support:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class ArrayMultiObject extends ArrayObject</span>
-<span class="x">{</span>
-<span class="x">    function __construct($array, $flags = 0, $iterator_class = "ArrayIterator")</span>
-<span class="x">    {</span>
-<span class="x">        $objects = array();</span>
-<span class="x">        foreach($array AS $key =&gt; $value) {</span>
-<span class="x">            if(is_array($value)) {</span>
-<span class="x">                $objects[$key] = new ArrayMultiObject($value, $flags, $iterator_class);</span>
-<span class="x">            } else {</span>
-<span class="x">                $objects[$key] = $value;</span>
-<span class="x">            }</span>
-<span class="x">        }</span>
-
-<span class="x">        parent::__construct($objects, $flags, $iterator_class);</span>
-<span class="x">    }</span>
-
-<span class="x">    public function offsetSet($name, $value)</span>
-<span class="x">    {</span>
-<span class="x">        if(is_array($value)) {</span>
-<span class="x">            $value = new ArrayMultiObject($value);</span>
-<span class="x">        }</span>
-
-<span class="x">        return parent::offsetSet($name, $value);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/php.html">PHP</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on July 22, 2008
                 
             </small>
         </p>

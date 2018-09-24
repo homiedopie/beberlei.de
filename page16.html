@@ -63,6 +63,99 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/03/27/test-your-legacy-php-application-with-function-mocks.html">Test your Legacy PHP Application with Function Mocks!</a></h1>
+<p>Much talking is going on about Unittesting, Mocks and TDD in the PHP
+world. For the most this discussions surround object-oriented PHP code,
+frameworks and applications.</p>
+<p>Yet I would assert that the reality for PHP developers (me included) is
+dealing with PHP 4, PHP 5 migrated, or non-object oriented legacy
+applications which are near to impossible to bring under test. Still
+this code works, is in production and needs maintenance and possibly
+extension for new features.</p>
+<p>For example many applications may still use <strong>mysql_*</strong> functions at
+length inside their model or have multiple nested function levels
+(Example: Wordpress). <a class="reference external" href="http://pecl.php.net/package/runkit">Runkit</a> to
+the rescue: A PECL extension that can hack your running PHP code, such
+that method or functions are repointed to execute new implementations.
+Using this extension you can actually mock out internal PHP functions,
+which is great to bring legacy code under test.</p>
+<p>Consider this following proof of concept, <a class="reference external" href="http://github.com/padraic/runkit/tree/master">using the Runkit extension
+build by Padraic Brady</a>
+(the one from pecl.php.net does not compile on PHP 5.2), which replaces
+the functionality of <strong>mysql_query()</strong>. You have to set the following
+option in your php.ini: <strong>runkit.internal_override = On</strong> for this to
+work. By default only user-defined functions may be overwritten by
+Runkit.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class FunctionMocker
+{
+    protected $_mockedFuncBehaviourMap = array();
+
+    public function mock($funcName, $return=null)
+    {
+        $newFuncCode = 'return "'.$return.'";';
+
+        $renamedName = "__".$funcName."_mockOriginalCopy";
+        runkit_function_copy($funcName, $renamedName);
+        runkit_function_redefine($funcName, '', $newFuncCode);
+
+        $this-&gt;_mockedFuncBehaviourMap[$funcName] = $renamedName;
+    }
+
+    public function reset()
+    {
+        foreach($this-&gt;_mockedFuncBehaviourMap AS $funcName =&gt; $renamedName) {
+            runkit_function_remove($funcName);
+            runkit_function_copy($renamedName, $funcName);
+            runkit_function_remove($renamedName);
+        }
+        $this-&gt;_mockedFuncBehaviourMap = array();
+    }
+}
+
+$mocker = new FunctionMocker();
+$mocker-&gt;mock('mysql_query', 'hello world!');
+
+echo mysql_query(); // hello world
+
+$mocker-&gt;reset();
+
+mysql_query(); // error
+</pre></div>
+</div>
+<p>This example, only allows for string return values of the mock and
+has no support for replacing the arguments of the mocked function.
+Also chaining of different return values based on input or call
+number might be interesting. Some kind of Code Generator Tool would
+have to be implemented to support this functionality. Additionally
+Assertions and Verifying should be implemented for the function
+arguments. All in all this would allow to mock functions as you
+would mock interfaces/classes, which would be a great addition for
+all those legacy applications that use procedural PHP.</p>
+<p>Additionally what the real killer for runkit would be: The
+possibility to insert PHP callbacks instead of real PHP code into
+the <strong>runkit_function_redefine</strong>.</p>
+</div></blockquote>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/testing.html">Testing</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on March 27, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/03/10/speaking-about-framework-quality-on-the-ipc-spring-09.html">Speaking about Framework Quality on the IPC Spring 09</a></h1>
 <p>Just a short notice, my thesis is taking its last breath, I will be
 speaking on the <a class="reference external" href="http://www.phpconference.com">IPC Spring 09
@@ -419,75 +512,6 @@ PHP tools and enhance Code Sniffer support.</p>
         <p>
             <small>
                 Posted on July 30, 2009
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
-<p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
-post</a> on Dependency
-Injection containers and Zend_Application I was eager to find out if
-its possible to integrate the new <a class="reference external" href="http://components.symfony-project.org/dependency-injection/">Symfony Dependency Injection
-Container</a>
-into the Zend Framework. To my surprise it’s possible without having to
-make any changes to one of the two components. An example use-case would
-look like:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>$container = new sfServiceContainerBuilder();
-
-$loader = new sfServiceContainerLoaderFileXml($container);
-$loader-&gt;load(APPLICATION_PATH.'/config/objects.xml');
-
-$application = new Zend_Application(
-    APPLICATION_ENV,
-    APPLICATION_PATH . '/config/application.xml'
-);
-$application-&gt;getBootstrap()-&gt;setContainer($container);
-$application-&gt;bootstrap()
-            -&gt;run();
-</pre></div>
-</div>
-</div></blockquote>
-<p>Resources instantiated by Zend_Application are then injected into the
-container by the name of the resource and are given the resource
-instance. Any object from the Symfony container can then use these
-dependencies in their object setup. The only drawback of the integration
-is the fact that the Symfony Container is case-sensitive in regards to
-the service names but Zend_Application lower-cases all service before
-injecting them into the container. The following code is a restatement
-of my previous example of a <strong>MyModel</strong> class which requires a
-<strong>Zend_Db</strong> and <strong>Zend_Cache</strong> constructor argument.</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>$container-&gt;register('myModel', 'MyModel')
-          -&gt;addArgument(new sfServiceReference('db'))
-          -&gt;addArgument(new sfServiceReference('cache'));
-</pre></div>
-</div>
-</div></blockquote>
-<p>Access to a MyModel instance with its dependencies is then granted
-through the call <strong>$container-&gt;myModel</strong> throughout the application.
-Make sure to call this after running Zend_Application::bootstrap, so
-that the Resource dependencies are injected first.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/symfony.html">Symfony</a>
-                 / 
-                <a href="tags/dependencyinjection.html">DependencyInjection</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on July 04, 2009
                 
             </small>
         </p>
