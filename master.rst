@@ -4,6 +4,7 @@ Sitemap
 .. toctree::
    :maxdepth: 1
 
+   2018/10/20/how_we_paid_the_hidden_costs_of_bootstrapping_tideways
    2018/09/24/proofing_the_pythagorean_theorem_and_what_this_means_for_domain_driven_design
    2017/07/29/hide_slack_unread_and_highlight_tray_icon_on_ubuntu_linux
    2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error
