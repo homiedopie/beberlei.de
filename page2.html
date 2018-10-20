@@ -63,6 +63,182 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a></h1>
+<p>Global State is considered bad for maintainability of software. Side effects on
+global state can cause a very nasty class of bugs. Context objects are one
+flavour of global state. For example, I remember that Symfony1 had a
+particularly nasty context object that was a global singleton containing
+references to very many services of the framework.</p>
+<p>As with every concept in programming, there are no absolute truths though and
+there are many use-cases where context objects make sense. This blog posts
+tries to explain my reasons for using context objects.</p>
+<div class="section" id="what-is-a-context">
+<h2>What is a Context?</h2>
+<p>Context is defined as all the information and circumstances in which
+something can be <em>fully</em> understood. In daily programming this is mostly
+related to the state of variables and databases. Some examples in the world
+of PHP include the superglobals <span class="docutils literal"><span class="pre">$_GET</span></span> and <span class="docutils literal"><span class="pre">$_POST</span></span>.</p>
+<p>Any piece of code is always running in some context and the question is how much
+of it is explicit in the code and how much is hidden.</p>
+<p>A context object is a way to make the existing context explicit for your code.</p>
+</div>
+<div class="section" id="context-objects">
+<h2>Context Objects</h2>
+<p>Lets take a look at the Definition of a context object</p>
+<blockquote>
+<div>A context object encapsulates the references/pointers to services and
+configuration information used/needed by other objects. It allows the objects
+living within a context to see the outside world. Objects living in a different
+context see a different view of the outside world.</div></blockquote>
+<p>Besides the obvious use of encapsulating services and config variables, this
+definition mentions two important properties:</p>
+<ol class="arabic simple">
+<li>Allows to see the outside world, which does <em>not</em> mean it can change it.
+In my opinion it is essential that context objects are immutable,
+to avoid side effects.</li>
+<li>The possibility of objects living in different contexts, seeing
+different context objects suggets that a context object
+should never be a singleton.</li>
+</ol>
+<p>By using objects instead of global variables for context, we can use
+encapsulation to achieve immutability.</p>
+<p>Context already exists in PHP through the existance of superglobals. Frameworks
+usually wrap them to achieve the properties mentioned above: Immutability and
+Not-Singleton.</p>
+<p>The Symfony Request object is one good example, where these properties (almost)
+hold. Wrapping the superglobals with this object even allowed creating
+Subrequests inside PHP requests.</p>
+</div>
+<div class="section" id="application-context">
+<h2>Application Context</h2>
+<p>Now that we have defined context we should make use of context objects in your
+applications.</p>
+<p>Anything that is an important global information in your application is
+relevant for the context:</p>
+<ol class="arabic simple">
+<li>Building a wiki? I actually have the idea for this approach from
+<a class="reference external" href="http://www.fitnesse.org/">Fitnesse</a>, a testing tool based on the wiki idea maintained by Uncle Bob
+and his team. Their <a class="reference external" href="https://github.com/unclebob/fitnesse/blob/master/src/fitnesse/FitNesseContext.java">context object</a> provides access to the current and the
+root page nodes.</li>
+<li>Building a shop? The users basket id, selected language/locale, current
+campaign (newsletter, google, social media?) can be information that should
+be available all the time.</li>
+<li>Building an analytics software? The currently selected date/time-range is
+probably important for all queries.</li>
+<li>Building a CMS/blog? The current page/post-id, the root page id, user
+language/locale seem to be good candidates for an application context.
+Wordpress does this although their context is global and encapsulated in an
+object.</li>
+<li>Building a multi-tenant app? The tenant-id and configuration for this
+tentant (selected product plan, activated features, ...) are
+good candidates for the context.</li>
+</ol>
+</div>
+<div class="section" id="real-world-example-context-in-tideways">
+<h2>Real World Example: Context in Tideways</h2>
+<p>How to introduce such a context? We could create an object in our application,
+for example how we did it in <a class="reference external" href="https://tideways.io">Tideways</a>
+with selected tenant (organization), application, date-range and server environment:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">PageContext</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var \Xhprof\Bundle\OrganizationBundle\Entity\Organization</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$organization</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var \Xhprof\Bundle\OrganizationBundle\Entity\Application</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$application</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var \Xhprof\Common\Date\DateRange</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$selectedDateRange</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var \Xhprof\Bundle\ProfilerBundle\View\EnvironmentView</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$selectedEnvironment</span><span class="p">;</span>
+
+    <span class="c1">// constructor and getters</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This object is created during request boot, in my case with a framework
+listener. The listener checks for access rights and security constraints,
+showing the 403/access denied page when necessary. This make 90% of access
+control checks unneeded that are usually cluttering the controller.</p>
+<p>The context is then made available for the application by using a Symfony
+<a class="reference external" href="https://www.beberlei.de/2013/02/19/extending_symfony2__paramconverter.html">parameter converter</a>, every controller-action can get access to the context
+by type-hinting for it:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">ApplicationController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showAction</span><span class="p">(</span><span class="nx">PageContext</span> <span class="nv">$pageContext</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">'application'</span> <span class="o">=&gt;</span> <span class="nv">$pageContext</span><span class="o">-&gt;</span><span class="na">getApplication</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The beauty of this approach is avoiding global state and passing
+the context around in a non-singleton way. Depending on the framework
+you use, it might be hard to achieve this kind of context injection.</p>
+<p>Now when I build <a class="reference external" href="https://www.beberlei.de/2014/10/14/lightweight_symfony2_controllers.html">lightweight Symfony2 controllers</a>
+in my applications, using a context object allows me to use even less services
+and move repetitive find and access control code outside of the controllers.</p>
+<p>I have also written a Twig extension that gives me access to the context
+object, so I don’t have to return it from every controller and created
+a wrapper for the URL Generation that appends context information
+to every URL (current date range + environment):</p>
+<div class="highlight-jinja2"><div class="highlight"><pre><span/>&lt;h1&gt;{{ pageContext.application.name }}&lt;/h1&gt;
+
+&lt;a href="{{ page_path("some_route") }}"&gt;Link with Context query arguments&lt;/a&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>A context object can help you make global state explicit and control access to
+it. Good requirements for a context object are immutability and not being a
+singleton.</p>
+<p>When used correctly this pattern can save you alot of redundant code and
+simplify both controllers and views massively.</p>
+<p>The pattern has its drawbacks: You have to be careful not put too powerful
+objects into the context and if you can modify the context, then you will
+probably introduce nasty side effets at some point. Additionally if you don’t
+make sure that creating the context is a very fast operation then you will
+suffer from performance hits, because the context is created on every request,
+maybe fetching expensive data that isn’t even used.</p>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/symfony.html">Symfony</a>
+                 / 
+                <a href="tags/designpatterns.html">DesignPatterns</a>
+                 / 
+                <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on March 12, 2017
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2016/05/28/composer_monorepo_plugin_previously_called_fiddler.html">Composer Monorepo Plugin (previously called Fiddler)</a></h1>
 <p>I have <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">written about monorepos</a>
 in this blog before, <a class="reference external" href="https://qafoo.com/resources/presentations/symfony_live_berlin_2015/monorepos.html">presented a talk</a>
@@ -480,219 +656,6 @@ on traits in tests for more information.</p>
         <p>
             <small>
                 Posted on June 12, 2015
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a></h1>
-<blockquote>
-<div>tl;dr Monolithic repositories can bring a lot of benefits. I prototyped
-<a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> that complements Composer
-to add dependency management for monolithic repositories to PHP.</div></blockquote>
-<p>Thanks to <a class="reference external" href="https://twitter.com/iam_asm89">Alexander</a> for discussing this
-topic with me as well as reviewing the draft of this post.</p>
-<p>As Git and Composer are more ubiquitous in open-source projects and within
-companies, monolithic repositories containing multiple projects have become a
-bit of a bad practice. This is a similar trend to how monolithic applications
-are out of fashion and the recent focus on microservices and Docker.</p>
-<p>Composer has made it possible to create many small packages and distribute them
-easily through Packagist. This has massively improved the PHP ecosystem by
-increasing re-usability and sharing.</p>
-<p>But it is important to consider package distribution and development seperate
-from each other. The current progress in package manager tooling comes at a
-cost for version control productivity, because Composer, NPM, Bower force you
-to have exactly one repository for one package to benefit from the
-reusability/distribution.</p>
-<p>This blog post compares monolithic repositories with one repository per package
-approach. It focuses on internal projects and repositories in organizations and
-companies. I will discuss open source projects in a follow-up post.</p>
-<div class="section" id="workflow-at-facebook-google-twitter">
-<h2>Workflow at Facebook, Google, Twitter</h2>
-<p>The move towards smaller repositories is called into question by three extremely
-productive organizations that work at incredible scale.</p>
-<ul class="simple">
-<li>Facebook <a class="reference external" href="https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale">mentioned in their talk “Big Code: Developer Infrastructure at
-Facebook’s Scale”</a>
-that they are going to merge their three big code repositories Server, iOS
-and Android into a single big repository over the course of 2015.</li>
-<li>Google open-sourced <a class="reference external" href="http://bazel.io">Bazel</a>, the build tool behind a huge
-chunk of their codebase managed in a single Perforce repository with over 20 million
-commits (<a class="reference external" href="http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf">Reference</a>).</li>
-<li>Twitter, Foursquare and Square are working on their clone of Google’s Bazel
-build system called <a class="reference external" href="https://pantsbuild.github.io/">Pants</a>. It is also
-designed for monolithic repositories.</li>
-</ul>
-<p>All three companies cite huge developer productivity benefits,
-code-reusability, large-scale refactorings and development at scale for
-choosing this approach. The Facebook talk even mentions how all their
-development infrastructure efforts focus on keeping this workflow because of
-the benefits it brings.</p>
-</div>
-<div class="section" id="downsides-of-having-many-repositories">
-<h2>Downsides of having many Repositories</h2>
-<p>In contrast working with ever smaller repositories can be a huge burden for
-developer mental models: I have seen this in open-source projects such as
-Doctrine and several customer projects:</p>
-<ol class="arabic simple">
-<li>Cross repository changes require certain pull-requests on Github/Gitlab to
-be merged in order or in combination yet the tools don’t provide visibility
-into these dependencies. They are purely informal, leading to high error
-rates.</li>
-<li>Version pinning through NPM and Composer package managers is great for
-managing third party dependencies as long its not too many of them and they
-don’t change too often. For internal dependencies its a lot of work to
-update dependencies between repositories all the time. Time gets lost by
-developers that don’t have the correct dependencies or because of mistakes
-in the merge process.</li>
-<li>Changing code in core libraries can break dependencies without the developer
-even realizing this because tests don’t run together. This introduces a
-longer feedback cycle between code that depends on each other, with all the
-downsides.</li>
-</ol>
-<p>One important remark about monolithic repositories: It does not automatically
-lead to a monolithic code-base. Especially Symfony2 and ZF2 are a very
-good example of how you can build individual components with a clean dependency
-graph in a single big repository.</p>
-<p>At <a class="reference external" href="http://qafoo.com">Qafoo</a> we have always preferred monolithic project
-repositories containing several components over many small independent ones. We
-advised many customers to choose this approach except in some special cases
-where going small was economically more efficient.</p>
-</div>
-<div class="section" id="benefits-of-monolithic-repositories">
-<h2>Benefits of Monolithic Repositories</h2>
-<p>Even if you are not at the scale of Facebook or Google, a single repository
-still provides the mentioned benefits:</p>
-<ul class="simple">
-<li>Adjusting to constant change by factoring out libraries, merging libraries
-and introducing new dependencies for multiple projects is much easier when
-done in a single, atomic VCS commit.</li>
-<li>Discoverability of code is much higher, if you have all the code in a single
-place. Github and Gitlab don’t offer powerful tools like find, grep, sed over
-more than one repository. Hunting down dependencies, in specific versions can
-cost alot of time.</li>
-<li>Reusability increases as it is much easier to just use code from the same
-repository than from another repository. Composer and NPM simplify combining
-repositories at specific versions, however one problem is actually knowing
-that the code exists in the first place.</li>
-<li>From an operational perspective it is much easier to get a new developer
-up to speed setting up projects from a single repository. Just practically
-its easier to add his public key to only one Team/Repository/Directory than
-to hundreds. On top of that setting up many small repositories and
-familiarizing with each of them costs a lot of time.</li>
-</ul>
-<p>This is why I have been struggling with how Packagist and Satis force the move
-to smaller repositories through the technical constraint “one repository equals
-one composer.json file”. For reusable open source projects this is perfectly
-fine, but for company projects I have seen it hurt developer productivity more
-often than is acceptable.</p>
-</div>
-<div class="section" id="introducing-fiddler">
-<h2>Introducing Fiddler</h2>
-<p>So today I prototyped a build system that complements Composer to manage
-multiple separate projects/packages in a single repository. I call it <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a>. Fiddler introduces a maintainable
-approach to managing dependencies for multiple projects in a single repository,
-without losing the benefits of having explicit dependencies for each separate
-project.</p>
-<p>In practice Fiddler allows you to manage all your third-party dependencies using a
-<span class="docutils literal"><span class="pre">composer.json</span></span> file, while adding a new way of managing your internal
-dependencies. It combines both external and internal packages to a single
-pool and allows you to pick them as dependencies for your projects.</p>
-<p>For each project you add a <span class="docutils literal"><span class="pre">fiddler.json</span></span> file where you specify both your
-third-party and internal dependencies. Fiddler will take care of generating a
-specific autoloader for each project, containing only the dependencies of the
-project.  This allows you to have one repository, while still having <em>explicit</em>
-dependencies per project.</p>
-<p>Keeping explicit dependencies for each project means it’s still easy to find
-out which components are affected by changes in internal or third-party
-dependencies.</p>
-</div>
-<div class="section" id="example-project">
-<h2>Example Project</h2>
-<p>Say you have three packages in your application, Library_1, Project_A
-and Project_B and both projects depend on the library which in turn depends
-on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>projects
-├── components
-│   ├── Project_A
-│   │   └── fiddler.json
-│   ├── Project_B
-│   │   └── fiddler.json
-│   └── Library_1
-│       └── fiddler.json
-├── composer.json
-</pre></div>
-</div>
-<p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Library1</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
-    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ProjectA</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
-    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"components/Library_1"</span><span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s2">"~2.6"</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>As you can see dependencies are specified without version constraints and as
-directory paths relative to the project root. Since everything is in one
-repository, all internal code is always versioned, tested and deployed
-together. Dropping the need for explicit versions when specifying internal
-dependencies.</p>
-<p>With this setup you can now generate the autoloading files for each package
-exactly like Composer would by calling:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ php fiddler.phar build
-Building fiddler.json projects.
- [Build] components/Library_1
- [Build] components/Project_A
- [Build] components/Project_B
-</pre></div>
-</div>
-<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">"vendor/autoload.php";</span></span> and it loads an
-autoloader with all the dependencies specified for each component, for example
-in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
-
-<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Component\DependencyInjection\ContainerBuilder</span><span class="p">;</span>
-</pre></div>
-</div>
-<p>This is an early access preview, please test this, provide feedback if you see
-this as a valuable or not and about possible extensions. See the <a class="reference external" href="https://github.com/beberlei/fiddler">README</a> for more details about functionality
-and implementation details.</p>
-<p>The code is very rough and simple right now, you will probably stumble accross
-some bugs, please <a class="reference external" href="https://github.com/beberlei/fiddler/issues">report them</a>.
-It is stable enough so that we could actually port <a class="reference external" href="https://tideways.io">Tideways</a> to it already which is a multi package repository.</p>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/monorepos.html">Monorepos</a>
-                 / 
-                <a href="tags/composer.html">Composer</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on April 11, 2015
                  by Benjamin Eberlei
             </small>
         </p>

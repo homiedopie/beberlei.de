@@ -63,6 +63,64 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/01/24/complaining-about-zend-filter-input.html">Complaining about Zend_Filter_Input</a></h1>
+<p>Zend_Filter_Input is really nice to be sure form data is filtered
+correctly, but i have some serious complaints: Why the hell are the
+error messages so user-unfriendly? I really would like to use the output
+of Zend_Filter_Input::getMessages(), but I could never trust to show
+them to a user of my website: They are obviously written for developers.
+Some examples:</p>
+<blockquote>
+<div>‘’ does not appear to be an integer ‘’ is an empty string</div></blockquote>
+<p>I use a ton of validators to filter the comments form and all possible
+error messages that can be thrown are not “user-save”. Because all these
+messages are handled in each Validator class its almost impossible to
+change them without going nuts:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">$validators = array(</span>
+<span class="x">    'article_id' =&gt; array(</span>
+<span class="x">        'Int',</span>
+<span class="x">        new Zend_Validate_Int(),</span>
+<span class="x">        array('GreaterThan', 0)</span>
+<span class="x">        ),</span>
+<span class="x">    'username' =&gt; 'Alnum',</span>
+<span class="x">    'userEmail' =&gt; new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL, true),</span>
+<span class="x">    'cp'   =&gt; array(</span>
+<span class="x">        'Digits',                // string</span>
+<span class="x">        new Zend_Validate_Int(), // object instance</span>
+<span class="x">        array('Between', 1138, 1138)  // string with constructor arguments</span>
+<span class="x">    ),</span>
+<span class="x">    'comment' =&gt; 'NotEmpty',</span>
+<span class="x">);</span>
+</pre></div>
+</div>
+<p>This simple $validators requirement creates templates for error
+messages in each validator object, that are: Zend_Validate_Int,
+Zend_Validate_Alnum, Zend_Validate_EmailAddress,
+Zend_Validate_Hostname, and the not empty message. To allow for user
+friendly messages one had to make child objects of each of the
+Validators and edit the error messages accordingly. I avoid this by
+printing my own errors from outside the Zend_Filter_Input, rather than
+using the object for what it is probably supposed to do.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 24, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/01/24/how-my-zend-db-table-models-look-like.html">How my Zend_Db_Table models look like</a></h1>
 <p>I am not too happy with the ZF Frameworks Table access solution. Not
 that I have anything against the <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Gateway
@@ -318,52 +376,6 @@ lag length:</p>
             <small>
                 Posted on April 27, 2008
                  by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/09/05/jquery-component-approved-for-extras-library.html">jQuery Component approved for extras library</a></h1>
-<p>Yesterday both my jQuery Helper proposals (<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery_View_Helper_JQuery+-+Benjamin+Eberlei">Core
-Helper</a>,
-<a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/ZendX_JQuery+UI+Widgets+Extension+-+Benjamin+Eberlei?focusedCommentId=7373203#comment-7373203">UI
-Widgets</a>)
-for the Zend Framework have been accepted for development. I have
-already checked my working prototypes <a class="reference external" href="http://framework.zend.com/svn/framework/extras/incubator/">into the Zend Framework
-SVN</a>. In my
-opinion the usage is quite stable already. There is likely to be no
-argument flip, function renaming or whatsoever. I have renamed the
-jqLink helper to ajaxLink though, because other libraries are offering
-the same functionality to make Ajax related calls and this way the
-learning curve for people using different libraries in different
-projects may be more easy.</p>
-<p>What is still missing? I have to add captureStart()/captureEnd()
-functions to the Container Widgets Accordion and Tabs, and will create
-additional pane helpers for both of them. This will likely be finished
-this weekend and then there is only the documentation missing. I am very
-confident this component will be finished for the Zend Framework 1.7
-release later this year.</p>
-<p>Since this component also includes helpers for the jQuery UI Widgets 1.6
-release (which is not released yet), a little waiting time before
-release is still good. I hope this all works out and the jQuery UI 1.6
-release is in the Google CDN, when ZF 1.7 comes out.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/jquery.html">jQuery</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on September 05, 2008
-                
             </small>
         </p>
     </div>

@@ -63,6 +63,142 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2012/06/03/setting_up_development_machines_with_puppet.html">Setting up Development Machines with Puppet</a></h1>
+<p>I wrote <a class="reference external" href="/2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">about Vagrant</a> last week and
+mentioned to talk about <a class="reference external" href="http://puppetlabs.com/puppet/what-is-puppet/">Puppet</a> in the future. Before I will
+dive into Puppet in combination with Vagrant I want to share my general
+experiences with Puppet (beginners level, I just played with this today).</p>
+<p>Puppet is a configuration management tool. It uses a declarative language to
+describe how a system should look like. Upon invocation of puppet it attempts
+to get the system from its current state into the desired state by installing
+packages, executing programs/scripts and creating files/directories.</p>
+<p>My laptop was still on Ubuntu 10.04 this morning, but for <a class="reference external" href="http://live.symfony.com">Symfony Live</a> I needed to upgrade to 12.04. This was necessary to
+run a Virtualbox VM on my laptop that I built on my 12.04 desktop. Additionally
+I really like the Unity desktop and wanted to get away from the Gnome that is
+in 10.04.</p>
+<p>After a backup and fresh installation of Ubuntu I realized how many things I
+have to install to get this machine productive:</p>
+<ul class="simple">
+<li>LAMP stack + a bunch of other databases and services</li>
+<li>Git, Svn, Hg, ..</li>
+<li>Virtualbox + Vagrant</li>
+<li>Vim with my Dot-Files, including Command-T which requires compilation,
+and a bunch of development tools such as tree, ack-grep.</li>
+<li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
+<li>Git with Author Information and global ignore file</li>
+<li>A bunch of .bashrc initializations</li>
+<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
+<li>and I probably forgot a bunch of tools just thinking about this today.</li>
+</ul>
+<p>I realized not only virtual machines, but also their hosts (my development
+machines) could be automatically setup with Puppet.</p>
+<p>So instead of saving my <span class="docutils literal"><span class="pre">.bash_history</span></span> to remember the steps I automated
+them using Puppet. In Puppet you define Resources of several types, for example
+Files, Packages or shell commands. You group these resources together in a
+<span class="docutils literal"><span class="pre">.pp</span></span> file and then invoke <span class="docutils literal"><span class="pre">puppet</span> <span class="pre">apply</span> <span class="pre">&lt;file&gt;.pp</span></span>. You can install Puppet
+via <span class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">puppet</span></span> on Ubuntu.</p>
+<p>The idea is to define Puppet resources in a way that they are performed once and
+then the system has this resource. This means you can run puppet as often as
+you want and it will only activate the missing resources.</p>
+<p>I separate the installation process into two puppet files, one that has to be
+run with root <span class="docutils literal"><span class="pre">~/.puppet/devmachine-root.pp</span></span> and another one that has to be run with
+my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
+<p>Because every dev-machine setup is unique, I will just show some
+examples of my puppet file to get the message across:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
+
+<span class="c1"># VIM Dot Files</span>
+<span class="n">vcsrepo</span> <span class="p">{</span> <span class="s1">'vim-dotfiles'</span><span class="p">:</span>
+    <span class="n">path</span>     <span class="o">=&gt;</span> <span class="s2">"/home/$id/.vim"</span><span class="p">,</span>
+    <span class="n">ensure</span>   <span class="o">=&gt;</span> <span class="n">present</span><span class="p">,</span>
+    <span class="n">provider</span> <span class="o">=&gt;</span> <span class="n">git</span><span class="p">,</span>
+    <span class="n">source</span>   <span class="o">=&gt;</span> <span class="s1">'https://...'</span>
+<span class="p">}</span>
+
+<span class="n">file</span> <span class="p">{</span> <span class="s1">'vim-dotfiles-symlink'</span><span class="p">:</span>
+    <span class="n">path</span>   <span class="o">=&gt;</span> <span class="s2">"/home/$id/.vimrc"</span><span class="p">,</span>
+    <span class="n">ensure</span> <span class="o">=&gt;</span> <span class="n">link</span><span class="p">,</span>
+    <span class="n">target</span> <span class="o">=&gt;</span> <span class="s1">'.vim/vimrc'</span><span class="p">,</span>
+    <span class="n">require</span> <span class="o">=&gt;</span> <span class="n">Vcsrepo</span><span class="p">[</span><span class="s1">'vim-dotfiles'</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">exec</span> <span class="p">{</span> <span class="s1">'vim-make-command-t'</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'rake make'</span><span class="p">,</span>
+    <span class="n">cwd</span>     <span class="o">=&gt;</span> <span class="s2">"/home/$id/.vim/bundle/Command-T"</span><span class="p">,</span>
+    <span class="n">unless</span>  <span class="o">=&gt;</span> <span class="s2">"ls -aFlh /home/$id/.vim/bundle/Command-T|grep 'command-t.recipe'"</span><span class="p">,</span>
+    <span class="n">require</span> <span class="o">=&gt;</span> <span class="n">Vcsrepo</span><span class="p">[</span><span class="s1">'vim-dotfiles'</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The three keywords <span class="docutils literal"><span class="pre">vcsrepo</span></span>, <span class="docutils literal"><span class="pre">file</span></span> and <span class="docutils literal"><span class="pre">exec</span></span> are called types. They
+define what functionality should be executed by puppet. Vcsrepo is a custom
+type that you can grab <a class="reference external" href="https://github.com/puppetlabs/puppetlabs-vcsrepo.git">from Github</a>.</p>
+<ul class="simple">
+<li>The first block uses Git to make sure that in my home directory the
+<span class="docutils literal"><span class="pre">~/.vim</span></span> directory is a checkout of a given remote git repository.</li>
+<li>The second file block makes sure that <span class="docutils literal"><span class="pre">~/.vimrc</span></span> points to <span class="docutils literal"><span class="pre">~/.vim/vimrc</span></span>
+using a symlink.</li>
+<li>The third block compiles the Command-T VIM plugin. Inside the
+exec block you can see the unless condition. This is necessary to prevent the
+command from being executed whenever <span class="docutils literal"><span class="pre">devmachine.pp</span></span> is executed with
+puppet. The require makes sure this resource is only activated after the dotfiles
+were installed.</li>
+</ul>
+<p>Another nice example is the configuration of Git:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># Configure Git</span>
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-author-name"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'git config --global user.name "Benjamin Eberlei"'</span><span class="p">,</span>
+    <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">"git config --global --get user.name|grep 'Benjamin Eberlei'"</span>
+<span class="p">}</span>
+
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-author-email"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'git config --global user.email "kontakt@beberlei.de"'</span><span class="p">,</span>
+    <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">"git config --global --get user.email|grep 'kontakt@beberlei.de'"</span>
+<span class="p">}</span>
+
+<span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-global-ignore"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=&gt;</span> <span class="s2">"git config --global core.excludesfile /home/$id/.gitignore"</span><span class="p">,</span>
+    <span class="n">unless</span>  <span class="o">=&gt;</span> <span class="s1">'git config -l --global|grep excludesfile'</span>
+<span class="p">}</span>
+
+<span class="n">file</span> <span class="p">{</span> <span class="s2">"git-global-ignorefile"</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=&gt;</span> <span class="s2">"/home/$id/.gitignore"</span><span class="p">,</span>
+    <span class="n">ensure</span> <span class="o">=&gt;</span> <span class="n">present</span><span class="p">,</span>
+    <span class="n">content</span> <span class="o">=&gt;</span> <span class="s2">"*.swo</span><span class="se">\n</span><span class="s2">*.swp</span><span class="se">\n</span><span class="s2">"</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here A bunch of commands is executed unless some option is already set. At last
+the global .gitingore is filled with the patterns of Vim temporary files.</p>
+<p>I also automated all the other steps listed above, but will spare you the
+details. For the LAMP Stack + PHP I used the now defunct
+dietervds/puppet-symfony2 repository as an inspiration. It ships a
+set of Puppet Modules. You can just put them into your <span class="docutils literal"><span class="pre">~/.puppet/modules</span></span>
+folder and they are then available in any of your puppet files.</p>
+<p>I can now reuse this on the different machines: desktop at home and at work and
+my laptop. Whenever I install a new tool or change some configuration of my
+system I can directly put this into puppet and keep the setup synchronized on
+all the machines I work with.</p>
+<p>You can find more detailed resources on the PuppetLabs website:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.puppetlabs.com/learning/ral.html">Tutorial</a></li>
+<li><a class="reference external" href="http://docs.puppetlabs.com/references/latest/type.html">Type Reference</a></li>
+<li><a class="reference external" href="docs.puppetlabs.com/puppet_core_types_cheatsheet.pdf">Type Cheat Sheet</a></li>
+</ul>
+
+
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 03, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/05/31/virtual_machines_with_vagrant__veewee_and_puppet.html">Virtual Machines with Vagrant, Veewee and Puppet</a></h1>
 <p>I have been playing with Vagrant these last days, a tool to automate Virtualbox
 VM management very efficiently. Being always late to new technologies
@@ -461,150 +597,6 @@ of the success or failure.</p>
         <p>
             <small>
                 Posted on February 07, 2010
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
-<p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
-2</a> we plan to integrate pessimistic
-Database-level locks across all the supported vendors (MySQL, Oracle,
-PostgreSql, IBM DB2 so far). This means row-level locking as defined in
-the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
-optionally in DQL Queries and Finder methods. The Implementation of this
-extension to SELECT statements is rather trivial, however functional
-testing of this feature is not.</p>
-<p>A general approach would look like this:</p>
-<ol class="arabic simple">
-<li>Run Query 1 and 2 with FOR UPDATE into the background</li>
-<li>Have both queries lock the row for a specified time x (using sleep)</li>
-<li>Verify that one of the two processes/threads runs approximately 2*x
-the lock time.</li>
-</ol>
-<p>Since PHP does not support process forking or threads naturally you run
-into a serious problem. How do you execute two database queries in
-parallel and verify that indeed one query is locking read access for the
-second one?</p>
-<p>Side note: There are some drawbacks to this testing approach. It could
-be that one background threads finishes the lock sleep already when the
-second just starts. The locking would work in these cases, however the
-lock time would not nearly be 2*x seconds, producing a test-failure. We
-are talking about a functional test though and I will accept a failure
-from time to time just to be 99% sure that locking works.</p>
-<p>Solving this problem with Gearman provides a pretty nice “real-world”
-example for the Job-Server that I wanted to share. This blog post
-contains a stripped down code-example from the Doctrine 2 testsuite. If
-you are interested, you can see the complete Gearman Locking Tests in
-<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
-GitHub</a>.</p>
-<p>Gearman allows to register worker processes with the job-server and
-offers clients to execute jobs on those workers in parallel. After
-installing the Gearman job-server and PHP pecl/gearman extension
-(<a class="reference external" href="http://toys.lerdorf.com/archives/51-Playing-with-Gearman.html">Rasmus Lerdorf has a post on
-installation</a>)
-we can go on writing our locking tests with Gearman.</p>
-<p>The first bit is the worker, a PHP script that tries to acquire a
-database lock and then sleeps for a second. The return value of this
-script is the total time required for acquiring the lock and sleeping.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class LockAgentWorker</span>
-<span class="x">{</span>
-<span class="x">    public function findWithLock($job)</span>
-<span class="x">    {</span>
-<span class="x">        $fixture = $this-&gt;processWorkload($job); // setup doctrine in here</span>
-
-<span class="x">        $s = microtime(true);</span>
-<span class="x">        $this-&gt;em-&gt;beginTransaction();</span>
-
-<span class="x">        $entity = $this-&gt;em-&gt;find($fixture['entityName'], $fixture['entityId'], $fixture['lockMode']);</span>
-
-<span class="x">        sleep(1);</span>
-<span class="x">        $this-&gt;em-&gt;rollback(); // clean up doctrine</span>
-
-<span class="x">        return (microtime(true) - $s);</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>The glue-code for the worker script contains of the registering of the
-worker method with the job-server and a simple infinite loop:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">$lockAgent = new LockAgentWorker();</span>
-
-<span class="x">$worker = new \GearmanWorker();</span>
-<span class="x">$worker-&gt;addServer();</span>
-<span class="x">$worker-&gt;addFunction("findWithLock", array($lockAgent, "findWithLock"));</span>
-
-<span class="x">while($worker-&gt;work()) {</span>
-<span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
-<span class="x">        break;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>We need two running workers for this to work, since one worker only
-processes one task at a time. Just open up two terminals and launch the
-php scripts. They will wait for their first task to process.</p>
-<p>Now we need to write our PHPUnit TestCase, which will contain a
-GearmanClient to execute two of the “findWithLock” in parallel. Our
-locking assertion will work like this:</p>
-<ol class="arabic simple">
-<li>Register two tasks for the “findWithLock” method that access the same
-database row.</li>
-<li>Register a completed callback using
-“GearmanClient::setCompleteCallback()” that collects the run-time of
-the individual workers.</li>
-<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
-<li>Assert that the maximum run-time is around 2 seconds (since each
-worker sleeps 1 second)</li>
-</ol>
-<p>The code for this steps could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
-<span class="x">{</span>
-<span class="x">    private $gearman = null;</span>
-<span class="x">    private $maxRunTime = 0;</span>
-<span class="x">    private $articleId;</span>
-
-<span class="x">    public function testLockIsAcquired()</span>
-<span class="x">    {</span>
-<span class="x">        // .. write fixture data into the database</span>
-
-<span class="x">        $gearman = new \GearmanClient();</span>
-<span class="x">        $gearman-&gt;addServer();</span>
-<span class="x">        $gearman-&gt;setCompleteCallback(array($this, "gearmanTaskCompleted"));</span>
-
-<span class="x">        $workload = array(); // necessary workload data to configure workers</span>
-<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
-<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
-
-<span class="x">        $gearman-&gt;runTasks();</span>
-
-<span class="x">        $this-&gt;assertTrue($this-&gt;maxRunTime &gt;= 2);</span>
-<span class="x">    }</span>
-
-<span class="x">    public function gearmanTaskCompleted($task)</span>
-<span class="x">    {</span>
-<span class="x">        $this-&gt;maxRunTime = max($this-&gt;maxRunTime, $task-&gt;data());</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>Now if both workers are waiting for processing the task we can run this
-test and get a green bar for a working lock support.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/testing.html">Testing</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on May 02, 2010
                 
             </small>
         </p>

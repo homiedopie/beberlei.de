@@ -63,6 +63,50 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/07/30/php-codesniffer-support-for-netbeans.html">PHP CodeSniffer Support for Netbeans</a></h1>
+<p>I dived into the code of my new favorite IDE
+<a class="reference external" href="http://www.netbeans.org">Netbeans</a> these last days and came up with
+an <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/tree/master">extension
+module</a>,
+which adds PHP CodeSniffer Support on a per file basis to make my life
+much easier. It shows warnings and errors as annotations to the Editor
+and marks the affected lines in yellow and red.</p>
+<p><a class="reference external" href="http://cloud.github.com/downloads/beberlei/netbeans-php-enhancements/netbeans_cs_support.png">|image0|</a></p>
+<p>[STRIKEOUT:My Java skills being very bad, it will only work on Linux
+currently, since the PHP Code Sniffer “binary” is hardcoded into the
+Java Source code. You have to create a “/usr/bin/phpcs2” executable,
+which is a wrapper that looks like:]</p>
+<p>With Manuals extensions (see the comments) the module now works without
+the wrapper script. It might even work under Windows now. Yet now the
+Zend Coding standard is enforced though. I am working on making that one
+configurable next.</p>
+<p>You can install the <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements/downloads">NBM module install
+file</a>
+from the GitHub repository into Netbeans and it “should” work then.</p>
+<p>I hope to get more familiar with Netbeans in the future to add some more
+PHP tools and enhance Code Sniffer support.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/codequality.html">CodeQuality</a>
+                 / 
+                <a href="tags/netbeans.html">Netbeans</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on July 30, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/07/04/using-symfony-dependency-injection-with-zend-application.html">Using Symfony Dependency Injection with Zend_Application</a></h1>
 <p>As a follow-up to my <a class="reference external" href="http://www.whitewashing.de/blog/articles/117">recent
 post</a> on Dependency
@@ -331,72 +375,6 @@ reindexed and deletes multiple entries of one article.</p>
         <p>
             <small>
                 Posted on May 18, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/05/17/integrated-zend-layout-into-this-blog.html">Integrated Zend_Layout into this blog</a></h1>
-<p>I finished with integrating Zend_Layout into this blog software today.
-At first I thought it is quite hard to use especially if you want to
-integrate dynamic navigational contents depending on the current
-module/controller/action setup. But I came up with a combination of
-actionStack and Named Response Sections as <a class="reference external" href="http://framework.zend.com/manual/en/zend.layout.quickstart.html#zend.layout.quickstart.mvc">described in the ZF
-Documentation of the Layout
-component</a>,
-which is quite easy to understand, use and extend.</p>
-<p>At each of the major Controllers I put different actions from a specific
-Navigation Controller on the
-<a class="reference external" href="http://framework.zend.com/manual/en/zend.controller.actionhelpers.html#zend.controller.actionhelpers.actionstack">ActionStack</a>
-(mostly global per Controller using the init() class method).</p>
-<p>A typical controller looks like this:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class BlogController extends Zend_Controller_Action
-{
-    public function init()
-    {
-        $this-&gt;_helper-&gt;actionStack('tagcloud', 'Navigation');
-        $this-&gt;_helper-&gt;actionStack('userinfo', 'Navigation');
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>The NavigationController looks like this:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class NavigationController extends Zend_Controller_Action
-{
-    public function tagcloudAction()
-    {
-        // Do not render the content of this action to the default output.
-        $this-&gt;getHelper("ViewRenderer")-&gt;setNoRender();
-
-        [...]
-
-        // Append content to secondaryNavigation named response section
-        $this-&gt;getResponse()-&gt;append('secondaryNavigation', $this-&gt;view-&gt;render('navigation/tagcloud.phtml'));
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>The layout.pthml then just calls certain named sections, for example &lt;=?
-$this-&gt;layout()-&gt;secondaryNavigation; ?&gt;</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on May 17, 2008
                 
             </small>
         </p>

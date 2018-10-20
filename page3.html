@@ -63,6 +63,219 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2015/04/11/monolithic_repositories_with_php_and_composer.html">Monolithic Repositories with PHP and Composer</a></h1>
+<blockquote>
+<div>tl;dr Monolithic repositories can bring a lot of benefits. I prototyped
+<a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> that complements Composer
+to add dependency management for monolithic repositories to PHP.</div></blockquote>
+<p>Thanks to <a class="reference external" href="https://twitter.com/iam_asm89">Alexander</a> for discussing this
+topic with me as well as reviewing the draft of this post.</p>
+<p>As Git and Composer are more ubiquitous in open-source projects and within
+companies, monolithic repositories containing multiple projects have become a
+bit of a bad practice. This is a similar trend to how monolithic applications
+are out of fashion and the recent focus on microservices and Docker.</p>
+<p>Composer has made it possible to create many small packages and distribute them
+easily through Packagist. This has massively improved the PHP ecosystem by
+increasing re-usability and sharing.</p>
+<p>But it is important to consider package distribution and development seperate
+from each other. The current progress in package manager tooling comes at a
+cost for version control productivity, because Composer, NPM, Bower force you
+to have exactly one repository for one package to benefit from the
+reusability/distribution.</p>
+<p>This blog post compares monolithic repositories with one repository per package
+approach. It focuses on internal projects and repositories in organizations and
+companies. I will discuss open source projects in a follow-up post.</p>
+<div class="section" id="workflow-at-facebook-google-twitter">
+<h2>Workflow at Facebook, Google, Twitter</h2>
+<p>The move towards smaller repositories is called into question by three extremely
+productive organizations that work at incredible scale.</p>
+<ul class="simple">
+<li>Facebook <a class="reference external" href="https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale">mentioned in their talk “Big Code: Developer Infrastructure at
+Facebook’s Scale”</a>
+that they are going to merge their three big code repositories Server, iOS
+and Android into a single big repository over the course of 2015.</li>
+<li>Google open-sourced <a class="reference external" href="http://bazel.io">Bazel</a>, the build tool behind a huge
+chunk of their codebase managed in a single Perforce repository with over 20 million
+commits (<a class="reference external" href="http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf">Reference</a>).</li>
+<li>Twitter, Foursquare and Square are working on their clone of Google’s Bazel
+build system called <a class="reference external" href="https://pantsbuild.github.io/">Pants</a>. It is also
+designed for monolithic repositories.</li>
+</ul>
+<p>All three companies cite huge developer productivity benefits,
+code-reusability, large-scale refactorings and development at scale for
+choosing this approach. The Facebook talk even mentions how all their
+development infrastructure efforts focus on keeping this workflow because of
+the benefits it brings.</p>
+</div>
+<div class="section" id="downsides-of-having-many-repositories">
+<h2>Downsides of having many Repositories</h2>
+<p>In contrast working with ever smaller repositories can be a huge burden for
+developer mental models: I have seen this in open-source projects such as
+Doctrine and several customer projects:</p>
+<ol class="arabic simple">
+<li>Cross repository changes require certain pull-requests on Github/Gitlab to
+be merged in order or in combination yet the tools don’t provide visibility
+into these dependencies. They are purely informal, leading to high error
+rates.</li>
+<li>Version pinning through NPM and Composer package managers is great for
+managing third party dependencies as long its not too many of them and they
+don’t change too often. For internal dependencies its a lot of work to
+update dependencies between repositories all the time. Time gets lost by
+developers that don’t have the correct dependencies or because of mistakes
+in the merge process.</li>
+<li>Changing code in core libraries can break dependencies without the developer
+even realizing this because tests don’t run together. This introduces a
+longer feedback cycle between code that depends on each other, with all the
+downsides.</li>
+</ol>
+<p>One important remark about monolithic repositories: It does not automatically
+lead to a monolithic code-base. Especially Symfony2 and ZF2 are a very
+good example of how you can build individual components with a clean dependency
+graph in a single big repository.</p>
+<p>At <a class="reference external" href="http://qafoo.com">Qafoo</a> we have always preferred monolithic project
+repositories containing several components over many small independent ones. We
+advised many customers to choose this approach except in some special cases
+where going small was economically more efficient.</p>
+</div>
+<div class="section" id="benefits-of-monolithic-repositories">
+<h2>Benefits of Monolithic Repositories</h2>
+<p>Even if you are not at the scale of Facebook or Google, a single repository
+still provides the mentioned benefits:</p>
+<ul class="simple">
+<li>Adjusting to constant change by factoring out libraries, merging libraries
+and introducing new dependencies for multiple projects is much easier when
+done in a single, atomic VCS commit.</li>
+<li>Discoverability of code is much higher, if you have all the code in a single
+place. Github and Gitlab don’t offer powerful tools like find, grep, sed over
+more than one repository. Hunting down dependencies, in specific versions can
+cost alot of time.</li>
+<li>Reusability increases as it is much easier to just use code from the same
+repository than from another repository. Composer and NPM simplify combining
+repositories at specific versions, however one problem is actually knowing
+that the code exists in the first place.</li>
+<li>From an operational perspective it is much easier to get a new developer
+up to speed setting up projects from a single repository. Just practically
+its easier to add his public key to only one Team/Repository/Directory than
+to hundreds. On top of that setting up many small repositories and
+familiarizing with each of them costs a lot of time.</li>
+</ul>
+<p>This is why I have been struggling with how Packagist and Satis force the move
+to smaller repositories through the technical constraint “one repository equals
+one composer.json file”. For reusable open source projects this is perfectly
+fine, but for company projects I have seen it hurt developer productivity more
+often than is acceptable.</p>
+</div>
+<div class="section" id="introducing-fiddler">
+<h2>Introducing Fiddler</h2>
+<p>So today I prototyped a build system that complements Composer to manage
+multiple separate projects/packages in a single repository. I call it <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a>. Fiddler introduces a maintainable
+approach to managing dependencies for multiple projects in a single repository,
+without losing the benefits of having explicit dependencies for each separate
+project.</p>
+<p>In practice Fiddler allows you to manage all your third-party dependencies using a
+<span class="docutils literal"><span class="pre">composer.json</span></span> file, while adding a new way of managing your internal
+dependencies. It combines both external and internal packages to a single
+pool and allows you to pick them as dependencies for your projects.</p>
+<p>For each project you add a <span class="docutils literal"><span class="pre">fiddler.json</span></span> file where you specify both your
+third-party and internal dependencies. Fiddler will take care of generating a
+specific autoloader for each project, containing only the dependencies of the
+project.  This allows you to have one repository, while still having <em>explicit</em>
+dependencies per project.</p>
+<p>Keeping explicit dependencies for each project means it’s still easy to find
+out which components are affected by changes in internal or third-party
+dependencies.</p>
+</div>
+<div class="section" id="example-project">
+<h2>Example Project</h2>
+<p>Say you have three packages in your application, Library_1, Project_A
+and Project_B and both projects depend on the library which in turn depends
+on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>projects
+├── components
+│   ├── Project_A
+│   │   └── fiddler.json
+│   ├── Project_B
+│   │   └── fiddler.json
+│   └── Library_1
+│       └── fiddler.json
+├── composer.json
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"Library1</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
+    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"vendor/symfony/dependency-injection"</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ProjectA</span><span class="se">\\</span><span class="s2">"</span><span class="p">:</span> <span class="s2">"src/"</span><span class="p">}},</span>
+    <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"components/Library_1"</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+    <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"symfony/dependency-injection"</span><span class="p">:</span> <span class="s2">"~2.6"</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As you can see dependencies are specified without version constraints and as
+directory paths relative to the project root. Since everything is in one
+repository, all internal code is always versioned, tested and deployed
+together. Dropping the need for explicit versions when specifying internal
+dependencies.</p>
+<p>With this setup you can now generate the autoloading files for each package
+exactly like Composer would by calling:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>$ php fiddler.phar build
+Building fiddler.json projects.
+ [Build] components/Library_1
+ [Build] components/Project_A
+ [Build] components/Project_B
+</pre></div>
+</div>
+<p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">"vendor/autoload.php";</span></span> and it loads an
+autoloader with all the dependencies specified for each component, for example
+in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
+
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Symfony\Component\DependencyInjection\ContainerBuilder</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This is an early access preview, please test this, provide feedback if you see
+this as a valuable or not and about possible extensions. See the <a class="reference external" href="https://github.com/beberlei/fiddler">README</a> for more details about functionality
+and implementation details.</p>
+<p>The code is very rough and simple right now, you will probably stumble accross
+some bugs, please <a class="reference external" href="https://github.com/beberlei/fiddler/issues">report them</a>.
+It is stable enough so that we could actually port <a class="reference external" href="https://tideways.io">Tideways</a> to it already which is a multi package repository.</p>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/monorepos.html">Monorepos</a>
+                 / 
+                <a href="tags/composer.html">Composer</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on April 11, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/02/26/integrate_symfony_and_webpack.html">Integrate Symfony and Webpack</a></h1>
 <p>Asset Management in Symfony2 is handled with the PHP based library Assetic by
 default, however I have never really connected to this library and at least for
@@ -735,82 +948,6 @@ code.</p>
         <p>
             <small>
                 Posted on February 10, 2015
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a></h1>
-<p>I haven’t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
-alternative PHP runtime didn’t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
-Profiler</a> would run out of the box with HHVM using the
-<a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">builtin XHProf extension</a>
-(Answer: It does).</p>
-<p>For this experiment I wanted to run the wordpress blog of my wife on HHVM
-locally. It turns out this is not very easy with an existing LAMP stack,
-because mod-php5 and mod-fastcgi obviously compete for the execution of <cite>.php</cite>
-files.</p>
-<p>Quick googling didn’t turn up a solution (there probably is one, hints in the
-comments are appreciated) and I didn’t want to install a Vagrant Box just for
-this. So I decided to turn this into a sunday side project. Requirements: A
-simple webserver that acts as proxy in front of HHVMs Fast-CGI. Think of it as
-the “builtin webserver” that HHVM is missing.</p>
-<p>This turns out to be really simple with Go, a language I use a lot for small
-projects in the last months.</p>
-<p>The code is <a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">very simple plumbing</a>
-starting with a HTTP Server that accepts client requests, translates them to FastCGI
-requests, sending them to HHVM and then parsing the FastCGI Response to turn it into a
-HTTP Response.</p>
-<p>As a PHP developer I am amazed how Go makes it easy to write this kind of
-infrastructure tooling. I prefer PHP for everything web related, but as I tried
-to explain in <a class="reference external" href="https://joind.in/event/view/2564">my talk at PHPBenelux last week</a>, Go is a fantastic language to write
-small, self-contained infrastructure components (or Microservices if you want a
-buzzword).</p>
-<p>Back to playing with HHVM, if you want to give your application a try with HHVM
-instead of ZendEngine PHP it boils down to <a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">installing a prebuilt HHVM package</a> and then
-using my <span class="docutils literal"><span class="pre">hhvm-serve</span></span> command:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ go get github.com/beberlei/hhvm-serve
-$ hhvm-serve --document-root /var/www
-Listening on http://localhost:8080
-Document root is /var/www
-Press Ctrl-C to quit.
-</pre></div>
-</div>
-<p>The server passes all the necessary environment variables to HHVM so that
-catch-all front-controller scripts such as Wordpress <span class="docutils literal"><span class="pre">index.php</span></span> or Symfony’s
-<span class="docutils literal"><span class="pre">app.php</span></span> should just work.</p>
-<p>If you don’t have a running Go Compiler setup this few lines should help you out on
-Ubuntu:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ sudo apt-get install golang
-$ GOPATH=~/go
-$ mkdir -p ~/go/{src,bin,pkg}
-$ PATH="$GOPATH/bin:$PATH"
-</pre></div>
-</div>
-<p>You should put the <span class="docutils literal"><span class="pre">$GOPATH</span></span> and <span class="docutils literal"><span class="pre">$PATH</span></span> changes into your bashrc to make this
-a permanent solution.</p>
-<p>Starting to run HHVM, a Wordpress installation is a good first candidate to
-check on, as I knew from HHVM team blog posts that Wordpress works. Using a
-simple siege based benchmark I was able to trigger the JIT compiler and the
-Profiler charts showed a nice performance boost minute after minute as HHVM
-replaces dynamic PHP with optimized (assembler?) code.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/go.html">Go</a>
-                 / 
-                <a href="tags/hhvm.html">HHVM</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 01, 2015
                  by Benjamin Eberlei
             </small>
         </p>

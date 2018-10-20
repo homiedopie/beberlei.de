@@ -63,6 +63,122 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2013/09/04/decoupling_from_symfony_security_and_fosuserbundle.html">Decoupling from Symfony Security and FOSUserBundle</a></h1>
+<p>In this blog post I will show how to decouple your core application
+from the Symfony Security component and User bundles such as the FOSUserBundle.</p>
+<p>In my opinion a framework has to be evaluated by how much it allows you to hide
+it from your actual application. This blog post will add another perspective on
+how to achieve decoupling from Symfony user and security with a very simple
+approach. With this puzzle piece and others I wrote about before (<a class="reference external" href="http://whitewashing.de/2013/06/27/extending_symfony2__controller_utilities.html">Controllers
+as Service</a>,
+<a class="reference external" href="http://whitewashing.de/2013/02/19/extending_symfony2__paramconverter.html">Param Converters</a>)
+and other pieces I still need to write about, I would classify Symfony2 as a
+good framework.</p>
+<p>A number of other authors have written blog posts on decoupling Symfony and your model
+code as well, such as William Durand <a class="reference external" href="http://williamdurand.fr/2013/08/07/ddd-with-symfony2-folder-structure-and-code-first/">on project structure</a>
+, Matthias Verraes <a class="reference external" href="http://verraes.net/2011/10/code-folder-structure/">on project structure as well</a>
+and on <a class="reference external" href="http://verraes.net/2013/04/decoupling-symfony2-forms-from-entities/">Decoupling Forms from Entities</a>.</p>
+<p>User management breaks the isolation of your business model open,
+by introducing the <span class="docutils literal"><span class="pre">UserInterface</span></span> from the Security component into your
+code base. In combination with the <em>FOSUserBundle</em> this can cause a dependency
+on quite a bit of code already because I wouldn’t call the <span class="docutils literal"><span class="pre">FOS\UserBundle\Model\User</span></span> object
+leightweight. However this and other FriendsOfSymfony bundles
+are very helpful to get annoying features of your application done in a matter
+of hours.</p>
+<p>You can decouple the <em>FOSUserBundle</em> from our own entities and code by
+introducing a second object that representes the user concept in our model.
+The <span class="docutils literal"><span class="pre">UserInterface</span></span> entities need fields for username, password, enabled and
+some more. Except the username and email, the business model rarely needs other
+properties.</p>
+<p>Take an ecommerce system as example, where customers can register as users.
+In this example we could create two entities <span class="docutils literal"><span class="pre">MyProject\UserBundle\Entity\User</span></span> and
+<span class="docutils literal"><span class="pre">MyProject\ShopBundle\Entity\Customer</span></span>. Two strategies exist now:</p>
+<ol class="arabic simple">
+<li>Use the same table for both entities with some shared and other exclusive columns</li>
+<li>Use different tables in the database</li>
+</ol>
+<p>I haven’t tried the first option yet, so I cannot say much about the feasibility.</p>
+<p>For case two, the <span class="docutils literal"><span class="pre">User</span></span> entity looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="c1">// src/MyProject/UserBundle/Entity/User.php;</span>
+
+<span class="k">namespace</span> <span class="nx">MyProject\UserBundle\Entity</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">FOS\UserBundle\Model\User</span> <span class="k">as</span> <span class="nx">BaseUser</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\Table(name="fos_user")</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">User</span> <span class="k">extends</span> <span class="nx">BaseUser</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Id</span>
+<span class="sd">     * @ORM\Column(type="integer")</span>
+<span class="sd">     * @ORM\GeneratedValue(strategy="AUTO")</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">Customer</span></span> entity is a completly new object, not depending
+on the <span class="docutils literal"><span class="pre">UserInterface</span></span> and containing some duplicated properties.</p>
+<p>You can either use exactly the same ID or plant the <span class="docutils literal"><span class="pre">$userId</span></span> as
+correlation ID in the <span class="docutils literal"><span class="pre">Customer</span></span> object.</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="c1">// src/MyProject/ShopBundle/Entity/Customer.php</span>
+
+<span class="k">namespace</span> <span class="nx">MyProject\ShopBundle\Entity</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ORM\Entity</span>
+<span class="sd"> * @ORM\Table(name="customer")</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Customer</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Id</span>
+<span class="sd">     * @ORM\Column(type="integer")</span>
+<span class="sd">     * @ORM\GeneratedValue(strategy="NONE")</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @ORM\Column(type="string")</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$username</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now you need to extend the application to synchronize all changes from the
+<span class="docutils literal"><span class="pre">User</span></span> entity to the <span class="docutils literal"><span class="pre">Customer</span></span> entity. You can
+achieve this relatively easy by overwriting the <span class="docutils literal"><span class="pre">ModelManager</span></span> or when finally
+supported by <em>FOSUserBundle</em> listening to events.  Your own code can
+exclusively work with <span class="docutils literal"><span class="pre">Customer</span></span> objects now, void of any reference to
+the Symfony Security component or the huge FOSUserBundle dependency.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/symfony.html">Symfony</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on September 04, 2013
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/08/19/speedup_symfony2_on_vagrant_boxes.html">Speedup Symfony2 on Vagrant boxes</a></h1>
 <ul class="simple">
 <li><strong>Update:</strong> Added requirements to configure Vagrant and Virtualbox before
@@ -756,92 +872,6 @@ each other than in the case of inheritance.</p>
         <p>
             <small>
                 Posted on June 27, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/06/24/bounded_contexts.html">Bounded Contexts</a></h1>
-<p>I regularly fall into the same trap when building applications: Trying to find
-the one model that unifies all the use-cases and allows to solve every problem.
-From discussions with other developers I know not to be the only one making this
-mistake.</p>
-<p>It is propably a human trait trying to find the one line that connects
-every dot. However in software design there is a case to be made for the
-separation of contexts to tackle complexity. Eric Evans described this in detail with the
-<a class="reference external" href="http://dddcommunity.org/uncategorized/bounded-context/">“Bounded Context”</a> pattern in his
-“Domain-Driven Design” book. According to an interview with Evans I read
-somewhere, he considers it one of the most important patterns in the whole book.</p>
-<p>The essence of this strategic pattern is to embrance the separation of
-different parts of an application and develop different models as different
-domain contexts. Consistency and constraints are enforced within one context,
-but don’t necessarily hold in another context.</p>
-<p>The goal is simplication and freeing us from the burden of finding that one
-model that fits all use cases. It is much less awkward to have some parts of
-the model reimplemented for different purposes than creating God objects that
-try to unify everything, and failing at this task.</p>
-<p>Evans goes even further and introduces a significant amount of patterns
-that describe the relationship between different bounded contexts.</p>
-<div class="section" id="an-experiment">
-<h2>An Experiment</h2>
-<p>At the <a class="reference external" href="http://www.socrates-conference.de/">SoCraTes conference</a> in August
-last year, I participated in a DDD architecture game by <a class="reference external" href="https://twitter.com/cyriux">Cyrille Martraire</a> that focused on distilling bounded contexts. We
-were given a very simple domain concept “Customer” and assigned different roles
-in the business.</p>
-<p>Everyone described their perfect customer very differently, imagining the
-Customer object that fits all these requirements was quite an eye opener. Even
-if there is no such single software that operates a business, going to the
-extreme and defining 10 different angles for a single concept made me clear,
-that sometimes different overlapping implementations are not such a bad thing.</p>
-</div>
-<div class="section" id="problems-and-solutions">
-<h2>Problems and Solutions</h2>
-<p>One problem when applying bounded contexts is data synchronization.
-Synchronization between contexts can be reached in many different ways,
-three of which are:</p>
-<ol class="arabic simple">
-<li>The <a class="reference external" href="http://martinfowler.com/eaaDev/DomainEvent.html">Domain Event</a> pattern that integrates
-nicelly into Domain-Driven Design and simplifies the synchronization with
-other parts of an application.</li>
-<li>Correlation Ids of the same entity into the different contexts and a clean
-seperation of the data (no shared data necessary).</li>
-<li>Another way are immutable read models (value objects) of the data managed in
-another context (entity).</li>
-</ol>
-<p>In any way relying on <a class="reference external" href="http://en.wikipedia.org/wiki/Eventual_consistency">Eventual
-Consistency</a> helps
-solving the synchronization problem.</p>
-<p>Depending on how your bounded contexts seperate from each other, duplication of
-classes is necessary as well. This is something that has to be accounted for
-and you should make sure that only one context is responsible for changing the
-same data. Different contexts can have different behaviors on the same data.
-This is actually a point where Domain-Driven Design and <a class="reference external" href="http://www.whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context and
-Interaction (DCI)</a>
-intersect.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>Applying bounded contexts to an application or a cluster of applications helps
-developers and domain experts to focus on problems in their specific context.
-Sometimes each context even has its own domain-expert. The benefit for
-developers is a simplified abstraction of different parts of the modelled
-problem.</p>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on June 24, 2013
                  by Benjamin Eberlei
             </small>
         </p>

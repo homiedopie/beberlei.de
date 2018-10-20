@@ -63,6 +63,150 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2010/05/02/testing-database-locks-with-phpunit-and-gearman.html">Testing Database Locks with PHPUnit and Gearman</a></h1>
+<p>For the Beta 2 release of <a class="reference external" href="http://www.doctrine-project.org">Doctrine
+2</a> we plan to integrate pessimistic
+Database-level locks across all the supported vendors (MySQL, Oracle,
+PostgreSql, IBM DB2 so far). This means row-level locking as defined in
+the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
+optionally in DQL Queries and Finder methods. The Implementation of this
+extension to SELECT statements is rather trivial, however functional
+testing of this feature is not.</p>
+<p>A general approach would look like this:</p>
+<ol class="arabic simple">
+<li>Run Query 1 and 2 with FOR UPDATE into the background</li>
+<li>Have both queries lock the row for a specified time x (using sleep)</li>
+<li>Verify that one of the two processes/threads runs approximately 2*x
+the lock time.</li>
+</ol>
+<p>Since PHP does not support process forking or threads naturally you run
+into a serious problem. How do you execute two database queries in
+parallel and verify that indeed one query is locking read access for the
+second one?</p>
+<p>Side note: There are some drawbacks to this testing approach. It could
+be that one background threads finishes the lock sleep already when the
+second just starts. The locking would work in these cases, however the
+lock time would not nearly be 2*x seconds, producing a test-failure. We
+are talking about a functional test though and I will accept a failure
+from time to time just to be 99% sure that locking works.</p>
+<p>Solving this problem with Gearman provides a pretty nice “real-world”
+example for the Job-Server that I wanted to share. This blog post
+contains a stripped down code-example from the Doctrine 2 testsuite. If
+you are interested, you can see the complete Gearman Locking Tests in
+<a class="reference external" href="http://github.com/beberlei/doctrine2/tree/lock-support/tests/Doctrine/Tests/ORM/Functional/Locking/">on
+GitHub</a>.</p>
+<p>Gearman allows to register worker processes with the job-server and
+offers clients to execute jobs on those workers in parallel. After
+installing the Gearman job-server and PHP pecl/gearman extension
+(<a class="reference external" href="http://toys.lerdorf.com/archives/51-Playing-with-Gearman.html">Rasmus Lerdorf has a post on
+installation</a>)
+we can go on writing our locking tests with Gearman.</p>
+<p>The first bit is the worker, a PHP script that tries to acquire a
+database lock and then sleeps for a second. The return value of this
+script is the total time required for acquiring the lock and sleeping.</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class LockAgentWorker</span>
+<span class="x">{</span>
+<span class="x">    public function findWithLock($job)</span>
+<span class="x">    {</span>
+<span class="x">        $fixture = $this-&gt;processWorkload($job); // setup doctrine in here</span>
+
+<span class="x">        $s = microtime(true);</span>
+<span class="x">        $this-&gt;em-&gt;beginTransaction();</span>
+
+<span class="x">        $entity = $this-&gt;em-&gt;find($fixture['entityName'], $fixture['entityId'], $fixture['lockMode']);</span>
+
+<span class="x">        sleep(1);</span>
+<span class="x">        $this-&gt;em-&gt;rollback(); // clean up doctrine</span>
+
+<span class="x">        return (microtime(true) - $s);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The glue-code for the worker script contains of the registering of the
+worker method with the job-server and a simple infinite loop:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">$lockAgent = new LockAgentWorker();</span>
+
+<span class="x">$worker = new \GearmanWorker();</span>
+<span class="x">$worker-&gt;addServer();</span>
+<span class="x">$worker-&gt;addFunction("findWithLock", array($lockAgent, "findWithLock"));</span>
+
+<span class="x">while($worker-&gt;work()) {</span>
+<span class="x">    if ($worker-&gt;returnCode() != GEARMAN_SUCCESS) {</span>
+<span class="x">        break;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>We need two running workers for this to work, since one worker only
+processes one task at a time. Just open up two terminals and launch the
+php scripts. They will wait for their first task to process.</p>
+<p>Now we need to write our PHPUnit TestCase, which will contain a
+GearmanClient to execute two of the “findWithLock” in parallel. Our
+locking assertion will work like this:</p>
+<ol class="arabic simple">
+<li>Register two tasks for the “findWithLock” method that access the same
+database row.</li>
+<li>Register a completed callback using
+“GearmanClient::setCompleteCallback()” that collects the run-time of
+the individual workers.</li>
+<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
+<li>Assert that the maximum run-time is around 2 seconds (since each
+worker sleeps 1 second)</li>
+</ol>
+<p>The code for this steps could look like:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
+<span class="x">{</span>
+<span class="x">    private $gearman = null;</span>
+<span class="x">    private $maxRunTime = 0;</span>
+<span class="x">    private $articleId;</span>
+
+<span class="x">    public function testLockIsAcquired()</span>
+<span class="x">    {</span>
+<span class="x">        // .. write fixture data into the database</span>
+
+<span class="x">        $gearman = new \GearmanClient();</span>
+<span class="x">        $gearman-&gt;addServer();</span>
+<span class="x">        $gearman-&gt;setCompleteCallback(array($this, "gearmanTaskCompleted"));</span>
+
+<span class="x">        $workload = array(); // necessary workload data to configure workers</span>
+<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
+<span class="x">        $gearman-&gt;addTask("findWithLock", serialize($workload));</span>
+
+<span class="x">        $gearman-&gt;runTasks();</span>
+
+<span class="x">        $this-&gt;assertTrue($this-&gt;maxRunTime &gt;= 2);</span>
+<span class="x">    }</span>
+
+<span class="x">    public function gearmanTaskCompleted($task)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;maxRunTime = max($this-&gt;maxRunTime, $task-&gt;data());</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>Now if both workers are waiting for processing the task we can run this
+test and get a green bar for a working lock support.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/testing.html">Testing</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on May 02, 2010
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/01/08/immutable-datetime-objects.html">Immutable DateTime Objects</a></h1>
 <p>One serious drawback of <a class="reference external" href="http://de.php.net/DateTime">PHPs DateTime
 extension</a> is the mutability of its
@@ -505,144 +649,6 @@ choose a global standard.</p>
             <small>
                 Posted on April 18, 2010
                  by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2010/12/18/generate-proxy-code-using-a-stream-wrapper.html">Generate Proxy code using a stream wrapper</a></h1>
-<p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
-<p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
-<p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <span class="docutils literal"><span class="pre">include()</span></span>. The client code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="nb">stream_wrapper_register</span><span class="p">(</span><span class="s2">"dc2proxy"</span><span class="p">,</span> <span class="s2">"Doctrine\ORM\Proxy\ProxyStreamWrapper"</span><span class="p">);</span>
-
-<span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">"dc2proxy:///proxies"</span><span class="p">;</span>
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$em</span><span class="p">;</span>
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$className</span><span class="p">;</span>
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$proxyClass</span><span class="p">;</span>
-
-<span class="k">require</span> <span class="nv">$proxyDir</span><span class="o">.</span> <span class="s2">"/"</span><span class="o">.</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="nv">$proxyClass</span><span class="p">)</span> <span class="o">.</span> <span class="s2">".php"</span><span class="p">;</span>
-
-<span class="nb">unset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
-</pre></div>
-</div>
-<p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
-The stream wrapper to make this work looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$proxyCode</span><span class="p">;</span>
-
-    <span class="k">function</span> <span class="nf">stream_open</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$options</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$opened_path</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_EM'</span><span class="p">]</span>
-                <span class="o">-&gt;</span><span class="na">getProxyFactory</span><span class="p">()</span>
-                <span class="o">-&gt;</span><span class="na">getProxyClassCode</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">],</span> <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_PROXYCLASS'</span><span class="p">]);</span>
-
-        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">stream_stat</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
-        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="s2">"ino"</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">url_stat</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$reflClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\ReflectionClass</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'DOCTRINE2_PSW_ENTITYNAME'</span><span class="p">]);</span>
-        <span class="nv">$stat</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$reflClass</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">());</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="nv">$stat</span><span class="p">[</span><span class="s2">"ino"</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nv">$stat</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_read</span><span class="p">(</span><span class="nv">$count</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$ret</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_write</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$left</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">);</span>
-        <span class="nv">$right</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span> <span class="o">=</span> <span class="nv">$left</span> <span class="o">.</span> <span class="nv">$data</span> <span class="o">.</span> <span class="nv">$right</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_tell</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_eof</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">&gt;=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">function</span> <span class="nf">stream_seek</span><span class="p">(</span><span class="nv">$offset</span><span class="p">,</span> <span class="nv">$whence</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">switch</span> <span class="p">(</span><span class="nv">$whence</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">case</span> <span class="nx">SEEK_SET</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nv">$offset</span><span class="p">;</span>
-                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">break</span><span class="p">;</span>
-
-            <span class="k">case</span> <span class="nx">SEEK_CUR</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">+=</span> <span class="nv">$offset</span><span class="p">;</span>
-                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">break</span><span class="p">;</span>
-
-            <span class="k">case</span> <span class="nx">SEEK_END</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">position</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">proxyCode</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$offset</span><span class="p">;</span>
-                     <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                     <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">break</span><span class="p">;</span>
-
-            <span class="k">default</span><span class="o">:</span>
-                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>What do you think about this approach? Are there any potential problems I am not seeing?</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/phpmagic.html">PHPMagic</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on December 18, 2010
-                
             </small>
         </p>
     </div>

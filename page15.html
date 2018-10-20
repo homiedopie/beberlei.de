@@ -63,6 +63,48 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html">Finally: Zend_Mail charset and/or long lines header encoding bug fixed</a></h1>
+<p>There was this <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">lurking bug in
+Zend_Mail</a> which
+destroyed every Mail-Header (and corresponding Mail) with non US-ASCII
+Chars and more than an encoded length of 74 chars. This is quite a huge
+subset of mails, but it seems a nice solution was not so easy, at least
+nobody tried to fixed it for quite some time.</p>
+<p>Where many hackish solutions we’re offered, Ota Mares aka Littlex spent
+incredible time to hunt the original problem down and with his help I
+tag-teamed the bug to death today. Saturo Yoshida of Zend Fame added
+some further spice regarding an alternative solution with Base64
+Encoding instead of Quoted Printable Mime Header encoding.</p>
+<p>In the end the solution we chose was, not to re-use the Mime encoding
+function that is specific to MIME bodies according to
+<a class="reference external" href="http://tools.ietf.org/html/rfc2045">RFC2045</a>, but to write a
+completely new algorithm for Mime Headers, whose rules are specified in
+<a class="reference external" href="http://tools.ietf.org/html/rfc2047">RFC2047</a>. This is now done and
+unit-tests prove its working according to standard.</p>
+<p>What is missing now is people trying that fix on as many Mail platforms
+as possible and <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">giving feedback in the
+issue</a> if a lengthy
+subject with non-ASCII chars is displayed correctly.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 14, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/01/11/howto-file-a-good-bug-report-suggestions-for-framework-users.html">Howto file a good bug report: Suggestions for framework users</a></h1>
 <p>I have fixed quite a number of bugs for the ZF lately, which lead me to
 this post about how to file a good bug report. There are many annoying
@@ -330,70 +372,6 @@ awesome NetBeans PHP support.</li>
             <small>
                 Posted on January 07, 2009
                 
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/03/11/using-zend-soap-server-and-autodiscover-in-a-controller.html">Using Zend_Soap Server and Autodiscover in a Controller</a></h1>
-<p>I am in a dilemma. I have condemned the usage of Zend_Soap_Server (or
-any other webservice server handler) <a class="reference external" href="http://www.whitewashing.de/blog/articles/106">inside a Model-View-Controller
-application</a> before.
-Still I get questions about <a class="reference external" href="http://www.whitewashing.de/blog/articles/65">my old Zend_Soap_Server and
-Zend_Soap_AutoDiscover
-example</a> not working in
-the MVC scenario. The following example provides you with a working Soap
-server inside a Zend_Controller_Action, although I discourage the use
-of it and would suggest using a dedicated script outside the dispatching
-process to gain multitudes of performance, which webservices often
-require.</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>require_once "/path/to/HelloWorldService.php";
-
-class MyDiscouragedSoapServerController extends Zend_Controller_Action
-{
-    public function serverAction()
-    {
-        $server = new Zend_Soap_Server("http://example.com/pathto/wsdl");
-        $server-&gt;setClass('HelloWorldService');
-        $server-&gt;handle();
-    }
-
-    public function wsdlAction()
-    {
-        $wsdl = new Zend_Soap_AutoDiscover();
-        $wsdl-&gt;setUri('http://example.com/pathto/server');
-        $wsdl-&gt;setClass('HelloWorldService');
-        $wsdl-&gt;handle();
-    }
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now all you have to do is create two routes, one that makes
-<strong>http://example.com/pathto/server</strong> point to
-<strong>MyDiscouragedSoapServerController::serverAction</strong> and the other route
-that makes <strong>http://example.com/pathto/wsdl</strong> point to
-<strong>MyDiscouragedSoapServerController::wsdlAction</strong>. The wrong version
-(Version Mismatch) error comes from sending a request for the WSDL file
-to the actual Soap Server, which he doesn’t like.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/soap.html">SOAP</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on March 11, 2009
-                 by beberlei <kontakt@beberlei.de>
             </small>
         </p>
     </div>

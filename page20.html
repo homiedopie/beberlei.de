@@ -63,6 +63,118 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
+<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
+with the alpha version, since I am currently searching for a good
+framework for a high performance application. My first benchmarks on
+ezcMvc just say: wh000pie! A lot faster as compared to the Zend
+Framework.
+Still ezcMvc is VERY loosely coupled and you have to write lots of lines
+to get where ZF gets you with less (more magic involved). As you can see
+from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
+component</a>
+it is currently a bit unwieldily to work with ezcMvcController since you
+have to create and return result objects everywhere. This is very nice
+since it abstracts from the actual response type (could be www, mail,
+cli, anything).
+I have created a very little extension of the ezcMvcController class
+that hopefully serves you quite some time. You can append variables to
+the ezcMvcResult object by calling the magic __get and __set on the
+controller. Plus it offers a method to use the ezcMvcInternalRedirect
+instead of the result. See for yourself:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>class myController extends ezcMvcController
+{
+    protected $result;
+
+    public function createResult()
+    {
+        $actionMethod = $this-&gt;createActionMethodName();
+
+        if ( method_exists( $this, $actionMethod ) ) {
+            $status = $this-&gt;$actionMethod();
+            if($status != 0) {
+                $this-&gt;getResult()-&gt;status = $status;
+            }
+            return $this-&gt;getResult();
+        } else {
+            throw new ezcMvcActionNotFoundException( $this-&gt;action );
+        }
+    }
+
+    protected function _redirect($uri)
+    {
+        $request = clone $this-&gt;request;
+        $request-&gt;uri = $uri;
+        $this-&gt;result = new ezcMvcInternalRedirect($request);
+    }
+
+    public function __get($name)
+    {
+        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
+            return $this-&gt;getResult()-&gt;variables[$name];
+        }
+        return null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this-&gt;getResult()-&gt;variables[$name] = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this-&gt;getResult()-&gt;variables[$name]);
+    }
+
+    protected function getResult()
+    {
+        if($this-&gt;result === null) {
+            $this-&gt;result = new ezcMvcResult();
+        }
+        return $this-&gt;result;
+    }
+}
+</pre></div>
+</div>
+<p>You can now use a controller in the following way:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>class dashboardController extends myController
+{
+    public function doIndex()
+    {
+        $this-&gt;cookie = "Cookie!"; // Proxy to $ezcMvcResult-&gt;variables['cookie']
+    }
+
+    public function doRedirect()
+    {
+        $this-&gt;_redirect("/");
+    }
+}
+</pre></div>
+</div>
+<p>Very nice! The next thing I have to extend in ezcMvc is automagical
+matching of controller and action names to view output names with a
+special View Handler that takes care of this. This saves another bunch
+of work you have to cope with in the current standard setup.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/ezcomponents.html">eZComponents</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on November 05, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/11/25/next-zf-mini-release-1-7-1.html">Next ZF Mini Release: 1.7.1</a></h1>
 <p>In the next days the next mini release of the Zend Framework will be
 released and I want to keep you up to date of my progress on it.
@@ -192,33 +304,6 @@ README.txt that is on the front page of github project page.</p>
         <p>
             <small>
                 Posted on November 29, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/11/12/updating-from-kde3-5-to-kde4-with-mac-style-menubars.html">Updating from KDE3.5 to KDE4 with Mac-Style Menubars</a></h1>
-<p>It seems KDE4 has no Mac-Style menubars and when you upgrade from 3.5 to
-4.1 within the same config folder (say you use the kubuntu distribution
-upgrade installer like I did) you end up with no menubars at all.
-To solve this little issue find a variable “macStyle = true” in the
-/home/username/.kde/share/config/kdeglobals file and switch it to
-macStyle = false and you have your menubars back.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/linux.html">Linux</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on November 12, 2008
                 
             </small>
         </p>

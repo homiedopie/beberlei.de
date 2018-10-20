@@ -27,7 +27,7 @@
         <script>window.jQuery || document.write('<script src="_static/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="_static/plugins.js"></script>
         <script src="_static/main.js"></script>
-        <link rel="search" title="Search" href="search.html" /><link rel="prev" title="Newer" href="page27.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+        <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page29.html" /><link rel="prev" title="Newer" href="page27.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
         VERSION:     '1.5.1',
@@ -63,6 +63,54 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/07/14/jquery-helper-what-is-to-include.html">jQuery Helper - What is to include?</a></h1>
+<p>I took some time in the last days to develop the concept for a possible
+jQuery View Helper that could pass the integration into the <a class="reference external" href="http://framework.zend.com">ZF
+Core</a>. Since
+<a class="reference external" href="http://www.jquery.com">jQuery</a> is organized somewhat different than
+Dojo is, its possible implementation for ZF will differ.</p>
+<p>The jQuery Helper itself will manage inclusion of jQuery javascript
+files and the base library, much like the Dojo component works (Using
+the Google CDN). On top of this simple Helpers should mimic $.get,
+$.post, $.load and $.getJSON in a simple way, so that with a simple
+function call you can generate an XmlHttpRequest that updates a
+specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
+Ajax</a>)</p>
+<p>Problematic are the next ideas: Additional Helpers will allow to
+specify the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
+(DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/">jQuery
+Autocomplete</a>
+or <a class="reference external" href="http://malsup.com/jquery/form/">jQuery Form</a> (AjaxForm and
+AjaxSubmit). These libraries need additional javascript content to be
+downloaded and implemented in the Zend Framework project. There
+currently exists no way to implement them using a CDN. Therefore any
+documentation must clearly specify which additional content has to be
+installed and how. The helpers will have to be general enough to support
+this.</p>
+<p>My proposal is currently in the workings and will be on the ZF Wiki in
+the next couple of hours.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+                <a href="tags/jquery.html">jQuery</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on July 14, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/07/22/multidimensional-array-via-spl.html">Multidimensional Array via SPL</a></h1>
 <p>Per default any implementation of ArrayObject does not allow to use the
 object as multidimensional array. This snippet here implements the
@@ -282,33 +330,6 @@ issue in the near future.</p>
         <p>
             <small>
                 Posted on July 12, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/07/24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a></h1>
-<p>Today I finished the first almost complete <a class="reference external" href="http://www.djangoproject.com">Django Template
-Language</a> Clone for PHP implementing the
-<a class="reference external" href="http://framework.zend.com">Zend Framework</a> View Interface. <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Dtl+-+Benjamin+Eberlei">My
-proposal</a>
-is up and running on the ZF Wiki. The source code can be downloaded from
-my <a class="reference external" href="http://www.beberlei.de/dev/svn">svn repository</a>.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on July 24, 2008
                 
             </small>
         </p>

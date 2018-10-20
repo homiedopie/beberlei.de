@@ -63,6 +63,90 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/12/18/dependecy-injection-the-juicy-way.html">Dependency Injection the juicy way</a></h1>
+<p>I have written on dependency injection before and <a class="reference external" href="http://www.whitewashing.de/blog/articles/83">came up with a
+solution for PHP via interface
+injection</a>. Thinking
+about it twice I didn’t like it very much. Its too much overkill that
+you have to implement all setter methods again and again.</p>
+<p>Still dependency injection is the way to write good, testable and easily
+exchanged and re-wired object graphs. I tried to do lots of dependency
+injection via constructor lately and realized that it pollutes my
+constructors when my object graph is too deep.</p>
+<p>An example: When I setup my database connection in the bootstrap file
+and encapsulate it in my model creation factory object, i have to insert
+the model factory through the configuration into the dispatcher into the
+different controllers and views to be accessible in the MVC pattern. The
+model factory has to walk 3 nodes in the object graph without being used
+at all in the “higher” steps. This creates very unnecessary
+dependencies.</p>
+<p>I came across <a class="reference external" href="http://misko.hevery.com/">Misko Hevery</a>‘s Blog, which
+rocks. There are also some <a class="reference external" href="http://www.youtube.com/results?search_query=misko+hevery&amp;search_type=&amp;aq=f">great Google Tech Talks by
+him</a>,
+where he argues in favour of dependency injection and debunks singletons
+as being evil (he does that on his blog too). From there I learnt about
+<a class="reference external" href="http://code.google.com/p/google-guice/">Guice</a>, a dependency
+injection framework for Java by Google.</p>
+<p>What I like about Guice: Its easy to use and its immediately obvious to
+someone without experience, why it works so good and you don’t have to
+hand down objects deep down the object graph. I cloned the basic
+functionality for PHP and an example would work as follows.</p>
+<p>We first have to implement a <strong>module</strong>, which defines which concrete
+implementation should be injected as a placeholder for which interface.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind("Service")-&gt;to("ConcreteService");  $b-&gt;bind("Add")-&gt;to("ConcreteAdd");  $b-&gt;bind("Sub")-&gt;to("ConcreteSub"); }}
+</pre></div>
+</div>
+</div></blockquote>
+<p>We can now use this module to instantiate an injector object:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance("Service");
+</pre></div>
+</div>
+</div></blockquote>
+<p>Given that the constructor of <strong>ConcreteService</strong> would expect an Add
+and a Sub object, the Injector would realize this and instantiate the
+concrete implementations <strong>ConcreteAdd</strong> and <strong>ConcreteSub</strong> and inject
+them into the constructor.</p>
+<p>What makes this dependency injection so simple and great to use? You can
+instantiate an injector everywhere in your code and just have to
+configure it using the additional module implementation. This way you
+don’t have to make sure that you pass down the dependency injection
+container from the bootstrap into all nodes of the application. You can
+also easily work with many frameworks and still be able to use
+dependency injection without having to hack the whole core of the
+framework.</p>
+<p>My guice clone does more. It allows to pass down additional non-object
+arguments into constructors, even for object dependencies. It offers a
+<strong>Provider</strong> interface to be able to wrap adapters around your already
+existing ServiceLocator or Registry objects. But its reflection
+capabilities have to be extended to docblock comments, so that better
+dependency detection is possible.</p>
+<p>Because using dependency injection with only this little example I will
+refrain from releasing the source code yet. I have to provide some
+useful documentation for it to be of use to anyone.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/dependencyinjection.html">DependencyInjection</a>
+                 / 
+                <a href="tags/sphicylibrary.html">SphicyLibrary</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on December 18, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/12/03/ezcomponents-view-handler-for-zend-pdf.html">ezComponents View Handler for Zend_Pdf</a></h1>
 <p><a class="reference external" href="http://www.whitewashing.de/blog/article/93">My previous posting</a>
 discussed different view handlers based on routing information. One
@@ -396,54 +480,6 @@ hopefully help and guide everyone to the correct dependencies.</p>
         <p>
             <small>
                 Posted on December 12, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/07/14/jquery-helper-what-is-to-include.html">jQuery Helper - What is to include?</a></h1>
-<p>I took some time in the last days to develop the concept for a possible
-jQuery View Helper that could pass the integration into the <a class="reference external" href="http://framework.zend.com">ZF
-Core</a>. Since
-<a class="reference external" href="http://www.jquery.com">jQuery</a> is organized somewhat different than
-Dojo is, its possible implementation for ZF will differ.</p>
-<p>The jQuery Helper itself will manage inclusion of jQuery javascript
-files and the base library, much like the Dojo component works (Using
-the Google CDN). On top of this simple Helpers should mimic $.get,
-$.post, $.load and $.getJSON in a simple way, so that with a simple
-function call you can generate an XmlHttpRequest that updates a
-specified part of the DOM (via injection). (See: <a class="reference external" href="http://book.cakephp.org/view/208/ajax">CakePHP
-Ajax</a>)</p>
-<p>Problematic are the next ideas: Additional Helpers will allow to
-specify the <a class="reference external" href="http://ui.jquery.com">jQuery UI Library</a> components
-(DatePicker, Sortables, Draggable, Dropable..), <a class="reference external" href="http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/">jQuery
-Autocomplete</a>
-or <a class="reference external" href="http://malsup.com/jquery/form/">jQuery Form</a> (AjaxForm and
-AjaxSubmit). These libraries need additional javascript content to be
-downloaded and implemented in the Zend Framework project. There
-currently exists no way to implement them using a CDN. Therefore any
-documentation must clearly specify which additional content has to be
-installed and how. The helpers will have to be general enough to support
-this.</p>
-<p>My proposal is currently in the workings and will be on the ZF Wiki in
-the next couple of hours.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/zendframework.html">ZendFramework</a>
-                 / 
-                <a href="tags/jquery.html">jQuery</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on July 14, 2008
                 
             </small>
         </p>

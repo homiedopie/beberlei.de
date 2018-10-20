@@ -63,6 +63,61 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/06/25/multimediatreff-on-frameworks.html">Multimediatreff on Frameworks</a></h1>
+<p>My neighbour gladly called my attention to the
+<a class="reference external" href="http://www.multimediatreff.de">Multimediatreff</a>, a relaxed conference
+that is held about three times a year, this last saturday on the topic:
+Frameworks and Content-Management-Systems.</p>
+<p>It was held in a very nice conference center in cologne, and from what I
+heard about 200 people attended. The first two topics were on
+<a class="reference external" href="http://www.joomla.org/">Joomla!</a> and barrier-free
+<a class="reference external" href="http://www.typo3.org">Typo3</a>. Since I am more the framework guy, I
+did not enjoy them too much. At least I got some input on how a
+barrier-free website has to function. The Joomla! presentation supported
+my prejudice, that programming in and for Joomla! produces ugly code.</p>
+<p>I did like the presentations on frameworks, the most interesting being
+the <a class="reference external" href="http://www.cakephp.org">CakePHP</a> presentation by <a class="reference external" href="http://teemow.com/">Timo
+Derstappen</a>, since I haven’t looked into Cake for
+about one and a half years. I have seen that with the new to come
+version 2, the framework became even better, now supporting easy code
+generation and flexible site generation. But its still somehow a Ruby
+clone and forces me too much in my programming style.</p>
+<p>The <a class="reference external" href="http://framework.zend.com">Zend Framework</a> presentation was done
+by Carsten Möhrke, who also wrote the first german ZF Book. He showed
+the creation of a blog using Zend Framework, being the Hello World
+example for frameworks. He specifically showed, that you can use
+anything you want as a model, a Zend_Db_Table object or any other
+object. He also showed something like a Data-Mapper pattern in his
+application. I got some ideas from this I probably will write about some
+later time.</p>
+<p>I also enjoyed the <a class="reference external" href="http://www.rubyonrails.de">Rails</a> presentation,
+because I never got the chance to look the Ruby guys at work of the
+shoulder. But this is even worse than CakePHP was my first observation.
+I am no fan of ActiveRecord being forced upon you as Model
+implementation.</p>
+<p>The pizza battle, mysteriously announced by the host, was another
+highlight, as well as the drinks and snacks in between. All in all I can
+highly recommend the Multimediatreff for the next time.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/conferences.html">Conferences</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 25, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/06/22/zf-caching-pages-via-front-controller-plugin.html">ZF: Caching Pages via Front Controller Plugin</a></h1>
 <p>Today I implemented caching using a front controller plugin (<a class="reference external" href="http://devzone.zend.com/article/3372">see
 Matthews post on Zend Devzone</a>)
@@ -455,118 +510,6 @@ supposed to do.</p>
         <p>
             <small>
                 Posted on June 24, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
-<p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
-with the alpha version, since I am currently searching for a good
-framework for a high performance application. My first benchmarks on
-ezcMvc just say: wh000pie! A lot faster as compared to the Zend
-Framework.
-Still ezcMvc is VERY loosely coupled and you have to write lots of lines
-to get where ZF gets you with less (more magic involved). As you can see
-from the <a class="reference external" href="http://ezcomponents.org/docs/tutorials/MvcTools#creating-the-controller">tutorial on the ezcMvcTools
-component</a>
-it is currently a bit unwieldily to work with ezcMvcController since you
-have to create and return result objects everywhere. This is very nice
-since it abstracts from the actual response type (could be www, mail,
-cli, anything).
-I have created a very little extension of the ezcMvcController class
-that hopefully serves you quite some time. You can append variables to
-the ezcMvcResult object by calling the magic __get and __set on the
-controller. Plus it offers a method to use the ezcMvcInternalRedirect
-instead of the result. See for yourself:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>class myController extends ezcMvcController
-{
-    protected $result;
-
-    public function createResult()
-    {
-        $actionMethod = $this-&gt;createActionMethodName();
-
-        if ( method_exists( $this, $actionMethod ) ) {
-            $status = $this-&gt;$actionMethod();
-            if($status != 0) {
-                $this-&gt;getResult()-&gt;status = $status;
-            }
-            return $this-&gt;getResult();
-        } else {
-            throw new ezcMvcActionNotFoundException( $this-&gt;action );
-        }
-    }
-
-    protected function _redirect($uri)
-    {
-        $request = clone $this-&gt;request;
-        $request-&gt;uri = $uri;
-        $this-&gt;result = new ezcMvcInternalRedirect($request);
-    }
-
-    public function __get($name)
-    {
-        if(isset($this-&gt;getResult()-&gt;variables[$name])) {
-            return $this-&gt;getResult()-&gt;variables[$name];
-        }
-        return null;
-    }
-
-    public function __set($name, $value)
-    {
-        $this-&gt;getResult()-&gt;variables[$name] = $value;
-    }
-
-    public function __isset($name)
-    {
-        return isset($this-&gt;getResult()-&gt;variables[$name]);
-    }
-
-    protected function getResult()
-    {
-        if($this-&gt;result === null) {
-            $this-&gt;result = new ezcMvcResult();
-        }
-        return $this-&gt;result;
-    }
-}
-</pre></div>
-</div>
-<p>You can now use a controller in the following way:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>class dashboardController extends myController
-{
-    public function doIndex()
-    {
-        $this-&gt;cookie = "Cookie!"; // Proxy to $ezcMvcResult-&gt;variables['cookie']
-    }
-
-    public function doRedirect()
-    {
-        $this-&gt;_redirect("/");
-    }
-}
-</pre></div>
-</div>
-<p>Very nice! The next thing I have to extend in ezcMvc is automagical
-matching of controller and action names to view output names with a
-special View Handler that takes care of this. This saves another bunch
-of work you have to cope with in the current standard setup.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/ezcomponents.html">eZComponents</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on November 05, 2008
                 
             </small>
         </p>
