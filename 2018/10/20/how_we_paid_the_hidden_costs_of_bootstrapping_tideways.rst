@@ -47,7 +47,7 @@ What went into funding Tideways instead of money?
 - We struck a deal with our first business partner `SysEleven
   <https://syseleven.de>`_ to trade hosting for Tideways in return for highly
   discounted licenses for almost all their customers. This helped us with the
-  large foud-digit monthly hosting costs that we had from day one, because as a
+  large four-digit monthly hosting costs that we had from day one, because as a
   monitoring company you need more servers than other SaaS, In return for
   investing in us, they now have us as a happy paying customer and they still
   get a good deal on licenses for their customers.
