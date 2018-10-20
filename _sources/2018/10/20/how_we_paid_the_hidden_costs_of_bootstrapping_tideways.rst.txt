@@ -21,10 +21,11 @@ This is something I am thinking about a lot to understand the journey and
 history of Tideways and by writing about my thoughts I can share my
 unconventional route for "bootstrapping" a SaaS.
 
-In his post Jason projects the growth to sustainable $ 20.000 MRR to take 5
-years, which is much too long for my taste. We projected to reach 20.000€ MRR
-(~ $23.000) after three years, and missing this target would probably have
-meant a re-evaluation, maybe even shutdown or sale of Tideways.
+In his post Jason projects the growth to sustainable $ 20.000 Monthly
+Reccurring Revenue (MRR) to take 5 years, which is much too long for my taste.
+We projected to reach 20.000€ MRR (~ $23.000) after three years, and missing
+this target would probably have meant a re-evaluation, maybe even shutdown or
+sale of Tideways.
 
 We reached this goal this summer, after almost exactly three years.
 
@@ -56,7 +57,7 @@ What went into funding Tideways instead of money?
   within the European and German PHP community I accidentily already built a
   large audience that would be potential customers for Tideways. We didn't need
   to invest more time into building an audience and we luckily never had to pay
-  for customer acquisition. However realistically I invested hundrets of unpaid
+  for customer acquisition. However realistically I invested hundreds of unpaid
   hours into my open source work since 2009 that allowed me to build this
   audience.
 
