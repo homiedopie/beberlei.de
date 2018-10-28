@@ -62,5 +62,5 @@ Hansson.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Bootstrapping, DeepWork
 .. comments::

@@ -82,5 +82,5 @@ available to their large customer base.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: Bootstrapping
 .. comments::

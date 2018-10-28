@@ -45,5 +45,5 @@ assumptions about the data storage.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: DomainDrivenDesign
 .. comments::
