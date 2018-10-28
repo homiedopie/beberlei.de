@@ -9,7 +9,7 @@ for larger companies.
 
 As an engineer, I have learned to be productive when I have a quiet space and
 can tinker on a problem without getting interrupted. Slack makes this very
-difficult and at least for me, is a primary cause of annexity and fear of
+difficult and at least for me, is a primary cause of anxiety and fear of
 missing out (FOMO).
 
 While at first sight it seems chat is asynchronous it really is not.
@@ -20,7 +20,7 @@ While at first sight it seems chat is asynchronous it really is not.
    not related is not helpful.
 2. In addition chats online status indicators exist just so that you know
    if someone can answer any question directly, increasing communication
-   annexity.
+   anxiety.
 3. If you set yourself into some kind of do not disturb mode or mute a channel,
    then its easy to miss important conversations and get left out of
    discussions or decisions. Reading up on long conversations you have missed
