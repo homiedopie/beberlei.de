@@ -28,5 +28,5 @@ packed this into a shell script `slack-quiet`.
 
 .. author:: default
 .. categories:: none
-.. tags:: none
+.. tags:: DeepWork
 .. comments::
