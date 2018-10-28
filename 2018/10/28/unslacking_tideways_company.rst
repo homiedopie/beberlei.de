@@ -49,8 +49,9 @@ e-mail or screen.
 My ultimate goal is to get longer stretches of uninterrupted time to work on
 features, customer support or operational issues. Under time pressure the last
 3 years I realized that productive and concentrated tinkering on projects is my
-number one driver of happiness at work. I consider this a primary value of the
-my company, and it takes hard work to make it happen.
+number one driver of happiness at work. I consider this a primary value of my
+company, and it takes work and distance to the current status quo to make it
+happen.
 
 If you want to follow up on this ideas on your own, I can recommend the books
 `Deep Work <http://calnewport.com/books/deep-work/>`_ by Cal Newport, `The
