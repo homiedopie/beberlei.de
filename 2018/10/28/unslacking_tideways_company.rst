@@ -4,8 +4,7 @@ Unslacking Tideways Company
 We have moved away from Slack at `Tideways <https://tideways.com>`_ over the
 last three months, because I found Slack is already annoying, even with just a
 four person team (plus the occasional freelancer). For me, it disrupts deep
-work phases and knowledge lost in the depth of chat history. I can't imagine
-how unproductive Slack must be for larger companies.
+work phases and knowledge lost in the depth of chat history.
 
 As an engineer, I have learned to be productive when I have a quiet space and
 can tinker on a problem without getting interrupted. Slack makes this very
