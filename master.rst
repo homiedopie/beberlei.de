@@ -147,6 +147,5 @@ Sitemap
    2008/07/21/zend-dojo-and-the-django-template-language
    2008/07/12/discussing-a-jquery-helper-for-zend-framework
    pages/about
-   pages/debugging_php
    pages/imprint
    2008/07/24/finished-first-django-template-language-port-to-php-zf
