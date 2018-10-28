@@ -53,9 +53,12 @@ number one driver of happiness at work. I consider this a primary value of the
 my company, and it takes hard work to make it happen.
 
 If you want to follow up on this ideas on your own, I can recommend the books
-`Deep Work by Cal Newport <http://calnewport.com/books/deep-work/>`_ and `It
-doesn't have to be crazy at work by Jason Fried and David Heinemeier-Hanson
-<https://basecamp.com/books/calm>`_.
+`Deep Work <http://calnewport.com/books/deep-work/>`_ by Cal Newport, `The
+Entrepreneur's Guide to Keeping Your Sh*t Together
+<https://zenfounder.com/products/entrepreneurs-guide-keeping-st-together/">`_
+by Sherry Walling and `It doesn't have to be crazy at work
+<https://basecamp.com/books/calm>`_ by Jason Fried and David Heinemeier
+Hansson.
 
 .. author:: default
 .. categories:: none
