@@ -63,6 +63,119 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2013/06/27/extending_symfony2__controller_utilities.html">Extending Symfony2: Controller Utilities</a></h1>
+<p>Controllers as a service are a heated topic in the Symfony world. Developers
+mainly choose to extend the base class, because its much simpler to use and
+less to write. But less to write is not necessarily true.</p>
+<div class="section" id="the-problem-injecting-tons-of-services">
+<h2>The problem: Injecting tons of services</h2>
+<p>The Symfony controller base class uses quite a lot of services, if
+you need them in your controller as a service, you have to inject them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
+        <span class="nx">RouterInterface</span> <span class="nv">$router</span><span class="p">,</span>
+        <span class="nx">EngineInterface</span> <span class="nv">$engine</span><span class="p">,</span>
+        <span class="nx">HttpKernel</span> <span class="nv">$kernel</span><span class="p">,</span>
+        <span class="nx">FormFactoryInterface</span> <span class="nv">$formFactory</span><span class="p">,</span>
+        <span class="nx">SecurityContextInterface</span> <span class="nv">$security</span>
+    <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">router</span> <span class="o">=</span> <span class="nv">$router</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">engine</span> <span class="o">=</span> <span class="nv">$engine</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">kernel</span> <span class="o">=</span> <span class="nv">$kernel</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFactory</span> <span class="o">=</span> <span class="nv">$formFactory</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">security</span> <span class="o">=</span> <span class="nv">$security</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are some problems here:</p>
+<ul class="simple">
+<li>The services are not loaded lazily, we probably end up with a resource overuse here.</li>
+<li>The constructor is MUCH too big, this doesn’t even include your own
+application, database or mailer services.</li>
+</ul>
+</div>
+<div class="section" id="the-quick-and-dirty-solution">
+<h2>The quick and dirty solution</h2>
+<p>You could as a first solution, inject the container into your controller.
+But this is actually the same as just using the base controller from Symfony
+or just use the <span class="docutils literal"><span class="pre">ContainerAware</span></span> interface in a controller of your own.</p>
+</div>
+<div class="section" id="the-solution-introduce-a-utilities-service">
+<h2>The solution: Introduce a Utilities Service</h2>
+<p>To avoid the mentioned problems with controller as a service, introduce a
+controller utilities service and register it as <span class="docutils literal"><span class="pre">controller_utils</span></span> service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">ControllerUtils</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="o">=</span> <span class="nv">$container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">createForm</span><span class="p">(</span><span class="nv">$type</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$template</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ..</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can implement this by just copying the over from
+<span class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></span> all the methods you
+need.</p>
+<p>Then you can simplify the controller as a service:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$utils</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span><span class="nx">ControllerUtils</span> <span class="nv">$utils</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">utils</span> <span class="o">=</span> <span class="nv">$utils</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You don’t have to stop here. You can introduce lots of helper objects
+and inject them into your controller, depending on your use-cases.
+Generic handling of file uploads comes to mind for example.</p>
+<p>From medium to large applications this can lead to much smaller
+controllers, because they can much more easily reuse code between
+each other than in the case of inheritance.</p>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/symfony.html">Symfony</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 27, 2013
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2013/06/24/bounded_contexts.html">Bounded Contexts</a></h1>
 <p>I regularly fall into the same trap when building applications: Trying to find
 the one model that unifies all the use-cases and allows to solve every problem.
@@ -527,40 +640,6 @@ hear other stories.</p>
         <p>
             <small>
                 Posted on April 06, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/03/12/code_coffee_bonn.html">Code &amp; Coffee Bonn</a></h1>
-<p>On last years <a class="reference external" href="http://www.socrates-conference.de/">SoCraTes Conference</a> I had
-the pleasure to meet <a class="reference external" href="https://twitter.com/sandromancuso">Sandro Mancuso</a> from
-the London Software Craftsmanship Community (LSCC). Following his Twitter
-account I stumbled upon a meetup concept called “Code &amp; Coffee” which the LSCC
-organizes very regularly. At a “Code &amp; Coffee” developers would meet up early
-in the morning before work to discuss and hack at some coffee place.</p>
-<p>I liked the idea very much and started such an event in Bonn. Our first
-test-event was a success, so that we now open up the concept to anyone who
-wants to join.</p>
-<p>There is a <a class="reference external" href="https://plus.google.com/u/0/communities/118268893445703199868">Google+ Community Code &amp; Coffee Bonn</a> where you can
-join and get regular invites to the events.</p>
-<p>Our next event is on March 26th. For more details see the Google+ page.</p>
-<p>Looking forward to seeing you there!</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/community.html">Community</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on March 12, 2013
                  by Benjamin Eberlei
             </small>
         </p>

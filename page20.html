@@ -63,6 +63,205 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/06/24/teaching-zend-form-some-mvc.html">Teaching Zend_Form some MVC</a></h1>
+<p>Lots of people complain that Zend Form runs counter to the MVC spirit,
+because it handles validation, business logic and view elements all in
+one acting as Model, Controller and View.</p>
+<p>Extending the Zend Form component to handle all this different aspects
+in different layers of the application is rather easy though. What we
+want of a MVC compatible Form object is the following:</p>
+<ul class="simple">
+<li>The <strong>model</strong> escapes and validates all the data that is put into the
+form.</li>
+<li>The <strong>view</strong> decides on how the form is displayed.</li>
+<li>The <strong>controller</strong> moves data from the model to the view and back,
+handling the stages of the form request.</li>
+</ul>
+<p>The first step is, <strong>allowing any Model that implements
+Zend_Validator_Interface to hook into the Zend_Form Validation
+process</strong>. We generate a new class, WW_Form_Mvc and allow a function
+setModel() to insert any Model object that implements
+Zend_Validator_Interface into the form. We extend isValid(),
+getMessages() and getErrors() to not only check all the form elements
+validators, but also the models validators. Please note that the
+array_merge() solution is not the correct way of how this snippet
+should work. Any merge operation of the messages and errors has to be on
+a field key level, which is not currently done.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_Form_Mvc extends Zend_Form
+{
+    protected $model = null;
+
+    /**
+     * Extends isValid() method of Zend Form to check for validity of specified model
+     * @param Array $data
+     * @return Boolean
+     */
+    public function isValid($data)
+    {
+        $valid = parent::isValid($data);
+
+        if($valid == true &amp;&amp; !is_null($model)) {
+            $valid = $this-&gt;model-&gt;isValid($data) &amp;&amp; $valid;
+        }
+        return $valid;
+    }
+
+    /**
+     * Extends getMessages() Validator Interface implementation of Zend Form to also
+     * return the messages of the Model validation.
+     * @return Array
+     */
+    public function getMessages($name = null, $suppressArrayNotation = false)
+    {
+        $messages = parent::getMessages($name, $suppressArrayNotation);
+
+        if(!is_null($model)) {
+             $form_messages = $this-&gt;model-&gt;getMessages();
+
+             $messages = array_merge($messages, $form_messages);
+        }
+
+        return $messages;
+    }
+
+    /**
+     * Extends getErrors() Validator Interface implementation of Zend Form to also
+     * return the errors of the Model validation.
+     * @return Array
+     */
+    public function getErrors($name = null)
+    {
+         $messages = parent::getErrors($name);
+
+        if(!is_null($model)) {
+             $form_messages = $this-&gt;model-&gt;getErrors();
+
+             $messages = array_merge($messages, $form_messages);
+        }
+
+        return $messages;
+    }
+
+    /**
+     * Set a Model object, which has to implement Zend_Validate_Interface
+     * @throws Zend_Exception
+     */
+    public function setModel($model)
+    {
+        if($model instanceof Zend_Validate_Interface) {
+            $this-&gt;model = $model;
+        } else {
+             throw new Zend_Exception('WW_Form_Mvc expects a model of type Zend_Validate_Interface');
+        }
+    }
+}
+</pre></div>
+</div>
+<p>We then extend the WW_Form_Mvc class to disable the automatic
+loading of decorators in the Constructor and additionally allow to
+pass a Model to the constructor as second argument:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_Form_Mvc
+{
+    protected $model = null;
+
+    /**
+     * this overrides the original Zend_Form Constructor and skips
+     * the decorator initialisation, because this is now being handled
+     * by View Helpers
+     */
+    public function __construct($options=null, $model=null)
+    {
+        if (is_array($options)) {
+            $this-&gt;setOptions($options);
+        } elseif ($options instanceof Zend_Config) {
+            $this-&gt;setConfig($options);
+        }
+
+        // Extensions...
+        $this-&gt;init();
+
+        if(!is_null($model)) {
+             $this-&gt;setModel($model);
+        }
+    }
+
+    // All the other stuff here
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>In our views we want to <strong>use helper methods to manage the
+displaying of the form</strong>. For each different style of form
+displaying, we can generate different helpers. For example a helper
+that would only apply the default decorators would look like this:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_View_Helper_FormDefault
+{
+    /**
+     * Load only default decorators on this Zend_Form object
+     *
+     * @param Zend_Form $form
+     */
+    public function formDefault(Zend_Form $form)
+    {
+        if($form instanceof Zend_Form) {
+            $form-&gt;loadDefaultDecorators();
+            return $form;
+        }
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>We can now use this helper and in any template say: &lt;?=
+$this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
+controller action that implements this form and we will see that it
+does not look different from what we would have done before:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>function formAction()
+{
+    $model = new SomeModel();
+
+    $form = new WW_Form_Mvc();
+    $form-&gt;setModel($model);
+
+    // generate form here, adding elements and stuff
+
+    if($form-&gt;isValid($_POST)) {
+        $model-&gt;insert($form-&gt;getValues());
+        $this-&gt;view-&gt;form = "Form was submitted!";
+    } else {
+        $this-&gt;view-&gt;form = $form;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Isnt that nice? Now each part of the equation is doing what its
+supposed to do.</p>
+</div></blockquote>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 24, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/11/05/overwrite-ezcmvccontroller-a-bit-more-rapid.html">Overwrite ezcMvcController - A bit more rapid</a></h1>
 <p>ezComponents gets Mvc in its 2008.2 version. I have played around a bit
 with the alpha version, since I am currently searching for a good
@@ -273,37 +472,6 @@ Calypso, so please don’t use it for anything production.</p>
         <p>
             <small>
                 Posted on November 01, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/11/29/encouraging-forks-for-calypso-dtl.html">Encouraging forks for Calypso DTL</a></h1>
-<p>I still get a bunch of emails regarding the <a class="reference external" href="http://www.beberlei.de/calypso">Calypso DTL template
-engine</a> that I have written some month
-ago and which i can currently not maintain any further (<a class="reference external" href="http://www.whitewashing.de/blog/articles/86">see my posting
-on that</a>). Still I
-encourage anyone to fork the project and develop it further. Personally
-what I think is missing are some bugfixes and enhancements regarding the
-compiling and parsing. I created a <a class="reference external" href="http://github.com/beberlei/calypsodtl/tree/master">GITHub Project for Calypso
-DTL</a>, so
-collaborative development is very easy and added general TODOS to the
-README.txt that is on the front page of github project page.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on November 29, 2008
                 
             </small>
         </p>

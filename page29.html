@@ -63,6 +63,66 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/07/12/discussing-a-jquery-helper-for-zend-framework.html">Discussing a jQuery Helper for Zend Framework</a></h1>
+<p>Yesterday I had some time to test Matthews <a class="reference external" href="http://framework.zend.com/wiki/display/ZFPROP/Zend_View_Helper_Dojo">Dojo View
+Helper</a>
+and the Zend_Dojo_Form component. At a first glance the implementation
+looks great and can almost instantly generate you a very nice form with
+all the possible Dijit form extensions that
+<a class="reference external" href="http://dojotoolkit.org/">Dojo</a> has to offer.</p>
+<p>If one were to refactor the Dojo Component to allow for
+<a class="reference external" href="http://www.jquery.com">jQuery</a> elements one bigger problem appears.
+Dojo has a CDN (Content Distribution Network) for all its components,
+that is, the Zend Dojo components can load all javascript and css files
+from a distant server. JQuery can only offer its main library to be
+loaded from a CDN. All additional components, for example the jQuery
+DatePicker, have to be installed locally. This significantly reduces the
+possibility for rapid development of Javascript/Ajax/Form components
+with jQuery and Zend Framework.</p>
+<p>One could offer a complete dependency downloadable archive with all the
+CSS, Javascript and Images inside, but this would be very complex to
+maintain. Looking at the future Zend Tool capabilities one possibility
+would be to offer a download client for all the relevant jQuery plugins,
+but there would have to be a man-middle-server that maintains the most
+up to date locations of all the plugins, which also has to be
+maintained. Does anybody have a better solution to solve this problem?
+Perhaps the jQuery Team needs to be made aware that they need a CDN for
+their most stable plugins.</p>
+<p>Abstracting from the CDN problem, I implemented a simple jQuery View
+Helper (mostly copy paste and simple rewrites from Matthews Dojo
+component) and a HtmlElement Form Helper which constructs a Date-Picker
+from within the template. This is very easy to use and looks great. In
+the next days I will add further helpers for the jQuery plugins I use in
+my day to day work live and hope to present a demo. I might even opting
+for a jQuery proposal aiming at inclusion in the Zend Extras Library.</p>
+<p><strong>Update:</strong> I got a <a class="reference external" href="http://groups.google.com/group/jquery-dev/browse_thread/thread/aec0d89b97a95880">reply on the jQuery mailing
+list</a>
+stating that a CDN is planned for the jQuery UI library. Sadly this does
+not include plugins for which one might desperately need a View Helper
+except for maybe the Date Picker. I will post further comments on this
+issue in the near future.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                 / 
+                <a href="tags/jquery.html">jQuery</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on July 12, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/07/24/finished-first-django-template-language-port-to-php-zf.html">Finished first Django Template Language Port to PHP + ZF</a></h1>
 <p>Today I finished the first almost complete <a class="reference external" href="http://www.djangoproject.com">Django Template
 Language</a> Clone for PHP implementing the

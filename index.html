@@ -63,6 +63,67 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2018/10/28/unslacking_tideways_company.html">Unslacking Tideways Company</a></h1>
+<p>We have moved away from Slack at Tideways over the last three months, because I
+found Slack is already annoying, even with just a four person team (plus the
+occasional freelancer). For me, it disrupts deep work phases and knowledge lost
+in the depth of chat history. I can’t imagine how unproductive Slack must be
+for larger companies.</p>
+<p>As an engineer, I have learned to be productive when I have a quiet space and
+can tinker on a problem without getting interrupted. Slack makes this very
+difficult and at least for me, is a primary cause of annexity and fear of
+missing out (FOMO).</p>
+<p>While at first sight it seems chat is asynchronous it really is not.</p>
+<ol class="arabic simple">
+<li>If you wait for a long time to reply to a message on chat, then the
+discussion thread is already spread in the history of the chat room and
+messages back and forth interleaved with many additional messages that are
+not related is not helpful.</li>
+<li>In addition chats online status indicators exist just so that you know
+if someone can answer any question directly, increasing communication
+annexity.</li>
+<li>If you set yourself into some kind of do not disturb mode or mute a channel,
+then its easy to miss important conversations and get left out of
+discussions or decisions. Reading up on long conversations you have missed
+is hard with chat tools.</li>
+<li>By also sending Github commit messages, OpsGenie and Tideways alerts,
+excerpts of HelpScout ticket updates and other “events” of the business into
+Slack through various integrations we made Slack the primary tool to check
+if <strong>anything</strong> is going on. While it is important to see what is going on,
+this almost never has to happen in realtime and by connecting it to the
+chat, we excuberated the previous points and everyone is checking chat even
+more frequently.</li>
+</ol>
+<p>Jason Fried summed it up much better than I could <a class="reference external" href="https://m.signalvnoise.com/is-group-chat-making-you-sweat-744659addf7d">in this blog post</a>.</p>
+<p>We are now using Github (issues and pull requests) and Basecamp (Messages,
+Todolists) to replace Slack. Both tools allow us to have context sensitive,
+asynchronous discussions on specific topics.</p>
+<p>Since work never happens in a vacuum, I would be happy to have only a
+single realtime notification tool (OpsGenie/PagerDuty) that sends notifications
+to poeple currently on-call, and only about problems that require realtime
+attention. Everything else, including chat, can be part of a daily summary
+e-mail or screen.</p>
+<p>My ultimate goal is to get longer stretches of uninterrupted time to work on
+features, customer support or operational issues. Under time pressure the last
+3 years I realized that productive and concentrated tinkering on projects is my
+number one driver of happiness at work. I consider this a primary value of the
+my company, and it takes hard work to make it happen.</p>
+<p>If you want to follow up on this ideas on your own, I can recommend the books
+<a class="reference external" href="http://calnewport.com/books/deep-work/">Deep Work by Cal Newport</a> and <a class="reference external" href="https://basecamp.com/books/calm">It
+doesn’t have to be crazy at work by Jason Fried and David Heinemeier-Hanson</a>.</p>
+
+
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on October 28, 2018
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2018/10/20/how_we_paid_the_hidden_costs_of_bootstrapping_tideways.html">How we paid the hidden costs of bootstrapping Tideways</a></h1>
 <p>Justin Jackson started an extremely interesting discussion about the
 <a class="reference external" href="https://justinjackson.ca/bootstrap-reality/">Bootstrappers paradox</a> and the
@@ -256,82 +317,6 @@ binary:</p>
         <p>
             <small>
                 Posted on March 29, 2017
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1.html">How to complete a side project and turn it into a business (Level 1)</a></h1>
-<p>Almost four years ago I wrote about <a class="reference external" href="https://beberlei.de/2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a> and when I stumbled
-across the post <a class="reference external" href="http://ewanvalentine.io/how-to-never-complete-anything/">How to *never* complete anything</a> several days ago I
-felt it was time for an update. Ewan’s post covers similar lessons learned that I
-wrote about in my post and I heard about many side projects that failed
-because of similar mistakes.</p>
-<p>There was an argument on HackerNews what a side project is, so I want to
-clarify this up front. I am talking about side-projects written with some intend
-of turning them into a business, as opposed to side-projects that are started for
-learning new technical skills.</p>
-<p>Three years ago I have started working on a PHP profiling and monitoring
-side-project, which I turned into a business called <a class="reference external" href="https://tideways.io">Tideways</a>. In this post I wanted to share some of the reasons why
-I think this project was successful.</p>
-<p>The idea for “XHProf as a Service” was on my “Side Project Ideas” trello board,
-where I write everything down that I want to try or experiment with. I have
-picked it out for implementation as my new side project, because that month I
-would have needed this for a large scale load-testing project at my job with
-<a class="reference external" href="https://qafoo.com">Qafoo</a>. It was not the first time I needed this for
-myself, I felt a regular pain that a product like this didn’t exist.</p>
-<p>Not wanting to make the same mistakes, I have applied all the lessons learned from 2013:</p>
-<ul class="simple">
-<li><strong>I picked a small scope</strong>: The first version contained very few features, re-used
-the existing xhprof PHP extension (Tideways now has its own) and instead of a
-daemon collecting data in realtime used a cronjob to collect data from a
-directory every minute. After six months of development I removed half of
-the features I experimented with to reduce the scope again.</li>
-<li><strong>I did not compete with the established competition on features</strong>, instead I focussed
-on two single features that I thought where the most important: Response time
-monitoring and Callgraph profiling. By focussing on a niche (PHP intead of all
-languages) I was able to provide a better solution than existing generic tools (obviously biased).</li>
-<li><strong>I did not work all alone on the project</strong>, instead I have immediately enlisted
-alpha-users that gave valuable feedback after 1 month of work and some of
-them are still our most active customers; brought in my employer Qafoo who is
-now a shareholder in the new business; formed business partnerships with
-companies that are now our biggest customers and re-sellers.</li>
-<li><strong>I did not keep the idea secret</strong>, when I announced our beta program
-publically in June 2014 the launch newsletter list received 250 sign ups and 60
-Twitter followers in a few hours.</li>
-<li><strong>I choose boring technology</strong>, using a monolithic Symfony, PHP, MySQL
-backend and jQuery frontend stack allowed me to iterate very fast on new
-features with technology that I already mastered. I <a class="reference external" href="http://mcfunley.com/choose-boring-technology">spent three innovation
-tokens</a> on using Golang for
-the daemon, using Elasticsearch as TimeSeries database and later on learning
-C for the PHP extension.</li>
-</ul>
-<p>Making these decisions has not magically turned my side project into a
-profit-generating business. However I have avoided all the problems that I have
-written about in my failed side project lessons post from four years ago.</p>
-<p>The fast iterations on a small scope combined with early user feedback showed
-that this idea will work as a business and it was worthwhile to keep pushing
-for two years, until the project generated enough revenue after all other costs
-to pay my full time salary.</p>
-<p>This felt like passing level 1 in getting a bootstrapped side project of the
-ground (there are many more levels after that).</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/sideprojects.html">SideProjects</a>
-                 / 
-                <a href="tags/bootstrapping.html">Bootstrapping</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on March 13, 2017
                  by Benjamin Eberlei
             </small>
         </p>

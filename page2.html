@@ -63,6 +63,82 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1.html">How to complete a side project and turn it into a business (Level 1)</a></h1>
+<p>Almost four years ago I wrote about <a class="reference external" href="https://beberlei.de/2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a> and when I stumbled
+across the post <a class="reference external" href="http://ewanvalentine.io/how-to-never-complete-anything/">How to *never* complete anything</a> several days ago I
+felt it was time for an update. Ewan’s post covers similar lessons learned that I
+wrote about in my post and I heard about many side projects that failed
+because of similar mistakes.</p>
+<p>There was an argument on HackerNews what a side project is, so I want to
+clarify this up front. I am talking about side-projects written with some intend
+of turning them into a business, as opposed to side-projects that are started for
+learning new technical skills.</p>
+<p>Three years ago I have started working on a PHP profiling and monitoring
+side-project, which I turned into a business called <a class="reference external" href="https://tideways.io">Tideways</a>. In this post I wanted to share some of the reasons why
+I think this project was successful.</p>
+<p>The idea for “XHProf as a Service” was on my “Side Project Ideas” trello board,
+where I write everything down that I want to try or experiment with. I have
+picked it out for implementation as my new side project, because that month I
+would have needed this for a large scale load-testing project at my job with
+<a class="reference external" href="https://qafoo.com">Qafoo</a>. It was not the first time I needed this for
+myself, I felt a regular pain that a product like this didn’t exist.</p>
+<p>Not wanting to make the same mistakes, I have applied all the lessons learned from 2013:</p>
+<ul class="simple">
+<li><strong>I picked a small scope</strong>: The first version contained very few features, re-used
+the existing xhprof PHP extension (Tideways now has its own) and instead of a
+daemon collecting data in realtime used a cronjob to collect data from a
+directory every minute. After six months of development I removed half of
+the features I experimented with to reduce the scope again.</li>
+<li><strong>I did not compete with the established competition on features</strong>, instead I focussed
+on two single features that I thought where the most important: Response time
+monitoring and Callgraph profiling. By focussing on a niche (PHP intead of all
+languages) I was able to provide a better solution than existing generic tools (obviously biased).</li>
+<li><strong>I did not work all alone on the project</strong>, instead I have immediately enlisted
+alpha-users that gave valuable feedback after 1 month of work and some of
+them are still our most active customers; brought in my employer Qafoo who is
+now a shareholder in the new business; formed business partnerships with
+companies that are now our biggest customers and re-sellers.</li>
+<li><strong>I did not keep the idea secret</strong>, when I announced our beta program
+publically in June 2014 the launch newsletter list received 250 sign ups and 60
+Twitter followers in a few hours.</li>
+<li><strong>I choose boring technology</strong>, using a monolithic Symfony, PHP, MySQL
+backend and jQuery frontend stack allowed me to iterate very fast on new
+features with technology that I already mastered. I <a class="reference external" href="http://mcfunley.com/choose-boring-technology">spent three innovation
+tokens</a> on using Golang for
+the daemon, using Elasticsearch as TimeSeries database and later on learning
+C for the PHP extension.</li>
+</ul>
+<p>Making these decisions has not magically turned my side project into a
+profit-generating business. However I have avoided all the problems that I have
+written about in my failed side project lessons post from four years ago.</p>
+<p>The fast iterations on a small scope combined with early user feedback showed
+that this idea will work as a business and it was worthwhile to keep pushing
+for two years, until the project generated enough revenue after all other costs
+to pay my full time salary.</p>
+<p>This felt like passing level 1 in getting a bootstrapped side project of the
+ground (there are many more levels after that).</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/sideprojects.html">SideProjects</a>
+                 / 
+                <a href="tags/bootstrapping.html">Bootstrapping</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on March 13, 2017
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2017/03/12/explicit_global_state_with_context_objects.html">Explicit Global State with Context Objects</a></h1>
 <p>Global State is considered bad for maintainability of software. Side effects on
 global state can cause a very nasty class of bugs. Context objects are one
@@ -588,74 +664,6 @@ only once.</p>
         <p>
             <small>
                 Posted on August 08, 2015
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2015/06/12/the_containertest.html">The ContainerTest</a></h1>
-<p>This is a short post before the weekend about testing in applications with
-dependency injection container (DIC). This solution helps me with a problem
-that I occasionally trip over in environments with large amounts of services
-connected through a DIC.</p>
-<p>The problem is forgetting to adjust the DIC configuration when you add a new or
-remove a dependency to a service. This can easily slip through into production
-if you rely on your functional- and unit-tests to catch the problem.</p>
-<p>I can avoid this problem by adding a functional test in my application that
-instantiate all the various services and checks if they are created correctly.
-The first time I saw this pattern was during development of some of the early
-Symfony2 bundles, most notably DoctrineBundle.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">ContainerTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
-<span class="p">{</span>
-    <span class="k">use</span> <span class="nx">SymfonySetup</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">dataServices</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
-            <span class="k">array</span><span class="p">(</span><span class="s1">'AcmeDemoBundle.FooService'</span><span class="p">,</span> <span class="s1">'Acme\DemoBundle\Service\FooService'</span><span class="p">),</span>
-            <span class="k">array</span><span class="p">(</span><span class="s1">'AcmeDemoBundle.BarController'</span><span class="p">,</span> <span class="s1">'Acme\DemoBundle\Controller\BarController'</span><span class="p">),</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="sd">/**</span>
-<span class="sd">     * @test</span>
-<span class="sd">     * @dataProvider dataServices</span>
-<span class="sd">     */</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">it_creates_service</span><span class="p">(</span><span class="nv">$id</span><span class="p">,</span> <span class="nv">$class</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$service</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContainer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertInstanceOf</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="nv">$service</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Whenever you create or modify a service check the ContainerTest if its already
-guarded by a test. Add a test if necesary and then make the change. It’s as
-easy as that.</p>
-<p>The <span class="docutils literal"><span class="pre">SymfonySetup</span></span> trait provides access to the Symfony DIC using
-<span class="docutils literal"><span class="pre">getContainer()</span></span> as you can see in the test method. See <a class="reference external" href="http://www.whitewashing.de/2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">my blog post</a>
-on traits in tests for more information.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/symfony.html">Symfony</a>
-                 / 
-                <a href="tags/testing.html">Testing</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on June 12, 2015
                  by Benjamin Eberlei
             </small>
         </p>

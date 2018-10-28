@@ -63,6 +63,225 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2015/02/10/a_case_for_weak_type_hints_only_in_php7.html">A case for weak type hints only in PHP7</a></h1>
+<p>TL;DR: I was one voice for having strict type hints until I tried the current
+patch. From both a library and application developer POV they don’t bring much
+to the table. I think PHP would be more consistent with weak type hints only.</p>
+<p>These last weeks there have been tons of discussions about <a class="reference external" href="https://wiki.php.net/rfc/scalar_type_hints">scalar type
+hints</a>
+in PHP following <a class="reference external" href="https://twitter.com/andreafaulds">Andrea Faulds</a> RFC
+that is currently in voting. Most of them were limited to PHP Internals
+mailinglist but since the voting started some days ago much has also been said
+on Twitter and blogs.</p>
+<p>This post is my completly subjective opinion on the issue.</p>
+<p>I would have preferred strict type hints, however after trying the patch, I
+think that strict type hints</p>
+<ul class="simple">
+<li>will cause considerable problems for application developers, forcing them to
+“replicate weak type hinting” by manually casting everywhere.</li>
+<li>are useless for library developers, because they have to assume the user
+is in weak type mode.</li>
+<li>are useless within a library because I already know the types at the public
+API, weak mode would suffice for all the lower layers of my library.</li>
+</ul>
+<p>Neither group of developers gets a considerable benefit from the current RFCs strict mode.</p>
+<p>The simple reason for this, request, console inputs and many databases provide
+us with strings, casting has to happen somewhere. Having strict type hints
+would not save us from this, type juggling and casting has to happen and
+PHP’s current approach is one of the main benefits of the language.</p>
+<div class="section" id="real-world-weak-vs-strict-code-example">
+<h2>Real World Weak vs Strict Code Example</h2>
+<p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
+Code</a> to
+support my case:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">UserController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">listAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$status</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">);</span> <span class="c1">// this is a string</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">'users'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchUsers</span><span class="p">(</span><span class="nv">$status</span><span class="p">),</span>
+            <span class="s1">'total'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">service</span><span class="o">-&gt;</span><span class="na">fetchTotalCount</span><span class="p">(</span><span class="nv">$status</span><span class="p">)</span>
+        <span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">UserService</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">STATUS_INACTIVE</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_WAITING</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">STATUS_APPROVED</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$connection</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchUsers</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT u.id, u.username FROM users u WHERE u.status = ? LIMIT 10'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchTotalCount</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$status</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span>
+    <span class="p">{</span>
+        <span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'SELECT count(*) FROM users u WHERE u.status = ?'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">connection</span><span class="o">-&gt;</span><span class="na">fetchColumn</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="p">[</span><span class="nv">$status</span><span class="p">]);</span> <span class="c1">// returns a string</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See how the code on <span class="docutils literal"><span class="pre">UserService</span></span> is guarded by scalar typehints to enforce
+having the right types inside the service:</p>
+<ul class="simple">
+<li><span class="docutils literal"><span class="pre">$status</span></span> is a flag to filter the result by and it is one of the integer constants, the type hint coerces an integer from the request string.</li>
+<li><span class="docutils literal"><span class="pre">fetchTotalCount()</span></span> returns an integer of total number of users matching the query, the type hint coerces an integer from the database string.</li>
+</ul>
+<p>This code example <em>only</em> works with weak typehinting mode as described in the RFC.</p>
+<p>Now lets enable strict type hinting to see how the code fails:</p>
+<ul class="simple">
+<li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
+<li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Argument</span> <span class="mi">1</span> <span class="n">passed</span> <span class="n">to</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchUsers</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">given</span><span class="p">,</span> <span class="n">called</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">22</span>
+<span class="ow">and</span> <span class="n">defined</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">37</span>
+
+<span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Return</span> <span class="n">value</span> <span class="n">of</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchTotalCount</span><span class="p">()</span> <span class="n">must</span>
+<span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">returned</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">48</span>
+</pre></div>
+</div>
+<p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">public function listAction(Request $request)</span>
+<span class="x">{</span>
+<span class="x">    $status = (int)$request-&gt;get('status'); // this is a string</span>
+
+<span class="x">    return [</span>
+<span class="x">        'users' =&gt; $this-&gt;service-&gt;fetchUsers($status),</span>
+<span class="x">        'total' =&gt; $this-&gt;service-&gt;fetchTotalCount($status)</span>
+<span class="x">    ];</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">public function fetchTotalCount(int $status): int</span>
+<span class="x">{</span>
+<span class="x">    $sql = 'SELECT count(*) FROM users u WHERE u.status = ?';</span>
+
+<span class="x">    return (int)$this-&gt;connection-&gt;fetchColumn($sql, [$status]);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>It feels to me that enabling strict mode completly defeats the purpose, because
+now we are forced to convert manually, reimplementing weak type hinting in our
+own code.</p>
+<p>More important: We write code with casts already, the scalar type hints patch
+is not necessary for that! Only a superficial level of additional safety is
+gained, one additional check of something we already know is true!</p>
+<p>Strict mode is useless for library developers, because I always have to assume
+weak mode anyways.</p>
+<p><strong>EDIT:</strong> I argued before that you have to check for casting strings to 0 when
+using weak typehints. That is not necessary. Passing <span class="docutils literal"><span class="pre">fetchTotalCount("foo")</span></span>
+will throw a catchable fatal error in weak mode already!</p>
+</div>
+<div class="section" id="do-we-need-strict-mode">
+<h2>Do we need strict mode?</h2>
+<p>In a well designed application or library, the developer can already trust the
+types of his variables today, 95% of the time, without even having type hints,
+using carefully designed abstractions (example Symfony Forms and Doctrine ORM): No
+substantial win for her from having strict type hints.</p>
+<p>In a badly designed application, the developer is uncertain about the types of
+variables. Using strict mode in this scenario she needs to start casting
+everywhere just to be sure. I cannot imagine the resulting code to look
+anything but bad. Strict would actually be counterproductive here.</p>
+<p>I also see a danger here, that writing “strict mode” code will become a best
+practice and this might lead developers working on badly desigend applications
+to write even crappier code just to follow best practices.</p>
+<p>As a pro strict mode developer I could argue:</p>
+<ul class="simple">
+<li>that libraries such as Doctrine ORM and Symfony Forms already
+abstract all the nitty gritty casting from request or database today. But I
+don’t think that is valid: They are two of the most sophisticated PHP libraries
+out there, maybe used by 1-5% of the userbase. I don’t want to force this
+level of abstraction on all users. I can’t use this level myself all the
+time. Also if libraries already abstract this for us, why need to duplicate
+the checks again if we can trust the variables types?</li>
+<li>that I might have complex (mathematical) algorithms that benefit from strict
+type hinting. But that is not really true: Once the variables have passed
+through the public API of my fully typehinted library I know the types and can rely
+on them on all lower levels. Weak or strict type hinting doesn’t make a
+difference anymore. Well designed libraries written in PHP5 already provide
+this kind of trust using carefully designed value objects and guard clauses.</li>
+<li>that using strict type in my library reduce the likelihood of bugs, but that
+is not guaranteed.  Users of my library can always decide not to use strict
+type hints and that requires me as a library author to consider this use-case
+and prevent possible problems. Again using strict mode doesn’t provide a
+benefit here.</li>
+<li>to write parts of the code in strict and parts in weak mode. But how to
+decide this? Projects usually pick only one paradigm for good reason:
+<span class="docutils literal"><span class="pre">E_STRICT</span></span> compatible code yes or no for example. Switching is arbitrary
+and dangerously inconsistent. As a team lead I would reject such kind of
+convention because it is impractible. Code that follows this paradigm in
+strict languages such as Java and C# has an aweful lot of converting methods
+such as <span class="docutils literal"><span class="pre">$connection-&gt;fetchColumnAsInteger()</span></span>. I do not want to go down
+that road.</li>
+</ul>
+</div>
+<div class="section" id="would-we-benefit-from-only-strict-mode">
+<h2>Would we benefit from only strict mode?</h2>
+<p>Supporters of strict mode only: Make sure to understand why this will never happen!</p>
+<p>Say the current RFC gets rejected, would we benefit from a strict type hinting
+RFC? No, and the current RFC details the exact reasons why. Most notably
+for BC reasons all the PHP API will not use the new strict type hinting.</p>
+<p>This current RFC is the only chance to get any kind of strict hinting into PHP.
+Yet with the limited usefullness as described before, we can agree that just
+having weak mode would be more consistent and therefore better for everyone.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>I as PHP developer using frameworks and libraries that help me write type safe
+code today, strict typing appeals to me. But put to a test in real code it
+proves to be impractical for many cases, and not actually much more useful
+than weak type hinting in many other cases.</p>
+<p>Weak types provide me with much of the type safety I need: In any given method,
+using only typehinted parameters and return values, I am safe from type
+juggling. As a library developer I have to assume caller uses weak mode all the
+time.</p>
+<p>Having strict type hints suggests that we can somehow get rid of type juggling
+all together. But that is not true, because we still have to work with user
+input and databases.</p>
+<p>The current RFC only introduced the extra strict mode because developers had a
+very negative reactions towards weak type hints. Strike me from this list, weak
+type hints are everything that PHP should have. I will go as far that others
+strict-typers would probably agree when actually working with the patch.</p>
+<p>I would rather prefer just having weak types for now, this is already
+a big change for the language and would prove to be valuable for everyone.</p>
+<p>I fear Strict mode will have no greater benefit than gamification of the
+language, the winner is the one with the highest percentage of strict mode
+code.</p>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/php.html">PHP</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 10, 2015
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2015/02/01/running_hhvm_webserver.html">Running HHVM with a Webserver</a></h1>
 <p>I haven’t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
 alternative PHP runtime didn’t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
@@ -707,184 +926,6 @@ approach to find improvements.</p>
         <p>
             <small>
                 Posted on August 11, 2014
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a></h1>
-<p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
-I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
-to start with a very simple “Hello World” example.</p>
-<p>The Symfony2 Standard Edition already contains a huge burden of concepts,
-assumptions and conventions that can be confusing for a beginner.</p>
-<ul class="simple">
-<li>YAML</li>
-<li>Twig</li>
-<li>Environments and Dependency Injection Container</li>
-<li>Various weird and magic syntaxes for bundles, <span class="docutils literal"><span class="pre">_controller</span></span> and template names</li>
-<li>Various files to open and poke around in</li>
-<li>Composer</li>
-<li>Maybe even Doctrine</li>
-</ul>
-<p>As a trainer it is very hard to explain all this at the same time.
-It makes a lot of sense to avoid as many of them as possible.</p>
-<p>That is why the Standard Edition is not the best way to start teaching Symfony,
-but one should actually consider a much lighter version of the framework and
-then gradually add more and more features until you end up with the standard
-edition.</p>
-<p>Fabien discussed the simplification of the Symfony Standard Edition from
-another angle before, considering the minimum necessary code to use when
-reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">“Packing a Symfony Full-Stack Application in
-one file”</a>.</p>
-<p>This blog post is about a truely minimal Symfony edition to start learning
-about the framework.  The first thing I like to show is a really simple Hello
-World controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">HelloController</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="nx">Response</span><span class="p">(</span><span class="s1">'Hello World!'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>What is the necessary framework glue code to support this Hello World? Lets start
-from the index file <cite>web/index.php</cite>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
-<span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Request</span><span class="p">;</span>
-
-<span class="nv">$request</span> <span class="o">=</span> <span class="nx">Request</span><span class="o">::</span><span class="na">createFromGlobals</span><span class="p">();</span>
-<span class="nv">$kernel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppKernel</span><span class="p">(</span><span class="s1">'dev'</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
-<span class="nv">$kernel</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
-at them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">{</span>
-<span class="x">    "require": {</span>
-<span class="x">        "symfony/symfony": "@stable"</span>
-<span class="x">    },</span>
-<span class="x">    "autoload": {</span>
-<span class="x">        "psr-0": { "Acme": "src/" }</span>
-<span class="x">    }</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>The <cite>composer.json</cite> file installs the latest stable Symfony release and
-adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
-<p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
-and the minimal version of this looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$container</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">loadFromExtension</span><span class="p">(</span><span class="s1">'framework'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-                <span class="s1">'secret'</span> <span class="o">=&gt;</span> <span class="s1">'some secret here'</span><span class="p">,</span>
-                <span class="s1">'router'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'resource'</span> <span class="o">=&gt;</span> <span class="s1">'%kernel.root_dir%/config/routing.yml'</span>
-                <span class="p">),</span>
-                <span class="s1">'templating'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'engines'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'twig'</span><span class="p">))</span>
-            <span class="p">));</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>In trainings we are starting with a single <span class="docutils literal"><span class="pre">config.yml</span></span> file but that is
-technically not necessary by using the <span class="docutils literal"><span class="pre">ClosureLoader</span></span>. The routing
-component has no such closure loader, so its not possible to avoid
-YAML in the first minutes of Symfony2 exposure and we reference
-the <cite>app/config/routing.yml</cite>:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span/>hello:
-  pattern: /
-  defaults:
-    _controller: "Acme\TrainingBundle\Controller\HelloController::helloAction"
-</pre></div>
-</div>
-<p>Did you know that you can specify controllers in Symfony by using the static callback
-syntax? It has disadvantages when considering bundle inheritance, but why
-bother a beginner with this feature and confuse him with the convention of
-<span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello"</span></span>.</p>
-<p>There are still lots of trip wires to stumble upon in this simple piece of <span class="docutils literal"><span class="pre">routing.yml</span></span>:</p>
-<ul class="simple">
-<li>Tabs are not allowed in YAML, in every training at least one person gets
-bitten by that.</li>
-<li>2 vs 4 spaces ambiguity.</li>
-<li>What is this magic <span class="docutils literal"><span class="pre">_controller</span></span> key?</li>
-<li>I carefully avoid the <span class="docutils literal"><span class="pre">{}</span></span> inline syntax of YAML here as well as it
-introduces yet another ambiguity.</li>
-</ul>
-<p>Run this application with the build in webserver:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ php -S localhost:8000 web/index.php
-</pre></div>
-</div>
-<p>Hello World!</p>
-<p>The next step for a beginner is his first twig template to print the Hello
-World. To avoid another confusing convention at the beginning, the <span class="docutils literal"><span class="pre">"AcmeTrainingBundle:Hello:hello.html.twig"</span></span>
-template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
-that is automatically registered in the Twig Bundle. Just create
-a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpFoundation\Response</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Bundle\FrameworkBundle\Controller\Controller</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">HelloController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">helloAction</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'hello.html.twig'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The total number of files is 5 (6 with template) for this example. Note that we
-haven’t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
-the static syntax we don’t need it.</p>
-<p>This is a very good starting point to start exploring more features of Symfony
-and gradually add the required configuration and files for this.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/symfony.html">Symfony</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on April 24, 2014
                  by Benjamin Eberlei
             </small>
         </p>

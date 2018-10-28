@@ -63,6 +63,199 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html">Zend_Form and the Model: Yet another perspective using a Mediator</a></h1>
+<p><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weier O’Phinney</a> of the
+Zend Framework Devteam <a class="reference external" href="http://weierophinney.net/matthew/archives/200-Using-Zend_Form-in-Your-Models.html">wrote a controversial post on integrating
+Zend_Form and the Model last
+month</a>.
+He separated concerns of view and model that communicate via a Form, by
+calling just thee validation functions on the Form inside the mode. On
+request you could retrieve the model to the controller and view layers.
+I already wrote into his comments that I didn’t like the solution
+because it relies on implicit rules for the developers to use the Form
+component correctly in all layers. Additionally the building of the form
+using this approach would be performed inside the model, although
+strictly speaking this is responsibility of the View Layer. Another
+negative point is duplication of input filtering code that has to be
+performed to use certain variables inside the controller or when
+different forms talk with the same model.</p>
+<p><a class="reference external" href="http://codeutopia.net">Jani</a> took it up and <a class="reference external" href="http://codeutopia.net/blog/2009/01/07/another-idea-for-using-models-with-forms/">proposed writing
+validators for forms and attaching them to the
+Form</a>
+as sort of a mediator. I am not a fan of this approach either, because
+the validator would have to include domain logic but is not really a
+part of the domain logic anymore but just a validator. Developers might
+forget using the validator inside the model for all their actions or
+there would be duplication of code in some places. In a perfect world,
+only functions of the models public interface should be called for
+validation.</p>
+<p>My personal favorite for Form and Model integration is a <strong>mediator</strong>
+object between the two layers. Your model will have to include an
+additional interface with one function <strong>acceptFormRequest($values);</strong>
+which accepts an array of validated Zend Form field values. It then
+tries to apply the validated data into a record. Additional required
+validations of the model can take place in this function, which
+separates the concerns of Form validation and Model data validation.
+Still the mediator merges those differences together: You can throw an
+Exception and it will be attached as a custom error message to the Form.
+The following very short code will show the required interface and the
+mediator code. This code is very simple and might produce maintenance
+overhead fast, but I propose some refactoring enhancements later in the
+discussion.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>interface WW_Model_AcceptFormRequest
+{
+    /**
+     * Acceept a form request
+     * @param array $values
+     * @return WW_Record_Interface
+     */
+    public function acceptFormRequest($values);
+}
+class WW_Model_FormMediator
+{
+    /**
+     * Try to push the form request to the model
+     *
+     * @param Zend_Form $form
+     * @param WW_Model_AcceptFormRequest $model
+     * @return WW_Record_Interface
+     */
+    public function pushFormToModel(Zend_Form $form, WW_Model_AcceptFormRequest $model)
+    {
+        if(!$form-&gt;isValid()) {
+            throw new Exception("Form not valid!");
+        } else {
+            $values = $form-&gt;getValues();
+            try {
+                $record = $model-&gt;acceptFormRequest($values);
+            } catch(Exception $e) {
+                // This exception message comes from the model, because validation failed
+                $form-&gt;addErrorMessage($e-&gt;getMessage());
+                throw new Exception("Form request not accepted by model!");
+            }
+        }
+        return $record;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You can see the mediator has two different stages where errors can
+occur: When the form is not valid or the model is not valid. Both exits
+can be catched inside the controller and are the indicator that the form
+has to be displayed again for further input corrections. When successful
+the model returns a valid record that applies to the form and model
+requirements and can be displayed. If this record should be persistent
+this would have been done inside the <strong>acceptFormRequest</strong> function
+already. An example using a very simple Model using the a BankAccount
+example. We have a form that validates all the incoming request data for
+a withdrawal of money, though does not validate it against the models
+internal state. Our BankAccountModel implements the
+<strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
+BankAccount. If found the given amount is withdrawn.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class BankAccountModel implements WW_Model_AcceptFormRequest {
+    public function acceptFormRequest($values)
+    {
+        $bankAccount = $this-&gt;getBankAccountBy($values['bankAccountNumber'], $values['pin']);
+        if($values['action'] == "withdraw") {
+            $bankAccount-&gt;withdraw($values['amount']);
+            $this-&gt;save($bankAccount);
+        } else {
+            // unknown action...
+        }
+    }
+    public function getBankAccountBy($key, $password) {
+        // Find by Primary Key returning 'BankAccount' instance or exception if not found.
+    }
+    public function save(BankAccount $ba) {
+        // Sql for saving the Bank Account
+    }
+}
+
+class BankAccount
+{
+    public function withdraw($amount)
+    {
+        if( ($this-&gt;getBalance()-$amount) &lt; 0 ) {
+            throw new Exception("You cannot withdraw more money than your bank account holds!");
+        }
+        $this-&gt;balance -= $amount;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Two exceptions might be thrown in this case: The Bank Account number
+does not exist or the password is wrong. Or you are not allowed to
+withdraw the given amount of money. If any of those exceptions is thrown
+the Model does not accept the form data and the form will have to be
+displayed again for the client showing the new error message that was
+returned from the model. The controller handling this process would look
+like this:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span/>class BankAccountController extends Zend_Controller_Action {
+    public function performWithdrawlAction() {
+        $form = new BankAccountWithdrawlForm(); // extends Zend_Form and builds the form
+
+        if($this-&gt;getRequest()-&gt;isPost()) {
+            $mediator         = new WW_Model_FormMediator();
+            $bankAccountModel = new BankAccountModel();
+            try {
+                $bankAccount = $mediator-&gt;pushFormToModel($form, $bankAccountModel);
+
+                $this-&gt;view-&gt;assign('bankAccount', $bankAccount); // Show new balance in view!
+            } catch(Exception $e) {
+                $this-&gt;view-&gt;assign('withdrawlForm', $form);
+                $this-&gt;_redirect('showWithdrawl');
+            }
+        } else {
+            $this-&gt;view-&gt;assign('withdrawlForm', $form);
+            $this-&gt;_redirect('showWithdrawl');
+        }
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>You can see the mediator tightly integrates Form and Model without both
+components knowing too much of each other. Still you can add error
+messages received from the model into the Form and redisplay it. One
+negative point of this approach is the fact that you only have one
+method for accepting form data, which could result in variable checking
+and redispatching in the case of many different operations that can be
+performed on the same model. For this case you might want to either:</p>
+<ol class="arabic simple">
+<li>Rewrite the mediator to accept a specific model class (not the
+interface) and call the required custom method that matches the forms
+request. (Best approach for separation concerns)</li>
+<li>Rewrite the mediator to also pass the <strong>get_class($form);</strong> value to
+the model for decision making (Faster approach)</li>
+</ol>
+<p>There is still some overhead on using the mediator. Since its generic
+you could build an Action Helper for it and use the direct call
+mechanism to save some lines of code.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 23, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/01/14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html">Finally: Zend_Mail charset and/or long lines header encoding bug fixed</a></h1>
 <p>There was this <a class="reference external" href="http://framework.zend.com/issues/browse/ZF-1688">lurking bug in
 Zend_Mail</a> which
@@ -300,78 +493,6 @@ at all.</p>
             <small>
                 Posted on January 12, 2009
                  by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/01/07/seven-things.html">Seven Things</a></h1>
-<p>I have been tagged by
-<a class="reference external" href="http://dolfschimmel.freeaqingme.com/?p=78">Freeaqingme</a> and the blog
-letter machinery. So read on for seven things you probably may not know
-about me.</p>
-<ul class="simple">
-<li>I will get my degree in some weeks, currently intensively writting on
-my thesis. My major is economics though. I probably won’t get a job
-with that sooner or later. I actually don’t want to, I have a job as
-programmer already.</li>
-<li>One christmas many years ago (Pentium PCs to 200Mhz were the coolest
-thing around) i wished and wished for a computer for playing Command
-and Conquer and stuff. What i got was a 3/86 i could only run crap
-with. So i had to start programming.</li>
-<li>In 11th grade (7 years ago) I took part in the german computer
-science olympics (<a class="reference external" href="http://www.bwinf.de/uploads/media/bwi20/runde1/20bwinf.pdf">exercise still
-online</a>)
-using PHP and writing thousands of lines of nested aray and for loop
-code and print the solution to the browser. No need to say I utterly
-failed, because I didn’t know a bit about algorithms, pointers and
-objects at all.</li>
-<li>I have only learned about what good programming practices are (OO,
-functional, whatever) really means in the last two years, spending
-almost every free minute of those many i had on projects to test
-around with patterns and programming styles.</li>
-<li>I went to my first conference last year september, the IPC in Mainz,
-getting to know lots of great people in the community.</li>
-<li>I don’t have a license at all (<a class="reference external" href="http://blog.libssh2.org/index.php?/archives/122-Seven-Things.html">Reference to
-Sara</a>).
-I am afraid of driving cars, although I drive my bike through the
-biggest crossroads in town like nuts.</li>
-<li>I am a timeline oriented reader, having made me masterplans to read
-both all the Discworld and Ian Rankin novels in the correct order to
-not miss a single reference.</li>
-</ul>
-<p>Its sad that everyone I would want to tag was already tagged by someone
-else, still for the head count:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weierophinney</a>, because
-he helped me understand Zend Framework alot.</li>
-<li><a class="reference external" href="http://www.dasprids.de/">Ben Scholzen</a>, because he is a fun guy to
-be around <strong>#zftalk.dev</strong>.</li>
-<li><a class="reference external" href="http://www.thomasweidner.com/flatpress/">Thomas Weidner</a>, because
-I like his dedication towards his ZF components.</li>
-<li><a class="reference external" href="http://kore-nordmann.de/blog.html">Kore Nordmann</a>, Bastian Feder
-and Thomas Weinert, because I had great discussions with him on IPC.</li>
-<li><a class="reference external" href="http://codeutopia.net/blog/">zomg aka Jani</a> because of his skills
-to be referenced by PHPDeveloper.org (joke) and the good IRC
-discussions.</li>
-<li><a class="reference external" href="http://blogs.sun.com/netbeansphp/">Petr Pisl</a> because of the
-awesome NetBeans PHP support.</li>
-</ul>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/internetmemes.html">InternetMemes</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on January 07, 2009
-                
             </small>
         </p>
     </div>
