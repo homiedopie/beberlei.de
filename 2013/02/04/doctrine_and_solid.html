@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Composer and Azure Websites Git Deployment" href="../../../2012/11/19/composer_and_azure_websites_git_deployment.html" /><link rel="prev" title="Extending Symfony2: ParamConverter" href="../19/extending_symfony2__paramconverter.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -82,7 +82,7 @@ with use-case driven methods.  These state transformations can be part of
 different responsibilities, specifically when properties belong to different
 groups of concepts.</p>
 <p>Take a very simple entity that contains updated/created at logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Mapping</span> <span class="k">as</span> <span class="nx">ORM</span><span class="p">;</span>
 
 <span class="sd">/**</span>
@@ -123,7 +123,7 @@ traits are not perfect even for this very simple example, because its very
 likely that you cannot override the constructor of every entity.</p>
 <p>The solution is to extract a value object <span class="docutils literal"><span class="pre">Timestamped</span></span> that contains
 all the logic:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Timestamped</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$createdAt</span><span class="p">;</span>
@@ -156,7 +156,7 @@ all the logic:</p>
 in other entities.</p>
 <p>Doctrine has no support for embedded objects, which is very sad. I am working
 very hard to get this feature into Doctrine as soon as possible. You can use
-the &#8220;object&#8221; type as a workaround and <span class="docutils literal"><span class="pre">serialize()</span></span> the value object into
+the “object” type as a workaround and <span class="docutils literal"><span class="pre">serialize()</span></span> the value object into
 the database. However this is beyond ugly in my opinion.</p>
 </div>
 <div class="section" id="extract-method-objects-maximizing-clarity">
@@ -169,7 +169,7 @@ To separate calculations from state transformations you can extract
 method objects instead of inlining the code into the <span class="docutils literal"><span class="pre">Order</span></span> object.</p>
 <p>For this kind of extraction I create a folder <span class="docutils literal"><span class="pre">Order</span></span> and put all
 the extracted method objects in the <span class="docutils literal"><span class="pre">Order</span></span> subnamespace.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Entity</span> <span class="p">{</span>
 
     <span class="k">class</span> <span class="nc">Order</span>
@@ -196,7 +196,7 @@ the extracted method objects in the <span class="docutils literal"><span class="
 </div>
 <p>From this step its easy to make the code reusable by passing the shipping cost
 calculator:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">Order</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">calculateShippingCosts</span><span class="p">(</span><span class="nx">ShippingCostCalculator</span> <span class="nv">$calculator</span><span class="p">)</span>

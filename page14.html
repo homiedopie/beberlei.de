@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page15.html" /><link rel="prev" title="Newer" href="page13.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,55 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
+<p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
+<a class="reference external" href="http:/www.pdepend.org">PDepend</a> offer export functionality in XML or
+in a Test-database that is not quite readable for any user from the
+start. Over the last month I have gradually written <a class="reference external" href="http://wiki.github.com/beberlei/puma">a nice webbased
+tool</a>, that aggregates this data
+and (todo in the future) relates them to help me with my open source
+projects.</p>
+<p>PHPUnit can be used with a <strong>–test-db-dsn</strong> command, which saves all
+information about tests into a Database and PDepend has a strong Package
+centric source parser for all sorts of project metrics.</p>
+<p>What I needed for my <a class="reference external" href="http://framework.zend.com">Zend Framework</a>
+related work (and other projects) was a tool that does a run of the
+complete test-suite for me and saves the information, so that I can see
+where problems occur (and if they are due to my changes or other
+peoples). Since PHPUnit will stopped calculating additional metrics, I
+have also integrated the fabulous PDepend Tool into this aggregator. It
+shows me, what classes and functions need refactoring due to complexity
+issues and draws some nice graphs that summarize all sorts of project
+related information on a per package basis.</p>
+<p>You can <a class="reference external" href="http://wiki.github.com/beberlei/puma">download or clone the an alpha version at
+Github</a>. Its written with
+<a class="reference external" href="http://www.ezcomponents.org">ezcMvcTools</a>, so you need this to work
+too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
+page</a>.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/puma.html">PUMA</a>
+                 / 
+                <a href="tags/testing.html">Testing</a>
+                 / 
+                <a href="tags/metrics.html">Metrics</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on February 08, 2009
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2009/02/13/update-on-unittest-and-metrics-tool.html">Update on Unittest and Metrics Tool</a></h1>
 <p>Some days ago i posted about the PHP Unittest and Metrics Aggregator tool that
 i have written on (and which I have dubbed PUMA). Discussing it with people I
@@ -117,7 +166,7 @@ any inline comments and can be greatly enhanced in readability with
 taking 2-5 minutes of time and refactoring the code. The original code
 sample was:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>function __construct(array $pathInfo) {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>function __construct(array $pathInfo) {
     $section = $pathInfo[0];
     $file = $pathInfo[1];
 
@@ -148,7 +197,7 @@ refactoring produces about double the code, but its done entirely by
 using NetBeans nice Rename variable and copy paste on extracting
 methods, which takes not more than 5 minutes.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class StaticXmlXsltRendererImpl extends AbstractXsltView
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class StaticXmlXsltRendererImpl extends AbstractXsltView
 {
     function render(array $filteredPathInfo) {
         $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
@@ -196,7 +245,7 @@ application configuration is made implicit into the code. This has to be
 extracted to be an explicit configuration constant and the comment can
 go.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>private function getTemplateValuesXmlFile($filteredPathInfo) {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>private function getTemplateValuesXmlFile($filteredPathInfo) {
     $section = $this-&gt;getSection($filteredPathInfo);
     $file = $this-&gt;getFile($filteredPathInfo);
 
@@ -318,7 +367,7 @@ inside the Front Controller and the Action Controller classes. Assume
 the resource ‘Db’ is initialized in your application, you can access it
 with:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>$front = Zend_Controller_Front::getInstance();
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>$front = Zend_Controller_Front::getInstance();
 $container = $front-&gt;getParam('bootstrap')-&gt;getContainer();
 $db = $container-&gt;db;
 
@@ -357,7 +406,7 @@ can be used as dependencies for objects that are lazy-loaded from the
 container. Skipping the tech-talk, here is an example. First we have to
 replace the default Container with Yadif:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>$objects = new Zend_Config_Xml(APPLICATION_PATH."/config/objects.xml");
 $container = new Yadif_Container($objects);
 
 $application = new Zend_Application(
@@ -378,7 +427,7 @@ first time from the container. We can merge these two worlds and make
 use of the Application resources inside the Yadif Configuration
 “objects.xml”, which looks like:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>&lt;?xml version="1.0" ?&gt;
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>&lt;?xml version="1.0" ?&gt;
 &lt;objects&gt;
     &lt;myModel&gt;
         &lt;class&gt;MyModel&lt;/class&gt;
@@ -390,7 +439,7 @@ use of the Application resources inside the Yadif Configuration
 <p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
 the the Database and Cache resources as constructor arguments:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class FooController extends Zend_Controller_Action {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class FooController extends Zend_Controller_Action {
     public function barAction()
     {
         $container = $this-&gt;getInvokeArg('bootstrap')-&gt;getContainer();
@@ -464,115 +513,6 @@ page</a>.</p>
             <small>
                 Posted on November 14, 2009
                  by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/08/31/enums-in-php.html">Enums in PHP</a></h1>
-<p><a class="reference external" href="http://blog.tobias-olry.de">A colleague of mine</a> complained about the
-missing support for Enums in PHP and how one often wants to have a
-variable that is constant and has one of several specific values. We
-came up with an elegant solution that we want to share, maybe its even
-helpful to you.
-If you want to implement Enum behaviour with a simple string or int
-value you end up with having to validate the values at several different
-locations in the code rather than being able to strictly enforce the
-Enum structure by using typehints.</p>
-<p>We discussed several approaches to this problem that all seemed a bit
-ugly in one or another way. For example the <strong>SplEnum</strong> class is a step
-in the right direction, however you can only use a type hint for
-“SplEnum” or add another inheritance layer. Also you have to implement
-different classes for each enum type, which requires you to implement a
-factory method for your enum to help with creation of the different
-types.</p>
-<p>We came up with a very simple Enum concept. It uses reflection in the
-constructor to check if the given value is a valid Enum value by
-checking it against all the defined constants of the implementing class
-and throws an Exception if it is not. The __toString() magic method is
-implemented to allow for simple checks of the enums value. Strict
-type-checks are not possible with this construct, however in our opinion
-it is a very elegant solution to enforce a limited set of specific
-values throughout your code-base.</p>
-<p>Here is the code plus a small example:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>abstract class MyEnum
-{
-    final public function __construct($value)
-    {
-        $c = new ReflectionClass($this);
-        if(!in_array($value, $c-&gt;getConstants())) {
-            throw IllegalArgumentException();
-        }
-        $this-&gt;value = $value;
-    }
-
-    final public function __toString()
-    {
-        return $this-&gt;value;
-    }
-}
-
-class Foo extends MyEnum
-{
-    const FOO = "foo";
-    const BAR = "bar";
-}
-
-$a = new Foo(Foo::FOO);
-$b = new Foo(Foo::BAR);
-$c = new Foo(Foo::BAR);
-
-if($a == Foo::FOO) {
-    echo "My value is Foo::FOO\n";
-} else {
-    echo "I dont match!\n";
-}
-
-if($a == $b) {
-    echo "a value equals b value!\n";
-}
-if($b == $c) {
-    echo "b value equals c value!\n";
-}
-</pre></div>
-</div>
-</div></blockquote>
-<p>Now you could nice things such as:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>function doStuff(Foo $foo) {
-    switch($foo) {
-        case Foo::FOO:
-            echo "do more here!\n";
-            break;
-        case Foo::BAR;
-            echo "evil stop!\n";
-            break;
-    }
-}
-
-doStuff($a);
-</pre></div>
-</div>
-</div></blockquote>
-<p>What are your thoughts?</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                 / 
-                <a href="tags/php.html">PHP</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 31, 2009
-                
             </small>
         </p>
     </div>

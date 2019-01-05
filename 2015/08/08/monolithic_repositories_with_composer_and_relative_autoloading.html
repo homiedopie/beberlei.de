@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="The ContainerTest" href="../../06/12/the_containertest.html" /><link rel="prev" title="How I use Wordpress with Git and Composer" href="../../../2016/02/21/how_i_use_wordpress_with_git_and_composer.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -66,13 +66,13 @@
 <h1>Monolithic Repositories with Composer and Relative Autoloading</h1>
 <p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
 is a way for monolithic PHP repositories with multiple components
-that I haven&#8217;t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
+that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
 <p>It relies on a new composer.json for each component and uses
 the autoloading capabilities of Composer in a hackish way.</p>
 <p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
 <span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
 its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;Foo&quot;</span><span class="p">:</span> <span class="s2">&quot;../foo/src/&quot;</span>
@@ -96,7 +96,7 @@ by traversing the autoloader for relative definitions.</li>
 code.</li>
 </ul>
 <p>I think this approach is ok, if you are only sharing a small number of
-components that don&#8217;t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
+components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
 problems by forcing to rely on the same dependencies in a project globally and
 only once.</p>
 </div>

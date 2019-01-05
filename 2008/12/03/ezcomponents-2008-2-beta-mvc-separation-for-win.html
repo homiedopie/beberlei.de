@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="REST and Ajax Aware controllers in ezcMvcTools" href="../04/rest-and-ajax-aware-controllers-in-ezcmvctools.html" /><link rel="prev" title="ezComponents View Handler for Zend_Pdf" href="ezcomponents-view-handler-for-zend-pdf.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -83,7 +83,7 @@ generally make no difference for the controller. We add two routes, one
 for the pdf one for the html view that execute the same controller and
 action:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">myRouter</span> <span class="n">extends</span> <span class="n">ezcMvcRouter</span><span class="p">{</span> <span class="n">public</span> <span class="n">function</span> <span class="n">createRoutes</span><span class="p">()</span> <span class="p">{</span>  <span class="k">return</span> <span class="n">array</span><span class="p">(</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">&#39;/pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;SomeController&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">),</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;SomeController&#39;</span><span class="p">,</span> <span class="n">index</span><span class="s1">&#39; ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables[&#39;</span><span class="n">items</span><span class="s1">&#39;] = Model::retrieveLotsOfItems();  return $result; }}</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">myRouter</span> <span class="n">extends</span> <span class="n">ezcMvcRouter</span><span class="p">{</span> <span class="n">public</span> <span class="n">function</span> <span class="n">createRoutes</span><span class="p">()</span> <span class="p">{</span>  <span class="k">return</span> <span class="n">array</span><span class="p">(</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">&#39;/pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;SomeController&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">),</span>   <span class="n">new</span> <span class="n">ezcMvcRailsRoute</span><span class="p">(</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;SomeController&#39;</span><span class="p">,</span> <span class="n">index</span><span class="s1">&#39; ),  ); }}class SomeController extends ezcMvcController{ public function doIndex() {  $result = new ezcMvcResult();  $result-&gt;variables[&#39;</span><span class="n">items</span><span class="s1">&#39;] = Model::retrieveLotsOfItems();  return $result; }}</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -91,7 +91,7 @@ action:</p>
 of our dispatcher configuration, but we still only need the http
 response writer, nothing more.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, &quot;/pdf&quot;)) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class myMvcConfiguration implements ezcMvcDispatcherConfiguration { [...] function createView( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result ) {  if(strstr($routeInfo-&gt;matchedRoute, &quot;/pdf&quot;)) {   return new myHtmlView( $request, $result );  } else {   return new myPdfView( $request, $result );  } } function createResponseWriter( ezcMvcRoutingInformation $routeInfo, ezcMvcRequest $request, ezcMvcResult $result, ezcMvcResponse $response ) {  return new ezcMvcHttpResponseWriter( $response ); } [...]}
 </pre></div>
 </div>
 </div></blockquote>
@@ -101,7 +101,7 @@ type. Please note that overwriting createResponseBody() in myPdfView is
 a shortcut that circumvents me having to write a new PDF View Handler
 (which would be the way to go).</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( &#39;content&#39;, &#39;../templates/index.phtml&#39; );  $zones[] = new ezcMvcPhpViewHandler( &#39;page_layout&#39;, &#39;../templates/layout.phtml&#39; );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = &quot;application/pdf&quot;;   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class myHtmlView extends ezcMvcView { function createZones( $layout ) {  $zones = array();   $zones[] = new ezcMvcPhpViewHandler( &#39;content&#39;, &#39;../templates/index.phtml&#39; );  $zones[] = new ezcMvcPhpViewHandler( &#39;page_layout&#39;, &#39;../templates/layout.phtml&#39; );  return $zones; }}class myPdfView extends ezcMvcView { function createZones() {  // empty, abstract method that has to be defined. } function createResponseBody() {  // Set PDF Content-Type Response Header  $this-&gt;result-&gt;content-&gt;type = &quot;application/pdf&quot;;   $pdf = new Zend_Pdf();  // do pdf stuff  return $pdf-&gt;render(); }}
 </pre></div>
 </div>
 </div></blockquote>

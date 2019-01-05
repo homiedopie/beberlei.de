@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill" href="../01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html" /><link rel="prev" title="Dependency Injection via Interface in PHP: An example" href="../../09/20/dependency-injection-via-interface-in-php-an-example.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -88,7 +88,7 @@ MVC applications. To circumvent the singleton and protected Constructor
 of Zend_Controller_Front, we have to build a new front controller that
 wraps around it and requires all the dependencies:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class Sphicy_Controller_Front
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class Sphicy_Controller_Front
 {
     protected $front;
 
@@ -132,7 +132,7 @@ dependencies in its constructor that are then forward injected into
 the required dependencies to concrete implementations, for example a
 module for a Zend MVC Http Application might look like:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class Sphicy_ZendMvc_ExampleModule implements spModule {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class Sphicy_ZendMvc_ExampleModule implements spModule {
      public function configure(spBinder $binder) {
          // Sphicy_Controller_Front does not extend Zend_Controller_Front, because of Singletonitis
          // It offers the dispatch method to proxy against Zend_Controller_Front::dispatch.
@@ -155,14 +155,14 @@ dispatcher is bound. But this dependency is optional and will be created
 automatically as can be seen in the <strong>Sphicy_Controller_Front</strong> class.</p>
 <p>The front controllers is now created by calling:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$injector = new spDefaultInjector(new Sphicy_ZendMvc_ExampleModule());
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$injector = new spDefaultInjector(new Sphicy_ZendMvc_ExampleModule());
 $front = $injector-&gt;getInstance(&quot;Sphicy_Controller_Front&quot;);
 $front-&gt;dispatch();
 </pre></div>
 </div>
 </div></blockquote>
 <p>What happens in the <strong>$injector-&gt;getInstance()</strong> line? Sphicy looks at
-<strong>Sphicy_Controller_Front</strong>&#8216;s constructor and finds that four
+<strong>Sphicy_Controller_Front</strong>’s constructor and finds that four
 dependencies are needed: Request, Response, Router and Dispatcher
 implementations. It looks up the bindings and searches for them,
 creating Zend_Controller_Request_Http,

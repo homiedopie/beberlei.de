@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Your Service Layer benefits from a Dispatcher" href="../09/your_service_layer_benefits_from_a_dispatcher.html" /><link rel="prev" title="Decoupling from Symfony Security and FOSUserBundle" href="../../09/04/decoupling_from_symfony_security_and_fosuserbundle.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -97,7 +97,7 @@ finally doing some benchmarking with <a class="reference external" href="https:/
 slow, causing lots of I/O on the NFS share and CPU and changing it to using
 explicit bundling in the <span class="docutils literal"><span class="pre">app/config/config.yml</span></span> helps alot. You can use a
 cronjob deployed by Puppet/Chef that invokes the <cite>assetic:dump</cite> command with
-a <cite>&#8211;watch</cite> flag in the background.</li>
+a <cite>–watch</cite> flag in the background.</li>
 <li>JMSDiExtraBundle scans for Services to check for changes on service objects.</li>
 <li><span class="docutils literal"><span class="pre">ReplaceAliasWithActualDefinitionPass</span></span> in Symfony DIC uses a set of
 recursive algorithms to replace aliases with the real services. That takes a
@@ -111,7 +111,7 @@ NFS share. I actually tried this before, but since I forgot the log directory,
 this felt equally slow and I reverted the change.</p>
 <p>Here is the code you should add to your <span class="docutils literal"><span class="pre">AppKernel</span></span> to give you a
 considerable performance boost on a Vagrant box:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
 <span class="p">{</span>
@@ -140,8 +140,8 @@ considerable performance boost on a Vagrant box:</p>
 <p>This brings the page rendering speeds down to between 0.5 and 1.5 seconds, which
 is quite normal for the development environment even outside a virtual machine.</p>
 <p>This tip obviously works for any kind of application that has a I/O intensive
-development environment: Don&#8217;t perform this operations on the NFS share unless
-you wan&#8217;t to suffer.</p>
+development environment: Don’t perform this operations on the NFS share unless
+you wan’t to suffer.</p>
 </div>
 
 

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="ZF: Managing 404 Errors with Version 1.0.3" href="../17/zf-managing-404-errors-with-version-1-0-3.html" /><link rel="prev" title="Zend_View Hack for implementation of RSS Feed" href="zend-view-hack-for-implementation-of-rss-feed.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -66,15 +66,15 @@
 <h1>Using a self defined Zend_Loader</h1>
 <p>When you start writing with a Framework like Zend like I did in the last
 weeks, you probably are still haunted by all the bad habits of pseudo
-object orientated PHP design, using lots of require and include&#8217;s.
-Zend_Loader doesn&#8217;t seem to help at first, its just another command
+object orientated PHP design, using lots of require and include’s.
+Zend_Loader doesn’t seem to help at first, its just another command
 (Zend_Loader::loadClass or ::loadFile). It sucks to register lots of
 autoload paths too.</p>
 <p>I wrote my own Zend_Loader child class. It grabs all include paths from
 a config File using the Zend_Config class, and completely frees you of
 thinking about includes.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class WWLoader extends Zend_Loader
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class WWLoader extends Zend_Loader
 {
     private static $dirs = NULL;
 
@@ -130,7 +130,7 @@ thinking about includes.</p>
 <p>ZEND_CONFIG_PATH is the only constant I use in my application. I
 initialize the following at the beginning of my bootstrap file:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">define</span><span class="p">(</span><span class="s1">&#39;ZEND_CONFIG_PATH&#39;</span><span class="p">,</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;/../application/config/&quot;</span><span class="p">);</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">define</span><span class="p">(</span><span class="s1">&#39;ZEND_CONFIG_PATH&#39;</span><span class="p">,</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;/../application/config/&quot;</span><span class="p">);</span>
 
 <span class="n">require_once</span> <span class="s1">&#39;Zend/Loader.php&#39;</span><span class="p">;</span>
 <span class="n">require_once</span> <span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="s1">&#39;/../application/include/WWLoader.php&#39;</span><span class="p">;</span>

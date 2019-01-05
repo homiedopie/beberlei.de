@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="How I use Wordpress with Git and Composer" href="../../02/21/how_i_use_wordpress_with_git_and_composer.html" /><link rel="prev" title="Explicit Global State with Context Objects" href="../../../2017/03/12/explicit_global_state_with_context_objects.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -66,17 +66,17 @@
 <h1>Composer Monorepo Plugin (previously called Fiddler)</h1>
 <p>I have <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">written about monorepos</a>
 in this blog before, <a class="reference external" href="https://qafoo.com/resources/presentations/symfony_live_berlin_2015/monorepos.html">presented a talk</a>
-about this topic and released a standalone tool called &#8220;Fiddler&#8221; that helps
+about this topic and released a standalone tool called “Fiddler” that helps
 integrating Composer with a monolithic repository.</p>
 <p>At the beginning of the year, somebody in <span class="docutils literal"><span class="pre">#composer-dev</span></span> IRC channel on
 Freenode pointed me in the direction of Composer plugins to use with Fiddler
 and it was an easy change to do so.</p>
 <p>With the help of a new Composer v1.1 feature to add custom commands from a
-plugin, Fiddler is now &#8220;gone&#8221; and I renamed the repository to the practical
+plugin, Fiddler is now “gone” and I renamed the repository to the practical
 <strong>beberlei/composer-monorepo-plugin</strong> package name on <a class="reference external" href="https://github.com/beberlei/composer-monorepo-plugin">Github</a>. After you install
 this plugin, you have the possibility to maintain subpackages and their
 dependencies in a single repository.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ composer require beberlei/composer-monorepo-plugin
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ composer require beberlei/composer-monorepo-plugin
 </pre></div>
 </div>
 <p>To use the plugin add <strong>monorepo.json</strong> files into each directory of a
@@ -84,7 +84,7 @@ subpackage and use a format similar to the <strong>composer.json</strong> to add
 dependencies to a.) external composer packages that you have listed in your
 global Composer file b.) other subpackages in the current monorepo.
 See this example for a demonstration:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="s2">&quot;vendor/symfony/http-foundation&quot;</span><span class="p">,</span>
         <span class="s2">&quot;components/Foo&quot;</span>
@@ -98,7 +98,7 @@ See this example for a demonstration:</p>
 <p>This subpackage here defined in a hypothetical file
 <strong>components/Bar/monorepo.json</strong> has dependencies to Symfony HTTP foundation
 and another subpackage Foo with its own <strong>components/Foo/monnorepo.json</strong>.
-Notice how we don&#8217;t need to specify versions (they are implicit) and import
+Notice how we don’t need to specify versions (they are implicit) and import
 other dependencies using the relative path from the global composer.json.</p>
 <p>The monorepo plugin is integrated with Composer, so every time you perform install,
 update or dump-autoload commands, the subpackages will be updated as well and

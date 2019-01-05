@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Symfony2: A Simple Hello World" href="../../04/24/symfony_hello_world.html" /><link rel="prev" title="Lightweight Symfony2 Controllers" href="../../10/14/lightweight_symfony2_controllers.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -64,14 +64,14 @@
 							<div class="blog-post">
         <div class="section" id="spotting-feature-envy-and-refactoring">
 <h1>Spotting Feature Envy and Refactoring</h1>
-<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki&#8217;s</a> on the
+<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki’s</a> on the
 <a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
 conference last week about Legacy Code and Refactoring. In the session a piece
 of real-world code was shown that contained one of most common code smells in
 LegacyCode: Feature Envy.</p>
-<p>Martin Fowler describes this smell as &#8220;a method that seems more interested in
+<p>Martin Fowler describes this smell as “a method that seems more interested in
 a class other than the one it is in. The most common focus of the envy is the
-data.&#8221;</p>
+data.”</p>
 <p>This code smell causes two very similar problems in a code base:</p>
 <ul class="simple">
 <li>Duplication of rules related to their data throughout the code base.</li>
@@ -80,7 +80,7 @@ data.&#8221;</p>
 <p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
 PHP projects. We often see code such as the following computation to
 create a range of dates for a reporting function:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
 <span class="p">{</span>
@@ -99,7 +99,7 @@ create a range of dates for a reporting function:</p>
 validation of creating an end date some days in the future of a start date
 can easily be duplicated throughout the whole code base and implements
 business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">DateTime</span>
 <span class="p">{</span>

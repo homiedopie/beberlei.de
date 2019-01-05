@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Extending Symfony2: ParamConverter" href="../../02/19/extending_symfony2__paramconverter.html" /><link rel="prev" title="Code &amp; Coffee Bonn" href="../12/code_coffee_bonn.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -89,14 +89,14 @@ is imprecise.</p>
 </li>
 </ul>
 <p>Generally introducing a new object such as a repository should pass the
-&#8220;<a class="reference external" href="http://www.growing-object-oriented-software.com/toc.html">Composite is simpler than the sum of its parts</a>&#8221; rule. However the
+“<a class="reference external" href="http://www.growing-object-oriented-software.com/toc.html">Composite is simpler than the sum of its parts</a>” rule. However the
 approach also clearly demonstrates a bad abstraction. In OOP the primary goal is avoiding
 changes to affect the whole system.</p>
 <div class="section" id="introduce-criteria-objects">
 <h2>Introduce Criteria Objects</h2>
 <p>Instead of using the <span class="docutils literal"><span class="pre">QueryBuilder</span></span> outside of the Repository, lets start with an
 alternative refactoring. I will introduce a <span class="docutils literal"><span class="pre">Criteria</span></span> class for the <span class="docutils literal"><span class="pre">User</span></span>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserCriteria</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$groupId</span><span class="p">;</span>
@@ -110,7 +110,7 @@ factory methods that create a criteria do make sense however.</p>
 <p>Now we can introduce a <span class="docutils literal"><span class="pre">match</span></span> method on the <span class="docutils literal"><span class="pre">UserRepository</span></span>. Lets see
 that on an interface level first, to see how simple usage is for the client
 side of the repository:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">UserRepository</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
@@ -123,7 +123,7 @@ side of the repository:</p>
 </div>
 <p>Put in a <span class="docutils literal"><span class="pre">$criteria</span></span> get back users or array data. Very nice and simple!
 The implementation would look like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="sd">/**</span>
 <span class="sd"> * @param UserCriteria $criteria</span>
 <span class="sd"> * @return array&lt;User&gt;</span>
@@ -148,10 +148,10 @@ The implementation would look like this:</p>
 <p>The benefit here is, that we can add additional conditions and processing
 by only adding a new property on the <span class="docutils literal"><span class="pre">UserCriteria</span></span> and then handling
 this inside <span class="docutils literal"><span class="pre">UserRepository#match()</span></span>. Additionally you can save the <span class="docutils literal"><span class="pre">UserCriteria</span></span>
-in the session, or even in the database to that users can &#8220;save filter&#8221; or return
+in the session, or even in the database to that users can “save filter” or return
 to a search overview, with the previous criteria still known.</p>
 <p>The client code now looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$criteria</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserCriteria</span><span class="p">();</span>
 <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">groupId</span> <span class="o">=</span> <span class="nv">$groupId</span><span class="p">;</span>
 <span class="nv">$criteria</span><span class="o">-&gt;</span><span class="na">hydrateMode</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">HYDRATE_ARRAY</span><span class="p">;</span>
@@ -169,7 +169,7 @@ original EasyBib solution, then you are missing the point.  We have factored
 away a violation of the Law Of Demeter and calls on an API (Doctrine)
 that should be implementation detail of the repository.</p>
 <p>Lets try this by adding a new filter criteria, for example permissions I mentioned before:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserCriteria</span>
 <span class="p">{</span>
     <span class="k">const</span> <span class="no">PERMISSION_READ</span> <span class="o">=</span> <span class="s1">&#39;read&#39;</span><span class="p">;</span>
@@ -212,7 +212,7 @@ approach it from our existing Criteria.</p>
 <p>Lets move the QueryBuilder code from the repository, into the Criteria object and
 rename it <span class="docutils literal"><span class="pre">UserSpecification</span></span>. Its important here to change the query builder
 code to use expressions that can be composed.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserSpecification</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$groupId</span><span class="p">;</span>
@@ -255,7 +255,7 @@ code to use expressions that can be composed.</p>
 </div>
 <p>The repository is then delegating the expression generation
 and puts the result into the <span class="docutils literal"><span class="pre">where()</span></span> method of the builder</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserRepository</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">UserSpecification</span> <span class="nv">$specification</span><span class="p">)</span>
@@ -278,7 +278,7 @@ different repositories. This is apparent by the <span class="docutils literal"><
 required to make the combination of conditions possible.
 Lets factor away the violation of the single
 responsibility principle by introducing three specifications:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="sd">/**</span>
@@ -355,7 +355,7 @@ responsibility principle by introducing three specifications:</p>
 <p>Now we need a new And-Specification to combine this in our code. This
 looks rather abstract and complex on the inside, but for clients
 of this object, the usage is simple and obvious.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">AndX</span> <span class="k">implements</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$children</span><span class="p">;</span>
@@ -387,7 +387,7 @@ of this object, the usage is simple and obvious.</p>
 <p>Assuming we import all specifications
 from a common namespace <span class="docutils literal"><span class="pre">Spec</span></span>, our client code will look
 like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$specification</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spec\AsArray</span><span class="p">(</span><span class="k">new</span> <span class="nx">Spec\AndX</span><span class="p">(</span>
     <span class="k">new</span> <span class="nx">Spec\FilterGroup</span><span class="p">(</span><span class="nv">$groupId</span><span class="p">),</span>
     <span class="k">new</span> <span class="nx">Spec\FilterPermission</span><span class="p">(</span><span class="nv">$permission</span><span class="p">)</span>
@@ -405,7 +405,7 @@ or and not specifications to enhance query capabilities.</p>
 <h2>Improving Specifications</h2>
 <p>You can now introduce reusability across different repositories by adding
 functionality to check if a specification supports a given entity.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="c1">// ..</span>
@@ -420,7 +420,7 @@ functionality to check if a specification supports a given entity.</p>
 <p>Every composite can delegate this operation to its children, and every leaf of
 the tree can return true or false. The Repository can then check for a valid
 specification in its match method:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">abstract</span> <span class="k">class</span> <span class="nc">EntitySpecificationRepository</span>
 <span class="p">{</span>
@@ -445,7 +445,7 @@ specification in its match method:</p>
 <p>Now we can introduce very generic specifications, such as <cite>OnlyPage($page, Specification $spec)`</cite>
 for limit queries, or <span class="docutils literal"><span class="pre">Equals($field,</span> <span class="pre">$value)</span></span>. For more readable code, you can then create
 a domain language for your specifications that is composed of more simple specifications:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">PowerUsers</span> <span class="k">implements</span> <span class="nx">Specification</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$spec</span><span class="p">;</span>

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="OOP Business Applications: Entity, Boundary, Interactor" href="../13/oop_business_applications_entity_boundary_interactor.html" /><link rel="prev" title="OOP Business Applications: Command-Query-Responsibility-Segregation (CQRS)" href="../18/oop_business_applications__command_query_responsibility_seggregation.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -70,14 +70,14 @@
 mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></li>
 </ul>
-<p>The next design pattern for technical system design is called &#8220;Data, Context,
-Interaction&#8221;. It&#8217;s inventors Trygve Reenskaug and James Coplien call it a new
+<p>The next design pattern for technical system design is called “Data, Context,
+Interaction”. It’s inventors Trygve Reenskaug and James Coplien call it a new
 paradigm, in the context of PHPs language constraints it can be classified as
 architectural design pattern. I came across this pattern through <a class="reference external" href="https://twitter.com/go_oh">Gordon Oheim</a>. He has also invested quite some time going
 through the book on DCI and trying to understand this pattern with me.</p>
 <p>As in the EBI pattern, DCI separates data objects (Data) from behavior implemented
 in use-cases (Context). Data objects are never directly involved in these
-use-cases, but are &#8220;casted&#8221; to their respective roles that they are taking in
+use-cases, but are “casted” to their respective roles that they are taking in
 the use-case. This can be implemented with aggregation or traits in PHP.</p>
 <p>One goal of DCI is to get object-oriented programming to a place, where you
 can look at a use-case and its roles and be very sure that the program is
@@ -91,7 +91,7 @@ the code with more confidence.</p>
 As in EBI, they only contain logic that is true for all the possible use-cases.
 These classes represent <em>what the system is</em>.</p>
 <p><strong>Roles</strong> and <strong>Context</strong> represent <em>what the system does</em> and are supposed to
-capture the End User&#8217;s Mental Model as close as possible.</p>
+capture the End User’s Mental Model as close as possible.</p>
 <p><strong>Roles</strong> add behavior to the data objects by either wrapping them or
 acting as traits for the data objects.</p>
 <p><strong>Context</strong> is the use-case and fulfils its role by making roles <strong>interact</strong> with
@@ -112,7 +112,7 @@ or by building two traits. I will go down the route with traits, to show
 one possible use-case for this new PHP 5.4 feature. The idea here is to
 implement all the behavior necessary on a trait and then have simple dummy
 objects using them in the tests for this use-case.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">trait</span> <span class="nx">TransferMoneySource</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferTo</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
@@ -137,7 +137,7 @@ here. The <span class="docutils literal"><span class="pre">withdraw</span></span
 dumb as possible, so that their implementation does not cause any side-effects
 on the execution of this use-case.</p>
 <p>The bank account would then be modified to look:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
@@ -172,7 +172,7 @@ have to know about how to bind roles to data, you could use GUIDs in your
 application and fetch all objects from one data store. Another way would be to
 implement data access objects for roles, that then know how to retrieve their
 corresponding data.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransfer</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
@@ -191,7 +191,7 @@ corresponding data.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The simplicity of this is appealing, however don&#8217;t forget that we have
+<p>The simplicity of this is appealing, however don’t forget that we have
 abstracted I/O completely here. There has to be code that deals with that part
 of the system somewhere. However this again is not at the heart of all the DCI
 examples out there, making it difficult to reason about the actual practical
@@ -202,7 +202,7 @@ implications.</p>
 traits.</p>
 </div>
 <p>Here is an example of how the bank application service could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nv">$sourceId</span><span class="p">,</span> <span class="nv">$destinationId</span><span class="p">,</span> <span class="nx">Money</span> <span class="nv">$amount</span><span class="p">)</span>
@@ -228,7 +228,7 @@ traits.</p>
 </div>
 <p>The <span class="docutils literal"><span class="pre">ObjectStorage</span></span> here is a service (repository) that can find any
 persistent data object by a global ID. This is necessary, because it
-doesn&#8217;t actually matter what data object uses the necessary traits
+doesn’t actually matter what data object uses the necessary traits
 for this use-case.</p>
 <p>Again as in EBI, in a bigger system you would need to find some abstraction
 layer that does this in a more generic way.</p>

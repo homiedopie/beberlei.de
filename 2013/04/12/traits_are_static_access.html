@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Lessons learned: A failed side project" href="../06/a_failed_side_project.html" /><link rel="prev" title="Symfony2 on Windows Azure Websites" href="../../05/23/symfony2_on_windows_azure_websites.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -73,7 +73,7 @@ are nothing else than static access in disguise. They actually lead to the
 exact same code smells. Familiar with the outcome of too much static use,
 we should reject traits as just another way of statically coupling your code
 to other classes.</p>
-<p>Let&#8217;s step back and take a look at the code smells that Static code produces:</p>
+<p>Let’s step back and take a look at the code smells that Static code produces:</p>
 <ul class="simple">
 <li>Tight coupling, no way to exchange at runtime</li>
 <li>Not mockable</li>
@@ -90,7 +90,7 @@ problems on their own:</p>
 </ul>
 <p>Take the following code, which tries to implement reusable
 controller code through traits:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyController</span>
 <span class="p">{</span>
     <span class="k">use</span> <span class="nx">Redirector</span><span class="p">;</span>
@@ -141,7 +141,7 @@ traits now, all having a <span class="docutils literal"><span class="pre">getCon
 class problems that cannot be solved. We could pass the container as an
 argument to the method, but that actually defeats the purpose of the
 abstraction here.</p>
-<p>Traits using state of their &#8220;parents&#8221; usually create bidirectional
+<p>Traits using state of their “parents” usually create bidirectional
 coupling between classes, something which should be avoided for good
 software design.</p>
 </li>
@@ -168,9 +168,9 @@ functionality.</p>
 </ol>
 <p>The discovery of this properties of traits me to the conclusion that traits are
 just static access in disguise.</p>
-<p>To see this argument a bit more drastically, you can &#8220;rewrite&#8221; a PHP 5.4 trait
-into &#8220;pseudo&#8221; static code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<p>To see this argument a bit more drastically, you can “rewrite” a PHP 5.4 trait
+into “pseudo” static code:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>
@@ -206,10 +206,10 @@ into &#8220;pseudo&#8221; static code:</p>
 </pre></div>
 </div>
 <p>Calling dynamic methods statically actually works right now (and access to
-<span class="docutils literal"><span class="pre">$this</span></span> of the parent class will luckily be removed in PHP 5.5). Let&#8217;s
+<span class="docutils literal"><span class="pre">$this</span></span> of the parent class will luckily be removed in PHP 5.5). Let’s
 reformulate it into something that is actually using static methods and
 will work on 5.5, requires changes to the visibility of properties though:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$container</span><span class="p">;</span>

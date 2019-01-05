@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,87 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2019/01/05/integrate_ansible_vault_with_1password_commandline.html">Integrate Ansible Vault with 1Password Commandline</a></h1>
+<p>We are using Ansible to provision and deploy Tideways in development and
+production and the Ansible Vault feature to unlock secrets on production.
+Since we recently introduced 1Password I integrated them both and unlock the
+Ansible Vault using 1Password.</p>
+<p>This way we can centrally change the Ansible Vault password regularly, without
+any of the developers with access to production/deployment needing to know the
+actual password.</p>
+<p>To make this integration work, you can setup 1Password CLI to query your
+1Password vault for secrets after logging in with password and two factor
+token.</p>
+<p>Then you only need a bash script to act as an executable <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/vault.html#providing-vault-passwords">Ansible Vault
+password file</a>.</p>
+<p>First, <a class="reference external" href="https://support.1password.com/command-line-getting-started/">download and install</a> the 1Password
+CLI according to their documentation.</p>
+<p>Next, you need to login with your 1Password account explicitly passing email,
+domain and secret key, so that the CLI can store this information in a
+configuration file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ op signin example.1password.com me@example.com
+Enter the Secret Key for me@example.com at example.1password.com: A3-**********************************
+Enter the password for me@example.com at example.1password.com:
+Enter your six-digit authentication code: ******
+</pre></div>
+</div>
+<p>After this one-time step, you can login more easily by just specifiying <span class="docutils literal"><span class="pre">op</span>
+<span class="pre">signin</span> <span class="pre">example</span></span>, so I create an alias for this in <span class="docutils literal"><span class="pre">~.bash_aliases</span></span> (I am on
+Ubuntu).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="n">alias</span> <span class="n">op</span><span class="o">-</span><span class="n">signin</span><span class="o">=</span><span class="s1">'eval $(op signin example)'</span>
+<span class="n">alias</span> <span class="n">op</span><span class="o">-</span><span class="n">logout</span><span class="o">=</span><span class="s1">'op signout &amp;&amp; unset OP_SESSION_example'</span>
+</pre></div>
+</div>
+<p>The eval line makes sure that an environment variable <span class="docutils literal"><span class="pre">OP_SESSION_example</span></span> is
+set for this terminal/shell only with temporary access to your 1Password vault
+in subsequent calls to the <span class="docutils literal"><span class="pre">op</span></span> command. You can use <span class="docutils literal"><span class="pre">op-logout</span></span> alias to
+invalidate this session and logout.</p>
+<p>Then I create the bash script in <span class="docutils literal"><span class="pre">/usr/local/bin/op-vault</span></span> that is used as
+Ansible Vault Password File. It needs to fetches the secret and print it to the
+screen.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>#!/bin/bash
+VAULT_ID="1234"
+VAULT_ANSIBLE_NAME="Ansible Vault"
+op get item --vault=$VAULT_ID "$VAULT_ANSIBLE_NAME" |jq '.details.fields[] | select(.designation=="password").value' | tr -d '"'
+</pre></div>
+</div>
+<p>This one liner uses the command <span class="docutils literal"><span class="pre">jq</span></span> to slice the JSON output to print only
+the password. The <span class="docutils literal"><span class="pre">tr</span></span> command trims the double quotes around the password.</p>
+<p>Make sure to configure the <span class="docutils literal"><span class="pre">VAULT_ID</span></span> and <span class="docutils literal"><span class="pre">VAULT_ANSIBLE_NAME</span></span> variables to
+point to the ID of your vault where the secret is stored in, and its name in
+the list. To get the UUIDs of all the vaults type <span class="docutils literal"><span class="pre">op</span> <span class="pre">list</span> <span class="pre">vaults</span></span> in your
+CLI.</p>
+<p>Afterwards you can unlock your Ansible Vault with 1Password by calling:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">--</span><span class="n">vault</span><span class="o">-</span><span class="n">password</span><span class="o">-</span><span class="n">file</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">op</span><span class="o">-</span><span class="n">vault</span> <span class="o">-</span><span class="n">i</span> <span class="n">inventory</span> <span class="n">your_playbook</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>This now only works in the current terminal/shell, when you called <span class="docutils literal"><span class="pre">op-signin</span></span> before to enter password and 2 factor token.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/deployment.html">Deployment</a>
+                 / 
+                <a href="tags/devops.html">DevOps</a>
+                 / 
+                <a href="tags/ansible.html">Ansible</a>
+                 / 
+                <a href="tags/automation.html">Automation</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on January 05, 2019
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2018/10/28/unslacking_tideways_company.html">Unslacking Tideways Company</a></h1>
 <p>We have moved away from Slack at <a class="reference external" href="https://tideways.com">Tideways</a> over the
 last three months, because I found Slack is already annoying, even with just a
@@ -143,7 +224,7 @@ from many others</a>.</p>
 bootstrapping a SaaS business is in the first few years, when you are
 essentially investing a lot of personal time and money until you can finally
 get a return on this investment and pay yourself a decent salary.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>All bootstrappers have to deal with the same tension: can I get this to
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>All bootstrappers have to deal with the same tension: can I get this to
 scale, while paying my bills, without burning out?
 </pre></div>
 </div>
@@ -279,7 +360,7 @@ clever use of an upstream Electron bug that makes the tray icon disappear in
 <p>I poked around in the list of files of the <cite>slack-desktop</cite> package and found
 out that you can just exchange the files for the tray icons , so that the Slack
 app is fooled into thinking it is showing the unread or highlight icons.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">sudo</span> <span class="o">-</span><span class="n">i</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="n">sudo</span> <span class="o">-</span><span class="n">i</span>
 <span class="n">cd</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">slack</span><span class="o">/</span><span class="n">resources</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">asar</span><span class="o">.</span><span class="n">unpacked</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">static</span>
 <span class="n">mv</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">highlight</span><span class="o">-</span><span class="n">backup</span><span class="o">.</span><span class="n">png</span>
 <span class="n">mv</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">.</span><span class="n">png</span> <span class="n">slack</span><span class="o">-</span><span class="n">taskbar</span><span class="o">-</span><span class="n">unread</span><span class="o">-</span><span class="n">backup</span><span class="o">.</span><span class="n">png</span>
@@ -304,50 +385,6 @@ packed this into a shell script <cite>slack-quiet</cite>.</p>
         <p>
             <small>
                 Posted on July 29, 2017
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html">Why does the PHP extension fail to load with _zval_ptr_dtor_wrapper error</a></h1>
-<p>I sometimes come across this error when loading an extension in PHP</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">PHP</span> <span class="ne">Warning</span><span class="p">:</span>  <span class="n">PHP</span> <span class="n">Startup</span><span class="p">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">load</span> <span class="n">dynamic</span> <span class="n">library</span>
-<span class="s1">'/usr/lib64/php-zts/5.5/modules/myext.so'</span> <span class="o">-</span>
-<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">php</span><span class="o">-</span><span class="n">zts</span><span class="o">/</span><span class="mf">5.5</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">myext</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="n">undefined</span> <span class="n">symbol</span><span class="p">:</span>
-<span class="n">_zval_ptr_dtor_wrapper</span> <span class="ow">in</span> <span class="n">Unknown</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">0</span>
-</pre></div>
-</div>
-<p>From the Google results it is not very easy to find out what this means.</p>
-<p>Technically the extension was compiled with a PHP version using the
-<span class="docutils literal"><span class="pre">-enable-debug</span></span> flag, which wraps all calls to <span class="docutils literal"><span class="pre">zval_ptr_dtor</span></span> in a wrapper
-macro that does not exist in a regular, non-debug build.</p>
-<p>But a debug extension and non-debug PHP are incompatible.</p>
-<p>PHP extensions are only compatible between different installations if the
-following constraints are the same for the compiling and the executing PHP
-binary:</p>
-<ul class="simple">
-<li>OS (Linux, Mac)</li>
-<li>libc (glibc or musl for Alpine)</li>
-<li>PHP version up to the minor level (5.5, 5.6, 7.0, 7.1)</li>
-<li>extension version (20151012 for PHP 7.0)</li>
-<li>thread-safety (ZTS) or non-thread-safety (NTS)</li>
-<li>debug or non-debug (<span class="docutils literal"><span class="pre">--enable-debug</span></span> flag during compile).</li>
-</ul>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/phpextension.html">PHPExtension</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on March 29, 2017
                  by Benjamin Eberlei
             </small>
         </p>

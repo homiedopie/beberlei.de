@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Virtual Machines with Vagrant, Veewee and Puppet" href="../../05/31/virtual_machines_with_vagrant__veewee_and_puppet.html" /><link rel="prev" title="OOP Business Applications: Trying to escape the mess" href="../../08/11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -87,7 +87,7 @@ and a bunch of development tools such as tree, ack-grep.</li>
 <li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
 <li>Git with Author Information and global ignore file</li>
 <li>A bunch of .bashrc initializations</li>
-<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Some open source projects I always have around (Doctrine, …)</li>
 <li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
 <li>and I probably forgot a bunch of tools just thinking about this today.</li>
 </ul>
@@ -106,7 +106,7 @@ run with root <span class="docutils literal"><span class="pre">~/.puppet/devmach
 my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
 
 <span class="c1"># VIM Dot Files</span>
 <span class="n">vcsrepo</span> <span class="p">{</span> <span class="s1">&#39;vim-dotfiles&#39;</span><span class="p">:</span>
@@ -146,7 +146,7 @@ puppet. The require makes sure this resource is only activated after the dotfile
 were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Configure Git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure Git</span>
 <span class="n">exec</span> <span class="p">{</span> <span class="s2">&quot;git-author-name&quot;</span><span class="p">:</span>
     <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">&#39;git config --global user.name &quot;Benjamin Eberlei&quot;&#39;</span><span class="p">,</span>
     <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">&quot;git config --global --get user.name|grep &#39;Benjamin Eberlei&#39;&quot;</span>

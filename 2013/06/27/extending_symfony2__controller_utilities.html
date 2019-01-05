@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Bounded Contexts" href="../24/bounded_contexts.html" /><link rel="prev" title="Doctrine and Domain Events" href="../../07/24/doctrine_and_domainevents.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -71,7 +71,7 @@ less to write. But less to write is not necessarily true.</p>
 <h2>The problem: Injecting tons of services</h2>
 <p>The Symfony controller base class uses quite a lot of services, if
 you need them in your controller as a service, you have to inject them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">_construct</span><span class="p">(</span>
@@ -94,7 +94,7 @@ you need them in your controller as a service, you have to inject them:</p>
 <p>There are some problems here:</p>
 <ul class="simple">
 <li>The services are not loaded lazily, we probably end up with a resource overuse here.</li>
-<li>The constructor is MUCH too big, this doesn&#8217;t even include your own
+<li>The constructor is MUCH too big, this doesn’t even include your own
 application, database or mailer services.</li>
 </ul>
 </div>
@@ -108,7 +108,7 @@ or just use the <span class="docutils literal"><span class="pre">ContainerAware<
 <h2>The solution: Introduce a Utilities Service</h2>
 <p>To avoid the mentioned problems with controller as a service, introduce a
 controller utilities service and register it as <span class="docutils literal"><span class="pre">controller_utils</span></span> service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">ControllerUtils</span>
 <span class="p">{</span>
@@ -136,7 +136,7 @@ controller utilities service and register it as <span class="docutils literal"><
 <span class="docutils literal"><span class="pre">Symfony\Bundle\FrameworkBundle\Controller\Controller</span></span> all the methods you
 need.</p>
 <p>Then you can simplify the controller as a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
@@ -149,7 +149,7 @@ need.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>You don&#8217;t have to stop here. You can introduce lots of helper objects
+<p>You don’t have to stop here. You can introduce lots of helper objects
 and inject them into your controller, depending on your use-cases.
 Generic handling of file uploads comes to mind for example.</p>
 <p>From medium to large applications this can lead to much smaller

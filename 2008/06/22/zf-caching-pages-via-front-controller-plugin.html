@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="On Frameworks and Javascript Coupling" href="../21/on-frameworks-and-javascript-coupling.html" /><link rel="prev" title="Multimediatreff on Frameworks" href="../25/multimediatreff-on-frameworks.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -73,7 +73,7 @@ at the gain change in performance.</p>
 Devzone</a> and a missing function
 getCache() in the code fragment:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>public function getCache()
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>public function getCache()
 {
     if( ($response = $this-&gt;cache-&gt;load($this-&gt;key)) != false) {
         return $response;
@@ -89,10 +89,10 @@ ready to begin.</p>
 <p>Testing came to the result that with 1000 requests, 10 of them concurrent
 (ab -n 1000 -c 10), which I know is a rather unrealistic assumption for
 this blog, the request time dropped by half, from six to three seconds
-(still lot of time, but this isn&#8217;t the best webserver).</p>
+(still lot of time, but this isn’t the best webserver).</p>
 <div class="section" id="results-without-caching">
 <h2>Results without caching</h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Requests</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span>    <span class="mf">1.49</span> <span class="p">[</span><span class="c1">#/sec] (mean)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Requests</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span>    <span class="mf">1.49</span> <span class="p">[</span><span class="c1">#/sec] (mean)</span>
 <span class="n">Time</span> <span class="n">per</span> <span class="n">request</span><span class="p">:</span>       <span class="mf">6695.213</span> <span class="p">[</span><span class="n">ms</span><span class="p">]</span> <span class="p">(</span><span class="n">mean</span><span class="p">)</span>
 
 <span class="n">Connection</span> <span class="n">Times</span> <span class="p">(</span><span class="n">ms</span><span class="p">)</span>
@@ -106,7 +106,7 @@ this blog, the request time dropped by half, from six to three seconds
 </div>
 <div class="section" id="results-with-caching">
 <h2>Results with caching</h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Requests</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span>    <span class="mf">3.03</span> <span class="p">[</span><span class="c1">#/sec] (mean)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Requests</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span>    <span class="mf">3.03</span> <span class="p">[</span><span class="c1">#/sec] (mean)</span>
 <span class="n">Time</span> <span class="n">per</span> <span class="n">request</span><span class="p">:</span>       <span class="mf">3304.534</span> <span class="p">[</span><span class="n">ms</span><span class="p">]</span> <span class="p">(</span><span class="n">mean</span><span class="p">)</span>
 
 <span class="n">Connection</span> <span class="n">Times</span> <span class="p">(</span><span class="n">ms</span><span class="p">)</span>

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Integrate Symfony and Webpack" href="../../02/26/integrate_symfony_and_webpack.html" /><link rel="prev" title="The ContainerTest" href="../../06/12/the_containertest.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -90,14 +90,14 @@ companies. I will discuss open source projects in a follow-up post.</p>
 <p>The move towards smaller repositories is called into question by three extremely
 productive organizations that work at incredible scale.</p>
 <ul class="simple">
-<li>Facebook <a class="reference external" href="https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale">mentioned in their talk &#8220;Big Code: Developer Infrastructure at
-Facebook&#8217;s Scale&#8221;</a>
+<li>Facebook <a class="reference external" href="https://developers.facebooklive.com/videos/561/big-code-developer-infrastructure-at-facebook-s-scale">mentioned in their talk “Big Code: Developer Infrastructure at
+Facebook’s Scale”</a>
 that they are going to merge their three big code repositories Server, iOS
 and Android into a single big repository over the course of 2015.</li>
 <li>Google open-sourced <a class="reference external" href="http://bazel.io">Bazel</a>, the build tool behind a huge
 chunk of their codebase managed in a single Perforce repository with over 20 million
 commits (<a class="reference external" href="http://www.perforce.com/sites/default/files/still-all-one-server-perforce-scale-google-wp.pdf">Reference</a>).</li>
-<li>Twitter, Foursquare and Square are working on their clone of Google&#8217;s Bazel
+<li>Twitter, Foursquare and Square are working on their clone of Google’s Bazel
 build system called <a class="reference external" href="https://pantsbuild.github.io/">Pants</a>. It is also
 designed for monolithic repositories.</li>
 </ul>
@@ -114,17 +114,17 @@ developer mental models: I have seen this in open-source projects such as
 Doctrine and several customer projects:</p>
 <ol class="arabic simple">
 <li>Cross repository changes require certain pull-requests on Github/Gitlab to
-be merged in order or in combination yet the tools don&#8217;t provide visibility
+be merged in order or in combination yet the tools don’t provide visibility
 into these dependencies. They are purely informal, leading to high error
 rates.</li>
 <li>Version pinning through NPM and Composer package managers is great for
 managing third party dependencies as long its not too many of them and they
-don&#8217;t change too often. For internal dependencies its a lot of work to
+don’t change too often. For internal dependencies its a lot of work to
 update dependencies between repositories all the time. Time gets lost by
-developers that don&#8217;t have the correct dependencies or because of mistakes
+developers that don’t have the correct dependencies or because of mistakes
 in the merge process.</li>
 <li>Changing code in core libraries can break dependencies without the developer
-even realizing this because tests don&#8217;t run together. This introduces a
+even realizing this because tests don’t run together. This introduces a
 longer feedback cycle between code that depends on each other, with all the
 downsides.</li>
 </ol>
@@ -146,7 +146,7 @@ still provides the mentioned benefits:</p>
 and introducing new dependencies for multiple projects is much easier when
 done in a single, atomic VCS commit.</li>
 <li>Discoverability of code is much higher, if you have all the code in a single
-place. Github and Gitlab don&#8217;t offer powerful tools like find, grep, sed over
+place. Github and Gitlab don’t offer powerful tools like find, grep, sed over
 more than one repository. Hunting down dependencies, in specific versions can
 cost alot of time.</li>
 <li>Reusability increases as it is much easier to just use code from the same
@@ -160,8 +160,8 @@ to hundreds. On top of that setting up many small repositories and
 familiarizing with each of them costs a lot of time.</li>
 </ul>
 <p>This is why I have been struggling with how Packagist and Satis force the move
-to smaller repositories through the technical constraint &#8220;one repository equals
-one composer.json file&#8221;. For reusable open source projects this is perfectly
+to smaller repositories through the technical constraint “one repository equals
+one composer.json file”. For reusable open source projects this is perfectly
 fine, but for company projects I have seen it hurt developer productivity more
 often than is acceptable.</p>
 </div>
@@ -181,7 +181,7 @@ third-party and internal dependencies. Fiddler will take care of generating a
 specific autoloader for each project, containing only the dependencies of the
 project.  This allows you to have one repository, while still having <em>explicit</em>
 dependencies per project.</p>
-<p>Keeping explicit dependencies for each project means it&#8217;s still easy to find
+<p>Keeping explicit dependencies for each project means it’s still easy to find
 out which components are affected by changes in internal or third-party
 dependencies.</p>
 </div>
@@ -190,7 +190,7 @@ dependencies.</p>
 <p>Say you have three packages in your application, Library_1, Project_A
 and Project_B and both projects depend on the library which in turn depends
 on <span class="docutils literal"><span class="pre">symfony/dependency-injection</span></span>. The repository has the following file structure:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>projects
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>projects
 ├── components
 │   ├── Project_A
 │   │   └── fiddler.json
@@ -202,21 +202,21 @@ on <span class="docutils literal"><span class="pre">symfony/dependency-injection
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Library_1 looks like this::</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Library1</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;src/&quot;</span><span class="p">}},</span>
     <span class="s2">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;vendor/symfony/dependency-injection&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <span class="docutils literal"><span class="pre">fiddler.json</span></span> of Project_A and Project_B look similar (except the autoload)::</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;autoload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;psr-0&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ProjectA</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;src/&quot;</span><span class="p">}},</span>
     <span class="s2">&quot;deps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;components/Library_1&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The global <span class="docutils literal"><span class="pre">composer.json</span></span> as you would expect::</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;symfony/dependency-injection&quot;</span><span class="p">:</span> <span class="s2">&quot;~2.6&quot;</span>
     <span class="p">}</span>
@@ -230,7 +230,7 @@ together. Dropping the need for explicit versions when specifying internal
 dependencies.</p>
 <p>With this setup you can now generate the autoloading files for each package
 exactly like Composer would by calling:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ php fiddler.phar build
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ php fiddler.phar build
 Building fiddler.json projects.
  [Build] components/Library_1
  [Build] components/Project_A
@@ -240,7 +240,7 @@ Building fiddler.json projects.
 <p>Now in each package you can <span class="docutils literal"><span class="pre">require</span> <span class="pre">&quot;vendor/autoload.php&quot;;</span></span> and it loads an
 autoloader with all the dependencies specified for each component, for example
 in <span class="docutils literal"><span class="pre">components/Library_1/index.php</span></span></p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">require_once</span> <span class="s2">&quot;vendor/autoload.php&quot;</span><span class="p">;</span>
 

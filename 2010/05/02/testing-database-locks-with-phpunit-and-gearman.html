@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Immutable DateTime Objects" href="../../01/08/immutable-datetime-objects.html" /><link rel="prev" title="Resources for a PHP and Hudson CI Integration" href="../../02/07/resources-for-a-php-and-hudson-ci-integration.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -68,7 +68,7 @@
 2</a> we plan to integrate pessimistic
 Database-level locks across all the supported vendors (MySQL, Oracle,
 PostgreSql, IBM DB2 so far). This means row-level locking as defined in
-the ANSI SQL Standard using &#8220;SELECT .. FOR UPDATE&#8221; will be available
+the ANSI SQL Standard using “SELECT .. FOR UPDATE” will be available
 optionally in DQL Queries and Finder methods. The Implementation of this
 extension to SELECT statements is rather trivial, however functional
 testing of this feature is not.</p>
@@ -89,7 +89,7 @@ second just starts. The locking would work in these cases, however the
 lock time would not nearly be 2*x seconds, producing a test-failure. We
 are talking about a functional test though and I will accept a failure
 from time to time just to be 99% sure that locking works.</p>
-<p>Solving this problem with Gearman provides a pretty nice &#8220;real-world&#8221;
+<p>Solving this problem with Gearman provides a pretty nice “real-world”
 example for the Job-Server that I wanted to share. This blog post
 contains a stripped down code-example from the Doctrine 2 testsuite. If
 you are interested, you can see the complete Gearman Locking Tests in
@@ -104,7 +104,7 @@ we can go on writing our locking tests with Gearman.</p>
 <p>The first bit is the worker, a PHP script that tries to acquire a
 database lock and then sleeps for a second. The return value of this
 script is the total time required for acquiring the lock and sleeping.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">class LockAgentWorker</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">class LockAgentWorker</span>
 <span class="x">{</span>
 <span class="x">    public function findWithLock($job)</span>
 <span class="x">    {</span>
@@ -125,7 +125,7 @@ script is the total time required for acquiring the lock and sleeping.</p>
 </div>
 <p>The glue-code for the worker script contains of the registering of the
 worker method with the job-server and a simple infinite loop:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">$lockAgent = new LockAgentWorker();</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">$lockAgent = new LockAgentWorker();</span>
 
 <span class="x">$worker = new \GearmanWorker();</span>
 <span class="x">$worker-&gt;addServer();</span>
@@ -142,20 +142,20 @@ worker method with the job-server and a simple infinite loop:</p>
 processes one task at a time. Just open up two terminals and launch the
 php scripts. They will wait for their first task to process.</p>
 <p>Now we need to write our PHPUnit TestCase, which will contain a
-GearmanClient to execute two of the &#8220;findWithLock&#8221; in parallel. Our
+GearmanClient to execute two of the “findWithLock” in parallel. Our
 locking assertion will work like this:</p>
 <ol class="arabic simple">
-<li>Register two tasks for the &#8220;findWithLock&#8221; method that access the same
+<li>Register two tasks for the “findWithLock” method that access the same
 database row.</li>
 <li>Register a completed callback using
-&#8220;GearmanClient::setCompleteCallback()&#8221; that collects the run-time of
+“GearmanClient::setCompleteCallback()” that collects the run-time of
 the individual workers.</li>
-<li>Execute this tasks in parallel using &#8220;GearmanClient::runTasks()&#8221;.</li>
+<li>Execute this tasks in parallel using “GearmanClient::runTasks()”.</li>
 <li>Assert that the maximum run-time is around 2 seconds (since each
 worker sleeps 1 second)</li>
 </ol>
 <p>The code for this steps could look like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">class GearmanLockTest extends \Doctrine\Tests\OrmFunctionalTestCase</span>
 <span class="x">{</span>
 <span class="x">    private $gearman = null;</span>
 <span class="x">    private $maxRunTime = 0;</span>

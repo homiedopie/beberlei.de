@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Monolithic Repositories with PHP and Composer" href="../../04/11/monolithic_repositories_with_php_and_composer.html" /><link rel="prev" title="Monolithic Repositories with Composer and Relative Autoloading" href="../../08/08/monolithic_repositories_with_composer_and_relative_autoloading.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -75,7 +75,7 @@ if you rely on your functional- and unit-tests to catch the problem.</p>
 instantiate all the various services and checks if they are created correctly.
 The first time I saw this pattern was during development of some of the early
 Symfony2 bundles, most notably DoctrineBundle.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme</span><span class="p">;</span>
 
@@ -104,7 +104,7 @@ Symfony2 bundles, most notably DoctrineBundle.</p>
 </pre></div>
 </div>
 <p>Whenever you create or modify a service check the ContainerTest if its already
-guarded by a test. Add a test if necesary and then make the change. It&#8217;s as
+guarded by a test. Add a test if necesary and then make the change. It’s as
 easy as that.</p>
 <p>The <span class="docutils literal"><span class="pre">SymfonySetup</span></span> trait provides access to the Symfony DIC using
 <span class="docutils literal"><span class="pre">getContainer()</span></span> as you can see in the test method. See <a class="reference external" href="http://www.whitewashing.de/2015/02/14/phpunit_before_annotations_and_traits_for_code_reuse.html">my blog post</a>

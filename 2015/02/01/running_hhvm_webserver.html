@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Symfony All The Things (Web)" href="../../../2014/10/26/symfony_all_the_things_web.html" /><link rel="prev" title="A case for weak type hints only in PHP7" href="../10/a_case_for_weak_type_hints_only_in_php7.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -64,8 +64,8 @@
 							<div class="blog-post">
         <div class="section" id="running-hhvm-with-a-webserver">
 <h1>Running HHVM with a Webserver</h1>
-<p>I haven&#8217;t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
-alternative PHP runtime didn&#8217;t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
+<p>I haven’t used <a class="reference external" href="http://hhvm.com">HHVM</a> yet because the use-case for the
+alternative PHP runtime didn’t came up. Today I was wondering if our <a class="reference external" href="https://qafoolabs.com">Qafoo
 Profiler</a> would run out of the box with HHVM using the
 <a class="reference external" href="http://docs.hhvm.com/manual/en/ref.xhprof.php">builtin XHProf extension</a>
 (Answer: It does).</p>
@@ -73,11 +73,11 @@ Profiler</a> would run out of the box with HHVM using the
 locally. It turns out this is not very easy with an existing LAMP stack,
 because mod-php5 and mod-fastcgi obviously compete for the execution of <cite>.php</cite>
 files.</p>
-<p>Quick googling didn&#8217;t turn up a solution (there probably is one, hints in the
-comments are appreciated) and I didn&#8217;t want to install a Vagrant Box just for
+<p>Quick googling didn’t turn up a solution (there probably is one, hints in the
+comments are appreciated) and I didn’t want to install a Vagrant Box just for
 this. So I decided to turn this into a sunday side project. Requirements: A
 simple webserver that acts as proxy in front of HHVMs Fast-CGI. Think of it as
-the &#8220;builtin webserver&#8221; that HHVM is missing.</p>
+the “builtin webserver” that HHVM is missing.</p>
 <p>This turns out to be really simple with Go, a language I use a lot for small
 projects in the last months.</p>
 <p>The code is <a class="reference external" href="https://github.com/beberlei/hhvm-serve/blob/master/hhvm-serve.go">very simple plumbing</a>
@@ -92,7 +92,7 @@ buzzword).</p>
 <p>Back to playing with HHVM, if you want to give your application a try with HHVM
 instead of ZendEngine PHP it boils down to <a class="reference external" href="https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM">installing a prebuilt HHVM package</a> and then
 using my <span class="docutils literal"><span class="pre">hhvm-serve</span></span> command:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ go get github.com/beberlei/hhvm-serve
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ go get github.com/beberlei/hhvm-serve
 $ hhvm-serve --document-root /var/www
 Listening on http://localhost:8080
 Document root is /var/www
@@ -100,11 +100,11 @@ Press Ctrl-C to quit.
 </pre></div>
 </div>
 <p>The server passes all the necessary environment variables to HHVM so that
-catch-all front-controller scripts such as Wordpress <span class="docutils literal"><span class="pre">index.php</span></span> or Symfony&#8217;s
+catch-all front-controller scripts such as Wordpress <span class="docutils literal"><span class="pre">index.php</span></span> or Symfony’s
 <span class="docutils literal"><span class="pre">app.php</span></span> should just work.</p>
-<p>If you don&#8217;t have a running Go Compiler setup this few lines should help you out on
+<p>If you don’t have a running Go Compiler setup this few lines should help you out on
 Ubuntu:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo apt-get install golang
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install golang
 $ GOPATH=~/go
 $ mkdir -p ~/go/{src,bin,pkg}
 $ PATH=&quot;$GOPATH/bin:$PATH&quot;

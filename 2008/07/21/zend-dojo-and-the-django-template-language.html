@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Discussing a jQuery Helper for Zend Framework" href="../12/discussing-a-jquery-helper-for-zend-framework.html" /><link rel="prev" title="ZF jQuery Helper - First Prototype Ready" href="../17/zf-jquery-helper-first-prototype-ready.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -76,18 +76,18 @@ the <a class="reference external" href="http://www.djangoproject.com/documentati
 language</a>
 and found that it is quite awesome.</p>
 <p>Variable filtering and evaluation looks almost like Smarty the syntax
-being {{var.key|filter1|filter2:&#8221;arg1&#8221;:&#8221;arg2&#8221;}}. The logical syntax is
+being {{var.key|filter1|filter2:”arg1”:”arg2”}}. The logical syntax is
 quite different though, taking an somehow object oriented view on
 templates you can extend an existing template and override specific
 parts with your more special implementation. Have a look at the
 following two snippets:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>This is an example of Django template inheritance:
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>This is an example of Django template inheritance:
 
 {% block helloworld %}Hello World!{% endblock %}
 </pre></div>
 </div>
-<div class="highlight-default"><div class="highlight"><pre><span></span>{% extends &quot;base.html&quot; %}
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{% extends &quot;base.html&quot; %}
 
 {%block helloworld %}Hello World for Object Oriented Views!{% endblock %}
 </pre></div>
@@ -98,7 +98,7 @@ realizes it inherits logic from a parent template and substitutes all
 special blocks for the parent ones. With a little object oriented
 background you can guess the result looks like this:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>This is an example of Django template inheritance:
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>This is an example of Django template inheritance:
 
 Hello World for Object Oriented Views!
 </pre></div>
@@ -123,7 +123,7 @@ a &lt;noscript&gt; variant to render the templates completely server-side.</p>
 <p>This generally being a cool idea since it makes developing applications
 with AJAX technology very easy I began to port the DTL to the Zend
 Framework and the whole weekend later I got a working implementation
-that supports at least the &#8220;extends&#8221;, &#8220;for&#8221;, &#8220;include&#8221;, and &#8220;comment&#8221;
+that supports at least the “extends”, “for”, “include”, and “comment”
 tags. As a next task I will implement the helper for DojoX DTL and will
 report back on my efforts.</p>
 </div>

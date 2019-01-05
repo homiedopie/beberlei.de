@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page12.html" /><link rel="prev" title="Newer" href="page10.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,283 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2012/08/13/oop_business_applications_entity_boundary_interactor.html">OOP Business Applications: Entity, Boundary, Interactor</a></h1>
+<p>Other posts in this series:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://whitewashing.de/2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the
+mess</a></li>
+</ul>
+<p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
+an architectural design pattern. I first heard about it in a keynote video of
+<a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc/">Uncle Bob</a> on Ruby
+Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
+This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
+by Alistair Cockburn.</p>
+<p>In this pattern any client of the system talks to the model using a model
+request object and receives data from the model in form of model responses objects.
+Additionally when your model talks to any kind of persistence or subsystem it
+should go through an adapter that is replaceable. For a model architecture
+designed this way, you can replace any part of the UI oder lower layers by
+writing new adapters and plug them in.</p>
+<div class="section" id="terminology">
+<h2>Terminology</h2>
+<p>To iterate the terminology:</p>
+<p><strong>Entities</strong> are objects that represent the system data of the application. They don’t contain
+much logic except rules that are set in stone and are never going to change
+(based on physic or mathematical laws or something).</p>
+<p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
+in the current use-case and works with entities to fulfil their task.</p>
+<p>The <strong>boundary</strong> is responsible for translating model request/response into a
+format that the UI or actor can understand. They also mediate between model
+and lower levels, for example to manage database transactions.</p>
+</div>
+<div class="section" id="an-example">
+<h2>An example</h2>
+<p>Lets start with an example in PHP code. We will keep using a common example
+throughout all blog posts, the usual Bank Account/Money Transfer. The use case
+is the money transfer from one bank account (source) to another one
+(destination).</p>
+<p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankAccount</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">subtract</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deposit</span><span class="p">(</span><span class="nx">Money</span> <span class="nv">$money</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">balance</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is straightforward to implement the <span class="docutils literal"><span class="pre">withdraw</span></span> and <span class="docutils literal"><span class="pre">deposit</span></span>
+functionality. The Money object implementation is omitted here.</p>
+<p>The Interactor handles the use-case of transferring money from the
+source to the destination account:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$destinationId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$amount</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">class</span> <span class="nc">MoneyTransferResponse</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MoneyTransfer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$accountDao</span><span class="p">;</span> <span class="c1">// ctor omitted</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$transfer</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$source</span>      <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">sourceId</span><span class="p">);</span>
+        <span class="nv">$destination</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">accountDao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">destinationId</span><span class="p">);</span>
+        <span class="nv">$money</span>       <span class="o">=</span> <span class="k">new</span> <span class="nx">Money</span><span class="p">(</span><span class="nv">$transfer</span><span class="o">-&gt;</span><span class="na">amount</span><span class="p">);</span>
+
+        <span class="nv">$source</span><span class="o">-&gt;</span><span class="na">withdraw</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+        <span class="nv">$destination</span><span class="o">-&gt;</span><span class="na">deposit</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">MoneyTransferResponse</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <span class="docutils literal"><span class="pre">MoneyTransferRequest</span></span> and <span class="docutils literal"><span class="pre">MoneyTransferResponse</span></span> objects are dumb
+php objects (so called data-transfer objects, DTO).</p>
+<p>You can see in the example that we use a Data Access object to retrieve the
+source and destination account entities from some storage subsystem. To follow the EBI
+design pattern, we have to decouple this data access object from the model,
+by offering a port (Interface):</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This way our business logic is storage independent.</p>
+<p>An example for a boundary would be the requirement for a transaction in
+the bank account sample. We need to wrap the whole MoneyTransfer use-case in
+a transaction. Lets say the invocation of our Use-Case is controlled through
+some kind of application boundary object:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">transferMoney</span><span class="p">(</span><span class="nx">MoneyTransferRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$connection</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">applicationFactory</span><span class="o">-&gt;</span><span class="na">createConnection</span><span class="p">();</span>
+        <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">beginTransaction</span><span class="p">();</span>
+
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="nv">$useCase</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MoneyTransfer</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createAccountDao</span><span class="p">());</span>
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$useCase</span><span class="o">-&gt;</span><span class="na">transferMoney</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">commit</span><span class="p">();</span>
+
+            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">rollback</span><span class="p">();</span>
+            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a very elaborate way to describe that calling the transfer money
+use-case is wrapped in a Transaction, another port for the storage system to
+manage transactions in this case. The code here is very explicit about
+the actual task. In a real application you would probably find a more
+generic approach to getting this job done.</p>
+</div>
+<div class="section" id="boundary-abstraction">
+<h2>Boundary Abstraction</h2>
+<p>Thinking about the boundaries I came up with a library several month ago called
+<a class="reference external" href="https://github.com/beberlei/context">Context</a>, which I deprecated already
+(Reason below).  It allows you to wrap calls to the model by some sort of proxy
+that transforms the request and response and also handles transactions and
+such. Loosely spoken this was actually some kind of AOP library, using the
+limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
+<p>With context you would do something like:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
+
+<span class="c1">// 1. direct invocation</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyService</span><span class="p">();</span>
+<span class="nv">$context</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'service'</span> <span class="o">=&gt;</span> <span class="nv">$myService</span><span class="p">,</span> <span class="s1">'method'</span> <span class="o">=&gt;</span> <span class="s1">'doSomething'</span><span class="p">,</span> <span class="s1">'arguments'</span> <span class="o">=&gt;</span> <span class="nv">$args</span><span class="p">));</span>
+
+<span class="c1">// 2. proxy wrapping</span>
+<span class="nv">$myService</span> <span class="o">=</span> <span class="nv">$context</span><span class="o">-&gt;</span><span class="na">wrap</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyService</span><span class="p">());</span>
+<span class="nv">$myService</span><span class="o">-&gt;</span><span class="na">doSomething</span><span class="p">(</span><span class="nv">$args</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The second way is obviously way more readable, but its also rather magic.</p>
+<p>I deprecated this library because in the end it wasn’t really helpful that
+much. Implementing an application specific proxy for services is done in
+almost no time and then it solves all your specific needs. My main problem with
+the library is that it tries to magically take away the need to design the
+boundary of your application yourself - in a way that is not really coherent to
+other developers.</p>
+<p>In my own current greenfield applications I quickly went away from using it,
+since a custom application proxy as shown in this
+<a class="reference external" href="https://gist.github.com/3272909">Gist</a> is really much simpler to implement and
+use.</p>
+</div>
+<div class="section" id="using-with-symfony2">
+<h2>Using with Symfony2</h2>
+<p>As I am currently exclusively developing Symfony2/Silex applications, applying
+EBI to Symfony2 framework based applications is very important to me. The
+biggest difficulty here is the Form layer, especially the request data-mapping and
+validation concerns, which are normally part of the model. There are two
+approaches I came up with to solve this:</p>
+<ul class="simple">
+<li>Build Forms for arrays or DTOs and send them through to the boundary to the model.
+You have to validate the data again on the model, which is annoying, but in
+this case the clean way. This is not so easy to do with complex forms though
+as you need to map the request objects to your entities.</li>
+<li>Create a Model Request that wraps and hides the form behind a simple data
+mapping API. This way you can make it look as if you would map a DTO onto
+an object, but in this case you are using the Form API as the mapper.</li>
+</ul>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$entity</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dao</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dataMapper</span><span class="o">-&gt;</span><span class="na">transform</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The problem with this approach is, that you cant really unit-test these methods
+anymore, because the complexity of the form layer mapping cannot be mocked with
+this API. Instead your tests always need the full form layer (with validation,
+depending services etc.) to allow for real-world testing. Additionally you have
+to make the DataMapper throw an exception that you can catch in the controller,
+rendering the appropriate response. Using exceptions for controlling executions
+paths is not a very good practice though.</p>
+<p>Another thing that actually helped was the SensioFrameworkExtraBundle and
+ParamConverters. In my project I now have the framework building the Model
+Request objects by convention from the HTTP Request, so that I only need to
+pass them on and can skip the actual mapping of HTTP Request to Model Request.</p>
+</div>
+<div class="section" id="pros-and-cons">
+<h2>Pros and Cons</h2>
+<p>This design pattern very closely resembles what Fowler calls <strong>Service Layer</strong>
+pattern in PoEAA. EBI is going a bit more into detail by naming individual
+parts of the pattern more explicit. Without more restrictions however using
+this pattern will drive you towards many of the problems described in my
+previous post.</p>
+<p>Clean separation from frameworks is achieved, depending on the actual usage
+however only at a significant cost.  Never forget stepping back and thinking
+about further abstractions, otherwise applying EBI is leading to lots of code
+being manually written.</p>
+<p>This already shows one particular annoyance are the data-transfer objects. You
+need to invest quite some work to get a mapping working from entities to
+transfer objects and back. In the process you will loose the convenience of
+“Open Entity Manager in the View”, where you can lazy load any
+data you want to access in the view. This is quite a painful step, because you
+are loosing lots of flexibility. Much more annoying is the need to update
+entities from data-transfer objects, requiring sophisticated code for merging
+of partial object graphs.</p>
+<p>What this design pattern improves is the testability of code and also the
+execution of tests is MUCH better, when you don’t have to go through the whole
+application stack to test something.</p>
+<p>Implementing behavior into the use-cases also avoids lots of lasagna code
+compared to a messy domain driven design. You get a very good overview of
+what is actually happening just by looking at the Model Request and Interactor
+classes. However depending on the use-case the classes can get very big
+and might need lots of collaborators, which make the problem complex again.</p>
+<p>It is important to note that aggregating the domain logic in the use-cases
+actually means going to some sort of transaction script processing, away from
+domain driven design. I am pretty sure that this is not necessarily the
+intention of this design pattern from a POV of Uncle Bob. However depending on
+the sophistication of the applications domain logic, transaction script is
+actually a very good pattern for simple to medium complex use-cases and
+I like to have this as a general rule for developers (“Put behavior on the
+use-case”).</p>
+<p>In conclusion I can partially recommend using the EBI pattern. You have to be
+careful to find abstraction layers that keep your code DRY and SOLID however,
+something which does not come naturally with this pattern. If you are not
+careful you end up with all the “messy points” that I mentioned in my previous
+blog post.</p>
+<p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
+by using some code-generation for example to do parts of this job for you. The
+worst outcome with this pattern is, when you manually code layers for HTTP
+Request/Form =&gt; DTO =&gt; Entity mapping and the other way around.</p>
+</div>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/applicationdesign.html">ApplicationDesign</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 13, 2012
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2012/08/11/oop_business_applications__trying_to_escape_the_mess.html">OOP Business Applications: Trying to escape the mess</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -232,7 +509,7 @@ and a bunch of development tools such as tree, ack-grep.</li>
 <li>PHP Tools (PHPUnit, PHPCS, Xdebug, Xhprof)</li>
 <li>Git with Author Information and global ignore file</li>
 <li>A bunch of .bashrc initializations</li>
-<li>Some open source projects I always have around (Doctrine, ...)</li>
+<li>Some open source projects I always have around (Doctrine, …)</li>
 <li>Setup automatic backup with my cloud storage provider (<a class="reference external" href="https://www.free-hidrive.com/">Strato Hidrive</a> - they support rsync)</li>
 <li>and I probably forgot a bunch of tools just thinking about this today.</li>
 </ul>
@@ -251,7 +528,7 @@ run with root <span class="docutils literal"><span class="pre">~/.puppet/devmach
 my own user <span class="docutils literal"><span class="pre">~/.puppet/devmachine.pp</span></span>.</p>
 <p>Because every dev-machine setup is unique, I will just show some
 examples of my puppet file to get the message across:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="c1"># /home/benny/.puppet/devmachine.pp</span>
 
 <span class="c1"># VIM Dot Files</span>
 <span class="n">vcsrepo</span> <span class="p">{</span> <span class="s1">'vim-dotfiles'</span><span class="p">:</span>
@@ -291,7 +568,7 @@ puppet. The require makes sure this resource is only activated after the dotfile
 were installed.</li>
 </ul>
 <p>Another nice example is the configuration of Git:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="c1"># Configure Git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="c1"># Configure Git</span>
 <span class="n">exec</span> <span class="p">{</span> <span class="s2">"git-author-name"</span><span class="p">:</span>
     <span class="n">command</span> <span class="o">=&gt;</span> <span class="s1">'git config --global user.name "Benjamin Eberlei"'</span><span class="p">,</span>
     <span class="n">unless</span> <span class="o">=&gt;</span> <span class="s2">"git config --global --get user.name|grep 'Benjamin Eberlei'"</span>
@@ -372,7 +649,7 @@ Guest Additions. To be able to use vagrant, you need a basebox with the
 virtualbox and guest additions versions matching correctly.</p>
 <p>To build your own Virtualbox you can use the Vagrant plugin <a class="reference external" href="https://github.com/jedi4ever/veewee">Veewee</a>. Install it from Github to get
 all the latest VM templates:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/>$ git clone https://github.com/jedi4ever/veewee.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/>$ git clone https://github.com/jedi4ever/veewee.git
 $ <span class="nb">cd</span> veewee
 $ sudo gem install bundler
 $ sudo bundle install
@@ -384,7 +661,7 @@ using Gems, but this not necessarily gives you the version with the most recent
 templates that match your own operating system version.</p>
 <p>Now lets define our own basebox definition and copy from an existing template
 that Veewee provides:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/>$ vagrant basebox define <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'ubuntu-server-12.04-i386'</span>
 </pre></div>
 </div>
 <p>This creates a copy from the default ubuntu server template into a folder
@@ -392,18 +669,18 @@ that Veewee provides:</p>
 in there to adjust the build process of the virtual machine image. For me its
 important to modify the definitions.rb and add the following, otherwise
 building the VMs fails:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/>:virtualbox <span class="o">=</span>&gt; <span class="o">{</span> : <span class="nv">vm_options</span> <span class="o">=</span>&gt; <span class="o">[</span><span class="s2">"pae"</span> <span class="o">=</span>&gt; <span class="s2">"on"</span><span class="o">]}</span>,
 </pre></div>
 </div>
 <p>You can then open up the postinstall.sh and install more packages that you need
 in your personal basebox. For example a LAMP stack. Do this right after the
 lines that do <cite>apt-get install -y</cite>:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/><span class="nb">export</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
 apt-get -y install php5 php5-cli php5 mysql-server-5.5 libapache2-mod-php5
 </pre></div>
 </div>
 <p>If you are done you can start building a virtualbox image with:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/>$ vagrant basebox build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/>$ vagrant basebox build
 </pre></div>
 </div>
 <p>Make sure not to start typing in the console window that open ups. It is
@@ -411,14 +688,14 @@ automatically controlled from a ruby script and every change to the keysequence
 breaks the building. This step takes a while. (Enough to write a blog post
 while watching a boring football game for example).</p>
 <p>When this is done, you can verify and export the VM into virtualbox/vagrant.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/>$ veewee vbox validate <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
 $ vagrant basebox <span class="nb">export</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
 $ vagrant box add <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span> <span class="s1">'beberlei-ubuntu-12.04-i386-php.box'</span>
 </pre></div>
 </div>
 <p>Now this box is also available as Vagrant base box. For example in a project
 that we want to use with vagrant, do:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span/>$ <span class="nb">cd</span> myproject/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span/>$ <span class="nb">cd</span> myproject/
 $ vagrant init <span class="s1">'beberlei-ubuntu-12.04-i386-php'</span>
 $ vagrant up
 $ vagrant ssh
@@ -506,159 +783,6 @@ fun with it.</p>
             <small>
                 Posted on May 26, 2012
                  by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2012/02/25/symfony2_controller_testing.html">Symfony2 Controller Testing without Application</a></h1>
-<p>Controller testing using the WebTestCase requires a Symfony Kernel and with
-that a complete application. However you can just ship your own simple kernel
-with just the dependencies necessary to test your application. This way you can
-easily create functional tests for bundles without the bundle requiring an
-application.</p>
-<div class="section" id="create-a-testkernel">
-<h2>Create a TestKernel</h2>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="c1">// Tests/Controller/App/AppKernel.php</span>
-
-<span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">AppKernel</span> <span class="k">extends</span> <span class="nx">Kernel</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerBundles</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$bundles</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-            <span class="c1">// Dependencies</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\FrameworkBundle\FrameworkBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\SecurityBundle\SecurityBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\MonologBundle\MonologBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Symfony\Bundle\TwigBundle\TwigBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle</span><span class="p">(),</span>
-            <span class="k">new</span> <span class="nx">JMS\SerializerBundle\JMSSerializerBundle</span><span class="p">(</span><span class="nv">$this</span><span class="p">),</span>
-            <span class="k">new</span> <span class="nx">FOS\RestBundle\FOSRestBundle</span><span class="p">(),</span>
-            <span class="c1">// My Bundle to test</span>
-            <span class="k">new</span> <span class="nx">Beberlei\WorkflowBundle\BeberleiWorkflowBundle</span><span class="p">(),</span>
-        <span class="p">);</span>
-
-        <span class="k">return</span> <span class="nv">$bundles</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerContainerConfiguration</span><span class="p">(</span><span class="nx">LoaderInterface</span> <span class="nv">$loader</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// We don't need that Environment stuff, just one config</span>
-        <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/config.yml'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="creating-the-config-yml">
-<h2>Creating the config.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre><span/># Tests/Controller/App/config.yml
-framework:
-    secret:          secret
-    charset:         UTF-8
-    test: ~
-    router:          { resource: "%kernel.root_dir%/routing.yml" }
-    form:            true
-    csrf_protection: true
-    validation:      { enable_annotations: true }
-    templating:      { engines: ['twig'] }
-    session:
-        auto_start:     false
-        storage_id: session.storage.filesystem
-
-monolog:
-    handlers:
-        main:
-            type:         fingers_crossed
-            action_level: error
-            handler:      nested
-        nested:
-            type:  stream
-            path:  %kernel.logs_dir%/%kernel.environment%.log
-            level: debug
-</pre></div>
-</div>
-</div>
-<div class="section" id="creating-the-routing-yml">
-<h2>Creating the routing.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre><span/><span class="c1"># Tests/Controller/App/routing.yml</span>
-<span class="l l-Scalar l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="s">"@BeberleiWorkflowBundle/Controller/"</span>
-    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
-    <span class="l l-Scalar l-Scalar-Plain">prefix</span><span class="p p-Indicator">:</span>   <span class="l l-Scalar l-Scalar-Plain">/</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="adding-a-phpunit-bootstrap">
-<h2>Adding a PHPUnit bootstrap</h2>
-<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree/">Travis &amp; Composer sitting in a
-Tree K-I-S-S-I-N-G” blog post</a>.</p>
-<p>His setup is missing the spl_autoload_register() call in the bootstrap file
-though.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="c1">// Tests/bootstrap.php</span>
-<span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/../vendor/.composer/autoload.php'</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s">&lt;&lt;&lt;'</span><span class="dl">EOT</span><span class="s">'</span>
-<span class="s">You must set up the project dependencies, run the following commands:</span>
-<span class="s">wget http://getcomposer.org/composer.phar</span>
-<span class="s">php composer.phar install</span>
-<span class="dl">EOT</span>
-    <span class="p">);</span>
-<span class="p">}</span>
-<span class="nx">\Doctrine\Common\Annotations\AnnotationRegistry</span><span class="o">::</span><span class="na">registerLoader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$loader</span><span class="p">,</span> <span class="s1">'loadClass'</span><span class="p">));</span>
-
-<span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$class</span><span class="p">,</span> <span class="s1">'Beberlei\\WorkflowBundle\\'</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nv">$path</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="o">.</span><span class="nb">implode</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nb">explode</span><span class="p">(</span><span class="s1">'\\'</span><span class="p">,</span> <span class="nv">$class</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">stream_resolve_include_path</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">require_once</span> <span class="nv">$path</span><span class="p">;</span>
-        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-</div>
-<p>That means your bundle should have a composer.json that loads all the
-dependencies.</p>
-</div>
-<div class="section" id="modifying-the-phpunit-xml-dist">
-<h2>Modifying the phpunit.xml.dist</h2>
-<p>We have to tell the WebTestCase base class where to find this kernel:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span/><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
-<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">"Tests/bootstrap.php"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;php&gt;</span>
-        <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">"KERNEL_DIR"</span> <span class="na">value=</span><span class="s">"Tests/Controller/App"</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;/php&gt;</span>
-<span class="nt">&lt;/phpunit&gt;</span>
-</pre></div>
-</div>
-<p>Now just run your web-test cases.</p>
-<p>If you want to debug the logging happening inside the Kernel just comment out
-the Monolog lines to get the log-messages printed to the screen.</p>
-<p>You have to add the <cite>Tests/App/cache</cite> and <cite>Tests/App/logs</cite> to your version
-control ignore files.</p>
-</div>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/symfony.html">Symfony</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 25, 2012
-                
             </small>
         </p>
     </div>

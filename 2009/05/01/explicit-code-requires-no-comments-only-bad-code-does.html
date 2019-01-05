@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Using a Dependency Injection Container with Zend_Application" href="../../06/16/using-a-dependency-injection-container-with-zend-application.html" /><link rel="prev" title="Update on Unittest and Metrics Tool" href="../../02/13/update-on-unittest-and-metrics-tool.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -73,7 +73,7 @@ any inline comments and can be greatly enhanced in readability with
 taking 2-5 minutes of time and refactoring the code. The original code
 sample was:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>function __construct(array $pathInfo) {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>function __construct(array $pathInfo) {
     $section = $pathInfo[0];
     $file = $pathInfo[1];
 
@@ -104,7 +104,7 @@ refactoring produces about double the code, but its done entirely by
 using NetBeans nice Rename variable and copy paste on extracting
 methods, which takes not more than 5 minutes.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class StaticXmlXsltRendererImpl extends AbstractXsltView
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class StaticXmlXsltRendererImpl extends AbstractXsltView
 {
     function render(array $filteredPathInfo) {
         $templateValuesXmlPath = $this-&gt;getTemplateValuesXmlFile($filteredPathInfo);
@@ -141,7 +141,7 @@ methods, which takes not more than 5 minutes.</p>
 </div>
 </div></blockquote>
 <p>In this code snippet the class name, variable names and methods clearly
-communicate what is done, which wasn&#8217;t the case in the previous example.
+communicate what is done, which wasn’t the case in the previous example.
 The only change for the clients is the change of using the constructor
 to using the <strong>render()</strong> method, which communicates the intend more.
 Also the render method now clearly communicates that either the error or
@@ -152,7 +152,7 @@ application configuration is made implicit into the code. This has to be
 extracted to be an explicit configuration constant and the comment can
 go.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>private function getTemplateValuesXmlFile($filteredPathInfo) {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>private function getTemplateValuesXmlFile($filteredPathInfo) {
     $section = $this-&gt;getSection($filteredPathInfo);
     $file = $this-&gt;getFile($filteredPathInfo);
 
@@ -164,13 +164,13 @@ go.</p>
 code that has been hacked into existence and is hard to understand.
 Either the programmer has to get it done and has no chance to
 clearly communicate the intend. Or what is even worse the to be
-changed legacy code is hard to understand but you can&#8217;t take the
+changed legacy code is hard to understand but you can’t take the
 chances to refactor it because its also already in production and
 has no tests. Now from the second point it is obvious that upon ugly
 code you put only more and more ugly code to fix the problems. This
 is what leads to the legacy maintenance problems that pretty much
 every programmer faces. And then commenting comes into play: You
-have to add a new feature X and it has to be done fast. You don&#8217;t
+have to add a new feature X and it has to be done fast. You don’t
 really understand the code or how it works together but you know you
 can put the new code for the feature into existence but its really
 unintuitive. So you begin to comment it excessively, because its the
@@ -215,8 +215,8 @@ would be duplication and duplication is bad. What if you have a
 project that does not follow this guidelines? Then of course
 comments should be used to explain code, but in the long run this
 should be refactored to self-explaining code. Additionally every new
-feature should be programmed explicitly to follow the &#8220;leave code
-better than before&#8221; principle.</p>
+feature should be programmed explicitly to follow the “leave code
+better than before” principle.</p>
 <p>In my opinion two refactoring tools are missing that would greatly
 help PHP programmers write nice to read code: Extract method and
 Replace magic value with constant. Can someone integrate them into

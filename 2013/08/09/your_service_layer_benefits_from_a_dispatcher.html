@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Doctrine and Domain Events" href="../../07/24/doctrine_and_domainevents.html" /><link rel="prev" title="Speedup Symfony2 on Vagrant boxes" href="../19/speedup_symfony2_on_vagrant_boxes.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -87,7 +87,7 @@ is about finding a maintainable solution to handle them.</p>
 <p>As a practical example I will pick the classical user registration example,
 starting with a service-layer that implements the cross-cutting
 concerns inside the service method:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserService</span>
 <span class="p">{</span>
@@ -128,7 +128,7 @@ can already see this leads to lots of spagetti-code.</p>
 into their own services. This requires to introduce an interface for <span class="docutils literal"><span class="pre">UserService</span></span>
 and then building decorators for the different concerns. Then the service
 can be built as a decorator chain:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$userService</span> <span class="o">=</span>
     <span class="k">new</span> <span class="nx">LogUserService</span><span class="p">(</span>
@@ -157,7 +157,7 @@ to registered services, we add all the cross-cutting concerns our application
 needs. Note: This is <strong>deliberatly written without further abstraction</strong>, just
 to show the concept. The real thing would propably seperate the
 responsibilities from each other.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">CommandDispatcher</span>
 <span class="p">{</span>
@@ -201,7 +201,7 @@ that when they send emails, those only get send when the transaction was
 successful. It checks if the user has the correct access
 controls/authentication and performs some generic logging.</p>
 <p>And using the dispatcher in your code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
 <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
 
@@ -223,7 +223,7 @@ adding a new method or service.</p>
 you actually call methods on the service-layer.</p>
 <p>There are two ways to make this call nicer. The first is use magic <span class="docutils literal"><span class="pre">__call</span></span> and some
 clever duck-typing to create an API similar to this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CommandDispatcher</span><span class="p">();</span>
 <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">registerService</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">());</span>
@@ -233,7 +233,7 @@ clever duck-typing to create an API similar to this:</p>
 </div>
 <p>The second approach does not require magic <span class="docutils literal"><span class="pre">__call</span></span>, but requires you to write a class for each
 command. We map the command class name to a callback:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="nv">$userService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserService</span><span class="p">();</span>
 
@@ -256,7 +256,7 @@ wrapped in the dispatcher, so we achieved a considerable improvement
 over the first example with all the concerns nicely seperated from each other.</p>
 <p>The benefits are:</p>
 <ul class="simple">
-<li>Services themself don&#8217;t need access to the cross-cutting concerns anymore,
+<li>Services themself don’t need access to the cross-cutting concerns anymore,
 reducing the number of dependencies and increasing maintainability and
 testability.</li>
 <li>Handling cross-cutting concerns, that can make the service layer code very
@@ -285,11 +285,11 @@ well.</p>
 small applications and the indirection of handling cross-cutting concerns
 might confuse teammates.</li>
 <li>Having the dispatcher object inside controllers feels strange from the MVC
-point of view, it doesn&#8217;t really fit. It also still may require implementing
+point of view, it doesn’t really fit. It also still may require implementing
 one action for every command, not simplifying this part of the development.</li>
-<li>While other languages don&#8217;t need this because of their support for AOP and
+<li>While other languages don’t need this because of their support for AOP and
 annotations (Spring for Java for example) this is necessary in PHP only,
-because we don&#8217;t have this features.</li>
+because we don’t have this features.</li>
 <li>Unless we use the explicit command object approach, there is no
 auto-completion for commands on the dispatcher in the IDEs.</li>
 </ul>

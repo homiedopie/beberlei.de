@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Lightweight Symfony2 Controllers" href="../14/lightweight_symfony2_controllers.html" /><link rel="prev" title="Running HHVM with a Webserver" href="../../../2015/02/01/running_hhvm_webserver.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -68,17 +68,17 @@
 the smallest possible example of a Symfony application. Using this in trainings
 helps the participants understand of just how few parts a Symfony application
 contains. Sure, there are lots of classes participating under the hood, but
-I don&#8217;t care about the internals only about the public API.</p>
+I don’t care about the internals only about the public API.</p>
 <p>We use microservice architectures for the bepado and <a class="reference external" href="https://tideways.io">PHP Profiler</a> projects that Qafoo is working on at the moment. For
 the different components a mix of Symfony Framework, Silex, Symfony Components
 and our own Rest-Microframework (RMF) are used. This zoo of
 different solutions sparked a recent discussion with <a class="reference external" href="https://twitter.com/manuelp">my colleague Manuel</a> about when we would want to use Symfony for a
 web application.</p>
-<p>We quickly agreed on: Always. I can&#8217;t speak for Manuel, but these are my
+<p>We quickly agreed on: Always. I can’t speak for Manuel, but these are my
 reasons for this decision:</p>
 <ul>
 <li><p class="first">I always want to use a technology that is based on Symfony HttpKernel,
-because of the built-in caching, ESI and the <a class="reference external" href="http://stackphp.com/">Stack-PHP</a> project. I usually don&#8217;t need this at the beginning
+because of the built-in caching, ESI and the <a class="reference external" href="http://stackphp.com/">Stack-PHP</a> project. I usually don’t need this at the beginning
 of a project, but at some point the simplicity of extending the Kernel
 through aggregation is incredible.</p>
 <p>This leaves three solutions: Silex, Symfony Framework and Plain Components.</p>
@@ -135,7 +135,7 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 </ol>
 <p>You can find <a class="reference external" href="https://github.com/beberlei/symfony-minimal-distribution">all the code on Github</a>.</p>
 <p>Start with the composer.json:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;symfony/symfony&quot;</span><span class="p">:</span> <span class="s2">&quot;@stable&quot;</span><span class="p">,</span>
         <span class="s2">&quot;symfony/monolog-bundle&quot;</span><span class="p">:</span> <span class="s2">&quot;@stable&quot;</span><span class="p">,</span>
@@ -148,7 +148,7 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 </pre></div>
 </div>
 <p>The index.php:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// web/index.php</span>
 
 <span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../vendor/autoload.php&quot;</span><span class="p">;</span>
@@ -169,7 +169,7 @@ Extending on the <a class="reference external" href="http://www.whitewashing.de/
 the different front controller files based on environment. We need a file
 called <span class="docutils literal"><span class="pre">.env</span></span> in our application root containing key-value pairs of
 environment variables:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># .env</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># .env</span>
 <span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
 <span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
 </pre></div>
@@ -177,7 +177,7 @@ environment variables:</p>
 <p>Add this file to <span class="docutils literal"><span class="pre">.gitignore</span></span>. Your deployment to production needs
 a mechanism to generate this file with production configuration.</p>
 <p>Our minimal AppKernel looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// app/AppKernel.php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
@@ -216,13 +216,13 @@ a mechanism to generate this file with production configuration.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>It points to a configuration file <span class="docutils literal"><span class="pre">config.yml</span></span>. We don&#8217;t use
-different configuration files per environment here because we don&#8217;t
+<p>It points to a configuration file <span class="docutils literal"><span class="pre">config.yml</span></span>. We don’t use
+different configuration files per environment here because we don’t
 need it. Instead we use the closure loader to enable the web debug
 toolbar when we are in development environment.</p>
-<p>Symfony configuration becomes much simpler if we don&#8217;t use the inheritance
+<p>Symfony configuration becomes much simpler if we don’t use the inheritance
 and load everything from just a single file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># app/config/config.yml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/config/config.yml</span>
 <span class="n">framework</span><span class="p">:</span>
     <span class="n">secret</span><span class="p">:</span> <span class="o">%</span><span class="n">secret</span><span class="o">%</span>
     <span class="n">router</span><span class="p">:</span>
@@ -249,7 +249,7 @@ and load everything from just a single file:</p>
 by adding new lines to <span class="docutils literal"><span class="pre">.env</span></span> file, making use of the excellent <a class="reference external" href="http://symfony.com/doc/current/cookbook/configuration/external_parameters.html">external
 configuration parameter support</a>
 in Symfony.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># .env</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># .env</span>
 <span class="n">SYMFONY_ENV</span><span class="o">=</span><span class="n">dev</span>
 <span class="n">SYMFONY_DEBUG</span><span class="o">=</span><span class="mi">1</span>
 <span class="n">SYMFONY__SECRET</span><span class="o">=</span><span class="n">abcdefg</span>
@@ -257,7 +257,7 @@ in Symfony.</p>
 </pre></div>
 </div>
 <p>Now add a <span class="docutils literal"><span class="pre">routing_prod.yml</span></span> file with a hello world route:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># app/config/routing_prod.yml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/config/routing_prod.yml</span>
 <span class="n">hello_world</span><span class="p">:</span>
     <span class="n">pattern</span><span class="p">:</span> <span class="o">/</span><span class="n">hello</span><span class="o">/</span><span class="p">{</span><span class="n">name</span><span class="p">}</span>
     <span class="n">defaults</span><span class="p">:</span>
@@ -266,7 +266,7 @@ in Symfony.</p>
 </div>
 <p>And because our routes are dependent on the environment in <span class="docutils literal"><span class="pre">config.yml</span></span> also a
 <span class="docutils literal"><span class="pre">routing_dev.yml</span></span> containing the WebDebug toolbar and profiler routes:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># app/config/routing_dev.yml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/config/routing_dev.yml</span>
 <span class="n">_wdt</span><span class="p">:</span>
     <span class="n">resource</span><span class="p">:</span> <span class="s2">&quot;@WebProfilerBundle/Resources/config/routing/wdt.xml&quot;</span>
     <span class="n">prefix</span><span class="p">:</span>   <span class="o">/</span><span class="n">_wdt</span>
@@ -283,7 +283,7 @@ in Symfony.</p>
 in routing.yml and in the AppKernel. When we follow Fabiens best practice
 about adding services, routes and templates into the <span class="docutils literal"><span class="pre">app/config</span></span> and
 <span class="docutils literal"><span class="pre">app/Resources/views</span></span> folders adding a bundle just requires the bundle class:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Acme/HelloBundle/AcmeHelloBundle.php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\HelloBundle</span><span class="p">;</span>
@@ -296,7 +296,7 @@ about adding services, routes and templates into the <span class="docutils liter
 </pre></div>
 </div>
 <p>And the controller that renders our Hello World:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Acme/HelloBundle/Controller/DefaultController.php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\HelloBundle\Controller</span><span class="p">;</span>
@@ -316,14 +316,14 @@ about adding services, routes and templates into the <span class="docutils liter
 </pre></div>
 </div>
 <p>Now we only put a template into <span class="docutils literal"><span class="pre">app/Resources</span></span>:</p>
-<div class="highlight-jinja"><div class="highlight"><pre><span></span><span class="c">{# app/Resources/AcmeHelloBundle/views/Default/hello.html.twig #}</span><span class="x"></span>
+<div class="highlight-jinja notranslate"><div class="highlight"><pre><span></span><span class="c">{# app/Resources/AcmeHelloBundle/views/Default/hello.html.twig #}</span><span class="x"></span>
 <span class="x">Hello </span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">!</span>
 </pre></div>
 </div>
 <p>As a last requirement we need a console script to manage our Symfony
 application. We reuse the vlucas/phpdotenv integration here to
 load all the required environment variables:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">#!/usr/bin/env php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">#!/usr/bin/env php</span>
 <span class="cp">&lt;?php</span>
 <span class="c1">// app/console</span>
 
@@ -345,7 +345,7 @@ load all the required environment variables:</p>
 </div>
 <p>Voila. The minimal Symfony distribution is done.</p>
 <p>Start the php built in webserver to take a look</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ php -S localhost:8080 web/index.php
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ php -S localhost:8080 web/index.php
 </pre></div>
 </div>
 <p>I personally like this simplicity of that, the only thing that annoys me are
@@ -363,7 +363,7 @@ as OAuth, Databases etc.</li>
 <span class="docutils literal"><span class="pre">app/config/parameters.yml</span></span> approach.</li>
 </ol>
 <p>This scales well, because at every point you can move towards abstracting
-bundles and configuration more using Symfony&#8217;s built in functionality.
+bundles and configuration more using Symfony’s built in functionality.
 No matter what type of application you build, it is always based on Symfony
 and the building blocks are always the same.</p>
 <p>I suggest to combine this minimal Symfony with the <a class="reference external" href="https://github.com/QafooLabs/QafooLabsNoFrameworkBundle">QafooLabsFrameworkExtraBundle</a> that I <a class="reference external" href="http://www.whitewashing.de/2014/10/14/lightweight_symfony2_controllers.html">blogged

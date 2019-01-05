@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Spotting Feature Envy and Refactoring" href="../../08/11/spotting_featureenvy_and_refactoring.html" /><link rel="prev" title="Symfony All The Things (Web)" href="../26/symfony_all_the_things_web.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -73,14 +73,14 @@ and your model typically introduce layers of abstraction that produce
 complexity. Service layers, CQRS and various design patterns are useful
 tools, but developing every application with this kind of abstraction screams
 over-engineering.</p>
-<p>While the Domain-Driven Design slogan is &#8220;Tackling complexity in software&#8221;,
-there are many abstractions out there that can better be described as &#8220;Causing
-complexity in software&#8221;. I have written some of them myself.</p>
-<p>Testability: There is a mantra &#8220;Don&#8217;t unit-test your controllers&#8221; that arose
+<p>While the Domain-Driven Design slogan is “Tackling complexity in software”,
+there are many abstractions out there that can better be described as “Causing
+complexity in software”. I have written some of them myself.</p>
+<p>Testability: There is a mantra “Don’t unit-test your controllers” that arose
 because controllers in most frameworks are just not testable. They have many
 dependencies on other framework classes and cannot be created in a test
 environment. This lead many teams to use slow and brittle integration tests instead.</p>
-<p>But what if controllers were testable because they don&#8217;t depend on the
+<p>But what if controllers were testable because they don’t depend on the
 framework anymore. We could avoid testing all the many layers that we
 have removed for the sake of simplicity and also reduce the number of
 slow integration tests.</p>
@@ -108,7 +108,7 @@ that does not require injecting a service into your controller.</li>
 <li>Avoid annotations</li>
 </ul>
 <p>The concepts are best explained by showing an example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
 
@@ -148,7 +148,7 @@ SensioFrameworkExtraBundle.</p>
 </ul>
 <p>The next example demontrates the abstraction for form requests that help writing very
 concise form code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">QafooLabs\MVC\TokenContext</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">QafooLabs\MVC\RedirectRouteResponse</span><span class="p">;</span>

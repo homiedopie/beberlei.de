@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Netbeans PHP CodeSniffer Plugin: Now with Options Dialog" href="../../11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html" /><link rel="prev" title="Explicit Code requires no comments - Only bad code does" href="../../05/01/explicit-code-requires-no-comments-only-bad-code-does.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -89,10 +89,10 @@ them into the MVC stack as additional Front Controller parameters.
 Technically a <strong>Zend_Registry</strong> instance holds all these resources with
 their respective resource names as keys. The resources are accessible
 inside the Front Controller and the Action Controller classes. Assume
-the resource &#8216;Db&#8217; is initialized in your application, you can access it
+the resource ‘Db’ is initialized in your application, you can access it
 with:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$front = Zend_Controller_Front::getInstance();
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$front = Zend_Controller_Front::getInstance();
 $container = $front-&gt;getParam(&#39;bootstrap&#39;)-&gt;getContainer();
 $db = $container-&gt;db;
 
@@ -131,7 +131,7 @@ can be used as dependencies for objects that are lazy-loaded from the
 container. Skipping the tech-talk, here is an example. First we have to
 replace the default Container with Yadif:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$objects = new Zend_Config_Xml(APPLICATION_PATH.&quot;/config/objects.xml&quot;);
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$objects = new Zend_Config_Xml(APPLICATION_PATH.&quot;/config/objects.xml&quot;);
 $container = new Yadif_Container($objects);
 
 $application = new Zend_Application(
@@ -145,14 +145,14 @@ $application-&gt;bootstrap()
 </pre></div>
 </div>
 </div></blockquote>
-<p>Assume you run Zend_Application with a &#8220;Db&#8221; and a &#8220;Cache&#8221; resource.
+<p>Assume you run Zend_Application with a “Db” and a “Cache” resource.
 These resources are loaded on every request. The objects configured in
 Yadif however are not instantiated until they are requested for the
 first time from the container. We can merge these two worlds and make
 use of the Application resources inside the Yadif Configuration
-&#8220;objects.xml&#8221;, which looks like:</p>
+“objects.xml”, which looks like:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; ?&gt;
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; ?&gt;
 &lt;objects&gt;
     &lt;myModel&gt;
         &lt;class&gt;MyModel&lt;/class&gt;
@@ -164,7 +164,7 @@ use of the Application resources inside the Yadif Configuration
 <p>Instantiating a <strong>myModel</strong> class inside the Action Controller uses
 the the Database and Cache resources as constructor arguments:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class FooController extends Zend_Controller_Action {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class FooController extends Zend_Controller_Action {
     public function barAction()
     {
         $container = $this-&gt;getInvokeArg(&#39;bootstrap&#39;)-&gt;getContainer();

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page14.html" /><link rel="prev" title="Newer" href="page12.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,115 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2010/04/27/doctrine-2-beta-1-released.html">Doctrine 2 Beta 1 released</a></h1>
+<p>Today we are happy to announce that the first beta of Doctrine 2 has been
+released and we fixed 165 issues kindly reported by several early adopters.</p>
+<p>You can grab the code from the Github project:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><a class="reference external" href="http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1">http://github.com/doctrine/doctrine2/tree/2.0.0-BETA1</a></dt>
+<dd>git clone git://github.com/doctrine/doctrine2.git</dd>
+</dl>
+</div></blockquote>
+<p>Or download it from our website:</p>
+<blockquote>
+<div><a class="reference external" href="http://www.doctrine-project.org/download#2_0">http://www.doctrine-project.org/download#2_0</a></div></blockquote>
+<p>It is our believe that Doctrine 2 brings PHP ORMs to a new level. We are
+leaving behind the Active Record pattern because we think it hurts
+testability, project maintainability and is not a suitable abstraction
+(80/20) for models that exceed the complexity of a blog or otherwise
+simple web application. Instead we implemented a pure Data Mapper
+approach with help of the new Reflection functionalities of PHP 5.3, so
+your Domain Objects neither have to extend a base class nor implement an
+interface.</p>
+<p>We also dropped most of the magical features of Doctrine 1 in favour of
+a simple and standardized API that is loosely based on the <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_API">Java
+Persistence API</a>, a
+technical standard for Object Relational Mappers. However we try not to
+blindly follow the “Program PHP like Java” approach and and deviated
+from JPA where applicable to make the concepts fit better into the PHP
+environment, such as alternatively hydrating all results into nested
+array structures for very high read performance.</p>
+<p>The cornerstone of Doctrine 2 is the query language DQL. It allows to
+execute queries on the object level defined by your metadata in a
+similar fashion to SQL. You can even do Joins, Subselects and Aggregates
+and Group Clauses in DQL, eliminating the need to circumvent ORMs for
+more advanced SQL features. Nevertheless it is also possible to write
+plain SQL and let Doctrine 2 hydrate the results into an object graph.</p>
+<p>In the last three month since alpha 4 we have done considerable changes
+and integrated lots of feedback from our users. The most notable changes
+are:</p>
+<ul class="simple">
+<li>Allowing Constructors of your Domain Objects to have non-optional
+parameters.</li>
+<li>Allow to define a natural ordering of to Many Collections that is
+automatically enforced trough an SQL ORDER BY statement when
+retrieved from the database.</li>
+<li>Shipping the Symfony Console Component to replace our own Console
+Implementation</li>
+<li>New DQL syntax to load objects partially, omitting potentially
+expensive fields from retrieval for the current request.</li>
+<li>Changes to how bi-directional have to be defined in the mapping
+files.</li>
+<li>Several changes to the Events API inside the ORM, to make sure many
+possible extension scenarios work smoothly.</li>
+<li>Enhancements to our Console Tools</li>
+<li>Surpassed the 1000 unit-tests each running against Postgres, Mysql,
+Sqlite and Oci8 drivers.</li>
+<li>Moved from SVN to Git:
+<a class="reference external" href="http://github.com/doctrine/doctrine2">http://github.com/doctrine/doctrine2</a></li>
+</ul>
+<p>We also did several painful backwards incompatible changes that seemed
+necessary to clean up and optimize the API or allow the ORM to be even
+faster than before. The beta phase beginning today will not contain any
+larger BC breaks anymore, opening up this release for a broader testing
+audience.</p>
+<p>For the next iteration several enhancements are planned:</p>
+<ul class="simple">
+<li>Support for PDO IBM, IBM DB2, SqlSrv and PDO SqlSrv und MsSql drivers</li>
+<li>Pessimistic Lock Support (FOR UPDATE and SHARED)</li>
+<li>Support for Custom Hydration Modes</li>
+<li>Support for Custom Persister Implementations</li>
+<li>Support for handling very large collections of related objects
+without needing an in-memory representation of the collection</li>
+<li>Separation of Doctrine\Common, Doctrine\DBAL and Doctrine\ORM into
+three different projects</li>
+<li>Extend the documentation even further, adding quickstart tutorials,
+cookbook recipes and enhancing the existing chapters.</li>
+</ul>
+<p>We also plan to support several extensions for the 2.0 release such as:</p>
+<ul class="simple">
+<li>Migrations</li>
+<li>PHPUnit Database Testing Integration</li>
+<li>NestedSet Support</li>
+<li>Symfony 2 Support</li>
+<li>Zend Framework 2 Support</li>
+</ul>
+<p>Please try out the new Beta release If you find the time and leave your
+feedback in our <a class="reference external" href="http://www.doctrine-project.org/jira/secure/Dashboard.jspa">Issue
+Tracker</a>,
+the <a class="reference external" href="http://groups.google.com/group/doctrine-user">Mailing-List</a> or
+come discuss with us on Doctrine 2 on Freenode #doctrine-dev.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/doctrine.html">Doctrine</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on April 27, 2010
+                 by beberlei <kontakt@beberlei.de>
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/04/18/new-netbeans-php-codesniffer-plugin-version.html">New Netbeans PHP CodeSniffer Plugin Version</a></h1>
 <p>This morning I took the time to merge several changes by Manuel Piechler into
 <a class="reference external" href="http://github.com/beberlei/netbeans-php-enhancements">my Github branch</a> of
@@ -100,7 +209,7 @@ choose a global standard.</p>
 <p>This blog-post is about an experiment and I am curios what others have to say about it. For Doctrine 2 we need to generate Proxy classes for the mapped objects to implement the Lazy Loading pattern. This is currently done with a console command or during runtime (for development). For Doctrine 2.1 we were thinking about using eval() as a third option for shared hosting or development environments. One annoyance of having to generate proxy code is that you have to regenerate it every time you change the original file. Additionally this makes deployment a little more complicated.</p>
 <p>Today I got the idea to use stream wrappers to solve this problem. You can use stream-wrappers in combination with include/require and if you are using APC the generated php code can even be cached. That means you only have to generate the code once and after that everything is served from APCs opcode cache. Additionally by using the return values of <span class="docutils literal"><span class="pre">stat()</span></span> for the original file you can automatically regenerate your proxy code in APC when the original file changes.</p>
 <p>I haven’t found a good way to pass state into a stream wrapper, that is why I put the data into $GLOBALS before calling <span class="docutils literal"><span class="pre">include()</span></span>. The client code looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nb">stream_wrapper_register</span><span class="p">(</span><span class="s2">"dc2proxy"</span><span class="p">,</span> <span class="s2">"Doctrine\ORM\Proxy\ProxyStreamWrapper"</span><span class="p">);</span>
 
 <span class="nv">$proxyDir</span> <span class="o">=</span> <span class="s2">"dc2proxy:///proxies"</span><span class="p">;</span>
@@ -115,7 +224,7 @@ choose a global standard.</p>
 </div>
 <p>Not the nicest code, but it works. I can generate PHP code and have APC cache it for me until the original code changes.
 The stream wrapper to make this work looks like this:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">Doctrine\ORM\Proxy</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">ProxyStreamWrapper</span>
@@ -236,8 +345,8 @@ The stream wrapper to make this work looks like this:</p>
         </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2010/12/07/blog-refactorings-with-symfony2-doctrine-2-and-zeta-components.html">Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</a></h1>
 <p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
-<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive ”.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive “.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="s2">"hello world with ReST and Zeta Components!"</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -307,55 +416,6 @@ to test out.</p>
             <small>
                 Posted on February 25, 2009
                  by beberlei <kontakt@beberlei.de>
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2009/02/08/unittest-and-metrics-aggregator-tool-for-php.html">Unittest and Metrics Aggregator Tool for PHP</a></h1>
-<p>Both <a class="reference external" href="http://www.phpunit.de">PHPUnit</a> and
-<a class="reference external" href="http:/www.pdepend.org">PDepend</a> offer export functionality in XML or
-in a Test-database that is not quite readable for any user from the
-start. Over the last month I have gradually written <a class="reference external" href="http://wiki.github.com/beberlei/puma">a nice webbased
-tool</a>, that aggregates this data
-and (todo in the future) relates them to help me with my open source
-projects.</p>
-<p>PHPUnit can be used with a <strong>–test-db-dsn</strong> command, which saves all
-information about tests into a Database and PDepend has a strong Package
-centric source parser for all sorts of project metrics.</p>
-<p>What I needed for my <a class="reference external" href="http://framework.zend.com">Zend Framework</a>
-related work (and other projects) was a tool that does a run of the
-complete test-suite for me and saves the information, so that I can see
-where problems occur (and if they are due to my changes or other
-peoples). Since PHPUnit will stopped calculating additional metrics, I
-have also integrated the fabulous PDepend Tool into this aggregator. It
-shows me, what classes and functions need refactoring due to complexity
-issues and draws some nice graphs that summarize all sorts of project
-related information on a per package basis.</p>
-<p>You can <a class="reference external" href="http://wiki.github.com/beberlei/puma">download or clone the an alpha version at
-Github</a>. Its written with
-<a class="reference external" href="http://www.ezcomponents.org">ezcMvcTools</a>, so you need this to work
-too. A list of <a class="reference external" href="http://wiki.github.com/beberlei/puma">some screenshots is at the Github Wiki
-page</a>.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/puma.html">PUMA</a>
-                 / 
-                <a href="tags/testing.html">Testing</a>
-                 / 
-                <a href="tags/metrics.html">Metrics</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on February 08, 2009
-                
             </small>
         </p>
     </div>

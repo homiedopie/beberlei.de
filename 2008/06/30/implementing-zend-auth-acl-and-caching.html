@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Exim4 and Virtual Users .forward Files" href="../14/exim4-and-virtual-users-forward-files.html" /><link rel="prev" title="Zend_Form - Rapid Development Plugin for Eclipse?" href="../../05/07/zend-form-rapid-development-plugin-for-eclipse.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -73,8 +73,8 @@ work in its original implementation due to different users groups
 sharing the same cached views.</p>
 <p>In the last days I came across two in depth tutorials on Zend_Acl and
 Zend_Auth integration to MVC. Most people probably saw the DevZone
-article &#8220;<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
-1)</a>&#8221;
+article “<a class="reference external" href="http://devzone.zend.com/article/3509-Zend_Acl-and-MVC-Integration-Part-I-Basic-Use">Zend_Acl and MVC Integration (part
+1)</a>”
 by Aldemar Bernal on the Frameworks Frontpage. Another good article was
 written by Frank Ruske in the latest german <a class="reference external" href="http://www.phpmagazin.de">PHP
 Magazin</a> (<a class="reference external" href="http://it-republik.de/zonen/magazine/ausgaben/psfile/source_file/14/Seite_80__482a98c572a5c.zip">Zipped Source Code of the
@@ -83,13 +83,13 @@ I took the best ideas of both articles and merged them into the existing
 components of my blog.</p>
 <p>This now enables me to cache the site depending on the Auth status of
 the page user agent. The blog is now caching all views that are
-generated for guest users. Since there is no &#8220;registered&#8221; or &#8220;member&#8221;
+generated for guest users. Since there is no “registered” or “member”
 account yet, this means the blogs content is cached and served from
 cache for everyone except me when I am logged in. To get this work I
 added some simple additional check in <a class="reference external" href="http://devzone.zend.com/article/3372-Front-Controller-Plugins-in-Zend-Framework">Matthews Cache View Controller
 Plugin</a>:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
 {
     $auth = Zend_Auth::getInstance();
     if($auth-&gt;hasIdentity()) {

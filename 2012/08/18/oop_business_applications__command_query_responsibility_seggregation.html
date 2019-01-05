@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="OOP Business Applications: Data, Context, Interaction" href="../16/oop_business_applications__data__context__interaction.html" /><link rel="prev" title="Building an Object Model: No setters allowed" href="../22/building_an_object_model__no_setters_allowed.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -72,11 +72,11 @@ mess</a></li>
 <li><a class="reference external" href="http://whitewashing.de/2012/08/16/oop_business_applications__data__context__interaction.html">Data, Context, Interaction</a></li>
 </ul>
 <p>The last pattern for designing your business logic is called
-&#8220;Command-Query-Responsibility-Segregation&#8221; or short CQRS. It has its roots in
-the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">&#8220;Command Query Separation&#8221;</a> principle that was
+“Command-Query-Responsibility-Segregation” or short CQRS. It has its roots in
+the <a class="reference external" href="http://en.wikipedia.org/wiki/Command-query_separation">“Command Query Separation”</a> principle that was
 put forward by Bertrand Meyer.</p>
 <p>Wikipedia has a very good summary about what this principle is about:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Command</span><span class="o">-</span><span class="n">Query</span><span class="o">-</span><span class="n">Separation</span> <span class="n">states</span> <span class="n">that</span> <span class="n">every</span> <span class="n">method</span> <span class="n">should</span> <span class="n">either</span> <span class="n">be</span> <span class="n">a</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Command</span><span class="o">-</span><span class="n">Query</span><span class="o">-</span><span class="n">Separation</span> <span class="n">states</span> <span class="n">that</span> <span class="n">every</span> <span class="n">method</span> <span class="n">should</span> <span class="n">either</span> <span class="n">be</span> <span class="n">a</span>
 <span class="n">command</span> <span class="n">that</span> <span class="n">performs</span> <span class="n">an</span> <span class="n">action</span><span class="p">,</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">query</span> <span class="n">that</span> <span class="n">returns</span> <span class="n">data</span> <span class="n">to</span> <span class="n">the</span>
 <span class="n">caller</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="n">both</span><span class="o">.</span> <span class="n">In</span> <span class="n">other</span> <span class="n">words</span><span class="p">,</span> <span class="n">asking</span> <span class="n">a</span> <span class="n">question</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">change</span>
 <span class="n">the</span> <span class="n">answer</span><span class="o">.</span> <span class="n">More</span> <span class="n">formally</span><span class="p">,</span> <span class="n">methods</span> <span class="n">should</span> <span class="k">return</span> <span class="n">a</span> <span class="n">value</span> <span class="n">only</span> <span class="k">if</span> <span class="n">they</span> <span class="n">are</span>
@@ -96,13 +96,13 @@ with CQRS.</p>
 <p>At its heart is the separation of Read and Write methods. This can be easily
 achieved by just having two different service layer classes instead of one.
 This insight alone is not really helpful, its just moving methods around.
-Coupled to this change however is the notion, that read and write models don&#8217;t
+Coupled to this change however is the notion, that read and write models don’t
 necessarily have to be the same:</p>
 <ul class="simple">
-<li>Getter/Setters: We don&#8217;t need setters in the write model, instead we use
+<li>Getter/Setters: We don’t need setters in the write model, instead we use
 explicit methods for each write operation. Entities are also much simpler
 without bi-directional relationships that read/write models often need.
-Read-only models (ViewModel) don&#8217;t need getters/setters. They could just use
+Read-only models (ViewModel) don’t need getters/setters. They could just use
 public properties or even be arrays.</li>
 <li>ORM Performance, Lazy Loading and Query Restrictions: In a write scenario we
 mostly need queries by primary key, changing only some objects. In
@@ -125,13 +125,13 @@ throw exceptions and refuse the execution. Proper validation of input data
 should happen before executing write operations though.</p>
 <p>One drawback of CQRS: A naive implementation doubles the amount of classes and
 services to write. But there are simple shortcuts to avoid having to write a
-full blown read-model if you don&#8217;t apply CQRS religiously:</p>
+full blown read-model if you don’t apply CQRS religiously:</p>
 <ul class="simple">
-<li>Don&#8217;t use different data-stores for both models.</li>
+<li>Don’t use different data-stores for both models.</li>
 <li>Mapping SQL to PHP arrays and stdClass objects through a simple gateway is
 very simple. You can easily generalize this to a simple object that gives
 efficient access to all your data.</li>
-<li>Share parts of the write and read models if you don&#8217;t have to compromise
+<li>Share parts of the write and read models if you don’t have to compromise
 much.</li>
 </ul>
 <p>The important thing to take away from this separation is, that the read part of
@@ -147,7 +147,7 @@ route a command to its appropriate command handler.</p>
 <h2>Example</h2>
 <p>Here is the most simple implementation of the Command Bus, just holds a hash map
 mapping command class names to command handlers:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">Handler</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">(</span><span class="nv">$command</span><span class="p">);</span>
@@ -170,7 +170,7 @@ mapping command class names to command handlers:</p>
 <p>In your code you would always pass Commands to the bus. That way the command
 bus is a central entry point to any write operation. With this we can rewrite the
 TransferMoney service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">TransferMoneyCommand</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -195,7 +195,7 @@ TransferMoney service:</p>
 </pre></div>
 </div>
 <p>There is also a benefit from the mental model of commands compared to the
-&#8220;generic&#8221; term of model requests in EBI. Your write model gets task
+“generic” term of model requests in EBI. Your write model gets task
 oriented.</p>
 <p>Routing everything through the command bus has several benefits as well:</p>
 <ul class="simple">
@@ -205,7 +205,7 @@ oriented.</p>
 </ul>
 <p>The command bus acts as the application boundary as described in the
 Entity-Boundary-Interactor pattern, usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyController</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">transferAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
@@ -232,7 +232,7 @@ You want this structure for all your applications, regardless of what
 architectural pattern you have chosen.</p>
 <p>Embracing the difference between read and write models is another plus of CQRS.
 It is very helpful, not to try fitting both read and write into one model.  You
-also don&#8217;t run into so many read-related problems with an ORM any more. You
+also don’t run into so many read-related problems with an ORM any more. You
 design the entities to be optimized for the write model only, loose the
 bidirectional associations and avoid all the optimizations here and there for
 read performance.</p>
@@ -243,7 +243,7 @@ doing so in the context of a use-case simplifies the code considerably compared
 to a generic mapping solution.</p>
 <p>One negative point: Its difficult to work with commands not returning any data
 in some cases. You need to find simple ways to return messages to the
-user. For that you also need to validate commands on the &#8220;client&#8221; or
+user. For that you also need to validate commands on the “client” or
 controller side, using the read model, so that you can prevent invalid/illegal
 commands from being sent as often as possible.</p>
 <p>Without return values from your models, you are left to using mocks as means of

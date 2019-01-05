@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page3.html" /><link rel="prev" title="Newer" href="index.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,50 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2017/03/29/why_does_the_php_extension_fail_to_load_with_zval_ptr_dtor_wrapper_error.html">Why does the PHP extension fail to load with _zval_ptr_dtor_wrapper error</a></h1>
+<p>I sometimes come across this error when loading an extension in PHP</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="n">PHP</span> <span class="ne">Warning</span><span class="p">:</span>  <span class="n">PHP</span> <span class="n">Startup</span><span class="p">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">load</span> <span class="n">dynamic</span> <span class="n">library</span>
+<span class="s1">'/usr/lib64/php-zts/5.5/modules/myext.so'</span> <span class="o">-</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">php</span><span class="o">-</span><span class="n">zts</span><span class="o">/</span><span class="mf">5.5</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">myext</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="n">undefined</span> <span class="n">symbol</span><span class="p">:</span>
+<span class="n">_zval_ptr_dtor_wrapper</span> <span class="ow">in</span> <span class="n">Unknown</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>From the Google results it is not very easy to find out what this means.</p>
+<p>Technically the extension was compiled with a PHP version using the
+<span class="docutils literal"><span class="pre">-enable-debug</span></span> flag, which wraps all calls to <span class="docutils literal"><span class="pre">zval_ptr_dtor</span></span> in a wrapper
+macro that does not exist in a regular, non-debug build.</p>
+<p>But a debug extension and non-debug PHP are incompatible.</p>
+<p>PHP extensions are only compatible between different installations if the
+following constraints are the same for the compiling and the executing PHP
+binary:</p>
+<ul class="simple">
+<li>OS (Linux, Mac)</li>
+<li>libc (glibc or musl for Alpine)</li>
+<li>PHP version up to the minor level (5.5, 5.6, 7.0, 7.1)</li>
+<li>extension version (20151012 for PHP 7.0)</li>
+<li>thread-safety (ZTS) or non-thread-safety (NTS)</li>
+<li>debug or non-debug (<span class="docutils literal"><span class="pre">--enable-debug</span></span> flag during compile).</li>
+</ul>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/phpextension.html">PHPExtension</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on March 29, 2017
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2017/03/13/how_to_complete_a_side_project_and_turn_it_into_a_business_level1.html">How to complete a side project and turn it into a business (Level 1)</a></h1>
 <p>Almost four years ago I wrote about <a class="reference external" href="https://beberlei.de/2013/04/06/a_failed_side_project.html">Lessons learned: A failed side project</a> and when I stumbled
 across the post <a class="reference external" href="http://ewanvalentine.io/how-to-never-complete-anything/">How to *never* complete anything</a> several days ago I
@@ -205,7 +249,7 @@ language/locale seem to be good candidates for an application context.
 Wordpress does this although their context is global and encapsulated in an
 object.</li>
 <li>Building a multi-tenant app? The tenant-id and configuration for this
-tentant (selected product plan, activated features, ...) are
+tentant (selected product plan, activated features, …) are
 good candidates for the context.</li>
 </ol>
 </div>
@@ -214,7 +258,7 @@ good candidates for the context.</li>
 <p>How to introduce such a context? We could create an object in our application,
 for example how we did it in <a class="reference external" href="https://tideways.io">Tideways</a>
 with selected tenant (organization), application, date-range and server environment:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">PageContext</span>
 <span class="p">{</span>
@@ -249,7 +293,7 @@ control checks unneeded that are usually cluttering the controller.</p>
 <p>The context is then made available for the application by using a Symfony
 <a class="reference external" href="https://www.beberlei.de/2013/02/19/extending_symfony2__paramconverter.html">parameter converter</a>, every controller-action can get access to the context
 by type-hinting for it:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">ApplicationController</span>
 <span class="p">{</span>
@@ -270,7 +314,7 @@ and move repetitive find and access control code outside of the controllers.</p>
 object, so I don’t have to return it from every controller and created
 a wrapper for the URL Generation that appends context information
 to every URL (current date range + environment):</p>
-<div class="highlight-jinja2"><div class="highlight"><pre><span/>&lt;h1&gt;{{ pageContext.application.name }}&lt;/h1&gt;
+<div class="highlight-jinja2 notranslate"><div class="highlight"><pre><span/>&lt;h1&gt;{{ pageContext.application.name }}&lt;/h1&gt;
 
 &lt;a href="{{ page_path("some_route") }}"&gt;Link with Context query arguments&lt;/a&gt;
 </pre></div>
@@ -327,7 +371,7 @@ plugin, Fiddler is now “gone” and I renamed the repository to the practical
 <strong>beberlei/composer-monorepo-plugin</strong> package name on <a class="reference external" href="https://github.com/beberlei/composer-monorepo-plugin">Github</a>. After you install
 this plugin, you have the possibility to maintain subpackages and their
 dependencies in a single repository.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ composer require beberlei/composer-monorepo-plugin
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ composer require beberlei/composer-monorepo-plugin
 </pre></div>
 </div>
 <p>To use the plugin add <strong>monorepo.json</strong> files into each directory of a
@@ -335,7 +379,7 @@ subpackage and use a format similar to the <strong>composer.json</strong> to add
 dependencies to a.) external composer packages that you have listed in your
 global Composer file b.) other subpackages in the current monorepo.
 See this example for a demonstration:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"deps"</span><span class="p">:</span> <span class="p">[</span>
         <span class="s2">"vendor/symfony/http-foundation"</span><span class="p">,</span>
         <span class="s2">"components/Foo"</span>
@@ -390,17 +434,17 @@ Wordpress and Composer.</p>
 <div class="section" id="initialize-repository">
 <h2>Initialize Repository</h2>
 <p>As a first step, create a new directory and git repository for your blog:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ mkdir myblog
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ mkdir myblog
 $ cd myblog
 $ git init
 </pre></div>
 </div>
 <p>Create a docroot directory that is publicly available for the webserver:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ mkdir htdocs
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ mkdir htdocs
 </pre></div>
 </div>
 <p>Place the index.php file in it that delegates to Wordpress (installed later):</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// htdocs/index.php</span>
 <span class="c1">// Front to the WordPress application. This file doesn't do anything, but loads</span>
 <span class="c1">// wp-blog-header.php which does and tells WordPress to load the theme.</span>
@@ -411,11 +455,11 @@ $ git init
 </div>
 <p>Create the wp-content directory inside the docroot, it will be configured to
 live <em>outside</em> the Wordpress installation.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ mkdir htdocs/wp-content -p
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ mkdir htdocs/wp-content -p
 </pre></div>
 </div>
 <p>And then create a <cite>.gitignore</cite> file with the following ignore paths:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wordpress</span><span class="o">/</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wordpress</span><span class="o">/</span>
 <span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wp</span><span class="o">-</span><span class="n">content</span><span class="o">/</span><span class="n">uploads</span>
 <span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wp</span><span class="o">-</span><span class="n">content</span><span class="o">/</span><span class="n">plugins</span>
 <span class="o">/</span><span class="n">htdocs</span><span class="o">/</span><span class="n">wp</span><span class="o">-</span><span class="n">content</span><span class="o">/</span><span class="n">themes</span>
@@ -426,7 +470,7 @@ force the ignored path into Git.</p>
 <p>Don’t forget to include the uploads directory in your backup, when deploying
 this blog to production.</p>
 <p>You directory tree should now look like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>.
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>.
 ├── .git
 ├── .gitignore
 └── htdocs
@@ -443,7 +487,7 @@ themes on Wordpress.org available through Composer. To utilize this work we
 create a composer.json file inside our repository root. There the file is
 outside of the webservers reach, users of your blog cannot download the
 composer.json.</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="p">{</span>
     <span class="s2">"require"</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">"ext-gd"</span><span class="p">:</span> <span class="s2">"*"</span><span class="p">,</span>
         <span class="s2">"wpackagist-plugin/easy-media-gallery"</span><span class="p">:</span> <span class="s2">"1.3.*"</span><span class="p">,</span>
@@ -473,7 +517,7 @@ Wordpress Core and all plugins in the correct directories. As you can see we
 put core into <cite>htdocs/wordpress</cite> and plugins into <cite>htdocs/wp-content/plugins</cite>.</p>
 <p>Now run the Composer install command to see the intallation output similar
 to the next excerpt:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ composer install
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ composer install
 Loading composer repositories with package information
 Installing dependencies (including require-dev)
   - Installing composer/installers (v1.0.23)
@@ -501,7 +545,7 @@ will create the neccessary database tables and give you <cite>wp-config.php</cit
 to download. Copy this file to <cite>htdocs/wp-config.php</cite> and modify it slightly,
 it is necessary to adjust the <span class="docutils literal"><span class="pre">WP_CONTENT_DIR</span></span>, <span class="docutils literal"><span class="pre">WP_CONTENT_URL</span></span> and
 <span class="docutils literal"><span class="pre">ABSPATH</span></span> constants:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="c1">// generated contents of wp-config.php, salts, database and so on</span>
 
@@ -538,7 +582,7 @@ exporting and importing a MySQL dump.</p>
 <p>For development I rely on the built-in PHP Webserver that is available since
 PHP 5.4 with a custom router-script (I found this on a blog a long time ago,
 but cannot find the source anymore):</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">//htdocs/router.php</span>
 
 <span class="nv">$root</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'DOCUMENT_ROOT'</span><span class="p">];</span>
@@ -565,7 +609,7 @@ but cannot find the source anymore):</p>
 <p>To make your blog run flawlessly on your dev machine, open up
 <span class="docutils literal"><span class="pre">htdocs/wp-config.php</span></span> and add the following if statement to rewrite
 <span class="docutils literal"><span class="pre">SITEURL</span></span> and <span class="docutils literal"><span class="pre">HOME</span></span> config variables:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// htdocs/wp-config.php</span>
 
 <span class="c1">// ... salts, DB user, password etc.</span>
@@ -585,7 +629,7 @@ but cannot find the source anymore):</p>
 </div>
 <p>You can now run your Wordpress blog locally using the following command-line
 arguments:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ php -S localhost:8000 -t htdocs/ htdocs/router.php
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ php -S localhost:8000 -t htdocs/ htdocs/router.php
 </pre></div>
 </div>
 <p>Keep this command running and visit <cite>localhost:8000</cite>.</p>
@@ -607,62 +651,6 @@ arguments:</p>
         <p>
             <small>
                 Posted on February 21, 2016
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2015/08/08/monolithic_repositories_with_composer_and_relative_autoloading.html">Monolithic Repositories with Composer and Relative Autoloading</a></h1>
-<p>Just was <a class="reference external" href="https://twitter.com/samuelroze/status/630037676654206976">reminded on Twitter by Samuel</a> that there
-is a way for monolithic PHP repositories with multiple components
-that I haven’t mentioned in my <a class="reference external" href="http://www.whitewashing.de/2015/04/11/monolithic_repositories_with_php_and_composer.html">previous post</a>.</p>
-<p>It relies on a new composer.json for each component and uses
-the autoloading capabilities of Composer in a hackish way.</p>
-<p>Assume we have two components located in <span class="docutils literal"><span class="pre">components/foo</span></span> and
-<span class="docutils literal"><span class="pre">components/bar</span></span>, then if bar depends on foo, it could define
-its <span class="docutils literal"><span class="pre">components/bar/composer.json</span></span> file as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="p">{</span>
-    <span class="s2">"autoload"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"psr-0"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"Foo"</span><span class="p">:</span> <span class="s2">"../foo/src/"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>This approach is very simple to start with, however it has some downsides
-you must take into account:</p>
-<ul class="simple">
-<li>you have to redefine dependencies in every composer.json that relies
-on another component.</li>
-<li>if foo and bar depend on different versions of some third library <span class="docutils literal"><span class="pre">baz</span></span>
-that are not compatible, then composer will not realize this and your
-code will break at runtime.</li>
-<li>if you want to generate deployable units (tarballs, debs, ..) then
-you will have a hard time to collect all the implicit dependencies
-by traversing the autoloader for relative definitions.</li>
-<li>A full checkout has multiple vendor directories with a lot of duplicated
-code.</li>
-</ul>
-<p>I think this approach is ok, if you are only sharing a small number of
-components that don’t define their own dependencies. The <a class="reference external" href="https://github.com/beberlei/fiddler">Fiddler</a> approach however solves all these
-problems by forcing to rely on the same dependencies in a project globally and
-only once.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/monorepos.html">Monorepos</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on August 08, 2015
                  by Benjamin Eberlei
             </small>
         </p>

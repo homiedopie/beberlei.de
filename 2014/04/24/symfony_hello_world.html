@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="SOAP and PHP in 2014" href="../../01/31/soap_and_php_in_2014.html" /><link rel="prev" title="Spotting Feature Envy and Refactoring" href="../../08/11/spotting_featureenvy_and_refactoring.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -66,7 +66,7 @@
 <h1>Symfony2: A Simple Hello World</h1>
 <p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
 I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
-to start with a very simple &#8220;Hello World&#8221; example.</p>
+to start with a very simple “Hello World” example.</p>
 <p>The Symfony2 Standard Edition already contains a huge burden of concepts,
 assumptions and conventions that can be confusing for a beginner.</p>
 <ul class="simple">
@@ -86,12 +86,12 @@ then gradually add more and more features until you end up with the standard
 edition.</p>
 <p>Fabien discussed the simplification of the Symfony Standard Edition from
 another angle before, considering the minimum necessary code to use when
-reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">&#8220;Packing a Symfony Full-Stack Application in
-one file&#8221;</a>.</p>
+reproducing bugs in his blog post <a class="reference external" href="http://fabien.potencier.org/article/70/packing-a-symfony-full-stack-framework-application-in-one-file-bootstrapping">“Packing a Symfony Full-Stack Application in
+one file”</a>.</p>
 <p>This blog post is about a truely minimal Symfony edition to start learning
 about the framework.  The first thing I like to show is a really simple Hello
 World controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
 
@@ -108,7 +108,7 @@ World controller:</p>
 </div>
 <p>What is the necessary framework glue code to support this Hello World? Lets start
 from the index file <cite>web/index.php</cite>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../vendor/autoload.php&quot;</span><span class="p">;</span>
 <span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">&quot;/../app/AppKernel.php&quot;</span><span class="p">;</span>
@@ -122,7 +122,7 @@ from the index file <cite>web/index.php</cite>:</p>
 </div>
 <p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
 at them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">{</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">{</span>
 <span class="x">    &quot;require&quot;: {</span>
 <span class="x">        &quot;symfony/symfony&quot;: &quot;@stable&quot;</span>
 <span class="x">    },</span>
@@ -136,7 +136,7 @@ at them:</p>
 adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
 <p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
 and the minimal version of this looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
@@ -171,7 +171,7 @@ technically not necessary by using the <span class="docutils literal"><span clas
 component has no such closure loader, so its not possible to avoid
 YAML in the first minutes of Symfony2 exposure and we reference
 the <cite>app/config/routing.yml</cite>:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span>hello:
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>hello:
   pattern: /
   defaults:
     _controller: &quot;Acme\TrainingBundle\Controller\HelloController::helloAction&quot;
@@ -191,7 +191,7 @@ bitten by that.</li>
 introduces yet another ambiguity.</li>
 </ul>
 <p>Run this application with the build in webserver:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ php -S localhost:8000 web/index.php
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ php -S localhost:8000 web/index.php
 </pre></div>
 </div>
 <p>Hello World!</p>
@@ -200,7 +200,7 @@ World. To avoid another confusing convention at the beginning, the <span class="
 template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
 that is automatically registered in the Twig Bundle. Just create
 a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
 
@@ -217,8 +217,8 @@ a template <cite>app/Resources/views/hello.html.twig</cite> and change the contr
 </pre></div>
 </div>
 <p>The total number of files is 5 (6 with template) for this example. Note that we
-haven&#8217;t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
-the static syntax we don&#8217;t need it.</p>
+haven’t actually created a bundle for <span class="docutils literal"><span class="pre">AcmeWorkshopBundle</span></span> yet, because with
+the static syntax we don’t need it.</p>
 <p>This is a very good starting point to start exploring more features of Symfony
 and gradually add the required configuration and files for this.</p>
 </div>

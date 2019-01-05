@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Zend_Form and the Model: Yet another perspective using a Mediator" href="../../01/23/zend-form-and-the-model-yet-another-perspective-using-a-mediator.html" /><link rel="prev" title="Netbeans PHP CodeSniffer Plugin: Now with Options Dialog" href="../../11/14/netbeans-php-codesniffer-plugin-now-with-options-dialog.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -76,7 +76,7 @@ Enum structure by using typehints.</p>
 <p>We discussed several approaches to this problem that all seemed a bit
 ugly in one or another way. For example the <strong>SplEnum</strong> class is a step
 in the right direction, however you can only use a type hint for
-&#8220;SplEnum&#8221; or add another inheritance layer. Also you have to implement
+“SplEnum” or add another inheritance layer. Also you have to implement
 different classes for each enum type, which requires you to implement a
 factory method for your enum to help with creation of the different
 types.</p>
@@ -90,7 +90,7 @@ it is a very elegant solution to enforce a limited set of specific
 values throughout your code-base.</p>
 <p>Here is the code plus a small example:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>abstract class MyEnum
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>abstract class MyEnum
 {
     final public function __construct($value)
     {
@@ -134,7 +134,7 @@ if($b == $c) {
 </div></blockquote>
 <p>Now you could nice things such as:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>function doStuff(Foo $foo) {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>function doStuff(Foo $foo) {
     switch($foo) {
         case Foo::FOO:
             echo &quot;do more here!\n&quot;;

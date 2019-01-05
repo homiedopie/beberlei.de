@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Dependency Injection with PHP: Introducing Sphicy" href="../../12/30/dependency-injection-with-php-introducing-sphicy.html" /><link rel="prev" title="New Calypso DTL Version 0.2" href="../11/new-calypso-dtl-version-0-2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -97,24 +97,24 @@ implementation of Interface Dependency Injection for PHP. The Container
 works with static method only, is therefore in the global scope, such
 that configuration is reduced to a minimum. Generally you have to write
 interfaces for object injection, for example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">interface InjectDbAdapter</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">interface InjectDbAdapter</span>
 <span class="x">{</span>
 <span class="x">    public function injectDbAdapter(Zend_Db_Adapter_Abstract $db);</span>
 <span class="x">}</span>
 </pre></div>
 </div>
-<p>Other potential examples include &#8220;InjectLogger&#8221;, &#8220;InjectSoapClient&#8221;, or
-&#8220;InjectAppConfig&#8221;. You then have to register a component for usage with
+<p>Other potential examples include “InjectLogger”, “InjectSoapClient”, or
+“InjectAppConfig”. You then have to register a component for usage with
 this interface:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">Whitewashing_Container::registerComponent(&#39;InjectDbAdapter&#39;, Zend_Db::factory($dbConfig));</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">Whitewashing_Container::registerComponent(&#39;InjectDbAdapter&#39;, Zend_Db::factory($dbConfig));</span>
 </pre></div>
 </div>
 <p>Now any class that implements the InjectDbAdapter interface can be
 instantiated via:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;);</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;);</span>
 </pre></div>
 </div>
-<p>and the loader takes care of calling the &#8216;Class&#8217; implementation of
+<p>and the loader takes care of calling the ‘Class’ implementation of
 injectDbAdapter with the given Database Adapter. A negative consequence
 of this approach is that you have to implement the inject methods for
 all interfaces in your concrete class implementations. With Traits
@@ -124,18 +124,18 @@ which can handle the concrete implementations.</p>
 <p>The Container takes care of all the dependency building, so when testing
 your components you can register lots of mock objects. You can also
 exchange dependencies for only a subset of objects very easily. I
-implemented a method &#8220;Whitewashing_Container::registerClassComponent&#8221;,
+implemented a method “Whitewashing_Container::registerClassComponent”,
 which registers a dependency component that is used with higher priority
 in construction of the given class. You can also specify a third
 parameter $localInterfaceOverride for the highest priority:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;, null, array(&#39;InjectDbAdapter&#39; =&gt; $newDbAdapter));</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">$obj = Whitewashing_Container::load(&#39;Class&#39;, null, array(&#39;InjectDbAdapter&#39; =&gt; $newDbAdapter));</span>
 </pre></div>
 </div>
 <p>Speedwise the usage of the Container reduces class instantiation by about
 50%, from 0.5 sec for 10000 classes with setting dependencies to 1 sec
 on my machine. But naturally only classes with dependencies and lots of
 them should be using this mechanism and with good application design,
-this shouldn&#8217;t be to many. You can download
+this shouldn’t be to many. You can download
 <a class="reference external" href="http://www.beberlei.de/sources/WhitewashingContainer.phps">Container</a>
 and <a class="reference external" href="http://www.beberlei.de/sources/di.phps">Example</a> sourcecode, to
 take a look. Currently this Container is not really creating new

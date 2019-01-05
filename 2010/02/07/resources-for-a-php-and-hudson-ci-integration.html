@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Testing Database Locks with PHPUnit and Gearman" href="../../05/02/testing-database-locks-with-phpunit-and-gearman.html" /><link rel="prev" title="Symfony2 Controller Testing without Application" href="../../../2012/02/25/symfony2_controller_testing.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -88,38 +88,38 @@ PHPUnit configurations. Currently that is solved by me using a Bash
 script that iterates over the configuration file names and invokes
 PHPUnit.</p>
 <p>There are already some awesome sources how to get Hudson and PHP
-working. I&#8217;ll list them here:</p>
+working. I’ll list them here:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann&#8217;s Howto in
+<li><a class="reference external" href="http://www.flickr.com/photos/sebastian_bergmann/sets/72157622541690849/">Sebastian Bergmann’s Howto in
 Screenshots</a></li>
-<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman&#8217;s series on PHP and
+<li><a class="reference external" href="http://luhman.org/blog/2009/12/16/installing-hudson-phing-phpunit-and-git-ubuntu">David Luhman’s series on PHP and
 Hudson</a></li>
 <li><a class="reference external" href="http://blog.jepamedia.org/2009/10/28/continuous-integration-for-php-with-hudson/">Justin Palmers Guide to install PHP and Hudson (With
 Screenshots)</a></li>
 </ul>
 <p>All those guides are already awesome and I would recommend choosing one
-of those to install Hudson, I think i can&#8217;t add anything new to those. I
+of those to install Hudson, I think i can’t add anything new to those. I
 have used Sebastians Howto, however i also like the third one. David
 Luhmans guide adds lots of details that are important to get the
 different parts of a build process to work.</p>
 <p>Now what these tutorials all do is that they use a bash command to
 execute the build process or specify an Ant Build file. However there
 is also a Phing Build process plugin for Hudson that allows to specify
-the build.xml targets to execute in the process. From the &#8220;Available
-Plugins&#8221; list you can choose the &#8220;Phing plugin&#8221;.</p>
+the build.xml targets to execute in the process. From the “Available
+Plugins” list you can choose the “Phing plugin”.</p>
 <p>After installation you have to configure the Phing install. The <a class="reference external" href="http://wiki.hudson-ci.org/display/HUDSON/Phing+Plugin">Phing
 Plugin Wiki
 Page</a> shows how
-to do this. You have to go to &#8220;Manage Hudson&#8221; =&gt; &#8220;Configure System&#8221; and
+to do this. You have to go to “Manage Hudson” =&gt; “Configure System” and
 look for Phing. There you find the dialog to configure your phing
 installations.</p>
 <p>In the context of choosing a build script for your project you can now
-choose &#8220;Phing&#8221; instead of Ant:</p>
+choose “Phing” instead of Ant:</p>
 <div class="figure align-center">
 <img alt="" src="https://www.flickr.com/photos/sebastian_bergmann/4046549930/in/set-72157622541690849/" />
 </div>
 <p>You can enter the targets to build, for example on my local Hudson
-instance I only execute &#8220;test&#8221; for Doctrine 2, since I am not interested
+instance I only execute “test” for Doctrine 2, since I am not interested
 in the building and deployment onto the PEAR channel at this development
 stage.</p>
 <p>From inside Netbeans you can then start builds by pointing to the Hudson

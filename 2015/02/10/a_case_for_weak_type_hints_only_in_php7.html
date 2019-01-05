@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Running HHVM with a Webserver" href="../01/running_hhvm_webserver.html" /><link rel="prev" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -65,7 +65,7 @@
         <div class="section" id="a-case-for-weak-type-hints-only-in-php7">
 <h1>A case for weak type hints only in PHP7</h1>
 <p>TL;DR: I was one voice for having strict type hints until I tried the current
-patch. From both a library and application developer POV they don&#8217;t bring much
+patch. From both a library and application developer POV they don’t bring much
 to the table. I think PHP would be more consistent with weak type hints only.</p>
 <p>These last weeks there have been tons of discussions about <a class="reference external" href="https://wiki.php.net/rfc/scalar_type_hints">scalar type
 hints</a>
@@ -78,7 +78,7 @@ on Twitter and blogs.</p>
 think that strict type hints</p>
 <ul class="simple">
 <li>will cause considerable problems for application developers, forcing them to
-&#8220;replicate weak type hinting&#8221; by manually casting everywhere.</li>
+“replicate weak type hinting” by manually casting everywhere.</li>
 <li>are useless for library developers, because they have to assume the user
 is in weak type mode.</li>
 <li>are useless within a library because I already know the types at the public
@@ -88,13 +88,13 @@ API, weak mode would suffice for all the lower layers of my library.</li>
 <p>The simple reason for this, request, console inputs and many databases provide
 us with strings, casting has to happen somewhere. Having strict type hints
 would not save us from this, type juggling and casting has to happen and
-PHP&#8217;s current approach is one of the main benefits of the language.</p>
+PHP’s current approach is one of the main benefits of the language.</p>
 <div class="section" id="real-world-weak-vs-strict-code-example">
 <h2>Real World Weak vs Strict Code Example</h2>
 <p>Lets look at an example of everyday framework code <a class="reference external" href="https://gist.github.com/beberlei/8b23160dd0b4466fe1c5">Full
 Code</a> to
 support my case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">UserController</span>
 <span class="p">{</span>
@@ -145,7 +145,7 @@ having the right types inside the service:</p>
 <li>Passing the string status from the request to UserSerice methods is rejected, we need to cast status to integer.</li>
 <li>Returning the integer from <span class="docutils literal"><span class="pre">fetchTotalCount</span></span> fails because the database returns a string number. We need to cast to integer.</li>
 </ul>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Argument</span> <span class="mi">1</span> <span class="n">passed</span> <span class="n">to</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchUsers</span><span class="p">()</span> <span class="n">must</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Catchable</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="n">Argument</span> <span class="mi">1</span> <span class="n">passed</span> <span class="n">to</span> <span class="n">UserService</span><span class="p">::</span><span class="n">fetchUsers</span><span class="p">()</span> <span class="n">must</span>
 <span class="n">be</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">integer</span><span class="p">,</span> <span class="n">string</span> <span class="n">given</span><span class="p">,</span> <span class="n">called</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">22</span>
 <span class="ow">and</span> <span class="n">defined</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hints</span><span class="o">.</span><span class="n">php</span> <span class="n">on</span> <span class="n">line</span> <span class="mi">37</span>
 
@@ -154,7 +154,7 @@ having the right types inside the service:</p>
 </pre></div>
 </div>
 <p>The fix everybody would go for is casting to <span class="docutils literal"><span class="pre">(int)</span></span> manually:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">public function listAction(Request $request)</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">public function listAction(Request $request)</span>
 <span class="x">{</span>
 <span class="x">    $status = (int)$request-&gt;get(&#39;status&#39;); // this is a string</span>
 
@@ -166,7 +166,7 @@ having the right types inside the service:</p>
 </pre></div>
 </div>
 <p>and:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">public function fetchTotalCount(int $status): int</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">public function fetchTotalCount(int $status): int</span>
 <span class="x">{</span>
 <span class="x">    $sql = &#39;SELECT count(*) FROM users u WHERE u.status = ?&#39;;</span>
 
@@ -196,28 +196,28 @@ substantial win for her from having strict type hints.</p>
 variables. Using strict mode in this scenario she needs to start casting
 everywhere just to be sure. I cannot imagine the resulting code to look
 anything but bad. Strict would actually be counterproductive here.</p>
-<p>I also see a danger here, that writing &#8220;strict mode&#8221; code will become a best
+<p>I also see a danger here, that writing “strict mode” code will become a best
 practice and this might lead developers working on badly desigend applications
 to write even crappier code just to follow best practices.</p>
 <p>As a pro strict mode developer I could argue:</p>
 <ul class="simple">
 <li>that libraries such as Doctrine ORM and Symfony Forms already
 abstract all the nitty gritty casting from request or database today. But I
-don&#8217;t think that is valid: They are two of the most sophisticated PHP libraries
-out there, maybe used by 1-5% of the userbase. I don&#8217;t want to force this
-level of abstraction on all users. I can&#8217;t use this level myself all the
+don’t think that is valid: They are two of the most sophisticated PHP libraries
+out there, maybe used by 1-5% of the userbase. I don’t want to force this
+level of abstraction on all users. I can’t use this level myself all the
 time. Also if libraries already abstract this for us, why need to duplicate
 the checks again if we can trust the variables types?</li>
 <li>that I might have complex (mathematical) algorithms that benefit from strict
 type hinting. But that is not really true: Once the variables have passed
 through the public API of my fully typehinted library I know the types and can rely
-on them on all lower levels. Weak or strict type hinting doesn&#8217;t make a
+on them on all lower levels. Weak or strict type hinting doesn’t make a
 difference anymore. Well designed libraries written in PHP5 already provide
 this kind of trust using carefully designed value objects and guard clauses.</li>
 <li>that using strict type in my library reduce the likelihood of bugs, but that
 is not guaranteed.  Users of my library can always decide not to use strict
 type hints and that requires me as a library author to consider this use-case
-and prevent possible problems. Again using strict mode doesn&#8217;t provide a
+and prevent possible problems. Again using strict mode doesn’t provide a
 benefit here.</li>
 <li>to write parts of the code in strict and parts in weak mode. But how to
 decide this? Projects usually pick only one paradigm for good reason:

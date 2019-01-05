@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="ezComponents View Handler for Zend_Pdf" href="../03/ezcomponents-view-handler-for-zend-pdf.html" /><link rel="prev" title="Zend + jQuery Enhancements: Ajax Forms, Tooltip and Autofill" href="../01/zend-jquery-enhancements-ajax-forms-tooltip-and-autofill.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -67,7 +67,7 @@
 <p>I have written on dependency injection before and <a class="reference external" href="http://www.whitewashing.de/blog/articles/83">came up with a
 solution for PHP via interface
 injection</a>. Thinking
-about it twice I didn&#8217;t like it very much. Its too much overkill that
+about it twice I didn’t like it very much. Its too much overkill that
 you have to implement all setter methods again and again.</p>
 <p>Still dependency injection is the way to write good, testable and easily
 exchanged and re-wired object graphs. I tried to do lots of dependency
@@ -78,9 +78,9 @@ and encapsulate it in my model creation factory object, i have to insert
 the model factory through the configuration into the dispatcher into the
 different controllers and views to be accessible in the MVC pattern. The
 model factory has to walk 3 nodes in the object graph without being used
-at all in the &#8220;higher&#8221; steps. This creates very unnecessary
+at all in the “higher” steps. This creates very unnecessary
 dependencies.</p>
-<p>I came across <a class="reference external" href="http://misko.hevery.com/">Misko Hevery</a>&#8216;s Blog, which
+<p>I came across <a class="reference external" href="http://misko.hevery.com/">Misko Hevery</a>’s Blog, which
 rocks. There are also some <a class="reference external" href="http://www.youtube.com/results?search_query=misko+hevery&amp;search_type=&amp;aq=f">great Google Tech Talks by
 him</a>,
 where he argues in favour of dependency injection and debunks singletons
@@ -88,19 +88,19 @@ as being evil (he does that on his blog too). From there I learnt about
 <a class="reference external" href="http://code.google.com/p/google-guice/">Guice</a>, a dependency
 injection framework for Java by Google.</p>
 <p>What I like about Guice: Its easy to use and its immediately obvious to
-someone without experience, why it works so good and you don&#8217;t have to
+someone without experience, why it works so good and you don’t have to
 hand down objects deep down the object graph. I cloned the basic
 functionality for PHP and an example would work as follows.</p>
 <p>We first have to implement a <strong>module</strong>, which defines which concrete
 implementation should be injected as a placeholder for which interface.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind(&quot;Service&quot;)-&gt;to(&quot;ConcreteService&quot;);  $b-&gt;bind(&quot;Add&quot;)-&gt;to(&quot;ConcreteAdd&quot;);  $b-&gt;bind(&quot;Sub&quot;)-&gt;to(&quot;ConcreteSub&quot;); }}
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class ServiceModule implements Module{ public function configure(Binder $b) {  $b-&gt;bind(&quot;Service&quot;)-&gt;to(&quot;ConcreteService&quot;);  $b-&gt;bind(&quot;Add&quot;)-&gt;to(&quot;ConcreteAdd&quot;);  $b-&gt;bind(&quot;Sub&quot;)-&gt;to(&quot;ConcreteSub&quot;); }}
 </pre></div>
 </div>
 </div></blockquote>
 <p>We can now use this module to instantiate an injector object:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance(&quot;Service&quot;);
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$injector = new Injector( new ServiceModule() );$service = $injector-&gt;getInstance(&quot;Service&quot;);
 </pre></div>
 </div>
 </div></blockquote>
@@ -111,7 +111,7 @@ them into the constructor.</p>
 <p>What makes this dependency injection so simple and great to use? You can
 instantiate an injector everywhere in your code and just have to
 configure it using the additional module implementation. This way you
-don&#8217;t have to make sure that you pass down the dependency injection
+don’t have to make sure that you pass down the dependency injection
 container from the bootstrap into all nodes of the application. You can
 also easily work with many frameworks and still be able to use
 dependency injection without having to hack the whole core of the

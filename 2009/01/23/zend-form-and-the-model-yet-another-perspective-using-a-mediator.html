@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Finally: Zend_Mail charset and/or long lines header encoding bug fixed" href="../14/finally-zend-mail-charset-and-or-long-lines-header-encoding-bug-fixed.html" /><link rel="prev" title="Enums in PHP" href="../../08/31/enums-in-php.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -64,14 +64,14 @@
 							<div class="blog-post">
         <div class="section" id="zend-form-and-the-model-yet-another-perspective-using-a-mediator">
 <h1>Zend_Form and the Model: Yet another perspective using a Mediator</h1>
-<p><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weier O&#8217;Phinney</a> of the
+<p><a class="reference external" href="http://weierophinney.net/matthew/">Matthew Weier O’Phinney</a> of the
 Zend Framework Devteam <a class="reference external" href="http://weierophinney.net/matthew/archives/200-Using-Zend_Form-in-Your-Models.html">wrote a controversial post on integrating
 Zend_Form and the Model last
 month</a>.
 He separated concerns of view and model that communicate via a Form, by
 calling just thee validation functions on the Form inside the mode. On
 request you could retrieve the model to the controller and view layers.
-I already wrote into his comments that I didn&#8217;t like the solution
+I already wrote into his comments that I didn’t like the solution
 because it relies on implicit rules for the developers to use the Form
 component correctly in all layers. Additionally the building of the form
 using this approach would be performed inside the model, although
@@ -103,7 +103,7 @@ mediator code. This code is very simple and might produce maintenance
 overhead fast, but I propose some refactoring enhancements later in the
 discussion.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>interface WW_Model_AcceptFormRequest
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>interface WW_Model_AcceptFormRequest
 {
     /**
      * Acceept a form request
@@ -155,7 +155,7 @@ internal state. Our BankAccountModel implements the
 <strong>WW_Model_AcceptFormRequest</strong> interface and returns a valid
 BankAccount. If found the given amount is withdrawn.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class BankAccountModel implements WW_Model_AcceptFormRequest {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class BankAccountModel implements WW_Model_AcceptFormRequest {
     public function acceptFormRequest($values)
     {
         $bankAccount = $this-&gt;getBankAccountBy($values[&#39;bankAccountNumber&#39;], $values[&#39;pin&#39;]);
@@ -195,7 +195,7 @@ displayed again for the client showing the new error message that was
 returned from the model. The controller handling this process would look
 like this:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class BankAccountController extends Zend_Controller_Action {
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class BankAccountController extends Zend_Controller_Action {
     public function performWithdrawlAction() {
         $form = new BankAccountWithdrawlForm(); // extends Zend_Form and builds the form
 

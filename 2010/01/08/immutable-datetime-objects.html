@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Application Lifecycle Management and Deployment with PEAR and PHAR (revisited) UPDATE" href="../10/application-lifecycle-management-and-deployment-with-pear-and-phar-revisited-update.html" /><link rel="prev" title="Testing Database Locks with PHPUnit and Gearman" href="../../05/02/testing-database-locks-with-phpunit-and-gearman.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -72,10 +72,10 @@ Additionally this possibly rules out several optimizations for scripts
 that make very heavy use of dates and could share references to equal
 timestamps.</p>
 <p><strong>Warning:</strong> All the code assumes that you work with one timezone only!</p>
-<p>The following code is an immutable version of PHP&#8217;s DateTime. All setter
+<p>The following code is an immutable version of PHP’s DateTime. All setter
 methods throw an exception and add(),sub() and modify() clone the
 current instance, apply the operation and return the new instance.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">Whitewashing\DateTime</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">DateTime</span> <span class="k">extends</span> <span class="nx">\DateTime</span>
@@ -154,12 +154,12 @@ current instance, apply the operation and return the new instance.</p>
 <p>Its not the prettiest code, but it works.</p>
 <p>A next optimization would be a <strong>DateFactory</strong> that manages DateTime
 instances by returning already existing instances for specific dates.
-This is not a perfect solution, since you won&#8217;t be able to enforce a
+This is not a perfect solution, since you won’t be able to enforce a
 single instance when you are using the relative descriptive dates or
 when calculating with dates using add(), sub() and modify(), however for
 lots of dates created from a database or other external source it might
 be quite a powerful optimization depending on your use-case:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="x">namespace Whitewashing\DateTime;</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="x">namespace Whitewashing\DateTime;</span>
 
 <span class="x">class DateFactory</span>
 <span class="x">{</span>

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Git is great: Helping out with MutateMe" href="../../../2009/02/25/git-is-great-helping-out-with-mutateme.html" /><link rel="prev" title="Generate Proxy code using a stream wrapper" href="../18/generate-proxy-code-using-a-stream-wrapper.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -65,15 +65,15 @@
         <div class="section" id="blog-refactorings-with-symfony2-doctrine-2-and-zeta-components">
 <h1>Blog Refactorings with Symfony2, Doctrine 2 and Zeta Components</h1>
 <p>I have been playing around with <a class="reference external" href="http://www.symfony-reloaded.org">Symfony 2</a> quite a lot lately and have rewritten this blog using Symfony 2, <a class="reference external" href="http://www.doctrine-project.org">Doctrine 2</a> and Zeta Components. You can go over to Github and <a class="reference external" href="https://github.com/beberlei/Whitewashing">find its project page</a>.</p>
-<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive &#8221;.. code-block:: &lt;language&gt;&#8221; and runs the subsequent code through Geshi for highlighting. For example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<p>Since I have found <a class="reference external" href="http://sphinx.pocoo.org/index.html">Sphinx</a> I am pretty impressed with Restructured Text and have now integrated that as writing language into my backend. Using <a class="reference external" href="http://zetacomponents.org/">Zeta Components</a> excellent Document component I transform the written ReST to XHTML. I <a class="reference external" href="https://github.com/beberlei/Whitewashing/tree/master/Util/DocumentVisitor">hooked into the Document rendering</a> and it now supports using the Sphinx directive “.. code-block:: &lt;language&gt;” and runs the subsequent code through Geshi for highlighting. For example:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="s2">&quot;hello world with ReST and Zeta Components!&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Using <a class="reference external" href="http://teddevito.com/demos/textarea.html">the jQuery Plugin Tabby</a> and <a class="reference external" href="http://markitup.jaysalvat.com/home/">MarkitUp with a ReST extension</a> I can also write more conveniently now. Also to battle spam I have moved the comment system to Disqus.</p>
 <p>My next plans for the blog bundle are:</p>
 <ul class="simple">
-<li>WebDav support for authoring. All articles will be named &#8220;slug.inputformat&#8221;, for example &#8220;blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst&#8221;. For this I plan to write a custom backend for ezcWebdav.</li>
+<li>WebDav support for authoring. All articles will be named “slug.inputformat”, for example “blog-refactorings-with-symfony2-doctrine2-zetacomponents.rst”. For this I plan to write a custom backend for ezcWebdav.</li>
 <li>Making the Bundle simpler to re-use by others.</li>
 <li>More jQuery love to the backend.</li>
 <li>Trigger some events in the blog post cycle and hook a twitter + facebook notification for new posts in there.</li>

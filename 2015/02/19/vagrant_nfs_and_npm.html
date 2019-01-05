@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="PHPunit @before Annotations and traits for code-reuse" href="../14/phpunit_before_annotations_and_traits_for_code_reuse.html" /><link rel="prev" title="Integrate Symfony and Webpack" href="../26/integrate_symfony_and_webpack.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -68,15 +68,15 @@
 so I have to make up for this now and offer some solutions.</p>
 <p>One problem I regularly have is the following: I have a Vagrant/Virtualbox
 using NFS and want to run NPM inside of that. Running it inside the box
-is necessary, because I don&#8217;t want everyone using the box have to setup the
+is necessary, because I don’t want everyone using the box have to setup the
 node stack.</p>
-<p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn&#8217;t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
+<p>However running <span class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span></span> on an NFS share doesn’t work as per <a class="reference external" href="https://github.com/npm/npm/issues/3565">issue
 #3565</a> because a chmod fails and
 apparently from the ticket, this is not going to be fixed.</p>
 <p>I finally got it working with a <a class="reference external" href="https://gist.github.com/kevinastone/8790717">workaround script</a> by <a class="reference external" href="https://github.com/kevinastone">Kevin
 Stone</a> that mimics NPM, but
 moves the <span class="docutils literal"><span class="pre">package.json</span></span> to a temporary directory and then rsyncs its back:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#!/bin/bash
 # roles/nodejs/files/tmpnpm.sh
 
 BASE_DIR=${TMPDIR:-/var/tmp}
@@ -100,7 +100,7 @@ popd
 </pre></div>
 </div>
 <p>Integrating this into my Ansible setup of the machine it looked like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># roles/nodejs/tasks/main.yml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># roles/nodejs/tasks/main.yml</span>
 <span class="c1"># More tasks here before this...</span>
 <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Install npm workaround&quot;</span>
   <span class="n">copy</span><span class="p">:</span> <span class="o">&gt;</span>
@@ -122,7 +122,7 @@ popd
 </div>
 <p>Where <span class="docutils literal"><span class="pre">global_packages</span></span> and <span class="docutils literal"><span class="pre">package_dirs</span></span> are specified from the
 outside when invoking the role:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># deploy.yml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># deploy.yml</span>
 <span class="o">---</span>
 <span class="o">-</span> <span class="n">hosts</span><span class="p">:</span> <span class="nb">all</span>
   <span class="n">roles</span><span class="p">:</span>

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Doctrine 2 Beta 1 released" href="../../04/27/doctrine-2-beta-1-released.html" /><link rel="prev" title="Immutable DateTime Objects" href="../08/immutable-datetime-objects.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -94,7 +94,7 @@ dependencies of your application by default installs into a
 system/global directory. This means dependencies your application
 uses are located in a completely different location than your
 application code.</li>
-<li>You can&#8217;t manage multiple versions of the same package with PEAR in
+<li>You can’t manage multiple versions of the same package with PEAR in
 this system directory, making it very hard to control servers with
 different applications.</li>
 <li>The global directory with your application dependencies is most often
@@ -103,13 +103,13 @@ with PEAR dependencies somewhat difficult.</li>
 </ul>
 <p>There are some solutions to this problems:</p>
 <ul class="simple">
-<li>Don&#8217;t use PEAR, but put all dependencies in your version control
+<li>Don’t use PEAR, but put all dependencies in your version control
 system.</li>
-<li>Don&#8217;t use PEAR, and bundle dependencies to your code in the
+<li>Don’t use PEAR, and bundle dependencies to your code in the
 build/deployment process.</li>
 <li>Use PEAR like in the article described, on a per project basis.</li>
 </ul>
-<p>The solutions that don&#8217;t use PEAR suffer from the disadvantage that you
+<p>The solutions that don’t use PEAR suffer from the disadvantage that you
 need to keep track of all the library and framework dependencies
 yourself and upgrade them yourself. This might not be such a huge
 problem from a first glance, but in my opinion many PHP applications and
@@ -142,13 +142,13 @@ application in a given directory. This approach is also used by the
 symfony plugin mechanism, which internally uses the PEAR installer (did
 you know?).</p>
 <p>Lets revisit my blog application example from my previous PEAR post, first
-install from Github and make the &#8220;pearanha&#8221; file executable and put it in your
+install from Github and make the “pearanha” file executable and put it in your
 PATH (A PEAR Server Channel will follow any time soon).</p>
 <p>Now we need to have an existing application directory somewhere, for
 example <strong>/var/www/blog</strong> and then we can put Pearanha on top of it
 with:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">benny</span><span class="nd">@desktop</span><span class="p">:</span> <span class="n">pearanha</span> <span class="n">generate</span><span class="o">-</span><span class="n">project</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">benny</span><span class="nd">@desktop</span><span class="p">:</span> <span class="n">pearanha</span> <span class="n">generate</span><span class="o">-</span><span class="n">project</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -166,7 +166,7 @@ installer and you are good to go.</p>
 you can begin to install all the required dependencies of your
 application:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>benny@desktop:~$ cd /var/www/blog
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>benny@desktop:~$ cd /var/www/blog
 benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover pear.zfcampus.org
 benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha install zfcampus/zf-alpha
 benny@desktop:/var/www/blog$ ./vendor/pear/my_pearanha channel-discover htmlpurifier.org
@@ -186,12 +186,12 @@ considerable simplification. The complete application (including its
 dependencies) can then be put under version control and be readily
 packaged as a single executable PHAR file by your build process.</p>
 <p>As a side node, I did try Pyrus instead of PEAR for the same discussed
-purpose, however most of the current PEAR channels don&#8217;t validate
+purpose, however most of the current PEAR channels don’t validate
 against Pyrus strict standards for the package.xml file. In the future
 this might change and a Pyrus based application installer will then be
 integrated into Pearanha.</p>
 <p><strong>UPDATE:</strong> I renamed PHPiranha to Pearanha as its more appropriate.
-Also after apinsteins comment on &#8220;pear config-create&#8221; I rewrote the
+Also after apinsteins comment on “pear config-create” I rewrote the
 generate-project parts to use the config-create functionality
 internally, which allowed me to throw away half of the self-written
 code. Thanks!</p>

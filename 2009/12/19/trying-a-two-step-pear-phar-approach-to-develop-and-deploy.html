@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="PHP CodeSniffer Support for Netbeans" href="../../07/30/php-codesniffer-support-for-netbeans.html" /><link rel="prev" title="PHP CodeSniffer for Netbeans v0.2" href="../../10/05/php-codesniffer-for-netbeans-v0-2.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -77,8 +77,8 @@ application in one PHAR file. I just recently had the idea for this
 scenario, so please bear with me and add all the feedback and comments
 you can come up with. I tested this with the ongoing rewrite of my blog
 software.</p>
-<p>First we&#8217;ll add a new user that we develop our application with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">useradd</span> <span class="o">-</span><span class="n">m</span> <span class="o">-</span><span class="n">g</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">whitewashing</span>
+<p>First we’ll add a new user that we develop our application with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">useradd</span> <span class="o">-</span><span class="n">m</span> <span class="o">-</span><span class="n">g</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">whitewashing</span>
 <span class="n">sudo</span> <span class="n">passwd</span> <span class="n">whitewashing</span>
 <span class="n">su</span> <span class="o">-</span> <span class="n">whitewashing</span>
 </pre></div>
@@ -91,9 +91,9 @@ Framework project style here but with a little twist. We will add a
 distinction between vendor and project libraries by adding a <em>vendor</em>
 directory into the main folder.</p>
 <p>But first we create a folder for our application, and create a Zend
-Framework project in the subfolder &#8220;trunk&#8221;, which will be the focus of
+Framework project in the subfolder “trunk”, which will be the focus of
 our development.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ mkdir whitewashing
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ mkdir whitewashing
 whitewashing@desktop:~$ zf create project whitewashing/trunk
 Creating project at /home/whitewashing/whitewashing/trunk
 whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor
@@ -101,11 +101,11 @@ whitewashing@desktop:~$ mkdir whitewashing/trunk/vendor
 </div>
 <p>Now we can configure an Apache virtual host to point to our
 /home/whitewashing/whitewashing/public directory, i call this
-&#8220;whitewashing-dev&#8221; add it to my /etc/hosts and can visit the dummy
+“whitewashing-dev” add it to my /etc/hosts and can visit the dummy
 project page.</p>
 <p>We then configure our PEAR installation for the specific application
 user and re-configure the bin and php library paths:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ pear create-config /home/whitewashing/ .pearrc
 whitewashing@desktop:~$ pear config-set php_dir /home/whitewashing/whitewashing/trunk/vendor
 whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/trunk/bin
 </pre></div>
@@ -113,11 +113,11 @@ whitewashing@desktop:~$ pear config-set bin_dir /home/whitewashing/whitewashing/
 <p>This configuration assumes that we will install all our stuff into our
 development trunk. From there also the PEAR installed libraries might be
 copied into branches or tags. PEAR Project tests, configuration and
-web-files will still be put by default under $HOME/pear/*. We don&#8217;t
+web-files will still be put by default under $HOME/pear/*. We don’t
 need them for our applications.</p>
 <p>Now we install all the dependencies our project needs, in this case Zend
 Framework, Doctrine 2, HTML Purifier:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ pear channel-discover pear.zfcampus.org
 whitewashing@desktop:~$ pear install zfcampus/zf-alpha
 whitewashing@desktop:~$ pear channel-discover htmlpurifier.org
 whitewashing@desktop:~$ pear install hp/HTMLPurifier
@@ -127,7 +127,7 @@ whitewashing@desktop:~$ pear install pear.phpdoctrine.org/DoctrineORM-2.0.0
 </div>
 <p>Now we have all three of the packages installed in our project folder
 <cite>whitewashing/trunk/vendor</cite>, see:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ ls -aFl whitewashing/trunk/vendor/
 total 680
 drwxr-xr-x  7 whitewashing www-data   4096 2009-12-13 14:45 ./
 drwxr-xr-x  8 whitewashing www-data   4096 2009-12-13 14:36 ../
@@ -152,7 +152,7 @@ drwxr-xr-x 59 whitewashing www-data   4096 2009-12-13 14:36 Zend/
 </div>
 <p>And both Doctrine and ZF registered their binary CLi tools inside the
 <cite>whitewashing/trunk/bin/</cite> folder:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ ls -aFl bin/
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>whitewashing@desktop:~$ ls -aFl bin/
 total 20
 drwxr-xr-x 2 whitewashing www-data 4096 2009-12-13 14:45 ./
 drwxr-xr-x 8 whitewashing www-data 4096 2009-12-13 14:36 ../
@@ -162,7 +162,7 @@ drwxr-xr-x 8 whitewashing www-data 4096 2009-12-13 14:36 ../
 </pre></div>
 </div>
 <p>We now have the full control over the versions of our dependencies, we
-can call &#8220;pear upgrade &#8221; whenever we want to update one of the ZF,
+can call “pear upgrade ” whenever we want to update one of the ZF,
 Doctrine or HtmlPurifier libraries inside our application.</p>
 <p>Now some magic is gonna happen, we start to develop our application and
 such which is all not really interesting for this topic. At some point
@@ -173,7 +173,7 @@ sure that the configuration files in
 to be created on the server and are kept that way. We could write an
 installer script for this configuration management.</p>
 <p>The reference for PHAR files is the PHP Manual for the Basics and Cal
-Evans&#8217; two posts
+Evans’ two posts
 (<a class="reference external" href="http://blog.calevans.com/2009/07/19/lessons-in-phar/">1</a>,
 <a class="reference external" href="http://blog.calevans.com/2009/07/26/packaging-zend-framework-as-a-phar-revisited/">2</a>)
 on this topic, aswell as <a class="reference external" href="http://geekmonkey.org/articles/PHP_Archives">a post on
@@ -194,7 +194,7 @@ outside into the PHAR context. This is a powerful feature that is
 required to distribute configurable applications like our blog.</p>
 <p>This screenshot shows how the application is currently structured in
 development mode. In production its structure should look like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">whitewashing</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">whitewashing</span>
 <span class="o">|--</span><span class="n">application</span>
 <span class="o">|</span>  <span class="o">|--</span><span class="n">configs</span>
 <span class="o">|</span>     <span class="o">|--</span> <span class="n">my</span> <span class="n">application</span> <span class="n">config</span> <span class="n">files</span> <span class="n">are</span> <span class="nb">all</span> <span class="n">here</span><span class="o">...</span>
@@ -210,7 +210,7 @@ development mode. In production its structure should look like:</p>
 points that only include the phar file and trigger the application
 bootstrapping that will be included in the Stub file. They both look
 like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?php
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?php
 define(&#39;EXTERNAL_APPLICATION_ROOT&#39;, __DIR__.&quot;/../&quot;);
 include EXTERNAL_APPLICATION_ROOT.&quot;/whitewashing.phar&quot;;
 </pre></div>
@@ -221,7 +221,7 @@ include EXTERNAL_APPLICATION_ROOT.&quot;/whitewashing.phar&quot;;
 <li>The stub file will be executed.</li>
 </ul>
 <p>Our application stub looks like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?php
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?php
 
 if(defined(&#39;EXTERNAL_APPLICATION_ROOT&#39;)) {
     // Mount the external application/configs directory as config if it exists.
@@ -261,7 +261,7 @@ a Gist</a> on Github. Now
 this should probably be put into the build context of your application,
 possibly as a phing or ant task or something alike.</p>
 <p>Now what this build process does not manage is the creation of the
-application entry point php and .htaccess files, but since they won&#8217;t
+application entry point php and .htaccess files, but since they won’t
 ever change its easy to add them to the build directory for now. An even
 more sophisticated version of the build script would lead to the
 creation of an additional tar.gz of the complete application folder. Our

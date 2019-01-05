@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="OOP Business Applications: Trying to escape the mess" href="../11/oop_business_applications__trying_to_escape_the_mess.html" /><link rel="prev" title="OOP Business Applications: Data, Context, Interaction" href="../16/oop_business_applications__data__context__interaction.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -72,8 +72,8 @@ mess</a></li>
 <p>Continuing the series, I will talk about Entity, Boundary and Interactor (EBI)
 an architectural design pattern. I first heard about it in a keynote video of
 <a class="reference external" href="https://sites.google.com/site/unclebobconsultingllc/">Uncle Bob</a> on Ruby
-Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">&#8220;The lost years of architecture&#8221;</a>.
-This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or &#8220;Ports and Adapters&#8221;
+Midwest called <a class="reference external" href="http://www.confreaks.com/videos/759-rubymidwest2011-keynote-architecture-the-lost-years">“The lost years of architecture”</a>.
+This is also described as <a class="reference external" href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal architecture</a> or “Ports and Adapters”
 by Alistair Cockburn.</p>
 <p>In this pattern any client of the system talks to the model using a model
 request object and receives data from the model in form of model responses objects.
@@ -84,7 +84,7 @@ writing new adapters and plug them in.</p>
 <div class="section" id="terminology">
 <h2>Terminology</h2>
 <p>To iterate the terminology:</p>
-<p><strong>Entities</strong> are objects that represent the system data of the application. They don&#8217;t contain
+<p><strong>Entities</strong> are objects that represent the system data of the application. They don’t contain
 much logic except rules that are set in stone and are never going to change
 (based on physic or mathematical laws or something).</p>
 <p><strong>Interactors</strong> are use-case objects, they contain the business logic that is valid
@@ -100,7 +100,7 @@ throughout all blog posts, the usual Bank Account/Money Transfer. The use case
 is the money transfer from one bank account (source) to another one
 (destination).</p>
 <p>We start by implementing the entity <span class="docutils literal"><span class="pre">BankAccount</span></span>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankAccount</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$balance</span><span class="p">;</span>
@@ -126,7 +126,7 @@ is the money transfer from one bank account (source) to another one
 functionality. The Money object implementation is omitted here.</p>
 <p>The Interactor handles the use-case of transferring money from the
 source to the destination account:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MoneyTransferRequest</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nv">$sourceId</span><span class="p">;</span>
@@ -161,7 +161,7 @@ php objects (so called data-transfer objects, DTO).</p>
 source and destination account entities from some storage subsystem. To follow the EBI
 design pattern, we have to decouple this data access object from the model,
 by offering a port (Interface):</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">interface</span> <span class="nx">AccountDaoInterface</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$accountId</span><span class="p">);</span>
@@ -173,7 +173,7 @@ by offering a port (Interface):</p>
 the bank account sample. We need to wrap the whole MoneyTransfer use-case in
 a transaction. Lets say the invocation of our Use-Case is controlled through
 some kind of application boundary object:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">BankApplicationBoundary</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="nv">$applicationFactory</span><span class="p">;</span>
@@ -212,7 +212,7 @@ that transforms the request and response and also handles transactions and
 such. Loosely spoken this was actually some kind of AOP library, using the
 limited ways that PHP provides to implement AOP (magic <span class="docutils literal"><span class="pre">__call</span></span> proxies).</p>
 <p>With context you would do something like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$context</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getContext</span><span class="p">();</span>
 
 <span class="c1">// 1. direct invocation</span>
@@ -225,7 +225,7 @@ limited ways that PHP provides to implement AOP (magic <span class="docutils lit
 </pre></div>
 </div>
 <p>The second way is obviously way more readable, but its also rather magic.</p>
-<p>I deprecated this library because in the end it wasn&#8217;t really helpful that
+<p>I deprecated this library because in the end it wasn’t really helpful that
 much. Implementing an application specific proxy for services is done in
 almost no time and then it solves all your specific needs. My main problem with
 the library is that it tries to magically take away the need to design the
@@ -252,7 +252,7 @@ as you need to map the request objects to your entities.</li>
 mapping API. This way you can make it look as if you would map a DTO onto
 an object, but in this case you are using the Form API as the mapper.</li>
 </ul>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">edit</span><span class="p">(</span><span class="nx">EditRequest</span> <span class="nv">$request</span><span class="p">)</span>
@@ -289,13 +289,13 @@ being manually written.</p>
 <p>This already shows one particular annoyance are the data-transfer objects. You
 need to invest quite some work to get a mapping working from entities to
 transfer objects and back. In the process you will loose the convenience of
-&#8220;Open Entity Manager in the View&#8221;, where you can lazy load any
+“Open Entity Manager in the View”, where you can lazy load any
 data you want to access in the view. This is quite a painful step, because you
 are loosing lots of flexibility. Much more annoying is the need to update
 entities from data-transfer objects, requiring sophisticated code for merging
 of partial object graphs.</p>
 <p>What this design pattern improves is the testability of code and also the
-execution of tests is MUCH better, when you don&#8217;t have to go through the whole
+execution of tests is MUCH better, when you don’t have to go through the whole
 application stack to test something.</p>
 <p>Implementing behavior into the use-cases also avoids lots of lasagna code
 compared to a messy domain driven design. You get a very good overview of
@@ -308,12 +308,12 @@ domain driven design. I am pretty sure that this is not necessarily the
 intention of this design pattern from a POV of Uncle Bob. However depending on
 the sophistication of the applications domain logic, transaction script is
 actually a very good pattern for simple to medium complex use-cases and
-I like to have this as a general rule for developers (&#8220;Put behavior on the
-use-case&#8221;).</p>
+I like to have this as a general rule for developers (“Put behavior on the
+use-case”).</p>
 <p>In conclusion I can partially recommend using the EBI pattern. You have to be
 careful to find abstraction layers that keep your code DRY and SOLID however,
 something which does not come naturally with this pattern. If you are not
-careful you end up with all the &#8220;messy points&#8221; that I mentioned in my previous
+careful you end up with all the “messy points” that I mentioned in my previous
 blog post.</p>
 <p>You should be especially careful to avoid lots of DTO &lt;-&gt; Entity Mapping code
 by using some code-generation for example to do parts of this job for you. The

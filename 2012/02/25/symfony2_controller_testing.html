@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Resources for a PHP and Hudson CI Integration" href="../../../2010/02/07/resources-for-a-php-and-hudson-ci-integration.html" /><link rel="prev" title="Doctrine switches from LGPL to MIT" href="../../05/26/doctrine_goes_mit.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -71,7 +71,7 @@ easily create functional tests for bundles without the bundle requiring an
 application.</p>
 <div class="section" id="create-a-testkernel">
 <h2>Create a TestKernel</h2>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// Tests/Controller/App/AppKernel.php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
@@ -108,7 +108,7 @@ application.</p>
 </div>
 <div class="section" id="creating-the-config-yml">
 <h2>Creating the config.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span># Tests/Controller/App/config.yml
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span># Tests/Controller/App/config.yml
 framework:
     secret:          secret
     charset:         UTF-8
@@ -137,21 +137,21 @@ monolog:
 </div>
 <div class="section" id="creating-the-routing-yml">
 <h2>Creating the routing.yml</h2>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># Tests/Controller/App/routing.yml</span>
-<span class="l l-Scalar l-Scalar-Plain">BeberleiWorkflowBundle</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="s">&quot;@BeberleiWorkflowBundle/Controller/&quot;</span>
-    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
-    <span class="l l-Scalar l-Scalar-Plain">prefix</span><span class="p p-Indicator">:</span>   <span class="l l-Scalar l-Scalar-Plain">/</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Tests/Controller/App/routing.yml</span>
+<span class="nt">BeberleiWorkflowBundle</span><span class="p">:</span>
+    <span class="nt">resource</span><span class="p">:</span> <span class="s">&quot;@BeberleiWorkflowBundle/Controller/&quot;</span>
+    <span class="nt">type</span><span class="p">:</span>     <span class="l l-Scalar l-Scalar-Plain">annotation</span>
+    <span class="nt">prefix</span><span class="p">:</span>   <span class="l l-Scalar l-Scalar-Plain">/</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="adding-a-phpunit-bootstrap">
 <h2>Adding a PHPUnit bootstrap</h2>
-<p>I assume the setup that Henrik described in his &#8220;<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree/">Travis &amp; Composer sitting in a
-Tree K-I-S-S-I-N-G&#8221; blog post</a>.</p>
+<p>I assume the setup that Henrik described in his “<a class="reference external" href="http://henrik.bjrnskov.dk/travis-and-composer-sitting-in-a-tree/">Travis &amp; Composer sitting in a
+Tree K-I-S-S-I-N-G” blog post</a>.</p>
 <p>His setup is missing the spl_autoload_register() call in the bootstrap file
 though.</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// Tests/bootstrap.php</span>
 <span class="nv">$loader</span> <span class="o">=</span> <span class="o">@</span><span class="k">include</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../vendor/.composer/autoload.php&#39;</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$loader</span><span class="p">)</span> <span class="p">{</span>
@@ -182,7 +182,7 @@ dependencies.</p>
 <div class="section" id="modifying-the-phpunit-xml-dist">
 <h2>Modifying the phpunit.xml.dist</h2>
 <p>We have to tell the WebTestCase base class where to find this kernel:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="c">&lt;!-- phpunit.xml.dist --&gt;</span>
 <span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Tests/bootstrap.php&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;php&gt;</span>
         <span class="nt">&lt;server</span> <span class="na">name=</span><span class="s">&quot;KERNEL_DIR&quot;</span> <span class="na">value=</span><span class="s">&quot;Tests/Controller/App&quot;</span> <span class="nt">/&gt;</span>

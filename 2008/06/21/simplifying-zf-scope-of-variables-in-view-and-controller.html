@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Teaching Zend_Form some MVC" href="../24/teaching-zend-form-some-mvc.html" /><link rel="prev" title="On Frameworks and Javascript Coupling" href="on-frameworks-and-javascript-coupling.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -64,7 +64,7 @@
 							<div class="blog-post">
         <div class="section" id="simplifying-zf-scope-of-variables-in-view-and-controller">
 <h1>Simplifying ZF: Scope of Variables in View and Controller</h1>
-<p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, &#8220;Web 2.0 Framework&#8221; My
+<p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
 Ass!</a>
 article referenced earlier I came up with some simplifications of the Zend
 View and Controller variable coupling.</p>
@@ -73,7 +73,7 @@ class which offers the possibility to circumvent the access of variables
 via $this and directly registers each variable key of the Zend_View
 object as an own variable in the script template:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class Zend_View_Extended extends Zend_View_Abstract
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class Zend_View_Extended extends Zend_View_Abstract
 {
     protected function _run()
     {
@@ -87,16 +87,16 @@ object as an own variable in the script template:</p>
 </div></blockquote>
 <p>Now rather than calling $this-&gt;data you can call $data in a script
 template. Of course this comes with additional overhead of each variable
-being registered twice. I don&#8217;t know how this handles performance wise,
+being registered twice. I don’t know how this handles performance wise,
 but maybe unsetting $this variables after copying solves this. Also you
 have to overwrite the initView() method of your base Controller Action
 class.</p>
 <p>Another simplification would be to allow for the following direct
 variable settings in any Controller Action, which would shorten the
 $this-&gt;view-&gt;variable call, to derive the same functionality via
-$this-&gt;variable. I haven&#8217;t tested this though.</p>
+$this-&gt;variable. I haven’t tested this though.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class Zend_Controller_SimpleAction extends Zend_Controller_Action
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class Zend_Controller_SimpleAction extends Zend_Controller_Action
 {
     function __set($name, $value)
     {

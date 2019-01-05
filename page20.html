@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page21.html" /><link rel="prev" title="Newer" href="page19.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,69 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2008/06/21/simplifying-zf-scope-of-variables-in-view-and-controller.html">Simplifying ZF: Scope of Variables in View and Controller</a></h1>
+<p>As a follow up on the <a class="reference external" href="http://destiney.com/blog/zend-framework-web-2-0-framework-my-ass">Zend Framework, “Web 2.0 Framework” My
+Ass!</a>
+article referenced earlier I came up with some simplifications of the Zend
+View and Controller variable coupling.</p>
+<p>Using some code in the article I created a new Zend_View_Extended
+class which offers the possibility to circumvent the access of variables
+via $this and directly registers each variable key of the Zend_View
+object as an own variable in the script template:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class Zend_View_Extended extends Zend_View_Abstract
+{
+    protected function _run()
+    {
+        while( list( $k, $v ) = each( $this ) ) ${$k} = $v;
+
+        include func_get_arg(0);
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now rather than calling $this-&gt;data you can call $data in a script
+template. Of course this comes with additional overhead of each variable
+being registered twice. I don’t know how this handles performance wise,
+but maybe unsetting $this variables after copying solves this. Also you
+have to overwrite the initView() method of your base Controller Action
+class.</p>
+<p>Another simplification would be to allow for the following direct
+variable settings in any Controller Action, which would shorten the
+$this-&gt;view-&gt;variable call, to derive the same functionality via
+$this-&gt;variable. I haven’t tested this though.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class Zend_Controller_SimpleAction extends Zend_Controller_Action
+{
+    function __set($name, $value)
+    {
+        $this-&gt;view-&gt;{$name} = $value;
+    }
+}
+</pre></div>
+</div>
+</div></blockquote>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/zendframework.html">ZendFramework</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on June 21, 2008
+                
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2008/06/24/teaching-zend-form-some-mvc.html">Teaching Zend_Form some MVC</a></h1>
 <p>Lots of people complain that Zend Form runs counter to the MVC spirit,
 because it handles validation, business logic and view elements all in
@@ -87,7 +150,7 @@ array_merge() solution is not the correct way of how this snippet
 should work. Any merge operation of the messages and errors has to be on
 a field key level, which is not currently done.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_Form_Mvc extends Zend_Form
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class WW_Form_Mvc extends Zend_Form
 {
     protected $model = null;
 
@@ -161,7 +224,7 @@ a field key level, which is not currently done.</p>
 loading of decorators in the Constructor and additionally allow to
 pass a Model to the constructor as second argument:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_Form_Mvc
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class WW_Form_Mvc
 {
     protected $model = null;
 
@@ -196,7 +259,7 @@ displaying of the form</strong>. For each different style of form
 displaying, we can generate different helpers. For example a helper
 that would only apply the default decorators would look like this:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>class WW_View_Helper_FormDefault
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>class WW_View_Helper_FormDefault
 {
     /**
      * Load only default decorators on this Zend_Form object
@@ -219,7 +282,7 @@ $this-&gt;formDefault($this-&gt;someForm); ?&gt; We can now look at our
 controller action that implements this form and we will see that it
 does not look different from what we would have done before:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span/>function formAction()
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span/>function formAction()
 {
     $model = new SomeModel();
 
@@ -280,7 +343,7 @@ that hopefully serves you quite some time. You can append variables to
 the ezcMvcResult object by calling the magic __get and __set on the
 controller. Plus it offers a method to use the ezcMvcInternalRedirect
 instead of the result. See for yourself:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>class myController extends ezcMvcController
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>class myController extends ezcMvcController
 {
     protected $result;
 
@@ -335,7 +398,7 @@ instead of the result. See for yourself:</p>
 </pre></div>
 </div>
 <p>You can now use a controller in the following way:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>class dashboardController extends myController
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>class dashboardController extends myController
 {
     public function doIndex()
     {
@@ -428,40 +491,6 @@ settings.</p>
                 <a href="tags/zendframework.html">ZendFramework</a>
                  / 
                 <a href="tags/soap.html">SOAP</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on November 01, 2008
-                
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2008/11/01/performance-in-calypso-and-bugs.html">Performance in Calypso (and Bugs)</a></h1>
-<p>I have tested Calypso performance some weeks ago and have not been able
-to write on it before. Don’t use it please its fucking slow and cannot
-be optimized in the current architecture, because the template will NOT
-be parsed into intermediate PHP code.</p>
-<p>Additionally there are some bugs:</p>
-<ol class="arabic simple">
-<li>You cannot currently use UTF8 encoding since htmlentities deep in the
-escape mechanism cannot be given the utf-8 specification.</li>
-<li>Triple or higher inheritance may not work under some circumstances.
-Which sucks.</li>
-</ol>
-<p>I sadly have no time currently to fix any of the issues poping up with
-Calypso, so please don’t use it for anything production.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/calypsolibrary.html">CalypsoLibrary</a>
                 
                 
             </div>

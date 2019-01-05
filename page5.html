@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="search.html" /><link rel="next" title="Older" href="page6.html" /><link rel="prev" title="Newer" href="page4.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script><script type="text/javascript" src="_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -62,6 +62,102 @@
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 col-sm-12"><article role="article">
 							<div class="section">
+            <h1><a href="2014/08/11/spotting_featureenvy_and_refactoring.html">Spotting Feature Envy and Refactoring</a></h1>
+<p>I was following <a class="reference external" href="http://twitter.com/rinkkasatiainen">Aki’s</a> on the
+<a class="reference external" href="https://www.softwerkskammer.org/activities/socrates-2014">SoCraTes2014</a>
+conference last week about Legacy Code and Refactoring. In the session a piece
+of real-world code was shown that contained one of most common code smells in
+LegacyCode: Feature Envy.</p>
+<p>Martin Fowler describes this smell as “a method that seems more interested in
+a class other than the one it is in. The most common focus of the envy is the
+data.”</p>
+<p>This code smell causes two very similar problems in a code base:</p>
+<ul class="simple">
+<li>Duplication of rules related to their data throughout the code base.</li>
+<li>Spreading domain concepts throughout the whole code-base.</li>
+</ul>
+<p>A simple example can show this problem with <span class="docutils literal"><span class="pre">DateTime</span></span> is wide-spread in many
+PHP projects. We often see code such as the following computation to
+create a range of dates for a reporting function:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$start</span><span class="p">;</span>
+    <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
+
+    <span class="c1">// calculation code here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a really simple example for Feature Envy: The computation and
+validation of creating an end date some days in the future of a start date
+can easily be duplicated throughout the whole code base and implements
+business rules that belong to the class <span class="docutils literal"><span class="pre">DateTime</span></span> itself:</p>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">DateTime</span>
+<span class="p">{</span>
+    <span class="c1">// ... other methods</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$days</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nv">$endDate</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+        <span class="nv">$endDate</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">'+'</span> <span class="o">.</span> <span class="nv">$days</span> <span class="o">.</span> <span class="s1">' day'</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$endDate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="nf">calculateReport</span><span class="p">(</span><span class="nx">DateTime</span> <span class="nv">$start</span><span class="p">,</span> <span class="nv">$days</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$endDate</span> <span class="o">=</span> <span class="nv">$start</span><span class="o">-&gt;</span><span class="na">getDateDaysInFuture</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
+
+    <span class="c1">// calculation code here.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>(Note: You cant extend the builtin DateTime this way and need to subclass).</p>
+<p>This is a great way to improve your code base massively and achieve what
+Object-Oriented and Domain-Driven Design is about: Modelling concepts of the
+domain by encapsulating data and behavior.</p>
+<p>Learning to spot this kind of Feature Envy is a very good way to incrementally
+improve your legacy code base towards better models. I find it very interesting
+that the focus on fixing technical code-smells duplication and feature envy
+actually leads to a better domain model. As a side effect it massively
+deemphasizes DDD building blocks like Entity or Value Object, which in my
+opinion are a big cause for confusion. Testability increases as well, because
+data objects with behavior are much simpler to setup for testing.</p>
+<p>That is why I recommend learning about Feature Envy. For me it is a very simple
+approach to find improvements.</p>
+
+
+            
+            <div class="tags">
+                More about: 
+                <a href="tags/codequality.html">CodeQuality</a>
+                
+                
+            </div>
+            
+
+            <div class="metadata">
+        <p>
+            <small>
+                Posted on August 11, 2014
+                 by Benjamin Eberlei
+            </small>
+        </p>
+    </div>
+        </div><div class="separator post_separator"></div><div class="section">
             <h1><a href="2014/04/24/symfony_hello_world.html">Symfony2: A Simple Hello World</a></h1>
 <p>Reading <a class="reference external" href="http://programming.oreilly.com/2014/04/simplifying-django.html">Simplyfing Django</a>
 I was reminded of how we organize the <a class="reference external" href="http://qafoo.com/services/training/topics/symfony2.html">Symfony2 Training at Qafoo</a>
@@ -90,7 +186,7 @@ one file”</a>.</p>
 <p>This blog post is about a truely minimal Symfony edition to start learning
 about the framework.  The first thing I like to show is a really simple Hello
 World controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
 
@@ -107,7 +203,7 @@ World controller:</p>
 </div>
 <p>What is the necessary framework glue code to support this Hello World? Lets start
 from the index file <cite>web/index.php</cite>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../vendor/autoload.php"</span><span class="p">;</span>
 <span class="k">require_once</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s2">"/../app/AppKernel.php"</span><span class="p">;</span>
@@ -121,7 +217,7 @@ from the index file <cite>web/index.php</cite>:</p>
 </div>
 <p>We are using Composer here and the <span class="docutils literal"><span class="pre">AppKernel</span></span> class, lets take a peak
 at them:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="x">{</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="x">{</span>
 <span class="x">    "require": {</span>
 <span class="x">        "symfony/symfony": "@stable"</span>
 <span class="x">    },</span>
@@ -135,7 +231,7 @@ at them:</p>
 adds autoloading for classes starting with <span class="docutils literal"><span class="pre">Acme</span></span> in the folder <cite>src</cite>.</p>
 <p>We need to define a Kernel for our application in <cite>app/AppKernel.php</cite>
 and the minimal version of this looks like:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\Kernel</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">Symfony\Component\Config\Loader\LoaderInterface</span><span class="p">;</span>
@@ -170,7 +266,7 @@ technically not necessary by using the <span class="docutils literal"><span clas
 component has no such closure loader, so its not possible to avoid
 YAML in the first minutes of Symfony2 exposure and we reference
 the <cite>app/config/routing.yml</cite>:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span/>hello:
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span/>hello:
   pattern: /
   defaults:
     _controller: "Acme\TrainingBundle\Controller\HelloController::helloAction"
@@ -190,7 +286,7 @@ bitten by that.</li>
 introduces yet another ambiguity.</li>
 </ul>
 <p>Run this application with the build in webserver:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/>$ php -S localhost:8000 web/index.php
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/>$ php -S localhost:8000 web/index.php
 </pre></div>
 </div>
 <p>Hello World!</p>
@@ -199,7 +295,7 @@ World. To avoid another confusing convention at the beginning, the <span class="
 template syntax, you can make use of the <cite>app/Resources/views/</cite> folder
 that is automatically registered in the Twig Bundle. Just create
 a template <cite>app/Resources/views/hello.html.twig</cite> and change the controller:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">namespace</span> <span class="nx">Acme\TrainingBundle\Controller</span><span class="p">;</span>
 
@@ -292,7 +388,7 @@ Servers both written in PHP. You can use the non-WSDL mode to expose an object
 from the server and use a non-wsdl client to talk to it. The PHP <span class="docutils literal"><span class="pre">SOAPClient</span></span>
 and <span class="docutils literal"><span class="pre">SOAPServer</span></span> have a common exchange format that is used in this case
 and replaces WSDL entirely.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// server.php</span>
 <span class="k">class</span> <span class="nc">MyService</span>
 <span class="p">{</span>
@@ -313,7 +409,7 @@ and replaces WSDL entirely.</p>
 </pre></div>
 </div>
 <p>The client is as simple as the following lines of code:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="c1">// client.php</span>
 <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">'uri'</span> <span class="o">=&gt;</span> <span class="s1">'http://server/namespace'</span><span class="p">,</span>
@@ -354,7 +450,7 @@ the client only sees “Internal Server Error” messages.</li>
 </ol>
 <p>You can easily solve the <span class="docutils literal"><span class="pre">SOAPFault</span></span> problem by decorating your service with an exception handler,
 and also logging the errors yourself.</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">class</span> <span class="nc">SoapExceptionHandler</span>
 <span class="p">{</span>
@@ -410,7 +506,7 @@ from code.</p>
 you should never write it manually. I use <a class="reference external" href="http://framework.zend.com/manual/2.0/en/modules/zend.soap.auto-discovery.html">Zend Frameworks SOAP Autodiscovery</a> for this.
 By default it uses the docblocks <span class="docutils literal"><span class="pre">@param</span></span> and <span class="docutils literal"><span class="pre">@return</span></span> to generate
 the correct WSDL for a service:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">'MyService'</span><span class="p">)</span>
              <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">'http://server/namespace'</span><span class="p">)</span> <span class="c1">// same as server 'uri'</span>
@@ -423,7 +519,7 @@ the correct WSDL for a service:</p>
 <p>You can now place that WSDL file in any public location and then point both
 <span class="docutils literal"><span class="pre">SOAPServer</span></span> and <span class="docutils literal"><span class="pre">SOAPClient</span></span> at the file using the first constructor
 argument:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="s1">'http://server/path/wsdl'</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 </pre></div>
@@ -447,7 +543,7 @@ which are used by default.</p>
 a little to adjust for correct namespace generation and code-style adjustments,
 but it works quite well by default. Here is an example of a generated class
 for the DHL Intraship SOAP API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">DHL\Intraship</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ComplexType</span>
@@ -491,7 +587,7 @@ for the DHL Intraship SOAP API:</p>
 </div>
 <p>The next thing you can generate is a classmap, that maps every WSDL Type to
 your newly generated code, in the above example:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPClient</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">'classmap'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
@@ -523,14 +619,14 @@ class in Zend Framework 2. It has no external dependencies, so you can just
 copy it into your project if you want.</p>
 <p>To generate a WSDL for document/literal mode, use the following methods
 on Zend Autodiscovery:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
 <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'style'</span> <span class="o">=&gt;</span> <span class="s1">'document'</span><span class="p">))</span>
              <span class="o">-&gt;</span><span class="na">setOperationStyle</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'use'</span> <span class="o">=&gt;</span> <span class="s1">'literal'</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>Then use the wrapper like such:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -555,7 +651,7 @@ certainly want to Integration test your clients and servers.</p>
 <p>You can do that in PHPUnit by using a client, that wraps a Server directly
 and doesn’t require a Webserver. Zend Framework 2 already has such an object,
 named <cite>ZendSoapClientLocal</cite>. Its usage is simple:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SOAPServer</span><span class="p">(</span><span class="nv">$wsdl</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span>
@@ -634,7 +730,7 @@ functionalities and I am releasing a new version 2.0 of Assert today.</p>
 a new fluent API, invoked by calling the function <span class="docutils literal"><span class="pre">Assert\that($value)</span></span>
 and then all the assertions you want to call on that value.</p>
 <p>Here are some examples:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notBlank</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
 <span class="nx">\Assert\that</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">isArray</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">();</span>
@@ -650,7 +746,7 @@ the user only exactly one error message. Because every assertion fails
 with an Exception, there was no way to execute multiple assertions and
 collect the errors. This has changed with the new lazy assertion API,
 that is similar to the Fluent API:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 <span class="nx">\Assert\lazy</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">()</span>
     <span class="o">-&gt;</span><span class="na">that</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">notEmpty</span><span class="p">()</span>
@@ -663,7 +759,7 @@ that you know how to differentiate the errors afterwards.</p>
 <p>On failure <span class="docutils literal"><span class="pre">verifyNow()</span></span> will throw an exception
 <span class="docutils literal"><span class="pre">Assert\\LazyAssertionException</span></span> (this does not extend
 <span class="docutils literal"><span class="pre">AssertionFailedException</span></span>) with a combined message:</p>
-<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">The</span> <span class="n">following</span> <span class="mi">3</span> <span class="n">assertions</span> <span class="n">failed</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span/><span class="n">The</span> <span class="n">following</span> <span class="mi">3</span> <span class="n">assertions</span> <span class="n">failed</span><span class="p">:</span>
 <span class="mi">1</span><span class="p">)</span> <span class="n">foo</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"10"</span> <span class="n">expected</span> <span class="n">to</span> <span class="n">be</span> <span class="n">string</span><span class="p">,</span> <span class="nb">type</span> <span class="n">integer</span> <span class="n">given</span><span class="o">.</span>
 <span class="mi">2</span><span class="p">)</span> <span class="n">bar</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"&lt;NULL&gt;"</span> <span class="ow">is</span> <span class="n">empty</span><span class="p">,</span> <span class="n">but</span> <span class="n">non</span> <span class="n">empty</span> <span class="n">value</span> <span class="n">was</span> <span class="n">expected</span><span class="o">.</span>
 <span class="mi">3</span><span class="p">)</span> <span class="n">baz</span><span class="p">:</span> <span class="n">Value</span> <span class="s2">"string"</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">array</span><span class="o">.</span>
@@ -678,7 +774,7 @@ useable for the frontend.</p>
 <p>In version 1.0 Assert did not have default error messages when failures
 occured. This has changed and now every assertion has a default failure
 message, as well as access to the value and constraints of an exception:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
+<div class="highlight-php notranslate"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
 
 <span class="k">use</span> <span class="nx">Assert\AssertionFailedException</span><span class="p">;</span>
 
@@ -776,79 +872,6 @@ discussions that the new year will bring.</p>
         <p>
             <small>
                 Posted on December 31, 2013
-                 by Benjamin Eberlei
-            </small>
-        </p>
-    </div>
-        </div><div class="separator post_separator"></div><div class="section">
-            <h1><a href="2013/12/05/feature_flags_and_doctrine_entities.html">Feature Flags and Doctrine Entities</a></h1>
-<p>I was in a discussion with some of the <a class="reference external" href="http://drafts.easybib.com/">EasyBib developers</a> this week about how to use feature flags with
-Doctrine Entities, Metadata Mapping and their database.</p>
-<p>The problem of feature flags with Doctrine is easily explained: If you add
-properties for a new feature that is disabled in the Doctrine metadata, then you
-need to upgrade the database before deployment, even when the feature is not
-being rolled out for some days/weeks. Doctrine requires the database to look
-exactly like the metadata specifies it.</p>
-<p>You can get around this problem by using the <cite>loadClassMetadata</cite> event quite
-easily:</p>
-<div class="highlight-php"><div class="highlight"><pre><span/><span class="cp">&lt;?php</span>
-<span class="k">namespace</span> <span class="nx">MyProject\Listener</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">MyProject\Config\FeatureFlagConfiguration</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">Doctrine\ORM\Event\LoadClassMetadataEventArgs</span><span class="p">;</span>
-
-<span class="k">class</span> <span class="nc">FeatureFlagMetadataListener</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$featureFlagConfiguration</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">FeatureFlagConfiguration</span> <span class="nv">$config</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadClassMetadata</span><span class="p">(</span><span class="nx">LoadClassMetadataEventArgs</span> <span class="nv">$eventArgs</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$classMetadata</span> <span class="o">=</span> <span class="nv">$eventArgs</span><span class="o">-&gt;</span><span class="na">getClassMetadata</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">featureFlagConfiguration</span><span class="o">-&gt;</span><span class="na">isEnabled</span><span class="p">(</span><span class="s1">'super_feature2'</span><span class="p">))</span> <span class="p">{</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">User"</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">mapField</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-                    <span class="s1">'fieldName'</span> <span class="o">=&gt;</span> <span class="s1">'superFeatureProperty'</span><span class="p">,</span>
-                    <span class="s1">'type'</span> <span class="o">=&gt;</span> <span class="s1">'string'</span>
-                <span class="p">));</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$classMetadata</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">===</span> <span class="s2">"MyProject</span><span class="se">\\</span><span class="s2">Entity</span><span class="se">\\</span><span class="s2">Something"</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// more mapping</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>You can find documentation on the ClassMetadata in the <a class="reference external" href="http://docs.doctrine-project.org/en/latest/reference/php-mapping.html">documentation</a> or
-<a class="reference external" href="http://www.doctrine-project.org/api/orm/2.4/class-Doctrine.ORM.Mapping.ClassMetadataInfo.html#methods">API</a>.</p>
-<p>Then if the feature is enabled fore some time and accepted into the pool of
-permanent features, you can remove the listener and move the mapping onto the
-Entities metadata.</p>
-
-
-            
-            <div class="tags">
-                More about: 
-                <a href="tags/doctrine.html">Doctrine</a>
-                 / 
-                <a href="tags/applicationdesign.html">ApplicationDesign</a>
-                
-                
-            </div>
-            
-
-            <div class="metadata">
-        <p>
-            <small>
-                Posted on December 05, 2013
                  by Benjamin Eberlei
             </small>
         </p>

@@ -30,13 +30,13 @@
         <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Dependency Injection the juicy way" href="../18/dependecy-injection-the-juicy-way.html" /><link rel="prev" title="Dependency Injection with PHP: Introducing Sphicy" href="../30/dependency-injection-with-php-introducing-sphicy.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
-    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script></head>
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script><script type="text/javascript" src="../../../_static/language_data.js"></script></head>
     <body role="document">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -80,23 +80,23 @@ and <a class="reference external" href="http://plugins.jquery.com/project/Autofi
 be a series of installments, beginning with the first one: AjaxForms</p>
 <p>AjaxForm allows you to enhance any form of yours to submit the data with
 ajax to the server, so no additional overhead of loading a new page is
-necessary. Combining the power of Zend_Form and jQuery&#8217;s ajaxForm you
+necessary. Combining the power of Zend_Form and jQuery’s ajaxForm you
 can even go so far as differentiating between successful and
 non-validated form submits. We will build a Form Decorator that
-integrates the AjaxForm plugin in any of your Zend_Form&#8217;s. On submit it
+integrates the AjaxForm plugin in any of your Zend_Form’s. On submit it
 will send the form data to the server via ajax and clears the form
 afterwards. Clients that have javascript disabled will work too, the
 form is submitted to the server in a standard pre-ajax fashion and
 processed that way.</p>
 <p>First what we need is obviously the new decorator, we will call it
-&#8220;My_JQuery_Form_Decorator_AjaxForm&#8221; and it will inherit from
+“My_JQuery_Form_Decorator_AjaxForm” and it will inherit from
 Zend_Form_Decorator_Form. What we then realize is, that this is just
 using a view helper to render, so what we need additionally is a
-&#8220;My_JQuery_View_Helper_AjaxForm&#8221; that extends from
-&#8220;Zend_View_Helper_Form&#8221;. The code of the view helper will have to
+“My_JQuery_View_Helper_AjaxForm” that extends from
+“Zend_View_Helper_Form”. The code of the view helper will have to
 look as follows to fulfil our needs:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>require_once &quot;Zend/View/Helper/Form.php&quot;;class ZendX_JQuery_View_Helper_AjaxForm extends Zend_View_Helper_Form{  /**   * Contains reference to the jQuery view helper   *   * @var ZendX_JQuery_View_Helper_JQuery_Container   */  protected $jquery;  /**   * Set view and enable jQuery Core and UI libraries   *   * @param Zend_View_Interface $view   * @return ZendX_JQuery_View_Helper_Widget   */  public function setView(Zend_View_Interface $view)  {    parent::setView($view);    $this-&gt;jquery = $this-&gt;view-&gt;jQuery();    $this-&gt;jquery-&gt;enable()           -&gt;uiEnable();    return $this;  }  public function ajaxForm($name, $attribs = null, $content = false, array $options=array())  {    $id = $name;    if(isset($attribs[&#39;id&#39;])) {      $id = $attribs[&#39;id&#39;];    }    if(!isset($options[&#39;clearForm&#39;])) {      $options[&#39;clearForm&#39;] = true;    }    if(count($options) &gt; 0) {      require_once &quot;Zend/Json.php&quot;;      $jsonOptions = Zend_Json::encode($options);      // Fix Callbacks if present      if(isset($options[&#39;beforeSubmit&#39;])) {        $jsonOptions = str_replace(&#39;&quot;beforeSubmit&quot;:&quot;&#39;.$options[&#39;beforeSubmit&#39;].&#39;&quot;&#39;, &#39;&quot;beforeSubmit&quot;:&#39;.$options[&#39;beforeSubmit&#39;], $jsonOptions);      }      if(isset($options[&#39;success&#39;])) {        $jsonOptions = str_replace(&#39;&quot;success&quot;:&quot;&#39;.$options[&#39;success&#39;].&#39;&quot;&#39;, &#39;&quot;success&quot;:&#39;.$options[&#39;success&#39;], $jsonOptions);      }    } else {      $jsonOptions = &quot;{}&quot;;    }    $this-&gt;jquery-&gt;addOnLoad(sprintf(      &#39;$(&quot;#%s&quot;).ajaxForm(%s)&#39;, $id, $jsonOptions    ));    return parent::form($name, $attribs, $content);  }}
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>require_once &quot;Zend/View/Helper/Form.php&quot;;class ZendX_JQuery_View_Helper_AjaxForm extends Zend_View_Helper_Form{  /**   * Contains reference to the jQuery view helper   *   * @var ZendX_JQuery_View_Helper_JQuery_Container   */  protected $jquery;  /**   * Set view and enable jQuery Core and UI libraries   *   * @param Zend_View_Interface $view   * @return ZendX_JQuery_View_Helper_Widget   */  public function setView(Zend_View_Interface $view)  {    parent::setView($view);    $this-&gt;jquery = $this-&gt;view-&gt;jQuery();    $this-&gt;jquery-&gt;enable()           -&gt;uiEnable();    return $this;  }  public function ajaxForm($name, $attribs = null, $content = false, array $options=array())  {    $id = $name;    if(isset($attribs[&#39;id&#39;])) {      $id = $attribs[&#39;id&#39;];    }    if(!isset($options[&#39;clearForm&#39;])) {      $options[&#39;clearForm&#39;] = true;    }    if(count($options) &gt; 0) {      require_once &quot;Zend/Json.php&quot;;      $jsonOptions = Zend_Json::encode($options);      // Fix Callbacks if present      if(isset($options[&#39;beforeSubmit&#39;])) {        $jsonOptions = str_replace(&#39;&quot;beforeSubmit&quot;:&quot;&#39;.$options[&#39;beforeSubmit&#39;].&#39;&quot;&#39;, &#39;&quot;beforeSubmit&quot;:&#39;.$options[&#39;beforeSubmit&#39;], $jsonOptions);      }      if(isset($options[&#39;success&#39;])) {        $jsonOptions = str_replace(&#39;&quot;success&quot;:&quot;&#39;.$options[&#39;success&#39;].&#39;&quot;&#39;, &#39;&quot;success&quot;:&#39;.$options[&#39;success&#39;], $jsonOptions);      }    } else {      $jsonOptions = &quot;{}&quot;;    }    $this-&gt;jquery-&gt;addOnLoad(sprintf(      &#39;$(&quot;#%s&quot;).ajaxForm(%s)&#39;, $id, $jsonOptions    ));    return parent::form($name, $attribs, $content);  }}
 </pre></div>
 </div>
 </div></blockquote>
@@ -108,14 +108,14 @@ sure that you include the jQuery Form plugin in your code, for example
 with &lt;?php $view-&gt;jQuery()-&gt;addJavascriptFile(..); &gt;</p>
 <p>Programming the decorator becomes a simple trick now:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>require_once &quot;Zend/Form/Decorator/Form.php&quot;;class My_JQuery_Form_Decorator_AjaxForm extends Zend_Form_Decorator_Form{  protected $_helper = &quot;ajaxForm&quot;;  protected $_jQueryParams = array();  public function getOptions()  {    $options = parent::getOptions();    if(isset($options[&#39;jQueryParams&#39;])) {      $this-&gt;_jQueryParams = $options[&#39;jQueryParams&#39;];      unset($options[&#39;jQueryParams&#39;]);      unset($this-&gt;_options[&#39;jQueryParams&#39;]);    }    return $options;  }  /**   * Render a form   *   * Replaces $content entirely from currently set element.   *   * @param string $content   * @return string   */  public function render($content)  {    $form  = $this-&gt;getElement();    $view  = $form-&gt;getView();    if (null === $view) {      return $content;    }    $helper    = $this-&gt;getHelper();    $attribs    = $this-&gt;getOptions();    $name     = $form-&gt;getFullyQualifiedName();    $attribs[&#39;id&#39;] = $form-&gt;getId();    return $view-&gt;$helper($name, $attribs, $content, $this-&gt;_jQueryParams);  }}
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>require_once &quot;Zend/Form/Decorator/Form.php&quot;;class My_JQuery_Form_Decorator_AjaxForm extends Zend_Form_Decorator_Form{  protected $_helper = &quot;ajaxForm&quot;;  protected $_jQueryParams = array();  public function getOptions()  {    $options = parent::getOptions();    if(isset($options[&#39;jQueryParams&#39;])) {      $this-&gt;_jQueryParams = $options[&#39;jQueryParams&#39;];      unset($options[&#39;jQueryParams&#39;]);      unset($this-&gt;_options[&#39;jQueryParams&#39;]);    }    return $options;  }  /**   * Render a form   *   * Replaces $content entirely from currently set element.   *   * @param string $content   * @return string   */  public function render($content)  {    $form  = $this-&gt;getElement();    $view  = $form-&gt;getView();    if (null === $view) {      return $content;    }    $helper    = $this-&gt;getHelper();    $attribs    = $this-&gt;getOptions();    $name     = $form-&gt;getFullyQualifiedName();    $attribs[&#39;id&#39;] = $form-&gt;getId();    return $view-&gt;$helper($name, $attribs, $content, $this-&gt;_jQueryParams);  }}
 </pre></div>
 </div>
 </div></blockquote>
 <p>Now to use either the decorator for your form, or just the view helper
 to print your form tag with jQuery code you can invoke:</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$form-&gt;addPrefixPath(&#39;My_JQuery_Form_Decorator&#39;, &#39;My/JQuery/Form/Decorator&#39;, &#39;decorator&#39;);$form-&gt;removeDecorator(&#39;Form&#39;)-&gt;addDecorator(array(&#39;AjaxForm&#39;, array(  &#39;jQueryParams&#39; =&gt; array(),)));$view-&gt;addHelperPath(&quot;My/JQuery/View/Helper&quot;, &quot;My_JQuery_View_Helper&quot;);$view-&gt;ajaxForm(&quot;formId1&quot;, $attribs, $content, $options);
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$form-&gt;addPrefixPath(&#39;My_JQuery_Form_Decorator&#39;, &#39;My/JQuery/Form/Decorator&#39;, &#39;decorator&#39;);$form-&gt;removeDecorator(&#39;Form&#39;)-&gt;addDecorator(array(&#39;AjaxForm&#39;, array(  &#39;jQueryParams&#39; =&gt; array(),)));$view-&gt;addHelperPath(&quot;My/JQuery/View/Helper&quot;, &quot;My_JQuery_View_Helper&quot;);$view-&gt;ajaxForm(&quot;formId1&quot;, $attribs, $content, $options);
 </pre></div>
 </div>
 </div></blockquote>
@@ -124,16 +124,16 @@ Form Decorator instead of the View Helper, we can additionally add some
 fancy logic and error handling ajax fun to the action controller that is
 handling the Zend_Form instance.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>class IndexController extends Zend_Controller_Action{  public function indexAction()  {    $foo = new MyAjaxTestForm();    try {      if(!$foo-&gt;isValid($_POST)) {        throw new Exception(&quot;Form is not valid!&quot;);      } else {        // do much saving and stuff here        if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {          $this-&gt;_helper-&gt;json(array(&quot;success&quot; =&gt; &quot;SUCCESSMESSAGEHERE&quot;));        }      }    } catch(Exception $e) {      if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {        $jsonErrors = array();        foreach( ( new RecursiveIteratorIterator(new RecursiveArrayIterator($form-&gt;getMessages())) ) AS $error) {          $jsonErrors[] = $error;        }        $this-&gt;_helper-&gt;json-&gt;sendJson($jsonErrors);      }    }  }}
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class IndexController extends Zend_Controller_Action{  public function indexAction()  {    $foo = new MyAjaxTestForm();    try {      if(!$foo-&gt;isValid($_POST)) {        throw new Exception(&quot;Form is not valid!&quot;);      } else {        // do much saving and stuff here        if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {          $this-&gt;_helper-&gt;json(array(&quot;success&quot; =&gt; &quot;SUCCESSMESSAGEHERE&quot;));        }      }    } catch(Exception $e) {      if($this-&gt;getRequest()-&gt;isXmlHttpRequest()) {        $jsonErrors = array();        foreach( ( new RecursiveIteratorIterator(new RecursiveArrayIterator($form-&gt;getMessages())) ) AS $error) {          $jsonErrors[] = $error;        }        $this-&gt;_helper-&gt;json-&gt;sendJson($jsonErrors);      }    }  }}
 </pre></div>
 </div>
 </div></blockquote>
 <p>This has to be processed by a callback function of the AjaxForm and
 which may for example look like the following which uses a predefined
-div box (#formMessages, don&#8217;t forget to implement it) to render either
+div box (#formMessages, don’t forget to implement it) to render either
 the success or the error messages.</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$form-&gt;addDecorator(array(&#39;AjaxForm&#39;, array(  &#39;jQueryParams&#39; =&gt; array(    &#39;success&#39; =&gt; &quot;formCallback1&quot;,   ),)));$view-&gt;jQuery()-&gt;addJavascript(&#39;function formCallback1(data) {  if(data.errors) {    $(&quot;#formMessages&quot;).append(&quot;&lt;ul&gt;&quot;);    for each(var item in data.errors) {      $(&quot;#formMessages&quot;).append(&quot;&lt;li&gt;&quot;+item+&quot;&lt;/li&gt;&quot;);    }    $(&quot;#formMessages&quot;).append(&quot;&lt;/ul&gt;&quot;);  } else {    $(&quot;#formMessages&quot;).html(data.success);  }}&#39;);
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$form-&gt;addDecorator(array(&#39;AjaxForm&#39;, array(  &#39;jQueryParams&#39; =&gt; array(    &#39;success&#39; =&gt; &quot;formCallback1&quot;,   ),)));$view-&gt;jQuery()-&gt;addJavascript(&#39;function formCallback1(data) {  if(data.errors) {    $(&quot;#formMessages&quot;).append(&quot;&lt;ul&gt;&quot;);    for each(var item in data.errors) {      $(&quot;#formMessages&quot;).append(&quot;&lt;li&gt;&quot;+item+&quot;&lt;/li&gt;&quot;);    }    $(&quot;#formMessages&quot;).append(&quot;&lt;/ul&gt;&quot;);  } else {    $(&quot;#formMessages&quot;).html(data.success);  }}&#39;);
 </pre></div>
 </div>
 </div></blockquote>
